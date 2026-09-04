@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "App Vecinos",
+    "slug": "app-vecinos",
+    "scheme": "app-vecinos",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ELISUR necesita acceso a tus fotos para que puedas subir la foto de tu negocio, tu galería y tus productos."
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "pe.appvecinos.movil"
+    },
+    "android": {
+      "package": "pe.appvecinos.movil",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    }
+  }
+}

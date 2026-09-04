@@ -1,0 +1,208 @@
+<title>Alternativas de navegación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-sunken: #eef6f0;
+    --surface-sunken-2: #e3ece4;
+    --ink: #1a2119;
+    --ink-soft: #5f6b5c;
+    --ink-faint: #96a091;
+    --primary: #1f8a5a;
+    --primary-strong: #146641;
+    --primary-soft: #dbf1e3;
+    --accent: #ef7148;
+    --accent-strong: #c8532e;
+    --accent-soft: #fce2d7;
+    --line: #e3ece4;
+    --line-strong: #c9d6cc;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #12180f; --surface: #1a2317; --surface-sunken: #202b1c; --surface-sunken-2: #283523;
+      --ink: #eaf0e6; --ink-soft: #a8b6a1; --ink-faint: #6e7c68;
+      --primary: #6fc797; --primary-strong: #9adcb7; --primary-soft: #22352a;
+      --accent: #f0956e; --accent-strong: #f7b393; --accent-soft: #3a271f;
+      --line: #283525; --line-strong: #37472f;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #12180f; --surface: #1a2317; --surface-sunken: #202b1c; --surface-sunken-2: #283523;
+    --ink: #eaf0e6; --ink-soft: #a8b6a1; --ink-faint: #6e7c68;
+    --primary: #6fc797; --primary-strong: #9adcb7; --primary-soft: #22352a;
+    --accent: #f0956e; --accent-strong: #f7b393; --accent-soft: #3a271f;
+    --line: #283525; --line-strong: #37472f;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg); color: var(--ink);
+    font-family: "Karla", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  ::selection{ background: var(--primary-soft); color: var(--primary-strong); }
+
+  .wrap{ max-width: 980px; margin: 0 auto; padding: 4.5rem 1.75rem 6rem; }
+
+  .eyebrow{
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary-strong);
+    display: flex; align-items: center; gap: 0.6em; margin: 0 0 1.1rem;
+  }
+  .eyebrow::before{ content:""; width:26px; height:1px; background: var(--primary-strong); display:inline-block; }
+
+  h1{
+    font-family: "Fraunces", Georgia, serif; font-weight: 600;
+    font-size: clamp(2rem, 4.2vw, 3rem); line-height: 1.08; letter-spacing: -0.01em;
+    margin: 0 0 1rem; text-wrap: balance; max-width: 20ch;
+  }
+  .lede{ font-size: 1.05rem; color: var(--ink-soft); max-width: 62ch; margin: 0 0 3rem; }
+
+  .opciones{ display: flex; flex-direction: column; gap: 2.75rem; }
+
+  .opcion{
+    border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem 1.8rem;
+    display: grid; grid-template-columns: 210px 1fr; gap: 1.8rem; align-items: start;
+  }
+  @media (max-width: 680px){ .opcion{ grid-template-columns: 1fr; } }
+
+  .opcion-numero{
+    font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 0.85rem;
+    color: var(--accent-strong); margin-bottom: 0.4rem; display:block;
+  }
+  .opcion-nombre{ font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.25rem; margin: 0 0 0.9rem; }
+
+  /* mini tab bar mock */
+  .barra{
+    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 16px;
+    padding: 10px 8px 8px; display:flex; justify-content: space-around; align-items:flex-end;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .item{ display:flex; flex-direction:column; align-items:center; gap:3px; flex:1; }
+  .item .ic{
+    width: 30px; height: 22px; border-radius: 11px; display:flex; align-items:center; justify-content:center;
+    font-size: 0.85rem; color: var(--ink-faint);
+  }
+  .item.active .ic{ background: var(--primary-soft); color: var(--primary-strong); }
+  .item .tx{ font-family:"IBM Plex Mono", monospace; font-size: 0.5rem; text-transform:uppercase; color: var(--ink-faint); }
+  .item.active .tx{ color: var(--primary-strong); font-weight:700; }
+  .item.fab .ic{ background: var(--accent); color: #fff; width:34px; height:34px; border-radius:50%; margin-top:-14px; box-shadow: 0 2px 6px rgba(239,113,72,0.4); }
+
+  .desc{ font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.9rem; }
+
+  .prosconsrow{ display:flex; gap: 1.2rem; flex-wrap: wrap; }
+  .pc{ flex: 1; min-width: 180px; }
+  .pc-titulo{ font-family:"IBM Plex Mono", monospace; font-size: 0.66rem; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.3rem; display:block; }
+  .pc.pro .pc-titulo{ color: var(--primary-strong); }
+  .pc.con .pc-titulo{ color: var(--accent-strong); }
+  .pc p{ font-size: 0.84rem; color: var(--ink-soft); margin: 0; }
+
+  .recomendada{
+    display:inline-block; font-family:"IBM Plex Mono", monospace; font-size:0.62rem; text-transform:uppercase;
+    background: var(--primary); color:#fff; padding: 3px 8px; border-radius: 4px; margin-left: 0.6rem; vertical-align: middle;
+  }
+
+  footer{ border-top: 1px solid var(--line); padding-top: 1.6rem; margin-top: 3rem; font-size: 0.85rem; color: var(--ink-faint); }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Explorando alternativas · bocetos</p>
+  <h1>¿Cinco pestañas son las correctas?</h1>
+  <p class="lede">Con la idea de que Servicios pase a ser el catálogo completo, vale la pena preguntarse si Buscar y Mapa siguen mereciendo su propio espacio en la barra, o si hay una combinación que se sienta más natural. Cuatro caminos posibles:</p>
+
+  <div class="opciones">
+
+    <div class="opcion">
+      <div>
+        <span class="opcion-numero">Opción A</span>
+        <h3 class="opcion-nombre">Dejarla como está</h3>
+        <div class="barra">
+          <div class="item active"><div class="ic">⌂</div><span class="tx">Inicio</span></div>
+          <div class="item"><div class="ic">⌕</div><span class="tx">Buscar</span></div>
+          <div class="item"><div class="ic">◎</div><span class="tx">Mapa</span></div>
+          <div class="item"><div class="ic">▤</div><span class="tx">Servicios</span></div>
+          <div class="item"><div class="ic">☺</div><span class="tx">Perfil</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="desc">La estructura actual, solo redefiniendo qué contiene cada una (como en el boceto anterior).</p>
+        <div class="prosconsrow">
+          <div class="pc pro"><span class="pc-titulo">A favor</span><p>Cero curva de aprendizaje para quien ya probó la app. Cada función tiene su lugar fijo.</p></div>
+          <div class="pc con"><span class="pc-titulo">En contra</span><p>Con Servicios como catálogo completo, "Buscar" y "Servicios" empiezan a sonar parecido — dos formas de llegar a lo mismo.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="opcion">
+      <div>
+        <span class="opcion-numero">Opción B</span>
+        <h3 class="opcion-nombre">Buscar se integra a Servicios<span class="recomendada">Recomendada</span></h3>
+        <div class="barra">
+          <div class="item active"><div class="ic">⌂</div><span class="tx">Inicio</span></div>
+          <div class="item"><div class="ic">▤</div><span class="tx">Servicios</span></div>
+          <div class="item"><div class="ic">◎</div><span class="tx">Mapa</span></div>
+          <div class="item"><div class="ic">☺</div><span class="tx">Perfil</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="desc">4 pestañas. El buscador de texto vive arriba de Servicios (siempre visible al abrir esa pestaña), en vez de tener una pestaña propia.</p>
+        <div class="prosconsrow">
+          <div class="pc pro"><span class="pc-titulo">A favor</span><p>Elimina la ambigüedad: un solo lugar para "encontrar cosas", ya sea explorando el catálogo o escribiendo. Barra más simple de escanear.</p></div>
+          <div class="pc con"><span class="pc-titulo">En contra</span><p>Quien solo quiere buscar rápido (sin ver el catálogo) tiene un toque extra. Se resuelve dejando el buscador como lo primero, ya activo, al abrir Servicios.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="opcion">
+      <div>
+        <span class="opcion-numero">Opción C</span>
+        <h3 class="opcion-nombre">La comunidad como protagonista</h3>
+        <div class="barra">
+          <div class="item active"><div class="ic">⌂</div><span class="tx">Inicio</span></div>
+          <div class="item"><div class="ic">▤</div><span class="tx">Servicios</span></div>
+          <div class="item"><div class="ic">📣</div><span class="tx">Comunidad</span></div>
+          <div class="item"><div class="ic">◎</div><span class="tx">Mapa</span></div>
+          <div class="item"><div class="ic">☺</div><span class="tx">Perfil</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="desc">Información local deja de ser "una notificación con campana" y sube a pestaña propia, llamada "Comunidad". Buscar se vuelve un ícono de lupa en la barra superior, presente en Inicio y Servicios.</p>
+        <div class="prosconsrow">
+          <div class="pc pro"><span class="pc-titulo">A favor</span><p>Es lo que diferencia a esta app de Google Maps o una app de delivery — le da protagonismo real a la confianza vecinal, el corazón del negocio.</p></div>
+          <div class="pc con"><span class="pc-titulo">En contra</span><p>Sigue siendo 5 pestañas. Buscar deja de ser una pestaña, así que hay que asegurarse de que el ícono de lupa sea igual de fácil de encontrar.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="opcion">
+      <div>
+        <span class="opcion-numero">Opción D</span>
+        <h3 class="opcion-nombre">Mapa deja de ser pestaña</h3>
+        <div class="barra">
+          <div class="item active"><div class="ic">⌂</div><span class="tx">Inicio</span></div>
+          <div class="item"><div class="ic">⌕</div><span class="tx">Buscar</span></div>
+          <div class="item"><div class="ic">▤</div><span class="tx">Servicios</span></div>
+          <div class="item"><div class="ic">☺</div><span class="tx">Perfil</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="desc">4 pestañas. El mapa se convierte en un botón "Ver en mapa" dentro de cualquier listado de negocios (Buscar o Servicios), no en un destino propio.</p>
+        <div class="prosconsrow">
+          <div class="pc pro"><span class="pc-titulo">A favor</span><p>El mapa es una forma de ver la misma información (negocios), no información distinta — tiene sentido que sea una vista, no un destino.</p></div>
+          <div class="pc con"><span class="pc-titulo">En contra</span><p>Alguien que solo quiere "ver qué hay cerca" pierde el atajo directo de un toque; ahora son dos.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Ninguna se ha implementado. Dime cuál dirección se acerca más a lo que imaginas (o si quieres mezclar partes de varias) y sigo el boceto desde ahí, con las pantallas completas.</footer>
+
+</div>
+

@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "movil",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "web", "--workspace=apps/movil"],
+      "port": 8081,
+      "autoPort": true
+    },
+    {
+      "name": "admin",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace=apps/admin"],
+      "port": 5183
+    },
+    {
+      "name": "meilisearch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "meilisearch"],
+      "port": 7700
+    }
+  ]
+}

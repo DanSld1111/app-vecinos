@@ -1,0 +1,603 @@
+<title>Fichas por rubro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a;
+    --verde-fuerte: #146641;
+    --verde-suave: #dbf1e3;
+    --coral: #ef7148;
+    --coral-fuerte: #c8532e;
+    --coral-suave: #fce2d7;
+    --azul: #2f6690;
+    --azul-suave: #dbe9f1;
+    --oro: #b8862e;
+    --oro-suave: #f6ecd6;
+
+    --superficie: #ffffff;
+    --superficie-hundida: #eef1ea;
+    --borde: #e5e3da;
+    --texto: #1a2119;
+    --texto-suave: #5f6b5c;
+    --texto-tenue: #96a091;
+    --sombra: 0 6px 16px rgba(15, 31, 22, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #e9e7de;
+    color: var(--texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    padding: 32px 20px 60px;
+  }
+  h1.pagina {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 28px;
+    text-align: center;
+    margin: 0 0 6px;
+  }
+  p.sub {
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: 14px;
+    margin: 0 0 34px;
+  }
+  .galeria {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 34px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .tarjeta-arquetipo { width: 330px; }
+  .etiqueta-arquetipo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .etiqueta-arquetipo .num {
+    width: 28px; height: 28px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 13px;
+    flex: none;
+  }
+  .etiqueta-arquetipo .txt strong { display: block; font-size: 14.5px; }
+  .etiqueta-arquetipo .txt span { font-size: 12px; color: var(--texto-suave); }
+
+  .telefono {
+    width: 330px;
+    background: var(--superficie);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(20,40,30,0.35);
+    border: 7px solid #0e1410;
+  }
+  .pantalla {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cabecera-ficha { padding: 14px 16px 0; }
+  .volver { margin-bottom: 8px; }
+  .foto-principal {
+    width: 100%; height: 100px; border-radius: 16px;
+    background: linear-gradient(135deg,#d9a15c,#8a5a2b);
+    margin-bottom: 10px;
+  }
+  .nombre-negocio { font-family: "Fraunces", serif; font-weight: 700; font-size: 19px; margin: 0; }
+  .desc-negocio { font-size: 12.5px; color: var(--texto-suave); margin: 3px 0 12px; }
+  .botones { display: flex; gap: 8px; margin-bottom: 16px; }
+  .btn { flex: 1; text-align: center; padding: 10px; border-radius: 999px; font-size: 12.5px; font-weight: 800; }
+  .btn.wsp { background: var(--verde); color: #fff; }
+  .btn.llamar { background: #fff; color: var(--texto); border: 1.5px solid var(--borde); }
+
+  .bloque { padding: 0 16px 18px; }
+  .etiqueta-seccion {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase;
+    color: var(--texto-tenue); margin: 0 0 10px;
+  }
+
+  /* Continuación común: mapa + horario */
+  .continua {
+    padding: 14px 16px 18px;
+    border-top: 1px solid var(--borde);
+  }
+  .mini-mapa {
+    height: 90px;
+    border-radius: 14px;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 17px, rgba(31,138,90,0.10) 17px, rgba(31,138,90,0.10) 18px),
+      repeating-linear-gradient(90deg, transparent, transparent 17px, rgba(31,138,90,0.10) 17px, rgba(31,138,90,0.10) 18px),
+      var(--superficie-hundida);
+    position: relative;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .mini-mapa .pin {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-60%);
+    width: 26px; height: 26px; border-radius: 50% 50% 50% 0;
+    background: var(--coral-fuerte); transform-origin: center;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mini-mapa .pin::after { content:""; width:8px; height:8px; border-radius:50%; background:#fff; transform: rotate(45deg); }
+  .fila-direccion { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .fila-direccion .txt { font-size: 12px; color: var(--texto-suave); }
+  .fila-direccion .txt b { display: block; color: var(--texto); font-size: 12.5px; }
+  .fila-direccion .llegar { font-size: 11.5px; font-weight: 800; color: var(--verde-fuerte); white-space: nowrap; }
+
+  .horario-hoy { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .horario-hoy .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); flex: none; }
+  .horario-hoy.cerrado .punto { background: var(--texto-tenue); }
+  .horario-hoy b { font-size: 12.5px; color: var(--verde-fuerte); }
+  .horario-hoy.cerrado b { color: var(--texto-tenue); }
+  .horario-hoy span { font-size: 12px; color: var(--texto-suave); }
+  .semana-horario { display: flex; gap: 5px; }
+  .dia-horario {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 0;
+    border-radius: 10px;
+    background: var(--superficie-hundida);
+  }
+  .dia-horario.hoy { background: var(--verde-suave); }
+  .dia-horario .letra { font-size: 10px; font-weight: 800; color: var(--texto-tenue); }
+  .dia-horario.hoy .letra { color: var(--verde-fuerte); }
+  .dia-horario .estado { width: 5px; height: 5px; border-radius: 50%; background: var(--verde); }
+  .dia-horario.cerrado .estado { background: var(--borde); }
+
+  /* --- A: Menú --- */
+  .menu-seccion-titulo { font-family: "Fraunces", serif; font-weight: 700; font-size: 15px; margin: 14px 0 8px; }
+  .menu-seccion-titulo:first-child { margin-top: 0; }
+  .item-menu { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--borde); }
+  .item-menu:first-of-type { border-top: none; }
+  .item-menu .foto { width: 44px; height: 44px; border-radius: 10px; flex: none; }
+  .item-menu .info { flex: 1; }
+  .item-menu .info .tag {
+    font-size: 9px; font-weight: 800; color: var(--coral-fuerte); background: var(--coral-suave);
+    padding: 2px 6px; border-radius: 999px; display: inline-block; margin-bottom: 2px;
+  }
+  .item-menu .nombre-item { font-size: 13.5px; font-weight: 700; display: block; }
+  .item-menu .precio { font-size: 13px; font-weight: 800; color: var(--verde-fuerte); }
+
+  /* --- B: Catalogo --- */
+  .chips-sub { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; }
+  .chips-sub::-webkit-scrollbar { display: none; }
+  .chip-sub { flex: none; padding: 6px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; border: 1.5px solid var(--borde); color: var(--texto-suave); white-space: nowrap; }
+  .chip-sub.activo { background: var(--texto); border-color: var(--texto); color: #fff; }
+  .grid-catalogo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .prod-card { border-radius: 14px; overflow: hidden; border: 1px solid var(--borde); }
+  .prod-card .foto { width: 100%; aspect-ratio: 1; }
+  .prod-card .info { padding: 8px; }
+  .prod-card .nombre-item { font-size: 12px; font-weight: 700; display: block; }
+  .prod-card .precio { font-size: 12.5px; font-weight: 800; color: var(--verde-fuerte); }
+
+  /* --- C: Servicios con tarifa --- */
+  .chips-especialidad { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip-especialidad { font-size: 11px; font-weight: 700; background: var(--azul-suave); color: var(--azul); padding: 5px 10px; border-radius: 999px; }
+  .item-servicio { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--borde); align-items: flex-start; }
+  .item-servicio:first-of-type { border-top: none; }
+  .item-servicio .icono { width: 34px; height: 34px; border-radius: 10px; background: var(--azul-suave); display: flex; align-items: center; justify-content: center; flex: none; }
+  .item-servicio .info { flex: 1; }
+  .item-servicio .nombre-item { font-size: 13.5px; font-weight: 700; display: block; }
+  .item-servicio .detalle { font-size: 11.5px; color: var(--texto-suave); }
+  .item-servicio .precio { font-size: 13px; font-weight: 800; color: var(--verde-fuerte); white-space: nowrap; }
+
+  /* --- D: Categorías del rubro --- */
+  .grid-rubros { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .rubro-card { display: flex; align-items: center; gap: 8px; background: var(--superficie-hundida); border-radius: 12px; padding: 10px; }
+  .rubro-card .icono { width: 30px; height: 30px; border-radius: 9px; background: #fff; display: flex; align-items: center; justify-content: center; flex: none; }
+  .rubro-card span { font-size: 12px; font-weight: 700; }
+  .nota-marcas { font-size: 11.5px; color: var(--texto-suave); background: var(--superficie-hundida); padding: 8px 10px; border-radius: 10px; }
+  .nota-marcas b { color: var(--texto); }
+
+  /* --- E: Ofertas + pasillos --- */
+  .ofertas-fila { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 16px; scrollbar-width: none; }
+  .ofertas-fila::-webkit-scrollbar { display: none; }
+  .oferta-card { flex: none; width: 130px; border-radius: 14px; overflow: hidden; border: 1px solid var(--borde); position: relative; }
+  .oferta-card .foto { width: 100%; height: 80px; }
+  .oferta-card .cinta { position: absolute; top: 6px; left: 6px; background: var(--coral-fuerte); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 999px; }
+  .oferta-card .info { padding: 7px 8px; }
+  .oferta-card .nombre-item { font-size: 11px; font-weight: 700; display: block; }
+  .oferta-card .precio { font-size: 12px; font-weight: 800; color: var(--verde-fuerte); }
+  .chips-pasillo { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip-pasillo { font-size: 11px; font-weight: 700; background: var(--oro-suave); color: var(--oro); padding: 5px 10px; border-radius: 999px; }
+
+  .nota-final {
+    max-width: 700px;
+    margin: 40px auto 0;
+    font-size: 13px;
+    color: #5c5f57;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .seccion-mapeo {
+    max-width: 900px;
+    margin: 64px auto 0;
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: var(--sombra);
+  }
+  .seccion-mapeo h2 {
+    font-family: "Fraunces", serif;
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .seccion-mapeo > p {
+    color: var(--texto-suave);
+    font-size: 13.5px;
+    margin: 0 0 24px;
+  }
+  .tabla-mapeo { display: flex; flex-direction: column; gap: 8px; margin-bottom: 34px; }
+  .fila-mapeo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--superficie-hundida);
+  }
+  .fila-mapeo .cat { flex: 1; font-size: 13.5px; font-weight: 700; }
+  .fila-mapeo .flecha-mini { color: var(--texto-tenue); font-size: 13px; }
+  .badge-arq {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 12px 5px 5px; border-radius: 999px;
+    background: #fff; border: 1.5px solid var(--borde);
+    font-size: 12px; font-weight: 700;
+  }
+  .badge-arq .letra {
+    width: 22px; height: 22px; border-radius: 50%; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;
+  }
+  .fila-mapeo.dudoso { background: var(--coral-suave); }
+  .fila-mapeo.dudoso .cat::after {
+    content: "requiere revisar caso por caso";
+    display: block; font-size: 10.5px; font-weight: 500; color: var(--coral-fuerte); margin-top: 1px;
+  }
+
+  .flujo-nueva-cat h3 { font-family: "Fraunces", serif; font-size: 16px; margin: 0 0 16px; }
+  .pasos-flujo { display: flex; align-items: stretch; gap: 10px; }
+  .paso-flujo {
+    flex: 1;
+    background: var(--superficie-hundida);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .paso-flujo .n {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--texto);
+    color: #fff; font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+  }
+  .paso-flujo b { display: block; font-size: 12.5px; margin-bottom: 3px; }
+  .paso-flujo span { font-size: 11.5px; color: var(--texto-suave); line-height: 1.4; }
+  .paso-flujo.fallback { background: var(--verde-suave); }
+  .paso-flujo.fallback .n { background: var(--verde-fuerte); }
+  .flecha-flujo { display: flex; align-items: center; color: var(--texto-tenue); font-size: 16px; }
+</style>
+
+<h1 class="pagina">Fichas de negocio según su rubro</h1>
+<p class="sub">Mismo encabezado y mismo pie (dirección, horario, verificado) — solo cambia el bloque central según qué vende el negocio.</p>
+
+<div class="galeria">
+
+  <!-- A: MENÚ -->
+  <div class="tarjeta-arquetipo">
+    <div class="etiqueta-arquetipo">
+      <div class="num" style="background:var(--coral)">A</div>
+      <div class="txt"><strong>Menú con precios</strong><span>Restaurantes, panaderías, postres</span></div>
+    </div>
+    <div class="telefono"><div class="pantalla">
+      <div class="cabecera-ficha">
+        <div class="foto-principal" style="background:linear-gradient(135deg,#d98a5c,#7a3a1e)"></div>
+        <h2 class="nombre-negocio">El Fogón Sanborjino</h2>
+        <p class="desc-negocio">Parrillas y comida criolla, sazón de barrio.</p>
+        <div class="botones"><div class="btn wsp">WhatsApp</div><div class="btn llamar">Llamar</div></div>
+      </div>
+      <div class="bloque">
+        <div class="etiqueta-seccion">Menú</div>
+        <div class="menu-seccion-titulo">Parrillas</div>
+        <div class="item-menu">
+          <div class="foto" style="background:var(--verde-suave)"></div>
+          <div class="info"><span class="tag">Más pedido</span><span class="nombre-item">Anticuchos (porción)</span></div>
+          <span class="precio">S/ 18</span>
+        </div>
+        <div class="item-menu">
+          <div class="foto" style="background:var(--verde-suave)"></div>
+          <div class="info"><span class="nombre-item">Parrilla mixta</span></div>
+          <span class="precio">S/ 32</span>
+        </div>
+        <div class="menu-seccion-titulo">Bebidas</div>
+        <div class="item-menu">
+          <div class="foto" style="background:var(--verde-suave)"></div>
+          <div class="info"><span class="nombre-item">Chicha morada (jarra)</span></div>
+          <span class="precio">S/ 10</span>
+        </div>
+      </div>
+      <div class="continua">
+        <div class="mini-mapa"><div class="pin"></div></div>
+        <div class="fila-direccion">
+          <div class="txt"><b>Av. Guardia Civil 235</b>San Borja</div>
+          <div class="llegar">Cómo llegar →</div>
+        </div>
+        <div class="horario-hoy"><div class="punto"></div><b>Abierto ahora</b><span>· cierra 22:00</span></div>
+        <div class="semana-horario">
+          <div class="dia-horario"><span class="letra">L</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario hoy"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">J</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">V</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">S</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">D</span><span class="estado"></span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- B: CATÁLOGO -->
+  <div class="tarjeta-arquetipo">
+    <div class="etiqueta-arquetipo">
+      <div class="num" style="background:var(--oro)">B</div>
+      <div class="txt"><strong>Catálogo visual</strong><span>Ropa, tejidos, accesorios</span></div>
+    </div>
+    <div class="telefono"><div class="pantalla">
+      <div class="cabecera-ficha">
+        <div class="foto-principal" style="background:linear-gradient(135deg,#c98fb0,#6b3a55)"></div>
+        <h2 class="nombre-negocio">Boutique El Jardín</h2>
+        <p class="desc-negocio">Moda femenina de temporada, hecha en Perú.</p>
+        <div class="botones"><div class="btn wsp">WhatsApp</div><div class="btn llamar">Llamar</div></div>
+      </div>
+      <div class="bloque">
+        <div class="etiqueta-seccion">Catálogo</div>
+        <div class="chips-sub">
+          <div class="chip-sub activo">Todo</div>
+          <div class="chip-sub">Vestidos</div>
+          <div class="chip-sub">Chompas</div>
+          <div class="chip-sub">Accesorios</div>
+        </div>
+        <div class="grid-catalogo">
+          <div class="prod-card">
+            <div class="foto" style="background:linear-gradient(160deg,#e3b8cf,#a85d84)"></div>
+            <div class="info"><span class="nombre-item">Vestido floral</span><span class="precio">S/ 89</span></div>
+          </div>
+          <div class="prod-card">
+            <div class="foto" style="background:linear-gradient(160deg,#d8c9a3,#8a7248)"></div>
+            <div class="info"><span class="nombre-item">Chompa alpaca</span><span class="precio">S/ 120</span></div>
+          </div>
+          <div class="prod-card">
+            <div class="foto" style="background:linear-gradient(160deg,#b9cdd6,#4f6b76)"></div>
+            <div class="info"><span class="nombre-item">Chalina tejida</span><span class="precio">S/ 45</span></div>
+          </div>
+          <div class="prod-card">
+            <div class="foto" style="background:linear-gradient(160deg,#e0d0e8,#7a5c8a)"></div>
+            <div class="info"><span class="nombre-item">Cartera artesanal</span><span class="precio">S/ 65</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="continua">
+        <div class="mini-mapa"><div class="pin"></div></div>
+        <div class="fila-direccion">
+          <div class="txt"><b>Av. San Luis 1580</b>San Borja</div>
+          <div class="llegar">Cómo llegar →</div>
+        </div>
+        <div class="horario-hoy"><div class="punto"></div><b>Abierto ahora</b><span>· cierra 20:00</span></div>
+        <div class="semana-horario">
+          <div class="dia-horario"><span class="letra">L</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario hoy"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">J</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">V</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">S</span><span class="estado"></span></div>
+          <div class="dia-horario cerrado"><span class="letra">D</span><span class="estado"></span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- C: SERVICIOS CON TARIFA -->
+  <div class="tarjeta-arquetipo">
+    <div class="etiqueta-arquetipo">
+      <div class="num" style="background:var(--azul)">C</div>
+      <div class="txt"><strong>Servicios y tarifas</strong><span>Lavanderías, veterinarias, salud</span></div>
+    </div>
+    <div class="telefono"><div class="pantalla">
+      <div class="cabecera-ficha">
+        <div class="foto-principal" style="background:linear-gradient(135deg,#7c94a8,#33475a)"></div>
+        <h2 class="nombre-negocio">Lavandería La Rinconada</h2>
+        <p class="desc-negocio">Lavado, secado y planchado el mismo día.</p>
+        <div class="botones"><div class="btn wsp">WhatsApp</div><div class="btn llamar">Llamar</div></div>
+      </div>
+      <div class="bloque">
+        <div class="etiqueta-seccion">Servicios y tarifas</div>
+        <div class="chips-especialidad">
+          <div class="chip-especialidad">Entrega el mismo día</div>
+          <div class="chip-especialidad">Recojo a domicilio</div>
+        </div>
+        <div class="item-servicio">
+          <div class="icono">🧺</div>
+          <div class="info"><span class="nombre-item">Lavado y secado</span><span class="detalle">Por kilo, mínimo 3kg</span></div>
+          <span class="precio">S/ 8 /kg</span>
+        </div>
+        <div class="item-servicio">
+          <div class="icono">👔</div>
+          <div class="info"><span class="nombre-item">Planchado</span><span class="detalle">Por prenda</span></div>
+          <span class="precio">S/ 3</span>
+        </div>
+        <div class="item-servicio">
+          <div class="icono">🛏️</div>
+          <div class="info"><span class="nombre-item">Edredón / cobertor</span><span class="detalle">Lavado especial</span></div>
+          <span class="precio">S/ 25</span>
+        </div>
+      </div>
+      <div class="continua">
+        <div class="mini-mapa"><div class="pin"></div></div>
+        <div class="fila-direccion">
+          <div class="txt"><b>Calle Las Magnolias 220</b>San Borja</div>
+          <div class="llegar">Cómo llegar →</div>
+        </div>
+        <div class="horario-hoy"><div class="punto"></div><b>Abierto ahora</b><span>· cierra 19:00</span></div>
+        <div class="semana-horario">
+          <div class="dia-horario"><span class="letra">L</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario hoy"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">J</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">V</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">S</span><span class="estado"></span></div>
+          <div class="dia-horario cerrado"><span class="letra">D</span><span class="estado"></span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- D: CATEGORÍAS DEL RUBRO -->
+  <div class="tarjeta-arquetipo">
+    <div class="etiqueta-arquetipo">
+      <div class="num" style="background:var(--verde)">D</div>
+      <div class="txt"><strong>Qué encuentras aquí</strong><span>Ferreterías, bazares, tiendas variadas</span></div>
+    </div>
+    <div class="telefono"><div class="pantalla">
+      <div class="cabecera-ficha">
+        <div class="foto-principal" style="background:linear-gradient(135deg,#8fae9c,#3f5c4c)"></div>
+        <h2 class="nombre-negocio">Ferretería Limatambo</h2>
+        <p class="desc-negocio">Todo para tu casa, del clavo al cemento.</p>
+        <div class="botones"><div class="btn wsp">WhatsApp</div><div class="btn llamar">Llamar</div></div>
+      </div>
+      <div class="bloque">
+        <div class="etiqueta-seccion">Qué encuentras aquí</div>
+        <div class="grid-rubros">
+          <div class="rubro-card"><div class="icono">🎨</div><span>Pintura</span></div>
+          <div class="rubro-card"><div class="icono">💡</div><span>Electricidad</span></div>
+          <div class="rubro-card"><div class="icono">🚰</div><span>Gasfitería</span></div>
+          <div class="rubro-card"><div class="icono">🔧</div><span>Herramientas</span></div>
+          <div class="rubro-card"><div class="icono">🔒</div><span>Cerrajería</span></div>
+          <div class="rubro-card"><div class="icono">🌱</div><span>Jardinería</span></div>
+        </div>
+        <div class="nota-marcas"><b>Marcas que trabajan:</b> Anypsa, Pavco, Bosch</div>
+      </div>
+      <div class="continua">
+        <div class="mini-mapa"><div class="pin"></div></div>
+        <div class="fila-direccion">
+          <div class="txt"><b>Jr. Húsares de Junín 812</b>San Borja</div>
+          <div class="llegar">Cómo llegar →</div>
+        </div>
+        <div class="horario-hoy"><div class="punto"></div><b>Abierto ahora</b><span>· cierra 20:00</span></div>
+        <div class="semana-horario">
+          <div class="dia-horario"><span class="letra">L</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario hoy"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">J</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">V</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">S</span><span class="estado"></span></div>
+          <div class="dia-horario cerrado"><span class="letra">D</span><span class="estado"></span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- E: OFERTAS + PASILLOS -->
+  <div class="tarjeta-arquetipo">
+    <div class="etiqueta-arquetipo">
+      <div class="num" style="background:var(--coral-fuerte)">E</div>
+      <div class="txt"><strong>Ofertas y pasillos</strong><span>Supermercados, minimarkets</span></div>
+    </div>
+    <div class="telefono"><div class="pantalla">
+      <div class="cabecera-ficha">
+        <div class="foto-principal" style="background:linear-gradient(135deg,#7fae7f,#2e4f2e)"></div>
+        <h2 class="nombre-negocio">Supermercado San Borja</h2>
+        <p class="desc-negocio">Abarrotes, frescos y limpieza para toda la semana.</p>
+        <div class="botones"><div class="btn wsp">WhatsApp</div><div class="btn llamar">Llamar</div></div>
+      </div>
+      <div class="bloque">
+        <div class="etiqueta-seccion">Ofertas de la semana</div>
+        <div class="ofertas-fila">
+          <div class="oferta-card">
+            <span class="cinta">2x1</span>
+            <div class="foto" style="background:linear-gradient(160deg,#dbe9d0,#7fae7f)"></div>
+            <div class="info"><span class="nombre-item">Lácteos Gloria</span><span class="precio">S/ 6.90</span></div>
+          </div>
+          <div class="oferta-card">
+            <span class="cinta">-20%</span>
+            <div class="foto" style="background:linear-gradient(160deg,#f0dcc4,#b98a55)"></div>
+            <div class="info"><span class="nombre-item">Panetón Bells</span><span class="precio">S/ 15.90</span></div>
+          </div>
+        </div>
+        <div class="etiqueta-seccion">Pasillos</div>
+        <div class="chips-pasillo">
+          <div class="chip-pasillo">Abarrotes</div>
+          <div class="chip-pasillo">Lácteos</div>
+          <div class="chip-pasillo">Limpieza</div>
+          <div class="chip-pasillo">Bebidas</div>
+          <div class="chip-pasillo">Cuidado personal</div>
+        </div>
+      </div>
+      <div class="continua">
+        <div class="mini-mapa"><div class="pin"></div></div>
+        <div class="fila-direccion">
+          <div class="txt"><b>Av. Angamos Este 2050</b>San Borja</div>
+          <div class="llegar">Cómo llegar →</div>
+        </div>
+        <div class="horario-hoy"><div class="punto"></div><b>Abierto ahora</b><span>· cierra 23:00</span></div>
+        <div class="semana-horario">
+          <div class="dia-horario"><span class="letra">L</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario hoy"><span class="letra">M</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">J</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">V</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">S</span><span class="estado"></span></div>
+          <div class="dia-horario"><span class="letra">D</span><span class="estado"></span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+
+<div class="seccion-mapeo">
+  <h2>Qué arquetipo usa cada categoría</h2>
+  <p>Mapeo automático — nadie tiene que elegir el diseño negocio por negocio, se decide una sola vez por categoría.</p>
+
+  <div class="tabla-mapeo">
+    <div class="fila-mapeo"><span class="cat">Restaurantes</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--coral)">A</span>Menú</div></div>
+    <div class="fila-mapeo"><span class="cat">Comida</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--coral)">A</span>Menú</div></div>
+    <div class="fila-mapeo"><span class="cat">Moda</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--oro)">B</span>Catálogo</div></div>
+    <div class="fila-mapeo"><span class="cat">Servicios</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--azul)">C</span>Servicios y tarifas</div></div>
+    <div class="fila-mapeo"><span class="cat">Salud</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--azul)">C</span>Servicios y tarifas</div></div>
+    <div class="fila-mapeo"><span class="cat">Mascotas</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--azul)">C</span>Servicios y tarifas</div></div>
+    <div class="fila-mapeo"><span class="cat">Hogar</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--verde)">D</span>Qué encuentras aquí</div></div>
+    <div class="fila-mapeo"><span class="cat">Supermercados</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--coral-fuerte)">E</span>Ofertas y pasillos</div></div>
+    <div class="fila-mapeo dudoso"><span class="cat">Emprendimientos</span><span class="flecha-mini">→</span><div class="badge-arq"><span class="letra" style="background:var(--texto-tenue)">?</span>A o B según el caso</div></div>
+  </div>
+
+  <div class="flujo-nueva-cat">
+    <h3>Flujo al crear una categoría nueva</h3>
+    <div class="pasos-flujo">
+      <div class="paso-flujo">
+        <div class="n">1</div>
+        <b>Creas la categoría</b>
+        <span>Ej. "Belleza y spa" — igual que hoy, nombre e ícono.</span>
+      </div>
+      <div class="flecha-flujo">→</div>
+      <div class="paso-flujo">
+        <div class="n">2</div>
+        <b>Eliges su arquetipo</b>
+        <span>Un desplegable con A–E. Un solo clic, una sola vez.</span>
+      </div>
+      <div class="flecha-flujo">→</div>
+      <div class="paso-flujo fallback">
+        <div class="n">✓</div>
+        <b>¿No elegiste ninguno?</b>
+        <span>Cae en la galería genérica de fotos — nunca se rompe ni se inventa un precio.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="nota-final">Boceto visual · sin conectar a código todavía · el encabezado (foto, nombre, WhatsApp/Llamar) y el pie (mapa, dirección, horario, verificado) se mantienen iguales en los cinco casos — es un solo componente reutilizable con un bloque central intercambiable según el rubro del negocio.</p>
+

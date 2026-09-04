@@ -1,0 +1,272 @@
+<title>Rediseño de Guía de negocios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a;
+    --verde-fuerte: #146641;
+    --verde-suave: #dbf1e3;
+    --coral: #ef7148;
+    --coral-fuerte: #c8532e;
+    --coral-suave: #fce2d7;
+    --azul: #2f6690;
+    --azul-suave: #dbe9f1;
+
+    --fondo-app: #eef1ea;
+    --superficie: #ffffff;
+    --superficie-hundida: #eef1ea;
+    --borde: #e5e3da;
+    --texto: #1a2119;
+    --texto-suave: #5f6b5c;
+    --texto-tenue: #96a091;
+    --sombra: 0 6px 16px rgba(15, 31, 22, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #e6e4db;
+    color: var(--texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .telefono {
+    width: 390px;
+    max-width: 100%;
+    background: var(--fondo-app);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(20,40,30,0.35);
+    border: 8px solid #0e1410;
+  }
+  .pantalla {
+    height: 844px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .pantalla::-webkit-scrollbar { display: none; }
+  .pantalla > * { flex-shrink: 0; }
+
+  .cabecera {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px 4px;
+  }
+  .cabecera svg { flex: none; }
+  .cabecera h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 19px;
+    margin: 0;
+  }
+
+  .cuerpo {
+    padding: 12px 20px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cuerpo > * { flex-shrink: 0; }
+
+  .buscador {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--superficie);
+    border-radius: 999px;
+    padding: 12px 16px;
+    box-shadow: var(--sombra);
+  }
+  .buscador span { color: var(--texto-tenue); font-size: 13.5px; font-weight: 600; }
+
+  .chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin: 0 -20px;
+    padding: 0 20px 2px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--superficie);
+    border: 1.5px solid var(--borde);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--texto-suave);
+    white-space: nowrap;
+  }
+  .chip.activo { background: var(--texto); border-color: var(--texto); color: #fff; }
+
+  .contador {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--texto-tenue);
+    margin: 0 2px;
+  }
+
+  .lista { display: flex; flex-direction: column; gap: 10px; }
+  .negocio {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--superficie);
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: var(--sombra);
+  }
+  .negocio .miniatura {
+    width: 54px; height: 54px; border-radius: 14px;
+    flex: none;
+    background-size: cover;
+    background-position: center;
+  }
+  .negocio .info { flex: 1; min-width: 0; }
+  .negocio .fila-nombre { display: flex; align-items: center; gap: 4px; }
+  .negocio .nombre {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 14.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .negocio .verificado {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--verde);
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .negocio .direccion {
+    font-size: 12px;
+    color: var(--texto-suave);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+  .negocio .tags { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .negocio .tag { font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
+  .negocio .tag.abierto { color: var(--verde-fuerte); }
+  .negocio .tag.cerrado { color: var(--texto-tenue); }
+  .negocio .punto { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .negocio .distancia { font-size: 11px; font-weight: 700; color: var(--texto-tenue); }
+  .negocio .chevron { color: var(--texto-tenue); flex: none; }
+
+  .nota {
+    max-width: 390px;
+    margin: 18px auto 0;
+    font-size: 13px;
+    color: #6b6f68;
+    text-align: center;
+  }
+</style>
+
+<div style="display:flex; flex-direction:column; align-items:center;">
+<div class="telefono">
+  <div class="pantalla">
+
+    <div class="cabecera">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="#1a2119" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h1>Guía de negocios</h1>
+    </div>
+
+    <div class="cuerpo">
+      <div class="buscador">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#96a091" stroke-width="2"/><path d="M21 21l-4-4" stroke="#96a091" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Buscar en San Borja</span>
+      </div>
+
+      <div class="chips">
+        <div class="chip activo">Todos</div>
+        <div class="chip">Comida</div>
+        <div class="chip">Salud</div>
+        <div class="chip">Hogar</div>
+        <div class="chip">Moda</div>
+        <div class="chip">Servicios</div>
+        <div class="chip">Mascotas</div>
+      </div>
+
+      <div class="contador">9 negocios</div>
+
+      <div class="lista">
+        <div class="negocio">
+          <div class="miniatura" style="background:linear-gradient(135deg,#d9a15c,#8a5a2b)"></div>
+          <div class="info">
+            <div class="fila-nombre">
+              <div class="nombre">Panadería Los Rosales</div>
+              <div class="verificado"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div class="direccion">Av. Los Rosales 345, San Borja</div>
+            <div class="tags">
+              <span class="tag abierto"><span class="punto"></span>Abierto</span>
+              <span class="distancia">🚶 3 min</span>
+            </div>
+          </div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <div class="negocio">
+          <div class="miniatura" style="background:linear-gradient(135deg,#8fae9c,#3f5c4c)"></div>
+          <div class="info">
+            <div class="fila-nombre">
+              <div class="nombre">Veterinaria Aviación</div>
+              <div class="verificado"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div class="direccion">Av. Aviación 4210, San Borja</div>
+            <div class="tags">
+              <span class="tag abierto"><span class="punto"></span>Abierto</span>
+              <span class="distancia">🚶 5 min</span>
+            </div>
+          </div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <div class="negocio">
+          <div class="miniatura" style="background:linear-gradient(135deg,#7c94a8,#33475a)"></div>
+          <div class="info">
+            <div class="fila-nombre">
+              <div class="nombre">Ferretería Limatambo</div>
+            </div>
+            <div class="direccion">Jr. Húsares de Junín 812, San Borja</div>
+            <div class="tags">
+              <span class="tag abierto"><span class="punto"></span>Abierto</span>
+              <span class="distancia">🚶 6 min</span>
+            </div>
+          </div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+
+        <div class="negocio">
+          <div class="miniatura" style="background:linear-gradient(135deg,#d98a5c,#7a3a1e)"></div>
+          <div class="info">
+            <div class="fila-nombre">
+              <div class="nombre">El Fogón Sanborjino</div>
+            </div>
+            <div class="direccion">Av. Guardia Civil 235, San Borja</div>
+            <div class="tags">
+              <span class="tag cerrado"><span class="punto"></span>Cerrado</span>
+              <span class="distancia">🚶 2 min</span>
+            </div>
+          </div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="nota">Boceto visual · tamaño real de app (390×844) · sin conectar a código todavía</div>
+</div>
+

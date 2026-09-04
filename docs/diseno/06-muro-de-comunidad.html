@@ -1,0 +1,471 @@
+<title>Muro de Comunidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a;
+    --verde-fuerte: #146641;
+    --verde-suave: #dbf1e3;
+    --coral: #ef7148;
+    --coral-fuerte: #c8532e;
+    --coral-suave: #fce2d7;
+    --oro: #b8862e;
+    --oro-suave: #f6ecd6;
+    --rojo: #c0392b;
+    --rojo-suave: #fbe2de;
+
+    --fondo-app: #f4f4f0;
+    --superficie: #ffffff;
+    --superficie-hundida: #eef6f0;
+    --borde: #e3ece4;
+    --texto: #1a2119;
+    --texto-suave: #5f6b5c;
+    --texto-tenue: #96a091;
+    --sombra: 0 1px 2px rgba(20, 40, 30, 0.04), 0 8px 24px -14px rgba(20, 40, 30, 0.18);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--fondo-app);
+    color: var(--texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .telefono {
+    width: 390px;
+    max-width: 100%;
+    background: var(--fondo-app);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(20,40,30,0.35);
+    border: 8px solid #0e1410;
+  }
+  .pantalla {
+    height: 844px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+  }
+  .pantalla::-webkit-scrollbar { display: none; }
+
+  /* --- Masthead --- */
+  .masthead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--fondo-app);
+    padding: 20px 20px 0;
+  }
+  .masthead-fila {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .masthead h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 26px;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  .masthead .zona {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--verde-fuerte);
+    background: var(--verde-suave);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .masthead p {
+    margin: 2px 0 14px;
+    font-size: 13.5px;
+    color: var(--texto-suave);
+    font-weight: 500;
+  }
+
+  /* --- Chips --- */
+  .chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--superficie);
+    border: 1.5px solid var(--borde);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--texto-suave);
+    white-space: nowrap;
+  }
+  .chip .punto { width: 7px; height: 7px; border-radius: 50%; }
+  .chip.activo {
+    background: var(--texto);
+    border-color: var(--texto);
+    color: #fff;
+  }
+  .chip.activo .punto { background: #fff !important; }
+
+  /* --- Composer teaser --- */
+  .composer {
+    margin: 0 20px 16px;
+    background: var(--superficie);
+    border: 1.5px dashed var(--borde);
+    border-radius: 18px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--texto-tenue);
+    font-weight: 600;
+  }
+  .composer .avatar-mini {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--superficie-hundida);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex: none;
+  }
+
+  /* --- Feed --- */
+  .feed {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0 20px 28px;
+  }
+
+  .post {
+    background: var(--superficie);
+    border-radius: 22px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+    border: 1px solid rgba(20,40,30,0.03);
+  }
+  .post.urgente { box-shadow: 0 1px 2px rgba(192,57,43,0.06), 0 10px 26px -14px rgba(192,57,43,0.35); }
+
+  .post-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px 10px;
+  }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px;
+    flex: none;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+  }
+  .avatar.municipal { background: var(--verde-suave); }
+  .avatar.junta { background: var(--oro-suave); }
+  .avatar.seguridad { background: var(--rojo-suave); }
+  .avatar.otro { background: var(--superficie-hundida); }
+
+  .post-meta { flex: 1; min-width: 0; }
+  .post-fuente {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 14.5px; font-weight: 800;
+  }
+  .verificado-tick {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--verde); flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .post-sub {
+    font-size: 12px; color: var(--texto-tenue); font-weight: 600;
+    margin-top: 1px;
+  }
+  .categoria-pill {
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 999px; flex: none;
+  }
+  .categoria-pill.municipal { background: var(--verde-suave); color: var(--verde-fuerte); }
+  .categoria-pill.junta { background: var(--oro-suave); color: var(--oro); }
+  .categoria-pill.seguridad { background: var(--rojo-suave); color: var(--rojo); }
+  .categoria-pill.otro { background: var(--superficie-hundida); color: var(--texto-suave); }
+
+  .post-cuerpo {
+    padding: 0 16px 12px;
+    font-size: 14.5px;
+    line-height: 1.48;
+    color: var(--texto);
+  }
+  .post-cuerpo b { font-family: "Fraunces", serif; font-weight: 700; font-size: 16.5px; display: block; margin-bottom: 3px; }
+
+  .post-imagen {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/10;
+    background-size: cover;
+    background-position: center;
+  }
+  .post-imagen.ilustrada {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icono-grande { width: 56px; height: 56px; }
+  .post-imagen .cinta {
+    position: absolute; top: 12px; left: 0;
+    background: var(--rojo);
+    color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.3px;
+    padding: 5px 12px 5px 16px;
+    border-radius: 0 999px 999px 0;
+    text-transform: uppercase;
+  }
+
+  .post-footer {
+    display: flex;
+    border-top: 1px solid var(--borde);
+    margin-top: 4px;
+  }
+  .accion {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 11px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--texto-suave);
+  }
+  .accion + .accion { border-left: 1px solid var(--borde); }
+  .accion.activa { color: var(--coral-fuerte); }
+  .accion svg { width: 17px; height: 17px; }
+
+  /* --- Próximamente card --- */
+  .proximamente {
+    background: linear-gradient(135deg, var(--verde-fuerte), var(--verde));
+    border-radius: 22px;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .proximamente svg.deco { position: absolute; right: -20px; bottom: -30px; opacity: 0.15; }
+  .proximamente .etq {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+    background: rgba(255,255,255,0.18); color: #fff;
+    width: fit-content; padding: 4px 10px; border-radius: 999px;
+  }
+  .proximamente h3 { font-family: "Fraunces", serif; font-size: 18px; margin: 4px 0 0; }
+  .proximamente p { margin: 0; font-size: 13px; opacity: 0.85; font-weight: 500; max-width: 80%; }
+
+  /* --- Tab bar mock --- */
+  .tabbar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 22px;
+    background: var(--superficie);
+    border-top: 1px solid var(--borde);
+  }
+  .tabitem { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 700; color: var(--texto-tenue); }
+  .tabitem.activo { color: var(--coral-fuerte); }
+  .tabitem .dot { width: 22px; height: 22px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
+  .tabitem.activo .dot { background: var(--coral-suave); }
+
+  .nota {
+    max-width: 390px;
+    margin: 18px auto 0;
+    font-size: 13px;
+    color: #6b6f68;
+    text-align: center;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+</style>
+
+<div style="display:flex; flex-direction:column; align-items:center;">
+<div class="telefono">
+  <div class="pantalla">
+
+    <div class="masthead">
+      <div class="masthead-fila">
+        <h1>Comunidad</h1>
+        <span class="zona">San Borja</span>
+      </div>
+      <p>Lo que está pasando cerca de ti, en tiempo real.</p>
+      <div class="chips">
+        <div class="chip activo"><span class="punto" style="background:#fff"></span>Todo</div>
+        <div class="chip"><span class="punto" style="background:var(--verde)"></span>Municipal</div>
+        <div class="chip"><span class="punto" style="background:var(--oro)"></span>Junta vecinal</div>
+        <div class="chip"><span class="punto" style="background:var(--rojo)"></span>Seguridad</div>
+        <div class="chip"><span class="punto" style="background:var(--texto-tenue)"></span>Reseñas</div>
+        <div class="chip"><span class="punto" style="background:var(--texto-tenue)"></span>Perdidos</div>
+      </div>
+    </div>
+
+    <div class="composer">
+      <div class="avatar-mini">🙂</div>
+      ¿Viste algo en tu cuadra? Cuéntale a tus vecinos…
+    </div>
+
+    <div class="feed">
+
+      <div class="post urgente">
+        <div class="post-header">
+          <div class="avatar seguridad">🚨</div>
+          <div class="post-meta">
+            <div class="post-fuente">Serenazgo San Borja
+              <span class="verificado-tick"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+            <div class="post-sub">hace 3 h · Av. Aviación</div>
+          </div>
+          <div class="categoria-pill seguridad">Alerta</div>
+        </div>
+        <div class="post-cuerpo">
+          <b>Refuerzo de rondas en zona norte</b>
+          Aumentamos la frecuencia de patrullaje entre Av. Aviación y Av. Angamos Este tras reportes de vecinos. Cualquier incidente, repórtalo al 105.
+        </div>
+        <div class="post-imagen ilustrada" style="background:linear-gradient(135deg,#3d2b26,#1a1210)">
+          <span class="cinta">Zona de patrullaje</span>
+          <svg class="icono-grande" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.5 4.5H18l-3.7 2.7L15.8 14 12 11.3 8.2 14l1.5-4.8L6 6.5h4.5L12 2z" fill="#fff" opacity="0.85"/><path d="M4 20c1-3 4-5 8-5s7 2 8 5" stroke="#fff" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="post-footer">
+          <div class="accion activa">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.2 2 4.5 5.6 4A5.6 5.6 0 0112 6.8 5.6 5.6 0 0118.4 4C22 4.5 23.6 8.2 22 11.7 19.5 16.4 12 21 12 21z" fill="currentColor"/></svg>
+            Me interesa
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1114.1 5.1L20 21l-4.2-1a8 8 0 01-11.8-8z" stroke="currentColor" stroke-width="2"/></svg>
+            Comentar
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Compartir
+          </div>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar municipal">🏛️</div>
+          <div class="post-meta">
+            <div class="post-fuente">Municipalidad de San Borja
+              <span class="verificado-tick"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+            <div class="post-sub">hace 1 día</div>
+          </div>
+          <div class="categoria-pill municipal">Municipal</div>
+        </div>
+        <div class="post-cuerpo">
+          <b>Campaña de vacunación antirrábica</b>
+          Vacunamos gratis a perros y gatos este domingo 31 de agosto en la Plaza Grau, de 9:00 a 13:00. ¡Trae a tu mascota!
+        </div>
+        <div class="post-imagen ilustrada" style="background:linear-gradient(135deg,var(--verde-fuerte),var(--verde))">
+          <svg class="icono-grande" viewBox="0 0 24 24" fill="none"><path d="M4.5 14c-2-3 0-6.5 3-6.8.3-2 2-3.7 4.2-3.5 1.8.2 3.1 1.6 3.4 3.3 2.7.4 4.4 3.5 3 6-1 1.8-3 2.5-4.6 2.2M9 14v3.5a2 2 0 002 2h1a2 2 0 002-2V15" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/></svg>
+        </div>
+        <div class="post-footer">
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.2 2 4.5 5.6 4A5.6 5.6 0 0112 6.8 5.6 5.6 0 0118.4 4C22 4.5 23.6 8.2 22 11.7 19.5 16.4 12 21 12 21z" stroke="currentColor" stroke-width="2"/></svg>
+            Me interesa
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1114.1 5.1L20 21l-4.2-1a8 8 0 01-11.8-8z" stroke="currentColor" stroke-width="2"/></svg>
+            Comentar
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Compartir
+          </div>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar junta">🤝</div>
+          <div class="post-meta">
+            <div class="post-fuente">Junta Vecinal Reducto N.° 2</div>
+            <div class="post-sub">hace 2 días · Parque Reducto N.° 2</div>
+          </div>
+          <div class="categoria-pill junta">Junta vecinal</div>
+        </div>
+        <div class="post-cuerpo">
+          <b>Reunión de la junta vecinal</b>
+          Este sábado 30 de agosto, 10:00 a.m. Se tratará seguridad y mantenimiento de áreas verdes. Tu opinión cuenta — te esperamos.
+        </div>
+        <div class="post-footer">
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.2 2 4.5 5.6 4A5.6 5.6 0 0112 6.8 5.6 5.6 0 0118.4 4C22 4.5 23.6 8.2 22 11.7 19.5 16.4 12 21 12 21z" stroke="currentColor" stroke-width="2"/></svg>
+            Me interesa
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1114.1 5.1L20 21l-4.2-1a8 8 0 01-11.8-8z" stroke="currentColor" stroke-width="2"/></svg>
+            Comentar
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Compartir
+          </div>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="post-header">
+          <div class="avatar municipal">💧</div>
+          <div class="post-meta">
+            <div class="post-fuente">Sedapal
+              <span class="verificado-tick"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+            <div class="post-sub">hace 4 días</div>
+          </div>
+          <div class="categoria-pill municipal">Municipal</div>
+        </div>
+        <div class="post-cuerpo">
+          <b>Corte de agua programado</b>
+          Jueves 28 de agosto, de 9:00 a 17:00, en las cuadras 20-24 de Av. San Luis, por mantenimiento de la red.
+        </div>
+        <div class="post-footer">
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.2 2 4.5 5.6 4A5.6 5.6 0 0112 6.8 5.6 5.6 0 0118.4 4C22 4.5 23.6 8.2 22 11.7 19.5 16.4 12 21 12 21z" stroke="currentColor" stroke-width="2"/></svg>
+            Me interesa
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1114.1 5.1L20 21l-4.2-1a8 8 0 01-11.8-8z" stroke="currentColor" stroke-width="2"/></svg>
+            Comentar
+          </div>
+          <div class="accion">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Compartir
+          </div>
+        </div>
+      </div>
+
+      <div class="proximamente">
+        <svg class="deco" width="120" height="120" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.4L12 16.8 5.7 21.2 8 13.8 2 9.4h7.6z"/></svg>
+        <span class="etq">Próximamente</span>
+        <h3>Reseñas de vecinos</h3>
+        <p>Muy pronto podrás calificar negocios y leer lo que opinan tus vecinos.</p>
+      </div>
+
+    </div>
+
+    <div class="tabbar">
+      <div class="tabitem"><div class="dot">🏠</div>Inicio</div>
+      <div class="tabitem"><div class="dot">🧭</div>Servicios</div>
+      <div class="tabitem activo"><div class="dot">💬</div>Comunidad</div>
+      <div class="tabitem"><div class="dot">👤</div>Perfil</div>
+    </div>
+
+  </div>
+</div>
+<div class="nota">Boceto visual · tamaño real de app (390×844) · sin conectar a código todavía</div>
+</div>
+

@@ -1,0 +1,205 @@
+openapi: 3.0.3
+info:
+  title: API ELISUR (nombre provisional)
+  version: "1.0"
+  description: >
+    Contrato de datos entre la aplicación móvil y el backend.
+    Borrador de Etapa 0: define la forma de las respuestas antes de que exista
+    base de datos o servidor. La implementación real (Etapa 2) debe cumplir
+    exactamente este contrato.
+servers:
+  - url: https://api.elisur.app/v1
+    description: Producción (placeholder, dominio provisional)
+
+paths:
+  /comunidades:
+    get:
+      summary: Listar comunidades activas
+      responses:
+        "200":
+          description: Lista de comunidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comunidad"
+
+  /comunidades/detectar:
+    get:
+      summary: Detectar la comunidad correspondiente a una coordenada GPS
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema: { type: number }
+        - name: lng
+          in: query
+          required: true
+          schema: { type: number }
+      responses:
+        "200":
+          description: Comunidad detectada, o null si el punto no cae en ninguna zona activa
+          content:
+            application/json:
+              schema:
+                nullable: true
+                $ref: "#/components/schemas/Comunidad"
+
+  /categorias:
+    get:
+      summary: Listar categorías
+      responses:
+        "200":
+          description: Árbol de categorías
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Categoria"
+
+  /negocios:
+    get:
+      summary: Listar negocios de una comunidad, paginado y filtrable
+      parameters:
+        - name: comunidadId
+          in: query
+          required: true
+          schema: { type: string }
+        - name: categoriaId
+          in: query
+          schema: { type: string }
+        - name: busqueda
+          in: query
+          schema: { type: string }
+        - name: cursor
+          in: query
+          schema: { type: string }
+        - name: limite
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: Página de resultados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultadoPaginadoNegocio"
+
+  /negocios/{id}:
+    get:
+      summary: Obtener la ficha de un negocio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Ficha del negocio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Negocio"
+        "404":
+          description: No existe un negocio con ese id
+
+components:
+  schemas:
+    Coordenada:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat: { type: number }
+        lng: { type: number }
+
+    Comunidad:
+      type: object
+      required: [id, distritoUbigeo, nombre, slug, activo]
+      properties:
+        id: { type: string }
+        distritoUbigeo: { type: string }
+        nombre: { type: string }
+        slug: { type: string }
+        activo: { type: boolean }
+        fechaLanzamiento: { type: string, format: date, nullable: true }
+
+    Categoria:
+      type: object
+      required: [id, nombre, slug, icono, orden]
+      properties:
+        id: { type: string }
+        padreId: { type: string, nullable: true }
+        nombre: { type: string }
+        slug: { type: string }
+        icono: { type: string }
+        orden: { type: integer }
+
+    HorarioDia:
+      type: object
+      required: [cerrado]
+      properties:
+        cerrado: { type: boolean }
+        abre: { type: string, example: "09:00" }
+        cierra: { type: string, example: "20:00" }
+
+    Horarios:
+      type: object
+      required: [lunes, martes, miercoles, jueves, viernes, sabado, domingo]
+      properties:
+        lunes: { $ref: "#/components/schemas/HorarioDia" }
+        martes: { $ref: "#/components/schemas/HorarioDia" }
+        miercoles: { $ref: "#/components/schemas/HorarioDia" }
+        jueves: { $ref: "#/components/schemas/HorarioDia" }
+        viernes: { $ref: "#/components/schemas/HorarioDia" }
+        sabado: { $ref: "#/components/schemas/HorarioDia" }
+        domingo: { $ref: "#/components/schemas/HorarioDia" }
+
+    Negocio:
+      type: object
+      required:
+        - id
+        - comunidadId
+        - distritoUbigeo
+        - nombre
+        - descripcion
+        - categoriaIds
+        - coordenada
+        - direccion
+        - horarios
+        - estado
+        - fuente
+        - creadoEn
+        - actualizadoEn
+      properties:
+        id: { type: string }
+        comunidadId: { type: string }
+        distritoUbigeo: { type: string }
+        nombre: { type: string }
+        descripcion: { type: string }
+        categoriaIds:
+          type: array
+          items: { type: string }
+        coordenada: { $ref: "#/components/schemas/Coordenada" }
+        direccion: { type: string }
+        telefono: { type: string, nullable: true }
+        whatsapp: { type: string, nullable: true }
+        horarios: { $ref: "#/components/schemas/Horarios" }
+        fotoPrincipalUrl: { type: string, nullable: true }
+        estado:
+          type: string
+          enum: [activo, inactivo, por_verificar]
+        verificadoEn: { type: string, format: date, nullable: true }
+        fuente: { type: string }
+        creadoEn: { type: string, format: date-time }
+        actualizadoEn: { type: string, format: date-time }
+
+    ResultadoPaginadoNegocio:
+      type: object
+      required: [items, cursorSiguiente]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Negocio" }
+        cursorSiguiente: { type: string, nullable: true }

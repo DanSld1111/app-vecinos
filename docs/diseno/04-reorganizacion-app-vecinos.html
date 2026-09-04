@@ -1,0 +1,525 @@
+<title>Reorganización de App Vecinos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-sunken: #eef6f0;
+    --surface-sunken-2: #e3ece4;
+    --ink: #1a2119;
+    --ink-soft: #5f6b5c;
+    --ink-faint: #96a091;
+    --primary: #1f8a5a;
+    --primary-strong: #146641;
+    --primary-soft: #dbf1e3;
+    --accent: #ef7148;
+    --accent-strong: #c8532e;
+    --accent-soft: #fce2d7;
+    --line: #e3ece4;
+    --line-strong: #c9d6cc;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #12180f;
+      --surface: #1a2317;
+      --surface-sunken: #202b1c;
+      --surface-sunken-2: #283523;
+      --ink: #eaf0e6;
+      --ink-soft: #a8b6a1;
+      --ink-faint: #6e7c68;
+      --primary: #6fc797;
+      --primary-strong: #9adcb7;
+      --primary-soft: #22352a;
+      --accent: #f0956e;
+      --accent-strong: #f7b393;
+      --accent-soft: #3a271f;
+      --line: #283525;
+      --line-strong: #37472f;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #12180f;
+    --surface: #1a2317;
+    --surface-sunken: #202b1c;
+    --surface-sunken-2: #283523;
+    --ink: #eaf0e6;
+    --ink-soft: #a8b6a1;
+    --ink-faint: #6e7c68;
+    --primary: #6fc797;
+    --primary-strong: #9adcb7;
+    --primary-soft: #22352a;
+    --accent: #f0956e;
+    --accent-strong: #f7b393;
+    --accent-soft: #3a271f;
+    --line: #283525;
+    --line-strong: #37472f;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Karla", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  ::selection{ background: var(--primary-soft); color: var(--primary-strong); }
+
+  .wrap{ max-width: 1180px; margin: 0 auto; padding: 4.5rem 1.75rem 6rem; }
+
+  .eyebrow{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary-strong);
+    display: flex; align-items: center; gap: 0.6em;
+    margin: 0 0 1.1rem;
+  }
+  .eyebrow::before{ content:""; width:26px; height:1px; background: var(--primary-strong); display:inline-block; }
+
+  h1{
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(2rem, 4.2vw, 3.1rem);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+  .lede{ font-size: 1.08rem; color: var(--ink-soft); max-width: 62ch; margin: 0 0 2rem; }
+
+  .callout{
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 3.5rem;
+    max-width: 74ch;
+  }
+  .callout p{ margin: 0.3rem 0; font-size: 0.92rem; color: var(--ink); }
+  .callout b{ color: var(--accent-strong); }
+
+  section{ margin-bottom: 4.5rem; }
+  .section-head{
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 1.8rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--line);
+  }
+  h2{
+    font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.55rem; margin: 0;
+  }
+  .section-note{ font-size: 0.9rem; color: var(--ink-faint); max-width: 36ch; text-align: right; }
+
+  /* comparación antes/después */
+  .comparacion{
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  }
+  @media (max-width: 720px){ .comparacion{ grid-template-columns: 1fr; } }
+  .col-antes, .col-despues{
+    border-radius: 12px;
+    padding: 1.3rem 1.4rem;
+    border: 1px solid var(--line);
+  }
+  .col-antes{ background: var(--surface-sunken); }
+  .col-despues{ background: var(--primary-soft); border-color: var(--primary-soft); }
+  .col-titulo{
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 0.8rem; display:block;
+  }
+  .col-antes .col-titulo{ color: var(--ink-faint); }
+  .col-despues .col-titulo{ color: var(--primary-strong); }
+  .comparacion h4{ font-family:"Karla"; font-size: 1rem; font-weight:700; margin: 0 0 0.3rem; color: var(--ink); }
+  .comparacion p{ font-size: 0.88rem; color: var(--ink-soft); margin: 0 0 1rem; }
+  .comparacion p:last-child{ margin-bottom: 0; }
+
+  /* IA tree */
+  .tree-scroll{ overflow-x: auto; padding-bottom: 0.5rem; }
+  .tree{ display: inline-flex; flex-direction: column; align-items: center; min-width: 100%; width: max-content; margin: 0 auto; }
+  .tree-root{
+    font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; background: var(--primary); color: #fff;
+    padding: 0.65rem 1.2rem; border-radius: 3px;
+  }
+  .stem{ width: 1px; height: 26px; background: var(--line-strong); }
+  .branch-row{ display: flex; position: relative; padding-top: 26px; }
+  .tab{ width: 200px; display: flex; flex-direction: column; align-items: center; padding: 0 0.6rem; position: relative; }
+  .tab::before{ content:""; position: absolute; top: -26px; left: 50%; width: 1px; height: 26px; background: var(--line-strong); }
+  .tab-card{ background: var(--surface); border: 1px solid var(--line-strong); border-radius: 4px; padding: 0.55rem 0.9rem; text-align: center; width: 100%; }
+  .tab-name{ font-family:"IBM Plex Mono", monospace; font-size:0.72rem; letter-spacing:0.03em; text-transform:uppercase; font-weight:600; color: var(--ink); }
+  .tab-role{ font-size: 0.7rem; color: var(--primary-strong); font-weight: 700; margin-top: 2px; }
+  .leaf-stem{ width: 1px; height: 16px; background: var(--line); margin-top: 2px; }
+  .leaves{ display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.15rem; width: 100%; }
+  .leaf{ font-size: 0.74rem; color: var(--ink-soft); background: var(--surface-sunken); border-radius: 3px; padding: 0.32rem 0.55rem; text-align: center; }
+  .leaf.fase2{ border: 1px dashed var(--line-strong); background: transparent; color: var(--ink-faint); }
+
+  /* phone gallery */
+  .gallery-scroll{ overflow-x: auto; margin: 0 -1.75rem; padding: 0.5rem 1.75rem 1.5rem; }
+  .gallery{ display: flex; gap: 2rem; width: max-content; }
+  .screen{ width: 250px; flex: none; }
+  .screen-label{ font-family:"IBM Plex Mono", monospace; font-size:0.74rem; color: var(--primary-strong); margin-bottom: 0.6rem; }
+  .phone{ background: var(--surface); border: 1px solid var(--line-strong); border-radius: 22px; padding: 8px; }
+  .phone-screen{ background: var(--bg); border-radius: 15px; overflow: hidden; display:flex; flex-direction:column; min-height: 440px; }
+  .status{ height: 18px; display:flex; align-items:center; justify-content:space-between; padding: 0 12px; font-family:"IBM Plex Mono", monospace; font-size:0.52rem; color: var(--ink-faint); }
+  .app-header{ padding: 6px 12px 8px; display:flex; flex-direction:column; gap:6px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 6px 12px 0; }
+  .pill{ align-self:flex-start; background: var(--primary-soft); color: var(--primary-strong); font-size:0.58rem; font-weight:700; padding:4px 8px; border-radius:20px; }
+  .campana{ position:relative; width:26px; height:26px; border-radius:50%; background: var(--surface-sunken); display:flex; align-items:center; justify-content:center; font-size:0.7rem; }
+  .campana::after{ content:""; position:absolute; top:3px; right:3px; width:6px; height:6px; border-radius:50%; background: var(--accent); border: 1.5px solid var(--bg); }
+  .search-bar{ height: 34px; background: var(--surface-sunken); border-radius: 20px; margin: 0 12px 8px; display:flex; align-items:center; padding: 0 10px; gap:6px; }
+  .search-bar::before{ content:"⌕"; color: var(--ink-faint); font-size:0.8rem; }
+  .search-bar span{ font-size: 0.58rem; color: var(--ink-faint); }
+  .label{ font-family:"IBM Plex Mono", monospace; font-size:0.5rem; text-transform:uppercase; letter-spacing:0.03em; color: var(--ink-faint); margin: 6px 12px 4px; }
+  .contentpad{ padding: 0 12px; display:flex; flex-direction:column; gap:8px; flex:1; }
+  .block{ background: var(--surface-sunken); border-radius: 8px; }
+  .banner{ height: 60px; }
+  .tile-row{ display:flex; gap:6px; }
+  .tile{ flex:1; aspect-ratio:1; border-radius:10px; background: var(--surface-sunken); display:flex; align-items:center; justify-content:center; }
+  .tile .ic{ width:20px; height:20px; border-radius:50%; background: var(--primary-soft); }
+  .row-item{ display:flex; align-items:center; gap:8px; padding: 6px 0; border-bottom:1px solid var(--line); }
+  .row-icon{ width:28px; height:28px; border-radius:8px; background: var(--primary-soft); flex:none; }
+  .row-icon.acc{ background: var(--accent-soft); }
+  .row-icon.off{ background: var(--surface-sunken); opacity:0.6; }
+  .line{ height:6px; border-radius:3px; background: var(--surface-sunken-2); }
+  .line.w70{ width:70%; } .line.w40{ width:40%; } .line.w90{width:90%;}
+  .chip-row{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{ background: var(--surface-sunken); border-radius:20px; padding: 5px 9px; font-size: 0.52rem; color: var(--ink-soft); }
+  .chip.active{ background: var(--primary); color: #fff; }
+  .badge-nuevo{ font-family:"IBM Plex Mono", monospace; font-size:0.44rem; text-transform:uppercase; background: var(--accent); color:#fff; padding:2px 6px; border-radius:4px; align-self:flex-start; }
+  .subtitulo-grupo{ font-size:0.62rem; font-weight:700; color: var(--ink); margin: 4px 0 2px; }
+  .tabbar{ height: 50px; border-top: 1px solid var(--line); display:flex; align-items:center; justify-content:space-around; background: var(--surface); }
+  .tabbar-item{ display:flex; flex-direction:column; align-items:center; gap:1px; }
+  .tabbar-item .tx{ font-family:"IBM Plex Mono", monospace; font-size:0.4rem; text-transform:uppercase; color: var(--ink-faint); }
+  .tabbar-item.active .tx{ color: var(--ink); font-weight:700; }
+  .ic-circle{ width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.72rem; margin-bottom:1px; transition: background 0.15s; }
+  .ic-circle.inicio, .ic-circle.servicios, .ic-circle.perfil{ background: var(--primary-soft); color: var(--primary-strong); }
+  .ic-circle.comunidad{ background: var(--accent-soft); color: var(--accent-strong); }
+  .tabbar-item.active .ic-circle.inicio, .tabbar-item.active .ic-circle.servicios, .tabbar-item.active .ic-circle.perfil{ background: var(--primary); color:#fff; }
+  .tabbar-item.active .ic-circle.comunidad{ background: var(--accent); color:#fff; }
+  .tabbar-item:not(.active) .ic-circle{ opacity: 0.85; }
+  .annot{ margin-top: 0.9rem; font-size: 0.82rem; color: var(--ink-soft); max-width: 240px; }
+
+  .overlay-header{ display:flex; align-items:center; gap:8px; padding: 8px 12px; }
+  .back-btn{ width:26px; height:26px; border-radius:50%; background: var(--surface-sunken); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color: var(--ink); flex:none; }
+  .search-bar.activo{ flex:1; margin:0; background: var(--surface-sunken-2); }
+  .search-bar.activo span{ color: var(--ink); font-weight:600; }
+  .mini-ads{ height: 46px; border-radius: 10px; background: linear-gradient(90deg, var(--accent), var(--accent-strong)); display:flex; align-items:center; padding: 0 10px; }
+  .mini-ads span{ color:#fff; font-size:0.5rem; font-weight:700; }
+  .mini-dots{ display:flex; gap:3px; justify-content:center; margin-top:4px; }
+  .mini-dots i{ width:4px; height:4px; border-radius:50%; background: var(--line-strong); display:block; }
+  .mini-dots i.on{ background: var(--accent); width:10px; border-radius:2px; }
+  .trend-chip{ display:flex; align-items:center; gap:6px; background: var(--surface-sunken); border-radius:20px; padding:5px 10px; }
+  .trend-chip .n{ font-family:"IBM Plex Mono", monospace; font-size:0.5rem; color: var(--accent-strong); font-weight:700; }
+  .trend-chip span.tx2{ font-size:0.52rem; color: var(--ink-soft); }
+
+  /* modal de permiso */
+  .permiso-modal{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 0 20px; gap:10px; text-align:center; }
+  .permiso-icono{ width:56px; height:56px; border-radius:50%; background: var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:4px; }
+  .permiso-titulo{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:0.95rem; color: var(--ink); }
+  .permiso-texto{ font-size:0.62rem; color: var(--ink-soft); line-height:1.5; max-width:180px; }
+  .permiso-btn{ width:100%; max-width:190px; height:32px; border-radius:8px; background: var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.62rem; font-weight:700; margin-top:8px; }
+  .permiso-btn.fantasma{ background:transparent; border:1px solid var(--line-strong); color: var(--ink-soft); }
+
+  /* perfil */
+  .perfil-header{ display:flex; align-items:center; gap:10px; padding: 10px 12px 6px; }
+  .avatar-grande{ width:46px; height:46px; border-radius:50%; background: var(--primary-soft); display:flex; align-items:center; justify-content:center; font-size:1.1rem; position:relative; flex:none; }
+  .avatar-editar{ position:absolute; bottom:-2px; right:-2px; width:15px; height:15px; border-radius:50%; background: var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.4rem; border:2px solid var(--surface); }
+  .stat-row{ display:flex; gap:8px; }
+  .stat-tile{ flex:1; background: var(--surface-sunken); border-radius:10px; padding:7px; text-align:center; }
+  .stat-num{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:0.92rem; color: var(--primary-strong); display:block; }
+  .stat-label{ font-size:0.42rem; color: var(--ink-soft); text-transform:uppercase; letter-spacing:0.03em; }
+  .toggle{ width:28px; height:16px; border-radius:9px; background: var(--line-strong); position:relative; flex:none; }
+  .toggle.on{ background: var(--primary); }
+  .toggle .knob{ position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:#fff; }
+  .toggle.on .knob{ left:14px; }
+
+  footer{ border-top: 1px solid var(--line); padding-top: 1.6rem; font-size: 0.85rem; color: var(--ink-faint); }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Boceto de reorganización · nada se ha implementado</p>
+  <h1>Cada cosa en un solo lugar, sin caminos duplicados</h1>
+  <p class="lede">Buscar y Mapa no eran contenido propio — eran formas de encontrar el contenido que ya vive en Servicios. Buscar se vuelve la barra de arriba en Inicio. En su lugar, sube <b>Comunidad</b>: el feed de todo lo que pasa en tu zona, que sí es contenido propio y el diferenciador real de la app.</p>
+
+  <div class="callout">
+    <p><b>El principio detrás de este boceto:</b> Servicios responde "¿qué ofrece esta app?". Buscar responde "sé lo que quiero, llévame directo" — vive como barra en Inicio. Comunidad responde "¿qué está pasando en mi zona?" — avisos, reseñas, seguridad y perdidos/encontrados, todo junto. La campana de Inicio sigue ahí, pero ahora primero pregunta si quieres activar notificaciones.</p>
+  </div>
+
+  <section id="arquitectura">
+    <div class="section-head">
+      <h2>1 · Nueva arquitectura</h2>
+      <p class="section-note">4 pestañas: Buscar y Mapa salen, Comunidad entra.</p>
+    </div>
+    <div class="tree-scroll">
+      <div class="tree">
+        <div class="tree-root">App Vecinos — San Borja</div>
+        <div class="stem"></div>
+        <div class="branch-row">
+          <div class="tab">
+            <div class="tab-card"><span class="tab-name">Inicio</span><div class="tab-role">Vitrina + búsqueda</div></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Campana → pide permiso de notificaciones</div>
+              <div class="leaf">Buscador (barra superior)</div>
+              <div class="leaf">Accesos directos (3-4 máx.)</div>
+              <div class="leaf">Negocios cerca de ti</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-name">Servicios</span><div class="tab-role">Catálogo completo</div></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Guía de negocios</div>
+              <div class="leaf">Restaurantes</div>
+              <div class="leaf">Market Space (productos)</div>
+              <div class="leaf">Supermarket</div>
+              <div class="leaf fase2">+ 8 próximamente</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-name">Comunidad</span><div class="tab-role">Feed de la zona · nueva</div></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Información local (avisos)</div>
+              <div class="leaf">Reseñas de vecinos</div>
+              <div class="leaf">Seguridad vecinal</div>
+              <div class="leaf">Perdidos y encontrados</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-name">Perfil</span><div class="tab-role">Más completo</div></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Mis reseñas · Favoritos</div>
+              <div class="leaf">Notificaciones · Modo oscuro</div>
+              <div class="leaf">Cambiar de comunidad</div>
+              <div class="leaf">Sobre la app · Ayuda · Invitar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="comparacion">
+    <div class="section-head">
+      <h2>2 · Cómo funciona la búsqueda ahora</h2>
+      <p class="section-note">Ya no es una pestaña — es una barra + una pantalla que se abre encima de todo.</p>
+    </div>
+    <div class="comparacion">
+      <div class="col-antes">
+        <span class="col-titulo">Hoy</span>
+        <h4>Buscar = una pestaña con 4 tarjetas</h4>
+        <p>Negocios, Productos, Restaurantes y Supermarket. El buscador de texto está escondido dentro de cada una — para escribir algo hay que primero elegir la guía correcta.</p>
+        <h4>Servicios = una lista aparte</h4>
+        <p>Solo tiene Información local activa; Restaurantes y Market Space no aparecen aquí aunque sí son servicios del catálogo.</p>
+      </div>
+      <div class="col-despues">
+        <span class="col-titulo">Propuesto</span>
+        <h4>La barra vive arriba de Inicio</h4>
+        <p>Igual que "Locales, platos y productos" en la referencia que enviaste. Un toque, y no hay que salir de Inicio para llegar a buscar.</p>
+        <h4>Al tocarla, tapa todo</h4>
+        <p>Aparece una pantalla completa con flecha para volver: primero <b>tus últimas búsquedas</b>, en el medio un carrusel pequeño de publicidad, y debajo <b>búsquedas en tendencia</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pantallas">
+    <div class="section-head">
+      <h2>3 · Boceto de pantallas</h2>
+      <p class="section-note">Bloques estructurales — no es el diseño visual final de cada elemento.</p>
+    </div>
+    <div class="gallery-scroll">
+      <div class="gallery">
+
+        <div class="screen">
+          <div class="screen-label">1 · Inicio</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status"><span>9:41</span><span>···</span></div>
+            <div class="topbar">
+              <div class="pill">📍 San Borja ▾</div>
+              <div class="campana">🔔</div>
+            </div>
+            <div class="search-bar" style="margin: 8px 12px 8px;"><span>Negocios, platos y productos</span></div>
+            <div class="contentpad" style="padding-top:0;">
+              <div class="label">Avisos de la comunidad</div>
+              <div class="block banner"></div>
+              <div class="label">Accesos directos</div>
+              <div class="tile-row">
+                <div class="tile"><div class="ic"></div></div>
+                <div class="tile"><div class="ic"></div></div>
+                <div class="tile"><div class="ic"></div></div>
+              </div>
+              <div class="label">Cerca de ti</div>
+              <div class="row-item"><div class="row-icon"></div><div style="flex:1"><div class="line w70"></div><div class="line w40" style="margin-top:4px"></div></div></div>
+              <div class="row-item"><div class="row-icon"></div><div style="flex:1"><div class="line w70"></div><div class="line w40" style="margin-top:4px"></div></div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item active"><div class="ic-circle inicio">🏠</div><span class="tx">Inicio</span></div>
+              <div class="tabbar-item"><div class="ic-circle servicios">▤</div><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><div class="ic-circle comunidad">📣</div><span class="tx">Comunidad</span></div>
+              <div class="tabbar-item"><div class="ic-circle perfil">☺</div><span class="tx">Perfil</span></div>
+            </div>
+          </div></div>
+          <p class="annot">La barra de búsqueda va arriba, en la misma posición que en la referencia que enviaste.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label">2 · Al tocar la barra</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status"><span>9:41</span><span>···</span></div>
+            <div class="overlay-header">
+              <div class="back-btn">←</div>
+              <div class="search-bar activo"><span>|</span></div>
+            </div>
+            <div class="contentpad" style="padding-top:2px;">
+              <div class="label" style="margin-left:0;">Tus últimas búsquedas</div>
+              <div class="row-item"><div class="row-icon" style="width:20px;height:20px;border-radius:6px;background:transparent;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;font-size:0.6rem;">⌕</div><div class="line w70"></div></div>
+              <div class="row-item"><div class="row-icon" style="width:20px;height:20px;border-radius:6px;background:transparent;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;font-size:0.6rem;">⌕</div><div class="line w40"></div></div>
+              <div class="row-item"><div class="row-icon" style="width:20px;height:20px;border-radius:6px;background:transparent;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;font-size:0.6rem;">⌕</div><div class="line w90"></div></div>
+
+              <div class="mini-ads"><span>PUBLICIDAD · Negocio destacado</span></div>
+              <div class="mini-dots"><i class="on"></i><i></i><i></i></div>
+
+              <div class="label" style="margin-left:0; margin-top:10px;">Búsquedas en tendencia</div>
+              <div class="chip-row">
+                <div class="trend-chip"><span class="n">1</span><span class="tx2">veterinaria</span></div>
+                <div class="trend-chip"><span class="n">2</span><span class="tx2">pollería</span></div>
+                <div class="trend-chip"><span class="n">3</span><span class="tx2">ferretería</span></div>
+                <div class="trend-chip"><span class="n">4</span><span class="tx2">tejidos</span></div>
+              </div>
+            </div>
+          </div></div>
+          <p class="annot">Pantalla completa, tapa todo Inicio. La flecha de arriba regresa sin perder el lugar donde estabas.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label">3 · Al tocar la campana</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status"><span>9:41</span><span>···</span></div>
+            <div class="permiso-modal">
+              <div class="permiso-icono">🔔</div>
+              <div class="permiso-titulo">Activa las notificaciones</div>
+              <p class="permiso-texto">Entérate al instante de ofertas de negocios de San Borja y novedades de tu comunidad. Puedes desactivarlo cuando quieras.</p>
+              <div class="permiso-btn">Activar notificaciones</div>
+              <div class="permiso-btn fantasma">Ahora no</div>
+            </div>
+          </div></div>
+          <p class="annot">Solo se pregunta una vez (o hasta que respondas). Después, la campana abre directo el feed de Comunidad.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label">4 · Servicios · catálogo unificado</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status"><span>9:41</span><span>···</span></div>
+            <div class="app-header"><div class="line w40" style="height:12px;"></div></div>
+            <div class="contentpad" style="padding-top:0; gap:2px;">
+              <div class="subtitulo-grupo">DISPONIBLE AHORA</div>
+              <div class="row-item"><div class="row-icon"></div><div style="flex:1"><div class="line w70"></div></div></div>
+              <div class="row-item"><div class="row-icon"></div><div style="flex:1"><div class="line w70"></div></div></div>
+              <div class="row-item"><div class="row-icon acc"></div><div style="flex:1"><div class="line w70"></div></div><span class="badge-nuevo">Nuevo</span></div>
+              <div class="row-item"><div class="row-icon"></div><div style="flex:1"><div class="line w70"></div></div></div>
+              <div class="subtitulo-grupo" style="margin-top:8px;">PRÓXIMAMENTE</div>
+              <div class="row-item" style="opacity:0.55;"><div class="row-icon off"></div><div style="flex:1"><div class="line w40"></div></div></div>
+              <div class="row-item" style="opacity:0.55;"><div class="row-icon off"></div><div style="flex:1"><div class="line w40"></div></div></div>
+              <div class="row-item" style="opacity:0.55;"><div class="row-icon off"></div><div style="flex:1"><div class="line w40"></div></div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><div class="ic-circle inicio">🏠</div><span class="tx">Inicio</span></div>
+              <div class="tabbar-item active"><div class="ic-circle servicios">▤</div><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><div class="ic-circle comunidad">📣</div><span class="tx">Comunidad</span></div>
+              <div class="tabbar-item"><div class="ic-circle perfil">☺</div><span class="tx">Perfil</span></div>
+            </div>
+          </div></div>
+          <p class="annot">Ahora sí es el mapa completo de "todo lo que ofrece la app" — un vecino nuevo entiende el producto entero desde aquí.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label">5 · Comunidad · nueva pestaña</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status"><span>9:41</span><span>···</span></div>
+            <div class="app-header"><div class="line w40" style="height:12px;"></div></div>
+            <div class="contentpad" style="padding-top:0;">
+              <div class="chip-row">
+                <div class="chip active">Todo</div><div class="chip">Avisos</div><div class="chip">Reseñas</div><div class="chip">Seguridad</div><div class="chip">Perdidos</div>
+              </div>
+              <div class="row-item"><div class="row-icon acc" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40" style="margin-bottom:4px;"></div><div class="line w90"></div></div></div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40" style="margin-bottom:4px;"></div><div class="line w70"></div></div></div>
+              <div class="row-item"><div class="row-icon acc" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40" style="margin-bottom:4px;"></div><div class="line w90"></div></div></div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40" style="margin-bottom:4px;"></div><div class="line w70"></div></div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><div class="ic-circle inicio">🏠</div><span class="tx">Inicio</span></div>
+              <div class="tabbar-item"><div class="ic-circle servicios">▤</div><span class="tx">Servicios</span></div>
+              <div class="tabbar-item active"><div class="ic-circle comunidad">📣</div><span class="tx">Comunidad</span></div>
+              <div class="tabbar-item"><div class="ic-circle perfil">☺</div><span class="tx">Perfil</span></div>
+            </div>
+          </div></div>
+          <p class="annot">Un solo feed con filtro por tipo. Avisos municipales, reseñas de negocios, alertas de seguridad y objetos/mascotas perdidas, mezclados por fecha.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label">6 · Perfil · con más contenido</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status"><span>9:41</span><span>···</span></div>
+            <div class="perfil-header">
+              <div class="avatar-grande">🙂<div class="avatar-editar">✎</div></div>
+              <div style="flex:1">
+                <div class="line w70" style="height:9px; margin-bottom:5px;"></div>
+                <div class="line w40"></div>
+              </div>
+            </div>
+            <div class="contentpad" style="padding-top:4px; gap:6px;">
+              <div class="stat-row">
+                <div class="stat-tile"><span class="stat-num">0</span><span class="stat-label">Reseñas</span></div>
+                <div class="stat-tile"><span class="stat-num">0</span><span class="stat-label">Favoritos</span></div>
+              </div>
+
+              <div class="subtitulo-grupo" style="margin-top:6px;">PREFERENCIAS</div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w70"></div></div><div class="toggle on"><div class="knob"></div></div></div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40"></div></div></div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w70"></div></div><div class="toggle"><div class="knob"></div></div></div>
+
+              <div class="subtitulo-grupo" style="margin-top:6px;">SOPORTE</div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40"></div></div></div>
+              <div class="row-item"><div class="row-icon" style="border-radius:50%;"></div><div style="flex:1"><div class="line w40"></div></div></div>
+              <div class="row-item"><div class="row-icon acc" style="border-radius:50%;"></div><div style="flex:1"><div class="line w90"></div></div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><div class="ic-circle inicio">🏠</div><span class="tx">Inicio</span></div>
+              <div class="tabbar-item"><div class="ic-circle servicios">▤</div><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><div class="ic-circle comunidad">📣</div><span class="tx">Comunidad</span></div>
+              <div class="tabbar-item active"><div class="ic-circle perfil">☺</div><span class="tx">Perfil</span></div>
+            </div>
+          </div></div>
+          <p class="annot">Nuevo: notificaciones y modo oscuro con switch, contador de reseñas y favoritos (conectan con Comunidad y Servicios), e "Invitar a vecinos" en Soporte.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="porque">
+    <div class="section-head">
+      <h2>4 · Por qué conviene, según la idea de negocio</h2>
+    </div>
+    <div class="comparacion">
+      <div class="col-antes" style="background:var(--surface-sunken);">
+        <span class="col-titulo">Riesgo si se queda como está</span>
+        <p>Un vecino nuevo no entiende qué hace la app completa de un vistazo — la mitad del catálogo está repartido entre dos pestañas con nombres parecidos ("Buscar" y "Servicios"), y eso choca con el objetivo del proyecto de ser <i>fácil de entender</i> desde el primer uso.</p>
+      </div>
+      <div class="col-despues">
+        <span class="col-titulo">Beneficio del cambio</span>
+        <p>Servicios se vuelve la respuesta directa a "¿qué puedo hacer en esta app?" — clave para un vecino nuevo o para presentarle la app a un negocio que se quiere afiliar. Buscar se vuelve más rápido de usar para quien ya sabe lo que quiere. Ninguna función se pierde, solo se les da un solo lugar de pertenencia.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>Esto es un boceto de organización — ningún archivo de la app fue modificado. Si te convence la idea general (o alguna parte de ella), lo implemento a partir de aquí.</footer>
+
+</div>
+

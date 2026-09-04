@@ -1,0 +1,342 @@
+<title>Rediseño de Notificaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a;
+    --verde-fuerte: #146641;
+    --verde-suave: #dbf1e3;
+    --coral: #ef7148;
+    --coral-fuerte: #c8532e;
+    --coral-suave: #fce2d7;
+    --oro: #b8862e;
+    --oro-suave: #f6ecd6;
+
+    --superficie: #ffffff;
+    --superficie-hundida: #eef1ea;
+    --borde: #e5e3da;
+    --texto: #1a2119;
+    --texto-suave: #5f6b5c;
+    --texto-tenue: #96a091;
+    --sombra: 0 6px 16px rgba(15, 31, 22, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #eceae2;
+    color: var(--texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 34px;
+    padding: 32px 16px 60px;
+    align-items: flex-start;
+  }
+  .columna { width: 330px; }
+  .etiqueta-pantalla {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .etiqueta-pantalla .num {
+    width: 28px; height: 28px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 13px;
+    flex: none;
+  }
+  .etiqueta-pantalla .txt strong { display: block; font-size: 14.5px; }
+  .etiqueta-pantalla .txt span { font-size: 12px; color: var(--texto-suave); }
+
+  .telefono {
+    width: 330px;
+    background: var(--superficie);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(20,40,30,0.35);
+    border: 7px solid #0e1410;
+  }
+  .pantalla {
+    height: 700px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    background: var(--superficie-hundida);
+  }
+  .pantalla::-webkit-scrollbar { display: none; }
+  .pantalla > * { flex-shrink: 0; }
+
+  .cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 12px;
+    background: var(--superficie);
+  }
+  .cabecera .lado { display: flex; align-items: center; gap: 10px; }
+  .cabecera h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0;
+  }
+  .btn-icono {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--superficie-hundida);
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+
+  .lista { padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 10px; }
+
+  .noti {
+    background: var(--superficie);
+    border-radius: 18px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+  }
+  .noti .fila {
+    display: flex;
+    gap: 12px;
+    padding: 13px;
+    align-items: flex-start;
+  }
+  .noti .icono {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex: none; font-size: 18px;
+  }
+  .noti .cuerpo { flex: 1; min-width: 0; }
+  .noti .fila-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .noti .titulo { font-size: 13.5px; font-weight: 800; line-height: 1.3; }
+  .noti .hora { font-size: 10.5px; color: var(--texto-tenue); white-space: nowrap; flex: none; margin-top: 2px; }
+  .noti .texto { font-size: 12px; color: var(--texto-suave); margin-top: 3px; line-height: 1.4; }
+  .noti .etiqueta {
+    display: inline-block; margin-top: 7px;
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px;
+    padding: 3px 8px; border-radius: 999px;
+  }
+  .noti.sinleer .fila { position: relative; }
+  .noti.sinleer .fila::after {
+    content: ""; position: absolute; top: 14px; right: 13px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--coral-fuerte);
+  }
+
+  .etiqueta-sep {
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px;
+    color: var(--texto-tenue); margin: 6px 2px 0;
+  }
+
+  /* Ajustes */
+  .ajustes-header { padding: 18px 20px 4px; background: var(--superficie); }
+  .ajustes-header .volver { margin-bottom: 14px; }
+  .ajustes-header h2 { font-family: "Fraunces", serif; font-weight: 700; font-size: 22px; margin: 0 0 8px; }
+  .ajustes-header p { font-size: 13px; color: var(--texto-suave); line-height: 1.5; margin: 0; }
+
+  .grupo-ajustes { padding: 18px 20px 6px; }
+  .grupo-ajustes h3 {
+    font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--texto-tenue); margin: 0 0 10px;
+  }
+  .tarjeta-ajustes { background: var(--superficie); border-radius: 16px; box-shadow: var(--sombra); overflow: hidden; }
+  .fila-ajuste {
+    display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+    border-top: 1px solid var(--borde);
+  }
+  .fila-ajuste:first-child { border-top: none; }
+  .fila-ajuste .icono {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex: none; font-size: 15px;
+  }
+  .fila-ajuste .info { flex: 1; }
+  .fila-ajuste .info b { display: block; font-size: 13px; font-weight: 700; }
+  .fila-ajuste .info span { font-size: 11px; color: var(--texto-suave); line-height: 1.3; display:block; margin-top:1px; }
+  .toggle {
+    width: 38px; height: 23px; border-radius: 999px; background: var(--borde);
+    position: relative; flex: none;
+  }
+  .toggle.on { background: var(--verde); }
+  .toggle .bola {
+    width: 17px; height: 17px; border-radius: 50%; background: #fff;
+    position: absolute; top: 3px; left: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .toggle.on .bola { left: 18px; }
+  .toggle.bloqueado { background: var(--coral-suave); opacity: 0.9; }
+  .toggle.bloqueado .bola { left: 18px; background: var(--coral-fuerte); }
+  .nota-bloqueado { font-size: 10px; font-weight: 700; color: var(--coral-fuerte); margin-top: 1px; display:block; }
+
+  .aviso-proximamente {
+    margin: 4px 20px 20px;
+    background: var(--verde-suave);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 11.5px;
+    color: var(--verde-fuerte);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .nota-final {
+    width: 100%;
+    max-width: 720px;
+    margin: 8px auto 0;
+    font-size: 13px;
+    color: #5c5f57;
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+
+<div class="columna">
+  <div class="etiqueta-pantalla">
+    <div class="num" style="background:var(--coral)">1</div>
+    <div class="txt"><strong>Notificaciones</strong><span>Lo que le llega al vecino al tocar la campana</span></div>
+  </div>
+  <div class="telefono"><div class="pantalla">
+
+    <div class="cabecera">
+      <div class="lado">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="#1a2119" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h1>Notificaciones</h1>
+      </div>
+      <div class="btn-icono">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#1a2119" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 000-3l-1.1-.3a6.6 6.6 0 00-.7-1.7l.6-1a1.7 1.7 0 00-2.3-2.3l-1 .6a6.6 6.6 0 00-1.7-.7L13 3.6a1.7 1.7 0 00-3 0l-.3 1.1a6.6 6.6 0 00-1.7.7l-1-.6a1.7 1.7 0 00-2.3 2.3l.6 1a6.6 6.6 0 00-.7 1.7l-1.1.3a1.7 1.7 0 000 3l1.1.3c.15.6.4 1.17.7 1.7l-.6 1a1.7 1.7 0 002.3 2.3l1-.6c.53.3 1.1.55 1.7.7l.3 1.1a1.7 1.7 0 003 0l.3-1.1c.6-.15 1.17-.4 1.7-.7l1 .6a1.7 1.7 0 002.3-2.3l-.6-1c.3-.53.55-1.1.7-1.7l1.1-.3z" stroke="#1a2119" stroke-width="1.5"/></svg>
+      </div>
+    </div>
+
+    <div class="lista">
+      <div class="etiqueta-sep">Hoy</div>
+
+      <div class="noti sinleer">
+        <div class="fila">
+          <div class="icono" style="background:var(--coral-suave)">🚨</div>
+          <div class="cuerpo">
+            <div class="fila-top">
+              <div class="titulo">Refuerzo de serenazgo en zona norte</div>
+              <div class="hora">16:40</div>
+            </div>
+            <div class="texto">Serenazgo aumentó las rondas nocturnas entre Av. Aviación y Av. Angamos Este.</div>
+            <span class="etiqueta" style="background:var(--coral-suave); color:var(--coral-fuerte)">Alerta de seguridad</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="noti sinleer">
+        <div class="fila">
+          <div class="icono" style="background:var(--verde-suave)">🎉</div>
+          <div class="cuerpo">
+            <div class="fila-top">
+              <div class="titulo">-15% en Parrilla mixta</div>
+              <div class="hora">14:05</div>
+            </div>
+            <div class="texto">El Fogón Sanborjino tiene una oferta activa cerca de ti.</div>
+            <span class="etiqueta" style="background:var(--verde-suave); color:var(--verde-fuerte)">Oferta de negocio</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="etiqueta-sep">Ayer</div>
+
+      <div class="noti">
+        <div class="fila">
+          <div class="icono" style="background:var(--oro-suave)">🏛️</div>
+          <div class="cuerpo">
+            <div class="fila-top">
+              <div class="titulo">Corte de agua programado</div>
+              <div class="hora">09:12</div>
+            </div>
+            <div class="texto">Sedapal informa corte el jueves de 9:00 a 17:00 en Av. San Luis.</div>
+            <span class="etiqueta" style="background:var(--oro-suave); color:var(--oro)">Aviso municipal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="noti">
+        <div class="fila">
+          <div class="icono" style="background:#e8e6dd">✨</div>
+          <div class="cuerpo">
+            <div class="fila-top">
+              <div class="titulo">Ahora puedes ver el horario completo</div>
+              <div class="hora">08:00</div>
+            </div>
+            <div class="texto">Toca "Ver horario completo" en cualquier negocio para ver sus 7 días.</div>
+            <span class="etiqueta" style="background:#e8e6dd; color:var(--texto-suave)">Novedad de la app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+</div>
+
+<div class="columna">
+  <div class="etiqueta-pantalla">
+    <div class="num" style="background:var(--verde)">2</div>
+    <div class="txt"><strong>Ajustes de notificaciones</strong><span>Se abre con el ícono de tuerca</span></div>
+  </div>
+  <div class="telefono"><div class="pantalla">
+
+    <div class="ajustes-header">
+      <svg class="volver" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="#1a2119" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h2>Notificaciones</h2>
+      <p>Elige qué avisos quieres recibir. Las alertas de seguridad siempre están activas, por tu propia seguridad.</p>
+    </div>
+
+    <div class="grupo-ajustes">
+      <h3>Comunidad</h3>
+      <div class="tarjeta-ajustes">
+        <div class="fila-ajuste">
+          <div class="icono" style="background:var(--coral-suave)">🚨</div>
+          <div class="info">
+            <b>Alertas de seguridad</b>
+            <span class="nota-bloqueado">No se puede desactivar</span>
+          </div>
+          <div class="toggle bloqueado"><div class="bola"></div></div>
+        </div>
+        <div class="fila-ajuste">
+          <div class="icono" style="background:var(--oro-suave)">🏛️</div>
+          <div class="info"><b>Avisos municipales y junta vecinal</b><span>Cortes de servicio, reuniones, campañas.</span></div>
+          <div class="toggle on"><div class="bola"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grupo-ajustes">
+      <h3>Negocios</h3>
+      <div class="tarjeta-ajustes">
+        <div class="fila-ajuste">
+          <div class="icono" style="background:var(--verde-suave)">🎉</div>
+          <div class="info"><b>Ofertas y promociones</b><span>Descuentos de negocios cerca de ti.</span></div>
+          <div class="toggle on"><div class="bola"></div></div>
+        </div>
+        <div class="fila-ajuste">
+          <div class="icono" style="background:var(--verde-suave)">🏪</div>
+          <div class="info"><b>Nuevos negocios en tu zona</b><span>Cuando se suma un negocio verificado.</span></div>
+          <div class="toggle"><div class="bola"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grupo-ajustes">
+      <h3>App</h3>
+      <div class="tarjeta-ajustes">
+        <div class="fila-ajuste">
+          <div class="icono" style="background:#e8e6dd">✨</div>
+          <div class="info"><b>Novedades de la app</b><span>Funciones nuevas y mejoras.</span></div>
+          <div class="toggle on"><div class="bola"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aviso-proximamente">
+      ✉️ Los avisos por correo llegarán cuando la app tenga cuentas de usuario (próxima etapa) — por ahora todo se recibe por notificación dentro de la app.
+    </div>
+
+  </div></div>
+</div>
+
+<p class="nota-final">Boceto visual · sin conectar a código todavía · las notificaciones de ejemplo usan contenido real de la app (avisos y ofertas existentes) — nada inventado, solo para mostrar cómo se vería el diseño.</p>
+

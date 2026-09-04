@@ -1,0 +1,433 @@
+<title>Paletas App Vecinos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --page-bg: #f6f6f2;
+    --page-surface: #ffffff;
+    --page-ink: #1d211c;
+    --page-ink-soft: #62695f;
+    --page-ink-faint: #93998c;
+    --page-line: #e2e2d6;
+    --page-accent: #2e6b4c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --page-bg: #14170f;
+      --page-surface: #1c2016;
+      --page-ink: #ecefe6;
+      --page-ink-soft: #a9b09f;
+      --page-ink-faint: #6f7568;
+      --page-line: #2a2f22;
+      --page-accent: #7fc39b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --page-bg: #14170f;
+    --page-surface: #1c2016;
+    --page-ink: #ecefe6;
+    --page-ink-soft: #a9b09f;
+    --page-ink-faint: #6f7568;
+    --page-line: #2a2f22;
+    --page-accent: #7fc39b;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--page-bg);
+    color: var(--page-ink);
+    font-family: "Karla", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap{ max-width: 1280px; margin: 0 auto; padding: 4rem 1.75rem 6rem; }
+
+  .eyebrow{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--page-accent);
+    display: flex; align-items: center; gap: 0.6em;
+    margin: 0 0 1.1rem;
+  }
+  .eyebrow::before{ content:""; width:26px; height:1px; background: var(--page-accent); display:inline-block; }
+
+  h1{
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+  .lede{
+    font-size: 1.05rem;
+    color: var(--page-ink-soft);
+    max-width: 62ch;
+    margin: 0 0 3.5rem;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px){ .grid{ grid-template-columns: 1fr; } }
+
+  .opcion{ display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .opcion-head{ display:flex; flex-direction:column; gap:0.3rem; }
+  .opcion-nombre{
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--page-ink);
+  }
+  .opcion-desc{ font-size: 0.85rem; color: var(--page-ink-soft); line-height: 1.45; }
+
+  /* ---------- PHONE MOCK (scoped per palette via CSS vars) ---------- */
+  .phone{
+    background: var(--page-surface);
+    border: 1px solid var(--page-line);
+    border-radius: 22px;
+    padding: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .screen{
+    background: var(--bg);
+    border-radius: 15px;
+    overflow: hidden;
+    font-family: "Karla", sans-serif;
+  }
+  .status{
+    height: 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 12px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.55rem;
+    color: var(--ink-faint);
+  }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 6px 12px 10px;
+  }
+  .ubicacion{
+    display:flex; align-items:center; gap:5px;
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 5px 9px 5px 7px;
+    border-radius: 20px;
+  }
+  .ubicacion .car{ font-size: 0.55rem; }
+  .campana{
+    position: relative;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--bg-sunken);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 0.75rem;
+    color: var(--ink);
+  }
+  .campana::after{
+    content:"";
+    position:absolute; top:3px; right:3px;
+    width:6px; height:6px; border-radius:50%;
+    background: var(--accent);
+    border: 1.5px solid var(--bg);
+  }
+  .banner{
+    margin: 0 12px 10px;
+    height: 78px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    display:flex; flex-direction:column; justify-content:center;
+    padding: 0 12px;
+    gap: 4px;
+  }
+  .banner .t1{ color: rgba(255,255,255,0.82); font-size:0.5rem; font-weight:700; letter-spacing:0.03em; text-transform:uppercase; }
+  .banner .t2{ color: #fff; font-size:0.78rem; font-weight:700; }
+
+  .contentpad{ padding: 0 12px; display:flex; flex-direction:column; gap:9px; }
+  .label{ font-family:"IBM Plex Mono", monospace; font-size:0.5rem; text-transform:uppercase; letter-spacing:0.03em; color: var(--ink-faint); margin-top:2px; }
+
+  .tiles{ display:flex; gap:7px; }
+  .tile{
+    flex:1;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    background: var(--bg-sunken);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap: 4px;
+  }
+  .tile .ic{
+    width: 24px; height:24px; border-radius:50%;
+    background: var(--primary-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 0.7rem;
+  }
+  .tile.acc .ic{ background: var(--accent-soft); }
+  .tile .tx{ font-size:0.44rem; font-weight:700; color: var(--ink-soft); }
+
+  .card-row{ display:flex; flex-direction:column; gap:7px; }
+  .biz{ display:flex; gap:8px; align-items:center; }
+  .biz-thumb{ width:38px; height:38px; border-radius:9px; background: var(--bg-sunken); flex:none; }
+  .biz-txt{ flex:1; display:flex; flex-direction:column; gap:4px; }
+  .line{ height:5px; border-radius:3px; background: var(--bg-sunken); }
+  .line.w70{ width:70%; } .line.w45{ width:45%; }
+  .badge{
+    font-size: 0.42rem; font-weight:800;
+    padding: 2px 6px; border-radius: 20px;
+    background: var(--accent-soft); color: var(--accent-strong);
+    align-self:flex-start;
+  }
+
+  .cta{
+    height: 30px;
+    border-radius: 9px;
+    background: var(--primary);
+    color: #fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 0.58rem; font-weight:700;
+    margin: 4px 0 2px;
+  }
+
+  .tabbar{
+    height: 48px;
+    border-top: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-around;
+    background: var(--bg);
+  }
+  .tabitem{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .tabitem .ic{ font-size:0.8rem; }
+  .tabitem .tx{ font-family:"IBM Plex Mono", monospace; font-size:0.38rem; text-transform:uppercase; color: var(--ink-faint); }
+  .tabitem.active .ic, .tabitem.active .tx{ color: var(--primary); font-weight:700; }
+
+  /* ---------- SWATCHES ---------- */
+  .swatches{ display:flex; gap:8px; flex-wrap:wrap; }
+  .swatch{ display:flex; flex-direction:column; gap:5px; width: 56px; }
+  .chip{ height: 34px; border-radius: 8px; border:1px solid rgba(0,0,0,0.06); }
+  .swatch .hex{ font-family:"IBM Plex Mono", monospace; font-size:0.58rem; color: var(--page-ink-faint); text-align:center; }
+  .swatch .rol{ font-size:0.6rem; color: var(--page-ink-soft); text-align:center; }
+
+  footer{
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--page-line);
+    font-size: 0.85rem;
+    color: var(--page-ink-faint);
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Exploración de color · App Vecinos</p>
+  <h1>Cuatro combinaciones de color sobre fondo blanco</h1>
+  <p class="lede">Mismo layout de Inicio (ubicación arriba, campana de avisos, banner, categorías en tarjetas-ícono, negocios cerca) con cuatro paletas distintas. Elige la que más te convenza — o dime qué mezclar de cada una.</p>
+
+  <div class="grid">
+
+    <!-- OPCIÓN A: Barrio Vivo -->
+    <div class="opcion" style="
+      --bg:#ffffff; --bg-sunken:#f4f0ee; --ink:#211c1a; --ink-soft:#6b5f5a; --ink-faint:#a0938c; --line:#ece4e1;
+      --primary:#e0603f; --primary-strong:#b8462c; --primary-soft:#fce3db;
+      --accent:#1b3a5c; --accent-strong:#1b3a5c; --accent-soft:#e2e9f0;
+    ">
+      <div class="opcion-head">
+        <span class="opcion-nombre">A · Barrio Vivo</span>
+        <span class="opcion-desc">Coral cálido + azul marino. Energético y confiable a la vez — el coral llama la atención sin ser el rojo-magenta típico de las apps de delivery.</span>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="status"><span>9:41</span><span>···</span></div>
+        <div class="topbar">
+          <div class="ubicacion">📍 San Borja <span class="car">▾</span></div>
+          <div class="campana">🔔</div>
+        </div>
+        <div class="banner"><span class="t1">Comunidad</span><span class="t2">Bienvenido al piloto de San Borja</span></div>
+        <div class="contentpad">
+          <span class="label">Categorías</span>
+          <div class="tiles">
+            <div class="tile"><div class="ic">🍽️</div><span class="tx">Comida</span></div>
+            <div class="tile acc"><div class="ic">🛍️</div><span class="tx">Productos</span></div>
+            <div class="tile"><div class="ic">🏪</div><span class="tx">Súper</span></div>
+            <div class="tile acc"><div class="ic">🐾</div><span class="tx">Mascotas</span></div>
+          </div>
+          <span class="label">Cerca de ti</span>
+          <div class="card-row">
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div><span class="badge">Verificado</span></div></div>
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div></div></div>
+          </div>
+          <div class="cta">Ver todos los negocios</div>
+        </div>
+        <div class="tabbar">
+          <div class="tabitem active"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+          <div class="tabitem"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+          <div class="tabitem"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+          <div class="tabitem"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+          <div class="tabitem"><span class="ic">☺</span><span class="tx">Perfil</span></div>
+        </div>
+      </div></div>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background:#e0603f"></div><div class="rol">Primario</div><div class="hex">#E0603F</div></div>
+        <div class="swatch"><div class="chip" style="background:#b8462c"></div><div class="rol">Primario+</div><div class="hex">#B8462C</div></div>
+        <div class="swatch"><div class="chip" style="background:#1b3a5c"></div><div class="rol">Acento</div><div class="hex">#1B3A5C</div></div>
+        <div class="swatch"><div class="chip" style="background:#fce3db"></div><div class="rol">Suave</div><div class="hex">#FCE3DB</div></div>
+      </div>
+    </div>
+
+    <!-- OPCIÓN B: Confianza Local -->
+    <div class="opcion" style="
+      --bg:#ffffff; --bg-sunken:#eef4f3; --ink:#182220; --ink-soft:#5c6b68; --ink-faint:#93a19d; --line:#e2ece9;
+      --primary:#0f6e6a; --primary-strong:#0a4f4c; --primary-soft:#d9efed;
+      --accent:#dd9a2a; --accent-strong:#a86e12; --accent-soft:#faedd2;
+    ">
+      <div class="opcion-head">
+        <span class="opcion-nombre">B · Confianza Local</span>
+        <span class="opcion-desc">Petróleo profundo + ámbar cálido. Serio y confiable para lo institucional (avisos, verificación), con el ámbar dando calidez humana.</span>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="status"><span>9:41</span><span>···</span></div>
+        <div class="topbar">
+          <div class="ubicacion">📍 San Borja <span class="car">▾</span></div>
+          <div class="campana">🔔</div>
+        </div>
+        <div class="banner"><span class="t1">Comunidad</span><span class="t2">Bienvenido al piloto de San Borja</span></div>
+        <div class="contentpad">
+          <span class="label">Categorías</span>
+          <div class="tiles">
+            <div class="tile"><div class="ic">🍽️</div><span class="tx">Comida</span></div>
+            <div class="tile acc"><div class="ic">🛍️</div><span class="tx">Productos</span></div>
+            <div class="tile"><div class="ic">🏪</div><span class="tx">Súper</span></div>
+            <div class="tile acc"><div class="ic">🐾</div><span class="tx">Mascotas</span></div>
+          </div>
+          <span class="label">Cerca de ti</span>
+          <div class="card-row">
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div><span class="badge">Verificado</span></div></div>
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div></div></div>
+          </div>
+          <div class="cta">Ver todos los negocios</div>
+        </div>
+        <div class="tabbar">
+          <div class="tabitem active"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+          <div class="tabitem"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+          <div class="tabitem"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+          <div class="tabitem"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+          <div class="tabitem"><span class="ic">☺</span><span class="tx">Perfil</span></div>
+        </div>
+      </div></div>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background:#0f6e6a"></div><div class="rol">Primario</div><div class="hex">#0F6E6A</div></div>
+        <div class="swatch"><div class="chip" style="background:#0a4f4c"></div><div class="rol">Primario+</div><div class="hex">#0A4F4C</div></div>
+        <div class="swatch"><div class="chip" style="background:#dd9a2a"></div><div class="rol">Acento</div><div class="hex">#DD9A2A</div></div>
+        <div class="swatch"><div class="chip" style="background:#d9efed"></div><div class="rol">Suave</div><div class="hex">#D9EFED</div></div>
+      </div>
+    </div>
+
+    <!-- OPCIÓN C: Verde San Borja -->
+    <div class="opcion" style="
+      --bg:#ffffff; --bg-sunken:#eef6f0; --ink:#1a2119; --ink-soft:#5f6b5c; --ink-faint:#96a091; --line:#e3ece4;
+      --primary:#1f8a5a; --primary-strong:#146641; --primary-soft:#dbf1e3;
+      --accent:#ef7148; --accent-strong:#c8532e; --accent-soft:#fce2d7;
+    ">
+      <div class="opcion-head">
+        <span class="opcion-nombre">C · Verde San Borja</span>
+        <span class="opcion-desc">Evolución del verde que ya tenías (parques del distrito) pero más vivo, con coral como acento para CTAs y destacados. Mantiene identidad, gana energía.</span>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="status"><span>9:41</span><span>···</span></div>
+        <div class="topbar">
+          <div class="ubicacion">📍 San Borja <span class="car">▾</span></div>
+          <div class="campana">🔔</div>
+        </div>
+        <div class="banner"><span class="t1">Comunidad</span><span class="t2">Bienvenido al piloto de San Borja</span></div>
+        <div class="contentpad">
+          <span class="label">Categorías</span>
+          <div class="tiles">
+            <div class="tile"><div class="ic">🍽️</div><span class="tx">Comida</span></div>
+            <div class="tile acc"><div class="ic">🛍️</div><span class="tx">Productos</span></div>
+            <div class="tile"><div class="ic">🏪</div><span class="tx">Súper</span></div>
+            <div class="tile acc"><div class="ic">🐾</div><span class="tx">Mascotas</span></div>
+          </div>
+          <span class="label">Cerca de ti</span>
+          <div class="card-row">
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div><span class="badge">Verificado</span></div></div>
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div></div></div>
+          </div>
+          <div class="cta">Ver todos los negocios</div>
+        </div>
+        <div class="tabbar">
+          <div class="tabitem active"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+          <div class="tabitem"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+          <div class="tabitem"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+          <div class="tabitem"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+          <div class="tabitem"><span class="ic">☺</span><span class="tx">Perfil</span></div>
+        </div>
+      </div></div>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background:#1f8a5a"></div><div class="rol">Primario</div><div class="hex">#1F8A5A</div></div>
+        <div class="swatch"><div class="chip" style="background:#146641"></div><div class="rol">Primario+</div><div class="hex">#146641</div></div>
+        <div class="swatch"><div class="chip" style="background:#ef7148"></div><div class="rol">Acento</div><div class="hex">#EF7148</div></div>
+        <div class="swatch"><div class="chip" style="background:#dbf1e3"></div><div class="rol">Suave</div><div class="hex">#DBF1E3</div></div>
+      </div>
+    </div>
+
+    <!-- OPCIÓN D: Cálido Vecinal -->
+    <div class="opcion" style="
+      --bg:#ffffff; --bg-sunken:#f6f0e8; --ink:#211c17; --ink-soft:#6b6153; --ink-faint:#a1958091; --line:#ece3d5;
+      --primary:#c77d22; --primary-strong:#9c5f14; --primary-soft:#f5e6cf;
+      --accent:#6a4568; --accent-strong:#4d2f4c; --accent-soft:#eee0ed;
+    ">
+      <div class="opcion-head">
+        <span class="opcion-nombre">D · Cálido Vecinal</span>
+        <span class="opcion-desc">Ocre/mostaza + ciruela. El más distintivo de los cuatro — evoca mercado y feria de barrio, con la ciruela dando un contraste sofisticado.</span>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="status"><span>9:41</span><span>···</span></div>
+        <div class="topbar">
+          <div class="ubicacion">📍 San Borja <span class="car">▾</span></div>
+          <div class="campana">🔔</div>
+        </div>
+        <div class="banner"><span class="t1">Comunidad</span><span class="t2">Bienvenido al piloto de San Borja</span></div>
+        <div class="contentpad">
+          <span class="label">Categorías</span>
+          <div class="tiles">
+            <div class="tile"><div class="ic">🍽️</div><span class="tx">Comida</span></div>
+            <div class="tile acc"><div class="ic">🛍️</div><span class="tx">Productos</span></div>
+            <div class="tile"><div class="ic">🏪</div><span class="tx">Súper</span></div>
+            <div class="tile acc"><div class="ic">🐾</div><span class="tx">Mascotas</span></div>
+          </div>
+          <span class="label">Cerca de ti</span>
+          <div class="card-row">
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div><span class="badge">Verificado</span></div></div>
+            <div class="biz"><div class="biz-thumb"></div><div class="biz-txt"><div class="line w70"></div><div class="line w45"></div></div></div>
+          </div>
+          <div class="cta">Ver todos los negocios</div>
+        </div>
+        <div class="tabbar">
+          <div class="tabitem active"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+          <div class="tabitem"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+          <div class="tabitem"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+          <div class="tabitem"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+          <div class="tabitem"><span class="ic">☺</span><span class="tx">Perfil</span></div>
+        </div>
+      </div></div>
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background:#c77d22"></div><div class="rol">Primario</div><div class="hex">#C77D22</div></div>
+        <div class="swatch"><div class="chip" style="background:#9c5f14"></div><div class="rol">Primario+</div><div class="hex">#9C5F14</div></div>
+        <div class="swatch"><div class="chip" style="background:#6a4568"></div><div class="rol">Acento</div><div class="hex">#6A4568</div></div>
+        <div class="swatch"><div class="chip" style="background:#f5e6cf"></div><div class="rol">Suave</div><div class="hex">#F5E6CF</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Las cuatro usan fondo blanco puro, como pediste. El texto y los grises de cada tarjeta cambian levemente de temperatura según la paleta (más cálidos en A y D, más fríos en B y C) para que el gris no se sienta desconectado del color principal.</footer>
+</div>
+

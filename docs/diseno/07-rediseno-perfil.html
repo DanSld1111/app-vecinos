@@ -1,0 +1,338 @@
+<title>Rediseño de Perfil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a;
+    --verde-fuerte: #146641;
+    --verde-suave: #dbf1e3;
+    --coral: #ef7148;
+    --coral-fuerte: #c8532e;
+    --coral-suave: #fce2d7;
+    --oro: #b8862e;
+
+    --fondo-app: #eef6f0;
+    --superficie: #ffffff;
+    --superficie-hundida: #f4f4f0;
+    --borde: #e3ece4;
+    --texto: #1a2119;
+    --texto-suave: #5f6b5c;
+    --texto-tenue: #96a091;
+    --sombra: 0 6px 16px rgba(15, 31, 22, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #eef1ea;
+    color: var(--texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  .telefono {
+    width: 390px;
+    max-width: 100%;
+    background: var(--fondo-app);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(20,40,30,0.35);
+    border: 8px solid #0e1410;
+  }
+  .pantalla {
+    height: 844px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 20px 20px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .pantalla::-webkit-scrollbar { display: none; }
+  .pantalla > * { flex-shrink: 0; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(160deg, #ffffff 0%, var(--verde-suave) 130%);
+    border-radius: 26px;
+    padding: 22px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--sombra);
+  }
+  .avatar-wrap { position: relative; flex: none; }
+  .avatar {
+    width: 62px; height: 62px; border-radius: 20px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 2px var(--verde-suave);
+  }
+  .avatar-editar {
+    position: absolute; bottom: -4px; right: -4px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--verde);
+    border: 2.5px solid var(--fondo-app);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-texto { flex: 1; min-width: 0; }
+  .header h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .fila-zona { display: flex; align-items: center; gap: 6px; }
+  .vecino-de { font-size: 13px; color: var(--texto-suave); font-weight: 600; }
+  .pill-zona {
+    font-size: 12px; font-weight: 800;
+    background: var(--verde-suave); color: var(--verde-fuerte);
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  /* Stats */
+  .stats { display: flex; gap: 12px; }
+  .stat-card {
+    flex: 1;
+    background: var(--superficie);
+    border-radius: 20px;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: var(--sombra);
+  }
+  .stat-icono {
+    width: 34px; height: 34px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 2px;
+  }
+  .stat-icono.resenas { background: var(--coral-suave); }
+  .stat-icono.favoritos { background: var(--verde-suave); }
+  .stat-numero { font-family: "Fraunces", serif; font-weight: 700; font-size: 22px; }
+  .stat-etiqueta { font-size: 11px; font-weight: 700; color: var(--texto-tenue); text-transform: uppercase; letter-spacing: 0.4px; }
+  .stat-card.proximo { opacity: 0.7; }
+  .stat-proximamente {
+    font-size: 10px; font-weight: 800; color: var(--texto-tenue);
+    background: var(--superficie-hundida); padding: 3px 9px; border-radius: 999px;
+    margin-top: 2px;
+  }
+
+  /* Sections */
+  .seccion-titulo {
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--texto-tenue);
+    margin: 2px 4px -6px;
+  }
+  .grupo-card {
+    background: var(--superficie);
+    border-radius: 20px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+  }
+  .fila {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .fila + .fila { border-top: 1px solid var(--borde); }
+  .fila-icono {
+    width: 36px; height: 36px; border-radius: 12px;
+    background: var(--superficie-hundida);
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .fila-texto { flex: 1; font-size: 14.5px; font-weight: 700; }
+  .fila-proximamente {
+    font-size: 10px; font-weight: 700; color: var(--texto-tenue);
+    background: var(--superficie-hundida); padding: 2px 7px; border-radius: 999px;
+    margin-left: 6px;
+  }
+  .toggle {
+    width: 40px; height: 24px; border-radius: 999px;
+    background: var(--borde);
+    position: relative;
+    flex: none;
+  }
+  .toggle.on { background: var(--verde); }
+  .toggle .knob {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; position: absolute; top: 3px; left: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .toggle.on .knob { left: 19px; }
+  .chevron { color: var(--texto-tenue); flex: none; }
+
+  /* CTA invitar */
+  .cta-invitar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, var(--coral), var(--coral-fuerte));
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 10px 24px -10px rgba(200,83,46,0.5);
+  }
+  .cta-icono {
+    width: 42px; height: 42px; border-radius: 14px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .cta-texto { flex: 1; color: #fff; }
+  .cta-texto strong { display: block; font-family: "Fraunces", serif; font-size: 15.5px; font-weight: 700; }
+  .cta-texto span { font-size: 12px; opacity: 0.9; font-weight: 500; }
+
+  .fila-peligro .fila-texto { color: var(--coral-fuerte); }
+  .fila-peligro .fila-icono { background: var(--coral-suave); }
+
+  .footer-marca {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--texto-tenue);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    margin-top: 4px;
+  }
+
+  .tabbar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 22px;
+    background: var(--superficie);
+    border-top: 1px solid var(--borde);
+    margin: 0 -20px -28px;
+  }
+  .tabitem { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 700; color: var(--texto-tenue); }
+  .tabitem.activo { color: var(--coral-fuerte); }
+  .tabitem .dot { width: 22px; height: 22px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
+  .tabitem.activo .dot { background: var(--coral-suave); }
+
+  .nota {
+    max-width: 390px;
+    margin: 18px auto 0;
+    font-size: 13px;
+    color: #6b6f68;
+    text-align: center;
+  }
+</style>
+
+<div style="display:flex; flex-direction:column; align-items:center;">
+<div class="telefono">
+  <div class="pantalla">
+
+    <div class="header">
+      <div class="avatar-wrap">
+        <div class="avatar">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#146641" stroke-width="1.8"/><path d="M4.5 20c1.3-4 4.6-6.5 7.5-6.5s6.2 2.5 7.5 6.5" stroke="#146641" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="avatar-editar">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="header-texto">
+        <h1>Mi perfil</h1>
+        <div class="fila-zona">
+          <span class="vecino-de">Vecino de</span>
+          <span class="pill-zona">San Borja</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card proximo">
+        <div class="stat-icono resenas">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6L12 2z" stroke="#c8532e" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-etiqueta">Reseñas</div>
+        <div class="stat-proximamente">Próximamente</div>
+      </div>
+      <div class="stat-card proximo">
+        <div class="stat-icono favoritos">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.2 2 4.5 5.6 4A5.6 5.6 0 0112 6.8 5.6 5.6 0 0118.4 4C22 4.5 23.6 8.2 22 11.7 19.5 16.4 12 21 12 21z" stroke="#146641" stroke-width="1.6"/></svg>
+        </div>
+        <div class="stat-etiqueta">Favoritos</div>
+        <div class="stat-proximamente">Próximamente</div>
+      </div>
+    </div>
+
+    <div class="seccion-titulo">Preferencias</div>
+    <div class="grupo-card">
+      <div class="fila">
+        <div class="fila-icono">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="#146641" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke="#146641" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="fila-texto">Notificaciones</div>
+        <div class="toggle on"><div class="knob"></div></div>
+      </div>
+      <div class="fila">
+        <div class="fila-icono">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" stroke="#146641" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fila-texto" style="display:flex;align-items:center;">Modo oscuro <span class="fila-proximamente">Próximamente</span></div>
+        <div class="toggle"><div class="knob"></div></div>
+      </div>
+      <div class="fila">
+        <div class="fila-icono">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z" stroke="#146641" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke="#146641" stroke-width="1.6"/></svg>
+        </div>
+        <div class="fila-texto">Cambiar de comunidad</div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="seccion-titulo">Soporte</div>
+    <div class="grupo-card">
+      <div class="fila">
+        <div class="fila-icono">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#146641" stroke-width="1.6"/><path d="M12 11v6M12 8v.3" stroke="#146641" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="fila-texto">Sobre San Borja</div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="fila">
+        <div class="fila-icono">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#146641" stroke-width="1.6"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.8.6-1.5 1-1.5 2.2M12 17v.2" stroke="#146641" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="fila-texto">Ayuda</div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="cta-invitar">
+      <div class="cta-icono">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 20v-1.6a3.6 3.6 0 00-3.6-3.6H6.6A3.6 3.6 0 003 18.4V20M9.8 11.2a3.6 3.6 0 100-7.2 3.6 3.6 0 000 7.2zM21 20v-1.6a3.6 3.6 0 00-2.7-3.5M15.5 4.2a3.6 3.6 0 010 6.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="cta-texto">
+        <strong>Invitar a vecinos</strong>
+        <span>Comparte ELISUR con tu cuadra</span>
+      </div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="grupo-card">
+      <div class="fila fila-peligro">
+        <div class="fila-icono">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 21H6a2 2 0 01-2-2V5a2 2 0 012-2h3M16 17l5-5-5-5M21 12H9" stroke="#c8532e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fila-texto">Cerrar sesión</div>
+      </div>
+    </div>
+
+    <div class="footer-marca">ELISUR · San Borja</div>
+
+    <div class="tabbar">
+      <div class="tabitem"><div class="dot">🏠</div>Inicio</div>
+      <div class="tabitem"><div class="dot">🧭</div>Servicios</div>
+      <div class="tabitem"><div class="dot">💬</div>Comunidad</div>
+      <div class="tabitem activo"><div class="dot">👤</div>Perfil</div>
+    </div>
+
+  </div>
+</div>
+<div class="nota">Boceto visual · tamaño real de app (390×844) · sin conectar a código todavía</div>
+</div>
+

@@ -1,0 +1,40 @@
+import { Anuncio } from "@app-vecinos/tipos";
+
+export const anunciosMock: Anuncio[] = [
+  {
+    id: "ad-fogon",
+    nombre: "20% en parrillas — El Fogón",
+    detalle: "20% en parrillas todos los martes",
+    imagenUrl: null,
+    ubicaciones: ["carrusel_inicio"],
+    negocioId: "neg-restaurante-fogon",
+    fechaInicio: "2026-08-01",
+    fechaFin: "2026-09-30",
+    orden: 1,
+    activo: true,
+  },
+  {
+    id: "ad-supermercado",
+    nombre: "2x1 en lácteos — Supermercado SB",
+    detalle: "2x1 en lácteos esta semana",
+    imagenUrl: null,
+    ubicaciones: ["carrusel_inicio", "banner_buscar"],
+    negocioId: "neg-supermercado-sb",
+    fechaInicio: "2026-08-15",
+    fechaFin: "2026-09-05",
+    orden: 2,
+    activo: true,
+  },
+  {
+    id: "ad-herminia",
+    nombre: "Torta por encargo — Doña Herminia",
+    detalle: "Encarga tu torta con 48h de anticipo",
+    imagenUrl: null,
+    ubicaciones: ["banner_buscar"],
+    negocioId: "neg-postres-herminia",
+    fechaInicio: "2026-10-01",
+    fechaFin: null,
+    orden: 3,
+    activo: true,
+  },
+];

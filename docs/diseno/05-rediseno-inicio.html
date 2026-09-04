@@ -1,0 +1,539 @@
+<title>Rediseño de Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-sunken: #f1f5f0;
+    --line: #e7ece6;
+    --ink: #172018;
+    --ink-soft: #5c6a5c;
+    --ink-faint: #93a091;
+    --primary: #1f8a5a;
+    --primary-strong: #146641;
+    --primary-soft: #dcf0e3;
+    --accent: #ef7148;
+    --accent-strong: #c8532e;
+    --accent-soft: #fce2d5;
+    --shadow: 160 30% 10%;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #0f1710; --surface: #17211a; --surface-sunken: #1d281f; --line: #263123;
+      --ink: #ecf1ea; --ink-soft: #a6b3a3; --ink-faint: #667363;
+      --primary: #6fcb98; --primary-strong: #97dcb6; --primary-soft: #1f3327;
+      --accent: #f19b76; --accent-strong: #f6b797; --accent-soft: #3a271e;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #0f1710; --surface: #17211a; --surface-sunken: #1d281f; --line: #263123;
+    --ink: #ecf1ea; --ink-soft: #a6b3a3; --ink-faint: #667363;
+    --primary: #6fcb98; --primary-strong: #97dcb6; --primary-soft: #1f3327;
+    --accent: #f19b76; --accent-strong: #f6b797; --accent-soft: #3a271e;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg); color: var(--ink);
+    font-family: "Karla", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+  }
+  ::selection{ background: var(--primary-soft); color: var(--primary-strong); }
+
+  .pagina{ max-width: 1180px; margin: 0 auto; padding: 4.5rem 1.75rem 6rem; }
+
+  .eyebrow{
+    font-family: ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--primary-strong); display:flex; align-items:center; gap:0.6em; margin: 0 0 1.1rem;
+  }
+  .eyebrow::before{ content:""; width:26px; height:1px; background: var(--primary-strong); display:inline-block; }
+
+  h1{
+    font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-style: italic;
+    font-size: clamp(2.1rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -0.01em;
+    margin: 0 0 1rem; text-wrap: balance; max-width: 18ch; color: var(--ink);
+  }
+  .lede{ font-size: 1.05rem; color: var(--ink-soft); max-width: 60ch; margin: 0 0 3rem; }
+
+  .layout{ display:grid; grid-template-columns: 340px 1fr; gap: 3rem; align-items: start; }
+  @media (max-width: 900px){ .layout{ grid-template-columns: 1fr; } }
+
+  /* ============ PHONE ============ */
+  .telefono{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 32px;
+    padding: 10px; box-shadow: 0 20px 50px -20px hsl(var(--shadow) / 0.35);
+    position: sticky; top: 2rem;
+  }
+  .pantalla{
+    background: var(--bg); border-radius: 24px; overflow: hidden;
+    min-height: 720px; display:flex; flex-direction:column; position:relative;
+  }
+  .status{ height:22px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:0.68rem; color:var(--ink-faint); font-weight:600; flex:none; }
+
+  @keyframes entrar{ from{ opacity:0; transform: translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  .entra{ opacity:0; animation: entrar 0.5s ease forwards; }
+
+  /* header */
+  .cabecera{ padding: 6px 20px 4px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .saludo-bloque{ display:flex; align-items:center; gap:9px; }
+  .saludo-ilustracion{ width:34px; height:34px; flex:none; }
+  .saludo-texto .hora{ font-size:0.62rem; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em; font-weight:700; }
+  .saludo-texto .nombre{ font-family:"Instrument Serif", Georgia, serif; font-style:italic; font-size:1.3rem; color:var(--ink); line-height:1.1; }
+  .icono-campana{
+    width:34px; height:34px; border-radius:50%; background: var(--surface-sunken);
+    display:flex; align-items:center; justify-content:center; position:relative; flex:none;
+  }
+  .icono-campana::after{ content:""; position:absolute; top:6px; right:6px; width:6px; height:6px; border-radius:50%; background: var(--accent); border: 1.5px solid var(--bg); }
+
+  .buscador-mini{
+    margin: 10px 20px 0; height: 38px; border-radius: 12px; background: var(--surface-sunken);
+    display:flex; align-items:center; gap:8px; padding: 0 12px; border: 1px solid transparent;
+  }
+  .buscador-mini svg{ flex:none; }
+  .buscador-mini span{ font-size:0.75rem; color: var(--ink-faint); }
+
+  /* carrusel de avisos (hero) */
+  .carrusel-hero{ margin: 14px 20px 0; border-radius: 22px; overflow:hidden; position:relative; }
+  .carrusel-hero-track{ display:flex; transition: transform 0.55s cubic-bezier(.4,0,.2,1); }
+  .hero{
+    min-width:100%; background: var(--primary);
+    padding: 18px 18px 20px; position: relative; overflow:hidden; color:#fff;
+  }
+  .hero-textura{ position:absolute; inset:0; opacity:0.16; }
+  .hero-eyebrow{ font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:800; color: rgba(255,255,255,0.85); position:relative; }
+  .hero-titulo{ font-family:"Instrument Serif", Georgia, serif; font-style:italic; font-size:1.5rem; line-height:1.15; margin: 4px 0 8px; position:relative; max-width: 80%; }
+  .hero-cuerpo{ font-size:0.78rem; color: rgba(255,255,255,0.92); line-height:1.4; max-width: 88%; position:relative; margin-bottom:12px; }
+  .hero-cta{
+    display:inline-flex; align-items:center; gap:6px; background:#fff; color: var(--primary-strong);
+    font-size:0.72rem; font-weight:800; padding: 8px 14px; border-radius:20px; position:relative;
+  }
+  .puntos{ display:flex; gap:5px; justify-content:center; margin: 9px 20px 0; }
+  .punto{ width:5px; height:5px; border-radius:50%; background: var(--line); transition: all 0.25s ease; cursor:pointer; }
+  .punto.activo{ background: var(--primary); width:15px; border-radius:3px; }
+  .punto.punto-ad.activo{ background: var(--accent); }
+
+  /* carrusel de publicidad */
+  .anuncio-cabecera{ display:flex; align-items:center; justify-content:space-between; margin: 22px 20px 8px; }
+  .anuncio-etiqueta{ font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--ink-faint); font-weight:700; display:flex; align-items:center; gap:5px; }
+  .anuncio-config{ font-size:0.58rem; color: var(--ink-faint); }
+  .carrusel-ad{ margin: 0 20px; border-radius:20px; overflow:hidden; position:relative; border:1px solid var(--line); }
+  .carrusel-ad-track{ display:flex; transition: transform 0.55s cubic-bezier(.4,0,.2,1); }
+  .ad-slide{ min-width:100%; display:flex; align-items:center; gap:16px; padding:18px; background: var(--surface); min-height: 88px; }
+  .ad-img{ width:64px; height:64px; border-radius:16px; flex:none; }
+  .ad-texto{ flex:1; min-width:0; }
+  .ad-nombre{ font-size:0.92rem; font-weight:700; color:var(--ink); }
+  .ad-detalle{ font-size:0.74rem; color:var(--ink-soft); margin-top:3px; }
+  .ad-cta{ font-size:0.68rem; font-weight:800; color: var(--accent-strong); flex:none; }
+
+  /* categorias */
+  .seccion-titulo{ font-family:"Instrument Serif", Georgia, serif; font-style:italic; font-size:1.15rem; color:var(--ink); margin: 20px 20px 10px; }
+  .rail-categorias{ display:flex; gap:14px; padding: 0 20px; overflow:hidden; }
+  .cat-item{ display:flex; flex-direction:column; align-items:center; gap:6px; flex:none; }
+  .cat-icono{ border-radius: 18px; display:flex; align-items:center; justify-content:center; background: var(--surface-sunken); }
+  .cat-icono.grande{ width:58px; height:58px; }
+  .cat-icono.normal{ width:50px; height:50px; }
+  .cat-nombre{ font-size:0.62rem; color: var(--ink-soft); font-weight:600; }
+
+  /* destacado spotlight */
+  .spotlight{
+    margin: 22px 20px 0; border-radius: 20px; overflow:hidden; border:1px solid var(--line);
+    display:flex; flex-direction:column; transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .spotlight:hover{ transform: translateY(-3px); box-shadow: 0 14px 30px -18px hsl(var(--shadow) / 0.4); }
+  .spotlight-img{ height:96px; background: linear-gradient(135deg, var(--accent-soft), var(--primary-soft)); position:relative; }
+  .spotlight-badge{
+    position:absolute; top:10px; left:10px; background:#fff; color: var(--primary-strong);
+    font-size:0.56rem; font-weight:800; padding:4px 8px; border-radius:20px; display:flex; align-items:center; gap:4px;
+  }
+  .spotlight-cuerpo{ padding: 10px 14px 12px; }
+  .spotlight-nombre{ font-weight:700; font-size:0.9rem; color: var(--ink); }
+  .spotlight-meta{ display:flex; gap:10px; margin-top:4px; }
+  .spotlight-meta span{ font-size:0.66rem; color: var(--ink-soft); display:flex; align-items:center; gap:3px; }
+
+  .rail-mini{
+    display:flex; gap:12px; margin: 12px 0 0; padding: 0 20px 6px;
+    overflow-x:auto; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
+    cursor: grab;
+  }
+  .rail-mini.arrastrando{ cursor: grabbing; scroll-snap-type: none; }
+  .rail-mini::-webkit-scrollbar{ display:none; }
+  .mini-tarjeta{
+    flex: 0 0 118px; scroll-snap-align:start; border-radius:16px; border:1px solid var(--line);
+    padding:10px; transition: transform 0.2s ease;
+  }
+  .mini-tarjeta:hover{ transform: translateY(-2px); }
+  .mini-img{ height:72px; border-radius:10px; background: var(--surface-sunken); margin-bottom:8px; }
+  .mini-nombre{ font-size:0.74rem; font-weight:700; color:var(--ink); line-height:1.25; }
+  .mini-dist{ font-size:0.6rem; color: var(--ink-faint); margin-top:4px; }
+
+  /* lista cerca de ti */
+  .lista-cerca{ padding: 0 20px; display:flex; flex-direction:column; gap:10px; margin-top: 8px; }
+  .fila-negocio{
+    display:flex; gap:12px; align-items:center; padding:10px; border-radius:16px; border:1px solid transparent;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .fila-negocio:hover{ border-color: var(--line); background: var(--surface-sunken); }
+  .fila-img{ width:52px; height:52px; border-radius:14px; background: var(--surface-sunken); flex:none; }
+  .fila-info{ flex:1; min-width:0; }
+  .fila-nombre-row{ display:flex; align-items:center; gap:5px; }
+  .fila-nombre{ font-size:0.82rem; font-weight:700; color:var(--ink); }
+  .check-verificado{ flex:none; }
+  .fila-sub{ font-size:0.68rem; color: var(--ink-soft); margin-top:2px; }
+  .fila-tags{ display:flex; gap:8px; margin-top:4px; }
+  .fila-tags span{ font-size:0.6rem; color: var(--primary-strong); font-weight:700; display:flex; align-items:center; gap:3px; }
+  .fila-tags span.abierto{ color: var(--primary-strong); }
+  .fila-tags span.distancia{ color: var(--ink-faint); font-weight:600; }
+
+  .tabbar{ height:60px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-around; background:var(--surface); margin-top:auto; }
+  .tab-circulo{ width:28px; height:28px; border-radius:50%; background: var(--primary); display:flex; align-items:center; justify-content:center; }
+  .tab-item{ display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .tab-item .tx{ font-size:0.55rem; font-weight:700; color:var(--ink); }
+  .tab-item.apagado .tab-circulo{ background: var(--primary-soft); }
+  .tab-item.apagado .tx{ color:var(--ink-faint); font-weight:600; }
+  .tab-item.coral .tab-circulo{ background: var(--accent-soft); }
+
+  /* ============ NOTAS LATERALES ============ */
+  .notas{ display:flex; flex-direction:column; gap: 2.2rem; padding-top: 0.5rem; }
+  .nota{ display:flex; gap:1rem; }
+  .nota-num{
+    font-family:"Instrument Serif", Georgia, serif; font-style:italic; font-size:1.4rem; color: var(--accent-strong);
+    flex:none; width:2ch;
+  }
+  .nota h3{ font-size:1rem; font-weight:700; margin:0 0 0.35rem; color:var(--ink); }
+  .nota p{ font-size:0.9rem; color: var(--ink-soft); margin:0; max-width:52ch; }
+
+  footer{ border-top:1px solid var(--line); margin-top:4rem; padding-top:1.5rem; font-size:0.85rem; color:var(--ink-faint); }
+</style>
+
+<div class="pagina">
+  <p class="eyebrow">Boceto visual · sin tocar código todavía</p>
+  <h1>Que se sienta hecho a mano, no generado</h1>
+  <p class="lede">Segunda vuelta: el aviso de la comunidad ahora es un carrusel que rota solo, hay un espacio de publicidad propio y separado, y las categorías llevan a un servicio real. Los puntos y la rotación son reales — funcionan en esta misma página.</p>
+
+  <div class="layout">
+    <div class="telefono">
+      <div class="pantalla">
+        <div class="status"><span>9:41</span><span>· · ·</span></div>
+
+        <div class="cabecera entra" style="animation-delay:.05s">
+          <div class="saludo-bloque">
+            <svg class="saludo-ilustracion" viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="19" fill="var(--primary-soft)"/>
+              <path d="M11 24 L16 15 L21 22 L25 16 L29 24 Z" fill="var(--primary)"/>
+              <circle cx="28" cy="12" r="3.2" fill="var(--accent)"/>
+            </svg>
+            <div class="saludo-texto">
+              <div class="hora">Buenas tardes</div>
+              <div class="nombre">San Borja hoy</div>
+            </div>
+          </div>
+          <div class="icono-campana">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><path d="M12 3a5 5 0 0 0-5 5v3.6c0 .6-.2 1.2-.6 1.6L5 15h14l-1.4-1.8c-.4-.4-.6-1-.6-1.6V8a5 5 0 0 0-5-5Z"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
+          </div>
+        </div>
+
+        <div class="buscador-mini entra" style="animation-delay:.1s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          <span>Negocios, platos y productos</span>
+        </div>
+
+        <div class="carrusel-hero entra" style="animation-delay:.15s">
+          <div class="carrusel-hero-track" id="pistaAvisos">
+            <div class="hero">
+              <svg class="hero-textura" viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M0 90 Q60 40 130 80 T300 60 V120 H0 Z" fill="#fff"/></svg>
+              <div class="hero-eyebrow">Aviso urgente</div>
+              <div class="hero-titulo">Corte de agua este jueves</div>
+              <div class="hero-cuerpo">Sedapal corta el suministro de 9am a 5pm en las cuadras 20–24 de Av. San Luis.</div>
+              <div class="hero-cta">Ver en Comunidad<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+            <div class="hero" style="background:var(--primary-strong)">
+              <svg class="hero-textura" viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M0 70 Q80 110 160 60 T300 90 V120 H0 Z" fill="#fff"/></svg>
+              <div class="hero-eyebrow">Junta vecinal</div>
+              <div class="hero-titulo">Reunión este sábado</div>
+              <div class="hero-cuerpo">10am en el parque Reducto N.° 2. Se trata seguridad y áreas verdes.</div>
+              <div class="hero-cta">Ver en Comunidad<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+            <div class="hero" style="background:#2d7a63">
+              <svg class="hero-textura" viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M0 100 Q100 50 200 90 T300 70 V120 H0 Z" fill="#fff"/></svg>
+              <div class="hero-eyebrow">Municipalidad</div>
+              <div class="hero-titulo">Vacunación antirrábica</div>
+              <div class="hero-cuerpo">Domingo en la Plaza Grau, de 9am a 1pm. Trae a tu mascota.</div>
+              <div class="hero-cta">Ver en Comunidad<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="puntos" id="puntosAvisos"></div>
+
+        <div class="seccion-titulo entra" style="animation-delay:.2s">Explora por tipo</div>
+        <div class="rail-categorias entra" style="animation-delay:.22s">
+          <div class="cat-item">
+            <div class="cat-icono grande" style="background:var(--primary-soft)">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--primary-strong)" stroke-width="1.8"><path d="M6 3v7a2 2 0 0 0 2 2v9M6 3a2 2 0 0 0-2 2v5M10 3v9M17 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>
+            </div>
+            <div class="cat-nombre">Comida</div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-icono normal" style="background:var(--accent-soft)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-strong)" stroke-width="1.8"><path d="M20.8 8.6c0-2.5-2-4.6-4.6-4.6-1.6 0-3 .8-3.8 2-.9-1.2-2.3-2-3.9-2a4.6 4.6 0 0 0-4.6 4.6c0 5.4 8.5 10.4 8.5 10.4s8.4-5 8.4-10.4Z"/></svg>
+            </div>
+            <div class="cat-nombre">Salud</div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-icono normal" style="background:var(--primary-soft)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-strong)" stroke-width="1.8"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10"/></svg>
+            </div>
+            <div class="cat-nombre">Hogar</div>
+          </div>
+          <div class="cat-item">
+            <div class="cat-icono normal" style="background:var(--accent-soft)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-strong)" stroke-width="1.8"><path d="M8 4 4 7l3 3-1 10h12L17 10l3-3-4-3-4 2-4-2Z"/></svg>
+            </div>
+            <div class="cat-nombre">Moda</div>
+          </div>
+        </div>
+
+        <div class="carrusel-ad entra" style="animation-delay:.26s; margin-top:20px;">
+          <div class="carrusel-ad-track" id="pistaAds">
+            <div class="ad-slide">
+              <div class="ad-img" style="background:var(--accent-soft)"></div>
+              <div class="ad-texto">
+                <div class="ad-nombre">El Fogón Sanborjino</div>
+                <div class="ad-detalle">20% en parrillas todos los martes</div>
+              </div>
+              <div class="ad-cta">Ver →</div>
+            </div>
+            <div class="ad-slide">
+              <div class="ad-img" style="background:var(--primary-soft)"></div>
+              <div class="ad-texto">
+                <div class="ad-nombre">Supermercado San Borja</div>
+                <div class="ad-detalle">2x1 en lácteos esta semana</div>
+              </div>
+              <div class="ad-cta">Ver →</div>
+            </div>
+            <div class="ad-slide">
+              <div class="ad-img" style="background:var(--accent-soft)"></div>
+              <div class="ad-texto">
+                <div class="ad-nombre">Postres Doña Herminia</div>
+                <div class="ad-detalle">Encarga tu torta con 48h de anticipo</div>
+              </div>
+              <div class="ad-cta">Ver →</div>
+            </div>
+          </div>
+        </div>
+        <div class="puntos" id="puntosAds"></div>
+
+        <div class="seccion-titulo entra" style="animation-delay:.28s">El más visitado esta semana</div>
+        <div class="spotlight entra" style="animation-delay:.3s">
+          <div class="spotlight-img">
+            <div class="spotlight-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--primary-strong)"><path d="M12 2 15 8l7 1-5 5 1.2 7L12 18l-6.2 3L7 14 2 9l7-1Z"/></svg>
+              Verificado
+            </div>
+          </div>
+          <div class="spotlight-cuerpo">
+            <div class="spotlight-nombre">El Fogón Sanborjino</div>
+            <div class="spotlight-meta">
+              <span>🔥 Parrillas y comida criolla</span>
+            </div>
+            <div class="spotlight-meta" style="margin-top:6px;">
+              <span>🚶 8 min caminando</span>
+              <span>🕐 Abierto hasta 10pm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail-mini entra" id="railMini" style="animation-delay:.34s">
+          <div class="mini-tarjeta">
+            <div class="mini-img"></div>
+            <div class="mini-nombre">Panadería Los Rosales</div>
+            <div class="mini-dist">🚶 3 min · Abierto</div>
+          </div>
+          <div class="mini-tarjeta">
+            <div class="mini-img"></div>
+            <div class="mini-nombre">Postres Doña Herminia</div>
+            <div class="mini-dist">🚶 6 min · Abierto</div>
+          </div>
+          <div class="mini-tarjeta">
+            <div class="mini-img"></div>
+            <div class="mini-nombre">Tejidos Andinos SB</div>
+            <div class="mini-dist">🚶 9 min · Abierto</div>
+          </div>
+          <div class="mini-tarjeta">
+            <div class="mini-img"></div>
+            <div class="mini-nombre">Boutique El Jardín</div>
+            <div class="mini-dist">🚶 5 min · Abierto</div>
+          </div>
+          <div class="mini-tarjeta">
+            <div class="mini-img"></div>
+            <div class="mini-nombre">Lavandería La Rinconada</div>
+            <div class="mini-dist">🚶 4 min · Abierto</div>
+          </div>
+          <div class="mini-tarjeta">
+            <div class="mini-img"></div>
+            <div class="mini-nombre">Supermercado San Borja</div>
+            <div class="mini-dist">🚶 10 min · Abierto</div>
+          </div>
+        </div>
+
+        <div class="seccion-titulo entra" style="animation-delay:.4s">Cerca de ti ahora</div>
+        <div class="lista-cerca entra" style="animation-delay:.42s">
+          <div class="fila-negocio">
+            <div class="fila-img"></div>
+            <div class="fila-info">
+              <div class="fila-nombre-row">
+                <span class="fila-nombre">Veterinaria Aviación</span>
+                <svg class="check-verificado" width="12" height="12" viewBox="0 0 24 24" fill="var(--primary)"><path d="M12 2 15 8l7 1-5 5 1.2 7L12 18l-6.2 3L7 14 2 9l7-1Z"/></svg>
+              </div>
+              <div class="fila-sub">Av. Aviación 4210</div>
+              <div class="fila-tags">
+                <span class="abierto">● Abierto</span>
+                <span class="distancia">🚶 4 min</span>
+              </div>
+            </div>
+          </div>
+          <div class="fila-negocio">
+            <div class="fila-img"></div>
+            <div class="fila-info">
+              <div class="fila-nombre-row">
+                <span class="fila-nombre">Ferretería Limatambo</span>
+              </div>
+              <div class="fila-sub">Jr. Húsares de Junín 812</div>
+              <div class="fila-tags">
+                <span class="abierto">● Abierto</span>
+                <span class="distancia">🚶 7 min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab-item"><div class="tab-circulo"></div><span class="tx">Inicio</span></div>
+          <div class="tab-item apagado"><div class="tab-circulo"></div><span class="tx">Servicios</span></div>
+          <div class="tab-item apagado coral"><div class="tab-circulo"></div><span class="tx">Comunidad</span></div>
+          <div class="tab-item apagado"><div class="tab-circulo"></div><span class="tx">Perfil</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notas">
+      <div class="nota">
+        <span class="nota-num">1</span>
+        <div>
+          <h3>Saludo con voz, no rótulo de sistema</h3>
+          <p>"Buenas tardes · San Borja hoy" en vez de un header genérico. El ícono junto al saludo es una silueta simple del parque de la comunidad, no un ícono de sistema — un detalle que nadie más tiene.</p>
+        </div>
+      </div>
+      <div class="nota">
+        <span class="nota-num">2</span>
+        <div>
+          <h3>El protagonista ahora es un carrusel</h3>
+          <p>El hero rota solo cada 4.5s entre los avisos activos (corte de agua → junta vecinal → vacunación), con puntos abajo para saltar directo o tocar y arrastrar. Sigue siendo un solo mensaje a la vez — nunca compite consigo mismo.</p>
+        </div>
+      </div>
+      <div class="nota">
+        <span class="nota-num">3</span>
+        <div>
+          <h3>Un espacio para anuncios, separado</h3>
+          <p>Debajo de las categorías, antes de los negocios destacados — ahí no compite con el aviso urgente ni interrumpe la lista de negocios. Es una tarjeta más grande y con más aire que antes, y rota sola cada 6s (tú decides el tiempo y qué negocio va ahí).</p>
+        </div>
+      </div>
+      <div class="nota">
+        <span class="nota-num">4</span>
+        <div>
+          <h3>Íconos propios, no Ionicons de outline</h3>
+          <p>Cada categoría usa un trazo dibujado a mano (SVG propio), no el set genérico de íconos que trae cualquier librería. El primero es más grande — es la categoría más usada, y el tamaño lo comunica sin etiqueta.</p>
+          <p style="margin-top:6px;"><b>Confirmado:</b> hoy en la app real, tocar una categoría solo filtra la lista de "Cerca de ti" en la misma pantalla — no te lleva a ningún servicio. En este rediseño, tocar una categoría te lleva a Servicios → Guía de negocios, ya filtrada por esa categoría. Es el comportamiento que tiene más sentido, y lo implemento así salvo que prefieras que se quede como filtro local.</p>
+        </div>
+      </div>
+      <div class="nota">
+        <span class="nota-num">5</span>
+        <div>
+          <h3>Ritmo asimétrico, no grid repetido</h3>
+          <p>Un negocio "destacado de la semana" grande, un riel deslizable de 6 negocios más chicos que se recorren con el dedo (o arrastrando el mouse, pruébalo aquí), y la lista normal después — tres tamaños de tarjeta en vez de uno solo repetido diez veces.</p>
+        </div>
+      </div>
+      <div class="nota">
+        <span class="nota-num">6</span>
+        <div>
+          <h3>La confianza se ve, no se dice</h3>
+          <p>El check verde de "Verificado" vive junto al nombre del negocio, no como texto aparte. Distancia caminando y si está abierto ahora, siempre visibles — información que el vecino realmente usa para decidir.</p>
+        </div>
+      </div>
+      <div class="nota">
+        <span class="nota-num">7</span>
+        <div>
+          <h3>Movimiento sutil al cargar</h3>
+          <p>Cada sección entra con una animación breve y escalonada (recárgala y mira). Al pasar el mouse sobre una tarjeta, se eleva ligeramente. Nada llamativo — el tipo de detalle que se nota sin que lo notes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Boceto visual — ningún archivo de la app fue modificado. Recarga la página para ver otra vez la animación de entrada.</footer>
+</div>
+
+<script>
+  function crearCarrusel(pistaId, puntosId, intervaloMs, clasePunto) {
+    const pista = document.getElementById(pistaId);
+    const contenedorPuntos = document.getElementById(puntosId);
+    const totalSlides = pista.children.length;
+    let indice = 0;
+    let temporizador;
+
+    for (let i = 0; i < totalSlides; i++) {
+      const punto = document.createElement('div');
+      punto.className = 'punto' + (clasePunto ? ' ' + clasePunto : '') + (i === 0 ? ' activo' : '');
+      punto.addEventListener('click', () => irA(i));
+      contenedorPuntos.appendChild(punto);
+    }
+
+    function irA(nuevoIndice) {
+      indice = nuevoIndice;
+      pista.style.transform = `translateX(-${indice * 100}%)`;
+      [...contenedorPuntos.children].forEach((p, i) => p.classList.toggle('activo', i === indice));
+    }
+
+    function siguiente() {
+      irA((indice + 1) % totalSlides);
+    }
+
+    function reiniciar() {
+      clearInterval(temporizador);
+      temporizador = setInterval(siguiente, intervaloMs);
+    }
+
+    reiniciar();
+    pista.parentElement.addEventListener('mouseenter', () => clearInterval(temporizador));
+    pista.parentElement.addEventListener('mouseleave', reiniciar);
+  }
+
+  crearCarrusel('pistaAvisos', 'puntosAvisos', 4500);
+  crearCarrusel('pistaAds', 'puntosAds', 6000, 'punto-ad');
+
+  // Arrastrar con mouse en el riel de negocios (el swipe táctil ya funciona nativo en el celular)
+  (function () {
+    const riel = document.getElementById('railMini');
+    let arrastrando = false, inicioX = 0, scrollInicial = 0;
+
+    riel.addEventListener('mousedown', (e) => {
+      arrastrando = true;
+      riel.classList.add('arrastrando');
+      inicioX = e.pageX;
+      scrollInicial = riel.scrollLeft;
+    });
+    window.addEventListener('mouseup', () => {
+      arrastrando = false;
+      riel.classList.remove('arrastrando');
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!arrastrando) return;
+      e.preventDefault();
+      riel.scrollLeft = scrollInicial - (e.pageX - inicioX);
+    });
+  })();
+</script>
+

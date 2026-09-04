@@ -1,0 +1,738 @@
+<title>Estructura ELISUR San Borja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #f5f6ef;
+    --surface: #ffffff;
+    --surface-sunken: #eaeee0;
+    --surface-sunken-2: #dfe4d2;
+    --ink: #1f2a20;
+    --ink-soft: #5b6b58;
+    --ink-faint: #8b988a;
+    --primary: #2e6b4c;
+    --primary-strong: #1f4e39;
+    --primary-soft: #dce8dd;
+    --accent: #b9822c;
+    --accent-soft: #f1e2c3;
+    --line: #d7dcc9;
+    --line-strong: #b9c2a8;
+    --shadow: 220 20% 20%;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #131a11;
+      --surface: #1b241a;
+      --surface-sunken: #222c1f;
+      --surface-sunken-2: #2b3627;
+      --ink: #e9ede1;
+      --ink-soft: #aab6a3;
+      --ink-faint: #74806f;
+      --primary: #7bc298;
+      --primary-strong: #a6d9bb;
+      --primary-soft: #24352a;
+      --accent: #e0ac5c;
+      --accent-soft: #3a2f1c;
+      --line: #2e3a2a;
+      --line-strong: #3c4b37;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #131a11;
+    --surface: #1b241a;
+    --surface-sunken: #222c1f;
+    --surface-sunken-2: #2b3627;
+    --ink: #e9ede1;
+    --ink-soft: #aab6a3;
+    --ink-faint: #74806f;
+    --primary: #7bc298;
+    --primary-strong: #a6d9bb;
+    --primary-soft: #24352a;
+    --accent: #e0ac5c;
+    --accent-soft: #3a2f1c;
+    --line: #2e3a2a;
+    --line-strong: #3c4b37;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Karla", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  ::selection{ background: var(--primary-soft); color: var(--primary-strong); }
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 4.5rem 1.75rem 6rem;
+  }
+
+  .eyebrow{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin: 0 0 1.1rem;
+  }
+  .eyebrow::before{
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--primary);
+    display: inline-block;
+  }
+
+  h1{
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    max-width: 18ch;
+  }
+
+  .lede{
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    margin: 0 0 1.6rem;
+  }
+
+  .meta-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.6rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 0.85rem 0;
+    margin-bottom: 4.5rem;
+  }
+  .meta-row b{ color: var(--ink-soft); font-weight: 500; }
+
+  section{ margin-bottom: 5.5rem; }
+  section:last-of-type{ margin-bottom: 2.5rem; }
+
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h2{
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .section-note{
+    font-size: 0.92rem;
+    color: var(--ink-faint);
+    max-width: 34ch;
+    text-align: right;
+  }
+
+  /* ---------- IA TREE ---------- */
+  .tree-scroll{ overflow-x: auto; padding-bottom: 0.5rem; }
+  .tree{
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100%;
+    width: max-content;
+    margin: 0 auto;
+  }
+  .tree-root{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    background: var(--primary);
+    color: var(--bg);
+    padding: 0.7rem 1.3rem;
+    border-radius: 3px;
+  }
+  :root[data-theme="dark"] .tree-root, @media (prefers-color-scheme: dark){ .tree-root{ color: #0e1710; } }
+  .stem{ width: 1px; height: 28px; background: var(--line-strong); }
+  .branch-row{
+    display: flex;
+    position: relative;
+    padding-top: 28px;
+  }
+  .branch-row::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: calc(50% / var(--n, 1) - 0px);
+    right: calc(50% / var(--n, 1));
+    height: 1px;
+    background: var(--line-strong);
+  }
+  .tab{
+    width: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0.6rem;
+    position: relative;
+  }
+  .tab::before{
+    content:"";
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    width: 1px;
+    height: 28px;
+    background: var(--line-strong);
+  }
+  .tab-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.6rem 0.9rem;
+    text-align: center;
+    width: 100%;
+  }
+  .tab-icon{ font-size: 1.05rem; display:block; margin-bottom: 0.15rem; }
+  .tab-name{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .leaf-stem{ width: 1px; height: 18px; background: var(--line); margin-top: 2px; }
+  .leaves{
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+    width: 100%;
+  }
+  .leaf{
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    background: var(--surface-sunken);
+    border-radius: 3px;
+    padding: 0.34rem 0.6rem;
+    text-align: center;
+    border: 1px solid transparent;
+  }
+  .leaf.fase2{
+    border: 1px dashed var(--line-strong);
+    background: transparent;
+    color: var(--ink-faint);
+  }
+
+  .legend{
+    display:flex; gap: 1.4rem; flex-wrap: wrap;
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:0.45em; }
+  .dot{ width:9px; height:9px; border-radius:2px; display:inline-block; background: var(--surface-sunken); }
+  .dot.f2{ background: transparent; border: 1px dashed var(--line-strong); }
+
+  /* ---------- PHONE GALLERY ---------- */
+  .gallery-scroll{
+    overflow-x: auto;
+    margin: 0 -1.75rem;
+    padding: 0.5rem 1.75rem 1.5rem;
+  }
+  .gallery{
+    display: flex;
+    gap: 2rem;
+    width: max-content;
+  }
+  .screen{
+    width: 250px;
+    flex: none;
+  }
+  .screen-label{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.74rem;
+    color: var(--primary);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+  }
+  .screen-label .n{ color: var(--ink-faint); }
+  .phone{
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 22px;
+    padding: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .phone-screen{
+    background: var(--bg);
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 430px;
+  }
+  .status-bar{
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.55rem;
+    color: var(--ink-faint);
+  }
+  .app-header{
+    padding: 8px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .community-chip{
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--primary-soft);
+    color: var(--primary-strong);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 4px 8px 4px 6px;
+    border-radius: 20px;
+  }
+  .block-label{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .block{
+    background: var(--surface-sunken);
+    border-radius: 8px;
+  }
+  .content-pad{ padding: 0 12px; display:flex; flex-direction:column; gap:10px; flex:1; }
+
+  .hero-block{ height: 92px; display:flex; align-items:flex-end; padding:8px; }
+  .search-block{ height: 30px; display:flex; align-items:center; padding: 0 10px; gap:6px; }
+  .search-block::before{ content:"⌕"; color: var(--ink-faint); font-size: 0.85rem; }
+  .chip-row{ display:flex; gap:6px; overflow:hidden; }
+  .chip{ background: var(--surface-sunken); border-radius:20px; padding: 6px 10px; font-size: 0.55rem; color: var(--ink-soft); white-space:nowrap; flex:none; }
+  .chip.active{ background: var(--primary); color: var(--bg); }
+
+  .card-row{ display:flex; flex-direction:column; gap:8px; }
+  .biz-card{ display:flex; gap:8px; }
+  .biz-thumb{ width:46px; height:46px; border-radius:8px; flex:none; }
+  .biz-text{ display:flex; flex-direction:column; gap:4px; justify-content:center; flex:1; }
+  .line{ height:6px; border-radius:3px; background: var(--surface-sunken-2); }
+  .line.w60{ width:60%; }
+  .line.w40{ width:40%; }
+  .line.w80{ width:80%; }
+
+  .big-thumb{ height: 110px; }
+  .action-row{ display:flex; gap:8px; }
+  .btn{ flex:1; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.56rem; font-weight:600; letter-spacing:0.02em; }
+  .btn.primary{ background: var(--primary); color: var(--bg); }
+  .btn.ghost{ background: transparent; border:1px solid var(--line-strong); color: var(--ink-soft); }
+
+  .map-area{ flex:1; position: relative; background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0/20px 20px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0/20px 20px,
+      var(--surface-sunken);
+    border-radius: 8px;
+    margin: 0 0 4px;
+  }
+  .pin{ position:absolute; width:10px; height:10px; border-radius:50% 50% 50% 0; background: var(--accent); transform: rotate(-45deg); }
+  .pin.me{ background: var(--primary); }
+
+  .list-row{ display:flex; align-items:center; gap:10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .list-icon{ width:30px; height:30px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center; background: var(--primary-soft); font-size:0.85rem; }
+
+  .tabbar{
+    height: 54px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: var(--surface);
+  }
+  .tabbar-item{ display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .tabbar-item span.ic{ font-size: 0.85rem; }
+  .tabbar-item span.tx{ font-family:"IBM Plex Mono", monospace; font-size:0.42rem; text-transform:uppercase; letter-spacing:0.03em; color: var(--ink-faint); }
+  .tabbar-item.active span.tx{ color: var(--primary); font-weight:600; }
+  .tabbar-item.active span.ic{ filter: none; }
+
+  .annot{
+    margin-top: 0.9rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    max-width: 240px;
+  }
+
+  /* ---------- JOURNEY ---------- */
+  .journey{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.4rem;
+  }
+  .journey li{
+    position: relative;
+    padding-top: 2.6rem;
+  }
+  .journey li::before{
+    content: attr(data-n);
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--accent);
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .journey li::after{
+    content: "";
+    position: absolute;
+    top: 0.9rem;
+    left: 2.4rem;
+    right: -1.4rem;
+    height: 1px;
+    background: var(--line);
+  }
+  .journey li:last-child::after{ display:none; }
+  .journey h3{
+    font-family: "Karla", sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+  }
+  .journey p{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding-top: 1.6rem;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  footer b{ color: var(--ink-soft); }
+
+  @media (max-width: 720px){
+    .journey{ grid-template-columns: 1fr 1fr; }
+    .journey li::after{ display:none; }
+    .section-note{ text-align:left; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ scroll-behavior:auto !important; } }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Modelo estructural · vista del vecino</p>
+  <h1>Cómo se recorre ELISUR en San Borja</h1>
+  <p class="lede">Antes de tocar código: así queda organizada la app desde el punto de vista de quien la usa — qué pestañas tiene, qué contiene cada pantalla y en qué orden las encuentra un vecino de San Borja. Es un mapa de estructura, no el diseño visual final.</p>
+  <div class="meta-row">
+    <span><b>Distrito piloto</b> San Borja</span>
+    <span><b>Alcance</b> Etapa 1 · fase de servicios 1</span>
+    <span><b>Estado</b> modelo previo a construcción</span>
+  </div>
+
+  <section id="mapa">
+    <div class="section-head">
+      <h2>1 · Mapa de navegación</h2>
+      <p class="section-note">Cinco pestañas fijas en la parte inferior. Todo lo demás cuelga de una de ellas.</p>
+    </div>
+
+    <div class="tree-scroll">
+      <div class="tree">
+        <div class="tree-root">ELISUR — San Borja (piloto)</div>
+        <div class="stem"></div>
+        <div class="branch-row">
+          <div class="tab">
+            <div class="tab-card"><span class="tab-icon">🏠</span><span class="tab-name">Inicio</span></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Categorías destacadas</div>
+              <div class="leaf">Negocios cerca de mí</div>
+              <div class="leaf">Avisos de la comunidad</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-icon">⌕</span><span class="tab-name">Buscar</span></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Guía de negocios</div>
+              <div class="leaf">Filtro por categoría</div>
+              <div class="leaf">Ficha de negocio</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-icon">◎</span><span class="tab-name">Mapa</span></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Negocios en el radio visible</div>
+              <div class="leaf">Mi ubicación</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-icon">▤</span><span class="tab-name">Servicios</span></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Restaurantes</div>
+              <div class="leaf">Market Space</div>
+              <div class="leaf">Información local</div>
+              <div class="leaf fase2">Inmobiliaria · fase 2</div>
+              <div class="leaf fase2">Empleo · fase 2</div>
+              <div class="leaf fase2">Salud y legal · fase 2</div>
+            </div>
+          </div>
+          <div class="tab">
+            <div class="tab-card"><span class="tab-icon">▾</span><span class="tab-name">Comunidad</span></div>
+            <div class="leaf-stem"></div>
+            <div class="leaves">
+              <div class="leaf">Cambiar de zona</div>
+              <div class="leaf">Sobre San Borja</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="dot"></span> disponible en el lanzamiento (fase 1)</span>
+      <span><span class="dot f2"></span> reservado, se activa en fase 2</span>
+    </div>
+  </section>
+
+  <section id="pantallas">
+    <div class="section-head">
+      <h2>2 · Pantallas clave</h2>
+      <p class="section-note">Bloques estructurales, no diseño final. Cada rótulo indica qué información vive ahí.</p>
+    </div>
+
+    <div class="gallery-scroll">
+      <div class="gallery">
+
+        <div class="screen">
+          <div class="screen-label"><span class="n">00</span> Primer permiso</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status-bar"><span>9:41</span><span>···</span></div>
+            <div class="content-pad" style="justify-content:center; align-items:center; text-align:center; gap:16px; padding-top:40px;">
+              <div class="block" style="width:64px; height:64px; border-radius:50%;"></div>
+              <div class="line w80" style="height:10px; width:70%;"></div>
+              <div class="line w60" style="margin:0 auto;"></div>
+              <div class="line w40" style="margin:0 auto;"></div>
+              <div class="btn primary" style="width:100%; margin-top:14px;">Activar mi ubicación</div>
+              <div class="block-label">Explica el beneficio antes de pedir el permiso</div>
+            </div>
+          </div></div>
+          <p class="annot">Nunca se pide el permiso de golpe: primero se explica para qué sirve.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label"><span class="n">01</span> Inicio</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status-bar"><span>9:41</span><span>···</span></div>
+            <div class="app-header">
+              <div class="community-chip">📍 San Borja ▾</div>
+            </div>
+            <div class="content-pad">
+              <div class="block-label">Avisos de la comunidad</div>
+              <div class="block hero-block"><div class="line w60" style="background:rgba(0,0,0,0.15);"></div></div>
+              <div class="block-label">Categorías</div>
+              <div class="chip-row">
+                <div class="chip active">Comida</div><div class="chip">Salud</div><div class="chip">Hogar</div><div class="chip">Moda</div>
+              </div>
+              <div class="block-label">Negocios cerca de ti</div>
+              <div class="card-row">
+                <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w80"></div><div class="line w40"></div></div></div>
+                <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w60"></div><div class="line w40"></div></div></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item active"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+              <div class="tabbar-item"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+              <div class="tabbar-item"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+              <div class="tabbar-item"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><span class="ic">▾</span><span class="tx">Zona</span></div>
+            </div>
+          </div></div>
+          <p class="annot">La zona activa siempre está a la vista y se puede cambiar con un toque.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label"><span class="n">02</span> Guía de negocios</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status-bar"><span>9:41</span><span>···</span></div>
+            <div class="app-header">
+              <div class="block search-block" style="width:100%;"><span class="block-label">buscar en San Borja</span></div>
+            </div>
+            <div class="content-pad">
+              <div class="chip-row">
+                <div class="chip active">Todos</div><div class="chip">Comida</div><div class="chip">Salud</div><div class="chip">Servicios</div>
+              </div>
+              <div class="block-label">128 negocios</div>
+              <div class="card-row">
+                <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w80"></div><div class="line w60"></div><div class="line w40"></div></div></div>
+                <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w60"></div><div class="line w60"></div><div class="line w40"></div></div></div>
+                <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w80"></div><div class="line w60"></div><div class="line w40"></div></div></div>
+                <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w60"></div><div class="line w60"></div><div class="line w40"></div></div></div>
+              </div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+              <div class="tabbar-item active"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+              <div class="tabbar-item"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+              <div class="tabbar-item"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><span class="ic">▾</span><span class="tx">Zona</span></div>
+            </div>
+          </div></div>
+          <p class="annot">Filtro por categoría siempre visible; la lista nunca carga de golpe, se pagina.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label"><span class="n">03</span> Ficha de negocio</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status-bar"><span>9:41</span><span>···</span></div>
+            <div class="content-pad" style="padding-top:0;">
+              <div class="block big-thumb" style="margin:0 -12px; border-radius:0;"></div>
+              <div class="line w60" style="height:11px;"></div>
+              <div class="line w40"></div>
+              <div class="block-label">Horario · dirección · categoría</div>
+              <div class="action-row">
+                <div class="btn primary">WhatsApp</div>
+                <div class="btn ghost">Llamar</div>
+              </div>
+              <div class="block-label" style="margin-top:2px;">Cómo llegar</div>
+              <div class="block" style="height:70px; border-radius:8px;"></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+              <div class="tabbar-item active"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+              <div class="tabbar-item"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+              <div class="tabbar-item"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><span class="ic">▾</span><span class="tx">Zona</span></div>
+            </div>
+          </div></div>
+          <p class="annot">El contacto ocurre fuera de la app: WhatsApp o llamada. ELISUR no interviene en la conversación.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label"><span class="n">04</span> Mapa</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status-bar"><span>9:41</span><span>···</span></div>
+            <div class="content-pad" style="padding-top:8px;">
+              <div class="map-area">
+                <div class="pin" style="top:38%; left:28%;"></div>
+                <div class="pin" style="top:55%; left:62%;"></div>
+                <div class="pin" style="top:70%; left:40%;"></div>
+                <div class="pin me" style="top:48%; left:48%; border-radius:50%; transform:none;"></div>
+              </div>
+              <div class="biz-card"><div class="block biz-thumb"></div><div class="biz-text"><div class="line w80"></div><div class="line w40"></div></div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+              <div class="tabbar-item"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+              <div class="tabbar-item active"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+              <div class="tabbar-item"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><span class="ic">▾</span><span class="tx">Zona</span></div>
+            </div>
+          </div></div>
+          <p class="annot">Solo se cargan los negocios dentro del área visible del mapa.</p>
+        </div>
+
+        <div class="screen">
+          <div class="screen-label"><span class="n">05</span> Servicios</div>
+          <div class="phone"><div class="phone-screen">
+            <div class="status-bar"><span>9:41</span><span>···</span></div>
+            <div class="app-header"><div class="line w60" style="height:12px;"></div></div>
+            <div class="content-pad" style="padding-top:0; gap:0;">
+              <div class="list-row"><div class="list-icon">🍽️</div><div class="biz-text"><div class="line w60"></div></div></div>
+              <div class="list-row"><div class="list-icon">🛍️</div><div class="biz-text"><div class="line w80"></div></div></div>
+              <div class="list-row"><div class="list-icon">📋</div><div class="biz-text"><div class="line w40"></div></div></div>
+              <div class="list-row" style="opacity:0.4;"><div class="list-icon">🏘️</div><div class="biz-text"><div class="line w60"></div></div></div>
+              <div class="list-row" style="opacity:0.4;"><div class="list-icon">💼</div><div class="biz-text"><div class="line w40"></div></div></div>
+            </div>
+            <div class="tabbar">
+              <div class="tabbar-item"><span class="ic">🏠</span><span class="tx">Inicio</span></div>
+              <div class="tabbar-item"><span class="ic">⌕</span><span class="tx">Buscar</span></div>
+              <div class="tabbar-item"><span class="ic">◎</span><span class="tx">Mapa</span></div>
+              <div class="tabbar-item active"><span class="ic">▤</span><span class="tx">Servicios</span></div>
+              <div class="tabbar-item"><span class="ic">▾</span><span class="tx">Zona</span></div>
+            </div>
+          </div></div>
+          <p class="annot">Restaurantes, Market Space e Información local viven aquí. Lo atenuado llega en fase 2.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="recorrido">
+    <div class="section-head">
+      <h2>3 · Primer recorrido de un vecino</h2>
+      <p class="section-note">Los cinco pasos, en orden, desde que abre la app por primera vez.</p>
+    </div>
+    <ol class="journey">
+      <li data-n="1">
+        <h3>Abre ELISUR</h3>
+        <p>Ve la pantalla de bienvenida y la explicación de por qué conviene compartir su ubicación.</p>
+      </li>
+      <li data-n="2">
+        <h3>Confirma su zona</h3>
+        <p>La app detecta San Borja o el vecino lo elige a mano desde el selector.</p>
+      </li>
+      <li data-n="3">
+        <h3>Explora Inicio</h3>
+        <p>Ve avisos de la comunidad, categorías y negocios cercanos sin buscar nada aún.</p>
+      </li>
+      <li data-n="4">
+        <h3>Busca algo puntual</h3>
+        <p>Filtra por categoría o escribe un nombre y llega a una ficha de negocio.</p>
+      </li>
+      <li data-n="5">
+        <h3>Sale de la app para contactar</h3>
+        <p>Toca WhatsApp o Llamar. La conversación ocurre fuera de ELISUR.</p>
+      </li>
+    </ol>
+  </section>
+
+  <footer>
+    <span>Modelo estructural — no es el diseño visual final</span>
+    <span><b>Siguiente paso</b> · Etapa 0: contrato de datos y sistema de diseño</span>
+  </footer>
+
+</div>
+

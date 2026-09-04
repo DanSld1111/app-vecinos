@@ -1,0 +1,480 @@
+<title>Boceto del Panel Administrador — ELISUR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a;
+    --verde-fuerte: #146641;
+    --verde-suave: #dbf1e3;
+    --coral: #ef7148;
+    --coral-fuerte: #c8532e;
+    --coral-suave: #fce2d7;
+    --oro: #b8862e;
+    --oro-suave: #f6ecd6;
+    --texto: #1a2119;
+    --texto-suave: #5f6b5c;
+    --texto-tenue: #96a091;
+    --superficie: #ffffff;
+    --superficie-hundida: #f4f4f0;
+    --borde: #e5e3da;
+    --sombra: 0 1px 2px rgba(20,40,30,0.04), 0 10px 28px -16px rgba(20,40,30,0.22);
+
+    --pagina-bg: #10160f;
+    --pagina-texto: #eef6f0;
+    --pagina-texto-suave: #9fb5a6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--pagina-bg);
+    color: var(--pagina-texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    padding: 56px 24px 80px;
+  }
+
+  .encabezado { max-width: 980px; margin: 0 auto 12px; text-align: center; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--coral); margin-bottom: 10px;
+  }
+  .encabezado h1 {
+    font-family: "Fraunces", serif; font-weight: 700; font-size: clamp(26px, 3.6vw, 36px);
+    margin: 0 0 12px; text-wrap: balance; color: #ffffff;
+  }
+  .encabezado p { color: var(--pagina-texto-suave); font-size: 15px; line-height: 1.6; max-width: 640px; margin: 0 auto; }
+
+  .roles-leyenda {
+    display: flex; justify-content: center; gap: 22px; margin: 26px auto 50px;
+    flex-wrap: wrap; font-size: 12.5px; font-weight: 700; color: var(--pagina-texto-suave);
+  }
+  .roles-leyenda span { display: inline-flex; align-items: center; gap: 7px; }
+  .roles-leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .galeria { display: flex; flex-direction: column; gap: 56px; max-width: 1120px; margin: 0 auto; }
+
+  .fila-etiqueta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .fila-etiqueta .num {
+    width: 28px; height: 28px; border-radius: 9px; background: var(--coral);
+    display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 13px; flex: none;
+  }
+  .fila-etiqueta .txt strong { display: block; font-size: 15px; color: #fff; }
+  .fila-etiqueta .txt span { font-size: 12.5px; color: var(--pagina-texto-suave); }
+  .badge-rol {
+    margin-left: auto; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 5px 11px; border-radius: 999px; flex: none;
+  }
+  .badge-superadmin { background: #2b2f27; color: #eef6f0; }
+  .badge-dueno { background: var(--verde-suave); color: var(--verde-fuerte); }
+  .badge-moderador { background: var(--coral-suave); color: var(--coral-fuerte); }
+  .badge-compartido { background: #33392f; color: var(--pagina-texto-suave); }
+
+  /* ---- Ventana de navegador ---- */
+  .ventana {
+    background: var(--superficie);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 30px 70px -30px rgba(0,0,0,0.55);
+  }
+  .barra-nav {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: #e9e7de; border-bottom: 1px solid var(--borde);
+  }
+  .puntos { display: flex; gap: 6px; }
+  .puntos i { width: 10px; height: 10px; border-radius: 50%; background: #c9c7bc; }
+  .barra-direccion {
+    flex: 1; background: #fff; border-radius: 7px; padding: 5px 12px;
+    font-size: 11.5px; color: var(--texto-tenue); font-family: ui-monospace, monospace;
+  }
+
+  .app-shell { display: flex; min-height: 560px; }
+  .sidebar {
+    width: 208px; flex: none; background: #182019; color: #dfe8e0;
+    display: flex; flex-direction: column; padding: 20px 14px;
+  }
+  .sidebar .marca { display: flex; align-items: center; gap: 9px; margin-bottom: 26px; padding: 0 6px; }
+  .sidebar .marca .punto { width: 26px; height: 26px; border-radius: 8px; background: var(--verde); display:flex; align-items:center; justify-content:center; }
+  .sidebar .marca span { font-family: "Fraunces", serif; font-weight: 700; font-size: 15px; color: #fff; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 3px; }
+  .sidebar nav a {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; color: #aab8ae; text-decoration: none;
+  }
+  .sidebar nav a .dot { width: 6px; height: 6px; border-radius: 50%; background: #4a5a4d; flex: none; }
+  .sidebar nav a.activo { background: #24302680; color: #ffffff; }
+  .sidebar nav a.activo .dot { background: var(--verde); }
+  .sidebar .pie-usuario {
+    margin-top: auto; display: flex; align-items: center; gap: 9px; padding: 10px 8px;
+    border-top: 1px solid #263025; font-size: 12px;
+  }
+  .sidebar .pie-usuario .avatar { width: 28px; height: 28px; border-radius: 50%; background: #33412f; flex: none; }
+  .sidebar .pie-usuario b { color: #fff; display:block; font-size: 12.5px; }
+  .sidebar .pie-usuario span { color: #8c9a8f; font-size: 11px; }
+
+  .contenido { flex: 1; background: var(--superficie-hundida); padding: 22px 26px; overflow: hidden; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .topbar h2 { font-family: "Fraunces", serif; font-weight: 700; font-size: 20px; margin: 0; color: var(--texto); }
+  .topbar p { margin: 2px 0 0; font-size: 12.5px; color: var(--texto-suave); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 9px;
+    font-size: 12.5px; font-weight: 700; white-space: nowrap;
+  }
+  .btn-primario { background: var(--verde); color: #fff; }
+  .btn-fantasma { background: #fff; border: 1.5px solid var(--borde); color: var(--texto); }
+
+  /* Dashboard */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  .stat-card {
+    background: var(--superficie); border-radius: 14px; padding: 16px; box-shadow: var(--sombra);
+  }
+  .stat-card .etiqueta { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--texto-tenue); margin-bottom: 8px; }
+  .stat-card .valor { font-family: "Fraunces", serif; font-weight: 700; font-size: 26px; color: var(--texto); }
+  .stat-card .delta { font-size: 11.5px; font-weight: 700; color: var(--verde-fuerte); margin-top: 4px; }
+
+  .panel {
+    background: var(--superficie); border-radius: 14px; box-shadow: var(--sombra); overflow: hidden;
+  }
+  .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--borde); display:flex; align-items:center; justify-content:space-between; }
+  .panel-head h3 { margin: 0; font-size: 13.5px; font-weight: 800; color: var(--texto); }
+  .panel-head .ver-todo { font-size: 11.5px; font-weight: 700; color: var(--verde-fuerte); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; padding: 10px 18px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--texto-tenue); border-bottom: 1px solid var(--borde); }
+  td { padding: 11px 18px; border-bottom: 1px solid var(--borde); color: var(--texto); }
+  tr:last-child td { border-bottom: none; }
+  .celda-negocio { display: flex; align-items: center; gap: 10px; }
+  .celda-negocio .miniatura { width: 30px; height: 30px; border-radius: 8px; flex: none; }
+  .celda-negocio b { display: block; font-size: 12.5px; }
+  .celda-negocio span { font-size: 11px; color: var(--texto-tenue); }
+  .pill { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; }
+  .pill-verde { background: var(--verde-suave); color: var(--verde-fuerte); }
+  .pill-oro { background: var(--oro-suave); color: var(--oro); }
+  .pill-gris { background: #eceae2; color: var(--texto-tenue); }
+  .fila-acciones { display: flex; gap: 8px; }
+  .icono-accion { width: 26px; height: 26px; border-radius: 7px; background: var(--superficie-hundida); display: flex; align-items: center; justify-content: center; }
+
+  /* Filtros */
+  .filtros { display: flex; gap: 8px; margin-bottom: 14px; }
+  .buscador-mini {
+    flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--borde);
+    border-radius: 9px; padding: 8px 12px; font-size: 12px; color: var(--texto-tenue);
+  }
+  .chip-filtro {
+    padding: 8px 13px; border-radius: 9px; border: 1px solid var(--borde); background: #fff;
+    font-size: 12px; font-weight: 700; color: var(--texto-suave); display: flex; align-items: center; gap: 6px;
+  }
+
+  /* Formulario negocio */
+  .tabs { display: flex; gap: 4px; margin-bottom: 18px; background: #fff; padding: 4px; border-radius: 10px; width: fit-content; box-shadow: var(--sombra); }
+  .tab { padding: 8px 15px; border-radius: 7px; font-size: 12px; font-weight: 700; color: var(--texto-suave); }
+  .tab.activo { background: var(--verde); color: #fff; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .campo { display: flex; flex-direction: column; gap: 6px; }
+  .campo.full { grid-column: 1 / -1; }
+  .campo label { font-size: 11px; font-weight: 800; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.02em; }
+  .campo .input {
+    background: #fff; border: 1.5px solid var(--borde); border-radius: 9px; padding: 10px 12px;
+    font-size: 13px; color: var(--texto);
+  }
+  .campo textarea.input { min-height: 56px; resize: none; font-family: inherit; }
+  .form-card { background: var(--superficie); border-radius: 14px; padding: 20px; box-shadow: var(--sombra); }
+  .form-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+  /* Horario mini */
+  .horario-lista { display: flex; flex-direction: column; gap: 0; }
+  .horario-fila { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--borde); font-size: 12.5px; }
+  .horario-fila:last-child { border-bottom: none; }
+  .horario-fila .dia { width: 90px; font-weight: 800; color: var(--texto); }
+  .horario-fila .horas { flex: 1; color: var(--texto-suave); }
+  .switch-mini { width: 32px; height: 18px; border-radius: 9px; background: var(--verde); position: relative; flex: none; }
+  .switch-mini.off { background: #dcdcd2; }
+  .switch-mini i { position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+  .switch-mini.off i { left: 2px; right: auto; }
+
+  /* Fotos grid */
+  .fotos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .foto-slot { aspect-ratio: 1; border-radius: 12px; background: var(--superficie-hundida); border: 1.5px dashed var(--borde); display: flex; align-items: center; justify-content: center; }
+  .foto-slot.llena { border-style: solid; background: linear-gradient(135deg, #d9c39a, #8a6a3f); }
+  .foto-slot.principal { position: relative; }
+  .foto-slot .etq { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.55); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
+
+  /* Contenido arquetipo */
+  .arquetipo-nota { background: var(--coral-suave); border-radius: 10px; padding: 10px 14px; font-size: 11.5px; color: var(--coral-fuerte); font-weight: 600; margin-bottom: 14px; }
+  .item-lista { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--borde); }
+  .item-lista:last-child { border-bottom: none; }
+  .item-lista .miniatura { width: 38px; height: 38px; border-radius: 9px; background: var(--superficie-hundida); flex: none; }
+  .item-lista .info { flex: 1; }
+  .item-lista b { display: block; font-size: 12.5px; }
+  .item-lista span { font-size: 11px; color: var(--texto-tenue); }
+  .item-lista .precio { font-size: 12.5px; font-weight: 800; color: var(--verde-fuerte); }
+
+  /* Avisos */
+  .layout-avisos { display: grid; grid-template-columns: 1fr 320px; gap: 16px; height: 100%; }
+  .aviso-card { background: var(--superficie); border-radius: 12px; padding: 13px 15px; box-shadow: var(--sombra); margin-bottom: 10px; }
+  .aviso-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 5px; }
+  .aviso-card b { font-size: 13px; }
+  .aviso-card p { margin: 3px 0 8px; font-size: 11.5px; color: var(--texto-suave); line-height: 1.5; }
+  .aviso-meta { display: flex; gap: 6px; align-items: center; }
+
+  .caption {
+    margin-top: 18px; color: var(--pagina-texto-suave); font-size: 12.5px; line-height: 1.6; text-align: center; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+</style>
+
+<div class="encabezado">
+  <div class="eyebrow">Boceto · Panel de administración</div>
+  <h1>Un panel, tres roles</h1>
+  <p>Propuesta de pantallas para el panel web (escritorio) que va a permitir gestionar negocios, avisos y comunidades — separado de la app móvil de vecinos, pero con la misma identidad visual.</p>
+</div>
+
+<div class="roles-leyenda">
+  <span><i style="background:#2b2f27"></i>Super-admin</span>
+  <span><i style="background:var(--verde)"></i>Dueño de negocio</span>
+  <span><i style="background:var(--coral)"></i>Moderador de avisos</span>
+</div>
+
+<div class="galeria">
+
+  <!-- PANTALLA 1: LOGIN -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">1</div>
+      <div class="txt"><strong>Inicio de sesión</strong><span>Pantalla compartida por los 3 roles</span></div>
+      <span class="badge-rol badge-compartido">Compartida</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/login</div></div>
+      <div style="min-height:420px; display:flex; align-items:center; justify-content:center; background:var(--superficie-hundida);">
+        <div style="width:320px; background:#fff; border-radius:16px; padding:32px 28px; box-shadow:var(--sombra);">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:22px;">
+            <div style="width:30px;height:30px;border-radius:9px;background:var(--verde);display:flex;align-items:center;justify-content:center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span style="font-family:'Fraunces',serif; font-weight:700; font-size:16px;">ELISUR admin</span>
+          </div>
+          <div class="campo" style="margin-bottom:12px;"><label>Correo</label><div class="input">maria@elfogon.pe</div></div>
+          <div class="campo" style="margin-bottom:18px;"><label>Contraseña</label><div class="input">••••••••••</div></div>
+          <div class="btn btn-primario" style="width:100%; justify-content:center;">Ingresar</div>
+          <p style="text-align:center; font-size:11px; color:var(--texto-tenue); margin-top:14px;">¿Olvidaste tu contraseña? Contacta al equipo ELISUR.</p>
+        </div>
+      </div>
+    </div>
+    <p class="caption">Sin auto-registro: el super-admin crea cada cuenta y entrega la credencial inicial (se fuerza cambio de contraseña al primer ingreso).</p>
+  </div>
+
+  <!-- PANTALLA 2: SUPER-ADMIN DASHBOARD -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">2</div>
+      <div class="txt"><strong>Dashboard</strong><span>Resumen general al entrar</span></div>
+      <span class="badge-rol badge-superadmin">Super-admin</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/dashboard</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a class="activo"><i class="dot"></i>Dashboard</a>
+            <a><i class="dot"></i>Negocios</a>
+            <a><i class="dot"></i>Categorías</a>
+            <a><i class="dot"></i>Comunidades</a>
+            <a><i class="dot"></i>Avisos</a>
+            <a><i class="dot"></i>Cuentas</a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar"></div><div><b>Equipo ELISUR</b><span>Super-admin</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Dashboard</h2><p>San Borja · resumen general</p></div><div class="btn btn-primario">+ Nuevo negocio</div></div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="etiqueta">Negocios activos</div><div class="valor">42</div><div class="delta">+3 esta semana</div></div>
+            <div class="stat-card"><div class="etiqueta">Por verificar</div><div class="valor">5</div></div>
+            <div class="stat-card"><div class="etiqueta">Avisos activos</div><div class="valor">4</div></div>
+            <div class="stat-card"><div class="etiqueta">Comunidades</div><div class="valor">1</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Negocios agregados recientemente</h3><span class="ver-todo">Ver todos →</span></div>
+            <table>
+              <tr><th>Negocio</th><th>Categoría</th><th>Estado</th></tr>
+              <tr><td><div class="celda-negocio"><div class="miniatura" style="background:var(--verde-suave)"></div><div><b>Tejidos Andinos SB</b><span>Emprendimientos</span></div></div></td><td>Emprendimientos</td><td><span class="pill pill-oro">Por verificar</span></td></tr>
+              <tr><td><div class="celda-negocio"><div class="miniatura" style="background:var(--coral-suave)"></div><div><b>Postres Doña Herminia</b><span>Emprendimientos</span></div></div></td><td>Emprendimientos</td><td><span class="pill pill-verde">Activo</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">Los números salen de datos reales de la comunidad activa — nada de cifras de ejemplo cuando ya haya negocios cargados.</p>
+  </div>
+
+  <!-- PANTALLA 3: SUPER-ADMIN NEGOCIOS -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">3</div>
+      <div class="txt"><strong>Negocios</strong><span>Tabla con filtros, alta y verificación</span></div>
+      <span class="badge-rol badge-superadmin">Super-admin</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/negocios</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a><i class="dot"></i>Dashboard</a>
+            <a class="activo"><i class="dot"></i>Negocios</a>
+            <a><i class="dot"></i>Categorías</a>
+            <a><i class="dot"></i>Comunidades</a>
+            <a><i class="dot"></i>Avisos</a>
+            <a><i class="dot"></i>Cuentas</a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar"></div><div><b>Equipo ELISUR</b><span>Super-admin</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Negocios</h2><p>42 negocios en San Borja</p></div><div class="btn btn-primario">+ Nuevo negocio</div></div>
+          <div class="filtros">
+            <div class="buscador-mini">🔍 Buscar negocio…</div>
+            <div class="chip-filtro">Categoría ▾</div>
+            <div class="chip-filtro">Estado ▾</div>
+          </div>
+          <div class="panel">
+            <table>
+              <tr><th>Negocio</th><th>Categoría</th><th>Estado</th><th>Verificado</th><th></th></tr>
+              <tr><td><div class="celda-negocio"><div class="miniatura" style="background:#e8d3ae"></div><div><b>Panadería Los Rosales</b><span>Av. Los Rosales 345</span></div></div></td><td>Comida</td><td><span class="pill pill-verde">Activo</span></td><td><span class="pill pill-verde">✓ Sí</span></td><td><div class="fila-acciones"><div class="icono-accion">✎</div><div class="icono-accion">⋯</div></div></td></tr>
+              <tr><td><div class="celda-negocio"><div class="miniatura" style="background:var(--coral-suave)"></div><div><b>Veterinaria Aviación</b><span>Av. Aviación 4210</span></div></div></td><td>Mascotas</td><td><span class="pill pill-verde">Activo</span></td><td><span class="pill pill-verde">✓ Sí</span></td><td><div class="fila-acciones"><div class="icono-accion">✎</div><div class="icono-accion">⋯</div></div></td></tr>
+              <tr><td><div class="celda-negocio"><div class="miniatura" style="background:#cfd8e0"></div><div><b>Ferretería Limatambo</b><span>Jr. Húsares de Junín 812</span></div></div></td><td>Hogar</td><td><span class="pill pill-verde">Activo</span></td><td><span class="pill pill-gris">No</span></td><td><div class="fila-acciones"><div class="icono-accion">✎</div><div class="icono-accion">⋯</div></div></td></tr>
+              <tr><td><div class="celda-negocio"><div class="miniatura" style="background:var(--verde-suave)"></div><div><b>Tejidos Andinos SB</b><span>Jr. Las Orquídeas 118</span></div></div></td><td>Emprendimientos</td><td><span class="pill pill-oro">Por verificar</span></td><td><span class="pill pill-gris">No</span></td><td><div class="fila-acciones"><div class="icono-accion">✎</div><div class="icono-accion">⋯</div></div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">"+ Nuevo negocio" abre el mismo formulario de la pantalla 4, vacío — el super-admin lo llena y genera la credencial para el dueño ahí mismo.</p>
+  </div>
+
+  <!-- PANTALLA 4: DUEÑO DE NEGOCIO - MI NEGOCIO -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">4</div>
+      <div class="txt"><strong>Mi negocio</strong><span>Formulario con pestañas — el mismo para todos los negocios</span></div>
+      <span class="badge-rol badge-dueno">Dueño de negocio</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/mi-negocio</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a class="activo"><i class="dot"></i>Mi negocio</a>
+            <a><i class="dot"></i>Horario</a>
+            <a><i class="dot"></i>Fotos</a>
+            <a><i class="dot"></i>Menú</a>
+            <a><i class="dot"></i>Ofertas</a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar" style="background:var(--verde-suave)"></div><div><b>El Fogón Sanborjino</b><span>Dueño de negocio</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Mi negocio</h2><p>Datos visibles en tu ficha pública</p></div><div class="btn btn-primario">Guardar cambios</div></div>
+          <div class="tabs">
+            <div class="tab activo">Datos básicos</div>
+            <div class="tab">Horario</div>
+            <div class="tab">Fotos</div>
+            <div class="tab">Menú</div>
+            <div class="tab">Ofertas</div>
+          </div>
+          <div class="form-card">
+            <div class="form-grid">
+              <div class="campo full"><label>Nombre del negocio</label><div class="input">El Fogón Sanborjino</div></div>
+              <div class="campo full"><label>Descripción</label><div class="input" style="min-height:52px;">Parrillas y comida criolla desde 2010, a la leña.</div></div>
+              <div class="campo"><label>Teléfono / WhatsApp</label><div class="input">+51 987 654 321</div></div>
+              <div class="campo"><label>Categoría</label><div class="input">Comida</div></div>
+              <div class="campo full"><label>Dirección</label><div class="input">Av. Guardia Civil 235, San Borja</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">La pestaña "Menú" cambia de nombre y de campos según el <b style="color:#fff">arquetipo</b> de la categoría del negocio — mismo motor que decide qué bloque mostrar en la ficha pública (ver pantalla siguiente).</p>
+  </div>
+
+  <!-- PANTALLA 4b: CONTENIDO SEGÚN ARQUETIPO -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">4b</div>
+      <div class="txt"><strong>Menú (o el arquetipo que corresponda)</strong><span>Un formulario, contenido variable por categoría</span></div>
+      <span class="badge-rol badge-dueno">Dueño de negocio</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/mi-negocio/menu</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a><i class="dot"></i>Mi negocio</a>
+            <a><i class="dot"></i>Horario</a>
+            <a><i class="dot"></i>Fotos</a>
+            <a class="activo"><i class="dot"></i>Menú</a>
+            <a><i class="dot"></i>Ofertas</a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar" style="background:var(--verde-suave)"></div><div><b>El Fogón Sanborjino</b><span>Dueño de negocio</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Menú</h2><p>Se muestra tal cual en la ficha pública</p></div><div class="btn btn-primario">+ Agregar plato</div></div>
+          <div class="arquetipo-nota">📋 Como tu categoría es "Comida", este bloque es tu Menú. Si fuera "Moda" sería Catálogo de fotos; si fuera "Salud" o "Mascotas", Servicios y tarifas.</div>
+          <div class="panel" style="padding:6px 18px;">
+            <div class="item-lista"><div class="miniatura" style="background:#e8c9a0"></div><div class="info"><b>Parrilla mixta</b><span>Parrillas</span></div><div class="precio">S/ 45</div></div>
+            <div class="item-lista"><div class="miniatura" style="background:#e8c9a0"></div><div class="info"><b>Anticuchos (4 unid.)</b><span>Entradas</span></div><div class="precio">S/ 22</div></div>
+            <div class="item-lista"><div class="miniatura" style="background:#e8c9a0"></div><div class="info"><b>Chicha morada 1L</b><span>Bebidas</span></div><div class="precio">S/ 12</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">Editar aquí actualiza en vivo lo que ve el vecino en <code style="color:#fff">MenuNegocio</code> dentro de la ficha del negocio — sin pasos intermedios.</p>
+  </div>
+
+  <!-- PANTALLA 5: MODERADOR AVISOS -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">5</div>
+      <div class="txt"><strong>Avisos</strong><span>Lista + panel de creación al costado</span></div>
+      <span class="badge-rol badge-moderador">Moderador de avisos</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/avisos</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a class="activo"><i class="dot"></i>Avisos</a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar" style="background:var(--coral-suave)"></div><div><b>Junta Vecinal SB</b><span>Moderador de avisos</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Avisos</h2><p>San Borja · 4 activos</p></div></div>
+          <div class="layout-avisos">
+            <div>
+              <div class="aviso-card">
+                <div class="top"><b>Corte de agua programado</b><span class="pill pill-gris">Municipal</span></div>
+                <p>Sedapal informa corte el jueves 28 de 9:00 a 17:00 en Av. San Luis.</p>
+                <div class="aviso-meta"><span class="pill pill-verde">Publicado</span><span style="font-size:11px;color:var(--texto-tenue)">hace 3 días</span></div>
+              </div>
+              <div class="aviso-card">
+                <div class="top"><b>Refuerzo de serenazgo en zona norte</b><span class="pill" style="background:var(--coral-suave); color:var(--coral-fuerte)">Seguridad</span></div>
+                <p>Rondas nocturnas reforzadas entre Av. Aviación y Av. Angamos Este.</p>
+                <div class="aviso-meta"><span class="pill pill-verde">Publicado</span><span style="font-size:11px;color:var(--texto-tenue)">hace 1 semana</span></div>
+              </div>
+            </div>
+            <div class="form-card">
+              <h3 style="margin:0 0 14px; font-size:13px;">Nuevo aviso</h3>
+              <div class="campo" style="margin-bottom:10px;"><label>Categoría</label><div class="input">Junta vecinal</div></div>
+              <div class="campo" style="margin-bottom:10px;"><label>Título</label><div class="input">Reunión de la junta vecinal</div></div>
+              <div class="campo" style="margin-bottom:14px;"><label>Cuerpo</label><div class="input" style="min-height:60px;">Este sábado 30, 10:00 a.m., parque Reducto N.° 2.</div></div>
+              <div class="btn btn-primario" style="width:100%; justify-content:center;">Publicar aviso</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">El moderador solo ve "Avisos" en su barra lateral — sin acceso a negocios ni cuentas, ni siquiera visible en el menú.</p>
+  </div>
+
+</div>
+

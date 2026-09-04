@@ -1,0 +1,455 @@
+<title>Panel Administrador — Detalle y Validación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1f8a5a; --verde-fuerte: #146641; --verde-suave: #dbf1e3;
+    --coral: #ef7148; --coral-fuerte: #c8532e; --coral-suave: #fce2d7;
+    --oro: #b8862e; --oro-suave: #f6ecd6;
+    --azul: #2f6690; --azul-suave: #dbe9f1;
+    --rojo: #c0392b; --rojo-suave: #fbe2de;
+    --texto: #1a2119; --texto-suave: #5f6b5c; --texto-tenue: #96a091;
+    --superficie: #ffffff; --superficie-hundida: #f4f4f0; --borde: #e5e3da;
+    --sombra: 0 1px 2px rgba(20,40,30,0.04), 0 10px 28px -16px rgba(20,40,30,0.22);
+    --pagina-bg: #10160f; --pagina-texto: #eef6f0; --pagina-texto-suave: #9fb5a6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--pagina-bg); color: var(--pagina-texto);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif; padding: 56px 24px 80px;
+  }
+  .encabezado { max-width: 980px; margin: 0 auto 12px; text-align: center; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--coral); margin-bottom: 10px; }
+  .encabezado h1 { font-family: "Fraunces", serif; font-weight: 700; font-size: clamp(26px, 3.6vw, 36px); margin: 0 0 12px; text-wrap: balance; color: #fff; }
+  .encabezado p { color: var(--pagina-texto-suave); font-size: 15px; line-height: 1.6; max-width: 700px; margin: 0 auto; }
+
+  .roles-leyenda { display: flex; justify-content: center; gap: 20px; margin: 26px auto 50px; flex-wrap: wrap; font-size: 12px; font-weight: 700; color: var(--pagina-texto-suave); }
+  .roles-leyenda span { display: inline-flex; align-items: center; gap: 7px; }
+  .roles-leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .galeria { display: flex; flex-direction: column; gap: 58px; max-width: 1140px; margin: 0 auto; }
+  .fila-etiqueta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .fila-etiqueta .num { width: 28px; height: 28px; border-radius: 9px; background: var(--coral); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 13px; flex: none; }
+  .fila-etiqueta .txt strong { display: block; font-size: 15px; color: #fff; }
+  .fila-etiqueta .txt span { font-size: 12.5px; color: var(--pagina-texto-suave); }
+  .badge-rol { margin-left: auto; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 5px 11px; border-radius: 999px; flex: none; }
+  .badge-superadmin { background: #2b2f27; color: #eef6f0; }
+  .badge-dueno { background: var(--verde-suave); color: var(--verde-fuerte); }
+  .badge-junta { background: var(--azul-suave); color: var(--azul); }
+  .badge-validador { background: var(--coral-suave); color: var(--coral-fuerte); }
+
+  .ventana { background: var(--superficie); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 70px -30px rgba(0,0,0,0.55); }
+  .barra-nav { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #e9e7de; border-bottom: 1px solid var(--borde); }
+  .puntos { display: flex; gap: 6px; }
+  .puntos i { width: 10px; height: 10px; border-radius: 50%; background: #c9c7bc; }
+  .barra-direccion { flex: 1; background: #fff; border-radius: 7px; padding: 5px 12px; font-size: 11.5px; color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; }
+
+  .app-shell { display: flex; min-height: 580px; }
+  .sidebar { width: 208px; flex: none; background: #182019; color: #dfe8e0; display: flex; flex-direction: column; padding: 20px 14px; }
+  .sidebar .marca { display: flex; align-items: center; gap: 9px; margin-bottom: 26px; padding: 0 6px; }
+  .sidebar .marca .punto { width: 26px; height: 26px; border-radius: 8px; background: var(--verde); display:flex; align-items:center; justify-content:center; }
+  .sidebar .marca span { font-family: "Fraunces", serif; font-weight: 700; font-size: 15px; color: #fff; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 3px; }
+  .sidebar nav a { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #aab8ae; text-decoration: none; }
+  .sidebar nav a .izq { display:flex; align-items:center; gap:10px; }
+  .sidebar nav a .dot { width: 6px; height: 6px; border-radius: 50%; background: #4a5a4d; flex: none; }
+  .sidebar nav a.activo { background: #24302680; color: #ffffff; }
+  .sidebar nav a.activo .dot { background: var(--verde); }
+  .sidebar nav a .contador { background: var(--coral); color: #fff; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; }
+  .sidebar .pie-usuario { margin-top: auto; display: flex; align-items: center; gap: 9px; padding: 10px 8px; border-top: 1px solid #263025; font-size: 12px; }
+  .sidebar .pie-usuario .avatar { width: 28px; height: 28px; border-radius: 50%; background: #33412f; flex: none; }
+  .sidebar .pie-usuario b { color: #fff; display:block; font-size: 12.5px; }
+  .sidebar .pie-usuario span { color: #8c9a8f; font-size: 11px; }
+
+  .contenido { flex: 1; background: var(--superficie-hundida); padding: 22px 26px; overflow: hidden; }
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+  .topbar h2 { font-family: "Fraunces", serif; font-weight: 700; font-size: 20px; margin: 0; color: var(--texto); }
+  .topbar p { margin: 2px 0 0; font-size: 12.5px; color: var(--texto-suave); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 9px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+  .btn-primario { background: var(--verde); color: #fff; }
+  .btn-fantasma { background: #fff; border: 1.5px solid var(--borde); color: var(--texto); }
+  .btn-rechazar { background: var(--rojo-suave); color: var(--rojo); }
+  .btn-aprobar { background: var(--verde); color: #fff; }
+
+  .panel { background: var(--superficie); border-radius: 14px; box-shadow: var(--sombra); overflow: hidden; }
+  .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--borde); display:flex; align-items:center; justify-content:space-between; }
+  .panel-head h3 { margin: 0; font-size: 13.5px; font-weight: 800; color: var(--texto); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; padding: 10px 16px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--texto-tenue); border-bottom: 1px solid var(--borde); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--borde); color: var(--texto); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .celda-negocio { display: flex; align-items: center; gap: 10px; }
+  .celda-negocio .miniatura { width: 30px; height: 30px; border-radius: 8px; flex: none; }
+  .celda-negocio b { display: block; font-size: 12.5px; }
+  .celda-negocio span { font-size: 11px; color: var(--texto-tenue); }
+  .pill { display: inline-flex; align-items:center; gap:4px; padding: 3px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; white-space:nowrap; }
+  .pill-verde { background: var(--verde-suave); color: var(--verde-fuerte); }
+  .pill-oro { background: var(--oro-suave); color: var(--oro); }
+  .pill-rojo { background: var(--rojo-suave); color: var(--rojo); }
+  .pill-gris { background: #eceae2; color: var(--texto-tenue); }
+  .pill-azul { background: var(--azul-suave); color: var(--azul); }
+  .fila-acciones { display: flex; gap: 8px; }
+  .icono-accion { width: 26px; height: 26px; border-radius: 7px; background: var(--superficie-hundida); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+  .filtros { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .buscador-mini { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--borde); border-radius: 9px; padding: 8px 12px; font-size: 12px; color: var(--texto-tenue); }
+  .chip-filtro { padding: 8px 13px; border-radius: 9px; border: 1px solid var(--borde); background: #fff; font-size: 12px; font-weight: 700; color: var(--texto-suave); display: flex; align-items: center; gap: 6px; }
+  .chip-filtro.activo { background: var(--texto); border-color: var(--texto); color: #fff; }
+
+  .campo { display: flex; flex-direction: column; gap: 6px; }
+  .campo.full { grid-column: 1 / -1; }
+  .campo label { font-size: 11px; font-weight: 800; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.02em; }
+  .campo .input { background: #fff; border: 1.5px solid var(--borde); border-radius: 9px; padding: 10px 12px; font-size: 13px; color: var(--texto); }
+  .campo textarea.input { min-height: 56px; resize: none; font-family: inherit; }
+  .campo .ayuda { font-size: 10.5px; color: var(--texto-tenue); }
+  .form-card { background: var(--superficie); border-radius: 14px; padding: 20px; box-shadow: var(--sombra); }
+
+  .caption { margin-top: 18px; color: var(--pagina-texto-suave); font-size: 12.5px; line-height: 1.6; text-align: center; max-width: 780px; margin-left: auto; margin-right: auto; }
+  .caption code { color: #fff; background: #263025; padding: 1px 6px; border-radius: 5px; font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+
+  /* Jerarquía distrito/comunidad */
+  .arbol { display: flex; flex-direction: column; gap: 10px; }
+  .distrito-card { background: #fff; border-radius: 12px; box-shadow: var(--sombra); overflow: hidden; }
+  .distrito-head { display: flex; align-items: center; gap: 10px; padding: 13px 16px; background: var(--verde-suave); }
+  .distrito-head .icono { width: 30px; height: 30px; border-radius: 8px; background: var(--verde); display:flex; align-items:center; justify-content:center; flex:none; }
+  .distrito-head b { font-family: "Fraunces", serif; font-size: 14.5px; color: var(--verde-fuerte); }
+  .distrito-head span { font-size: 11px; color: var(--verde-fuerte); opacity: 0.8; font-family: "IBM Plex Mono", monospace; }
+  .distrito-head .n-comunidades { margin-left: auto; font-size: 11px; font-weight: 800; color: var(--verde-fuerte); }
+  .comunidad-fila { display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 46px; border-top: 1px solid var(--borde); font-size: 12.5px; }
+  .comunidad-fila b { flex: 1; }
+  .comunidad-fila .slug { color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+  .distrito-card.inactivo .distrito-head { background: #eceae2; }
+  .distrito-card.inactivo .distrito-head b, .distrito-card.inactivo .distrito-head span, .distrito-card.inactivo .distrito-head .n-comunidades { color: var(--texto-tenue); }
+  .distrito-card.inactivo .distrito-head .icono { background: var(--texto-tenue); }
+
+  /* Formulario negocio completo */
+  .cascada { display: flex; gap: 8px; }
+  .cascada .input { flex: 1; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .seccion-form { margin-bottom: 20px; }
+  .seccion-form h4 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--texto-tenue); margin: 0 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--borde); }
+  .aviso-inline { background: var(--oro-suave); color: var(--oro); border-radius: 9px; padding: 9px 13px; font-size: 11.5px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+  /* Cola de validación */
+  .layout-cola { display: grid; grid-template-columns: 340px 1fr; gap: 16px; height: 100%; }
+  .cola-item { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: var(--sombra); margin-bottom: 8px; cursor: pointer; border: 2px solid transparent; }
+  .cola-item.seleccionado { border-color: var(--verde); }
+  .cola-item .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .cola-item b { font-size: 12.5px; }
+  .cola-item .meta { font-size: 10.5px; color: var(--texto-tenue); display:flex; gap:6px; align-items:center; }
+
+  .revision-card { background: #fff; border-radius: 14px; box-shadow: var(--sombra); padding: 22px; height: 100%; }
+  .revision-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--borde); }
+  .revision-head h3 { font-family: "Fraunces", serif; font-size: 18px; margin: 0 0 4px; }
+  .revision-head .ruta { font-size: 11.5px; color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; }
+  .campo-revision { margin-bottom: 14px; }
+  .campo-revision label { display:block; font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--texto-tenue); margin-bottom: 4px; }
+  .campo-revision .valor { font-size: 13px; color: var(--texto); }
+  .campo-revision .valor.destacado { background: var(--oro-suave); color: var(--oro); padding: 6px 10px; border-radius: 8px; display: inline-block; font-weight: 700; }
+  .revision-footer { display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--borde); }
+  .revision-footer .btn { flex: 1; justify-content: center; }
+  .motivo-box { background: var(--superficie-hundida); border-radius: 10px; padding: 12px; font-size: 12px; color: var(--texto-suave); margin-top: 10px; }
+  .motivo-box textarea { width: 100%; border: 1.5px solid var(--borde); border-radius: 8px; padding: 8px 10px; font-family: inherit; font-size: 12px; min-height: 44px; resize: none; }
+
+  /* Cuentas */
+  .rol-preview { display: flex; align-items: center; gap: 8px; }
+  .rol-preview .punto-rol { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+  /* Mis avisos junta vecinal */
+  .aviso-card-detalle { background: #fff; border-radius: 12px; padding: 14px 16px; box-shadow: var(--sombra); margin-bottom: 10px; }
+  .aviso-card-detalle .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+  .aviso-card-detalle b { font-size: 13px; }
+  .aviso-card-detalle p { margin: 3px 0 8px; font-size: 11.5px; color: var(--texto-suave); line-height: 1.5; }
+  .rechazo-nota { background: var(--rojo-suave); color: var(--rojo); border-radius: 8px; padding: 8px 11px; font-size: 11px; font-weight: 600; margin-top: 6px; }
+</style>
+
+<div class="encabezado">
+  <div class="eyebrow">Boceto · Panel administrador — detalle</div>
+  <h1>Multi-distrito y validación de contenido</h1>
+  <p>Segunda pasada, más específica: cómo se ve la jerarquía distrito → comunidad, el formulario completo de negocio, y la cola donde el validador aprueba o rechaza lo que suben negocios y juntas vecinales.</p>
+</div>
+
+<div class="roles-leyenda">
+  <span><i style="background:#2b2f27"></i>Super-admin</span>
+  <span><i style="background:var(--verde)"></i>Dueño de negocio</span>
+  <span><i style="background:var(--azul)"></i>Junta vecinal</span>
+  <span><i style="background:var(--coral)"></i>Validador de contenido</span>
+</div>
+
+<div class="galeria">
+
+  <!-- 1. DISTRITOS Y COMUNIDADES -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">1</div>
+      <div class="txt"><strong>Distritos y comunidades</strong><span>Pantalla nueva — expone la jerarquía que ya existe en el modelo de datos</span></div>
+      <span class="badge-rol badge-superadmin">Super-admin</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/distritos</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a><div class="izq"><i class="dot"></i>Dashboard</div></a>
+            <a class="activo"><div class="izq"><i class="dot"></i>Distritos</div></a>
+            <a><div class="izq"><i class="dot"></i>Categorías</div></a>
+            <a><div class="izq"><i class="dot"></i>Negocios</div></a>
+            <a><div class="izq"><i class="dot"></i>Validación</div><span class="contador">7</span></a>
+            <a><div class="izq"><i class="dot"></i>Cuentas</div></a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar"></div><div><b>Equipo ELISUR</b><span>Super-admin</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Distritos y comunidades</h2><p>1 distrito activo · listo para expandirse</p></div><div class="btn btn-primario">+ Nuevo distrito</div></div>
+          <div class="arbol">
+            <div class="distrito-card">
+              <div class="distrito-head">
+                <div class="icono"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <b>San Borja</b><span>UBIGEO 150140</span>
+                <div class="n-comunidades">1 comunidad</div>
+              </div>
+              <div class="comunidad-fila"><b>San Borja</b><span class="slug">com-san-borja</span><span class="pill pill-verde">Activa</span><span style="font-size:11px;color:var(--texto-tenue)">Lanzada ago 2026</span></div>
+            </div>
+            <div class="distrito-card inactivo">
+              <div class="distrito-head">
+                <div class="icono">＋</div>
+                <b>Surco</b><span>UBIGEO 150140 (ejemplo)</span>
+                <div class="n-comunidades">Sin comunidades — pendiente</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">Cada distrito puede tener varias comunidades (ej. si más adelante una comunidad es solo una urbanización dentro del distrito). "+ Nuevo distrito" es el primer paso real para expandir la app a una zona nueva.</p>
+  </div>
+
+  <!-- 2. NUEVO NEGOCIO -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">2</div>
+      <div class="txt"><strong>Nuevo negocio</strong><span>Formulario completo, campo por campo — incluye distrito → comunidad</span></div>
+      <span class="badge-rol badge-superadmin">Super-admin</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/negocios/nuevo</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a><div class="izq"><i class="dot"></i>Dashboard</div></a>
+            <a><div class="izq"><i class="dot"></i>Distritos</div></a>
+            <a><div class="izq"><i class="dot"></i>Categorías</div></a>
+            <a class="activo"><div class="izq"><i class="dot"></i>Negocios</div></a>
+            <a><div class="izq"><i class="dot"></i>Validación</div><span class="contador">7</span></a>
+            <a><div class="izq"><i class="dot"></i>Cuentas</div></a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar"></div><div><b>Equipo ELISUR</b><span>Super-admin</span></div></div>
+        </div>
+        <div class="contenido" style="overflow-y:auto;">
+          <div class="topbar"><div><h2>Nuevo negocio</h2><p>Al guardar queda "Por verificar" hasta que el validador lo revise</p></div><div class="btn btn-primario">Guardar y generar credencial</div></div>
+          <div class="form-card">
+
+            <div class="seccion-form">
+              <h4>Ubicación</h4>
+              <div class="cascada" style="margin-bottom:10px;">
+                <div class="campo" style="flex:1;"><label>Distrito</label><div class="input">San Borja</div></div>
+                <div class="campo" style="flex:1;"><label>Comunidad</label><div class="input">San Borja</div></div>
+              </div>
+              <div class="campo full"><label>Dirección</label><div class="input">Av. Guardia Civil 235, San Borja</div></div>
+            </div>
+
+            <div class="seccion-form">
+              <h4>Datos básicos</h4>
+              <div class="form-grid">
+                <div class="campo full"><label>Nombre del negocio</label><div class="input">El Fogón Sanborjino</div></div>
+                <div class="campo full"><label>Descripción</label><div class="input" style="min-height:48px;">Parrillas y comida criolla desde 2010, a la leña.</div></div>
+                <div class="campo"><label>Categorías</label><div class="input">Comida ✕</div></div>
+                <div class="campo"><label>Teléfono</label><div class="input">+51 987 654 321</div></div>
+                <div class="campo"><label>WhatsApp</label><div class="input">+51 987 654 321</div></div>
+                <div class="campo"><label>Fuente</label><div class="input">Alta directa — Super-admin</div><span class="ayuda">Queda registrado quién cargó el negocio (campo `fuente`)</span></div>
+              </div>
+            </div>
+
+            <div class="seccion-form">
+              <h4>Horario</h4>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <span class="pill pill-verde">Lun 08–20</span><span class="pill pill-verde">Mar 08–20</span><span class="pill pill-verde">Mié 08–20</span><span class="pill pill-verde">Jue 08–20</span><span class="pill pill-verde">Vie 08–22</span><span class="pill pill-verde">Sáb 09–22</span><span class="pill pill-gris">Dom cerrado</span>
+              </div>
+            </div>
+
+            <div class="seccion-form">
+              <h4>Fotos</h4>
+              <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:8px;">
+                <div style="aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#e8c9a0,#a97c4a);"></div>
+                <div style="aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--borde);display:flex;align-items:center;justify-content:center;color:var(--texto-tenue);font-size:18px;">+</div>
+              </div>
+            </div>
+
+            <div class="aviso-inline">📋 Categoría "Comida" → esta ficha usará el arquetipo <b>Menú</b>. El contenido del menú se carga después de guardar, desde la pestaña "Menú".</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">Distrito y Comunidad son obligatorios y van primero — así ningún negocio se guarda sin saber a qué zona pertenece, aunque hoy solo exista San Borja.</p>
+  </div>
+
+  <!-- 3. COLA DE VALIDACIÓN -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">3</div>
+      <div class="txt"><strong>Cola de validación</strong><span>Pantalla central del rol nuevo — negocios y avisos pendientes, en un solo lugar</span></div>
+      <span class="badge-rol badge-validador">Validador de contenido</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/validacion</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a class="activo"><div class="izq"><i class="dot"></i>Cola de validación</div><span class="contador">7</span></a>
+            <a><div class="izq"><i class="dot"></i>Historial</div></a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar" style="background:var(--coral-suave)"></div><div><b>Rocío Salas</b><span>Validadora · San Borja</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Cola de validación</h2><p>7 pendientes en tus distritos asignados</p></div></div>
+          <div class="filtros">
+            <div class="chip-filtro activo">Todo (7)</div>
+            <div class="chip-filtro">🏪 Negocios (4)</div>
+            <div class="chip-filtro">📢 Avisos (3)</div>
+            <div class="chip-filtro">Distrito: San Borja ▾</div>
+          </div>
+          <div class="layout-cola">
+            <div>
+              <div class="cola-item seleccionado">
+                <div class="top"><b>Tejidos Andinos SB</b><span class="pill pill-gris">🏪</span></div>
+                <div class="meta">San Borja · enviado hace 2h · edición de horario</div>
+              </div>
+              <div class="cola-item">
+                <div class="top"><b>Reunión extraordinaria — Sector 4</b><span class="pill pill-azul">📢</span></div>
+                <div class="meta">San Borja · Junta Vecinal SB · hace 5h</div>
+              </div>
+              <div class="cola-item">
+                <div class="top"><b>Postres Doña Herminia</b><span class="pill pill-gris">🏪</span></div>
+                <div class="meta">San Borja · alta nueva · hace 1 día</div>
+              </div>
+            </div>
+            <div class="revision-card">
+              <div class="revision-head">
+                <div>
+                  <h3>Tejidos Andinos SB</h3>
+                  <div class="ruta">Negocio · San Borja / San Borja · edición de horario</div>
+                </div>
+                <span class="pill pill-oro">Por verificar</span>
+              </div>
+              <div class="campo-revision"><label>Cambio propuesto</label><div class="valor destacado">Sábado: cerrado → 09:00–14:00</div></div>
+              <div class="campo-revision"><label>Enviado por</label><div class="valor">María Quispe (dueña) · hace 2 horas</div></div>
+              <div class="campo-revision"><label>Resto del negocio (sin cambios)</label><div class="valor" style="color:var(--texto-suave)">Tejidos, bordados y accesorios andinos · Jr. Las Orquídeas 118</div></div>
+              <div class="motivo-box">
+                <label style="display:block; font-size:10.5px; font-weight:800; color:var(--texto-tenue); margin-bottom:6px;">Motivo (obligatorio solo si rechazas)</label>
+                <textarea placeholder="Ej: la dirección no coincide con el mapa, verificar antes de aprobar…"></textarea>
+              </div>
+              <div class="revision-footer">
+                <div class="btn btn-rechazar">✕ Rechazar</div>
+                <div class="btn btn-aprobar">✓ Aprobar</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">El validador solo ve <b style="color:#fff">San Borja</b> porque así se lo asignó el super-admin — cuando haya más distritos, cada validador puede tener los suyos y la carga se reparte sin pisarse.</p>
+  </div>
+
+  <!-- 4. CUENTAS -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">4</div>
+      <div class="txt"><strong>Cuentas</strong><span>Alta de cuenta con rol + alcance geográfico</span></div>
+      <span class="badge-rol badge-superadmin">Super-admin</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/cuentas</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a><div class="izq"><i class="dot"></i>Dashboard</div></a>
+            <a><div class="izq"><i class="dot"></i>Distritos</div></a>
+            <a><div class="izq"><i class="dot"></i>Negocios</div></a>
+            <a><div class="izq"><i class="dot"></i>Validación</div><span class="contador">7</span></a>
+            <a class="activo"><div class="izq"><i class="dot"></i>Cuentas</div></a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar"></div><div><b>Equipo ELISUR</b><span>Super-admin</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Cuentas</h2><p>6 cuentas activas</p></div><div class="btn btn-primario">+ Nueva cuenta</div></div>
+          <div class="panel" style="margin-bottom:16px;">
+            <table>
+              <tr><th>Nombre</th><th>Rol</th><th>Alcance</th><th>Último acceso</th><th></th></tr>
+              <tr><td>Rocío Salas</td><td><div class="rol-preview"><span class="punto-rol" style="background:var(--coral)"></span>Validadora de contenido</div></td><td><span class="pill pill-verde">San Borja</span></td><td>Hace 20 min</td><td><div class="fila-acciones"><div class="icono-accion">✎</div></div></td></tr>
+              <tr><td>Junta Vecinal SB</td><td><div class="rol-preview"><span class="punto-rol" style="background:var(--azul)"></span>Junta vecinal</div></td><td><span class="pill pill-verde">San Borja</span></td><td>Ayer</td><td><div class="fila-acciones"><div class="icono-accion">✎</div></div></td></tr>
+              <tr><td>María Quispe</td><td><div class="rol-preview"><span class="punto-rol" style="background:var(--verde)"></span>Dueña de negocio</div></td><td><span class="pill pill-gris">Tejidos Andinos SB</span></td><td>Hace 2h</td><td><div class="fila-acciones"><div class="icono-accion">✎</div></div></td></tr>
+            </table>
+          </div>
+          <div class="form-card" style="max-width:420px;">
+            <h3 style="margin:0 0 14px; font-size:13px;">Nueva cuenta</h3>
+            <div class="campo" style="margin-bottom:10px;"><label>Nombre</label><div class="input">—</div></div>
+            <div class="campo" style="margin-bottom:10px;"><label>Correo</label><div class="input">—</div></div>
+            <div class="campo" style="margin-bottom:10px;"><label>Rol</label><div class="input">Validador de contenido ▾</div></div>
+            <div class="campo" style="margin-bottom:14px;"><label>Distritos asignados</label><div class="input">San Borja ✕</div><span class="ayuda">Solo aparece si el rol es Junta vecinal o Validador</span></div>
+            <div class="btn btn-primario" style="width:100%; justify-content:center;">Crear cuenta y enviar credencial</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">El campo "Distritos asignados" solo se muestra para roles que necesitan alcance geográfico (Junta vecinal, Validador). Para "Dueño de negocio" se muestra un selector de negocio en su lugar.</p>
+  </div>
+
+  <!-- 5. MIS AVISOS (JUNTA VECINAL) -->
+  <div>
+    <div class="fila-etiqueta">
+      <div class="num">5</div>
+      <div class="txt"><strong>Mis avisos</strong><span>Con estado de validación visible — incluye motivo si fue rechazado</span></div>
+      <span class="badge-rol badge-junta">Junta vecinal</span>
+    </div>
+    <div class="ventana">
+      <div class="barra-nav"><div class="puntos"><i></i><i></i><i></i></div><div class="barra-direccion">admin.elisur.app/mis-avisos</div></div>
+      <div class="app-shell">
+        <div class="sidebar">
+          <div class="marca"><div class="punto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>ELISUR admin</span></div>
+          <nav>
+            <a class="activo"><div class="izq"><i class="dot"></i>Mis avisos</div></a>
+          </nav>
+          <div class="pie-usuario"><div class="avatar" style="background:var(--azul-suave)"></div><div><b>Junta Vecinal SB</b><span>San Borja</span></div></div>
+        </div>
+        <div class="contenido">
+          <div class="topbar"><div><h2>Mis avisos</h2><p>San Borja</p></div><div class="btn btn-primario">+ Nuevo aviso</div></div>
+
+          <div class="aviso-card-detalle">
+            <div class="top"><b>Reunión extraordinaria — Sector 4</b><span class="pill pill-oro">Pendiente</span></div>
+            <p>Este jueves 3 de septiembre, 7:00 p.m., local comunal. Se tratará seguridad del sector.</p>
+          </div>
+
+          <div class="aviso-card-detalle">
+            <div class="top"><b>Campaña de poda de árboles</b><span class="pill pill-rojo">Rechazado</span></div>
+            <p>La municipalidad podará árboles en Av. San Luis la próxima semana.</p>
+            <div class="rechazo-nota">✕ Motivo: falta la fecha exacta — vuelve a enviarlo con el día y horario.</div>
+          </div>
+
+          <div class="aviso-card-detalle">
+            <div class="top"><b>Reunión de la junta vecinal</b><span class="pill pill-verde">Publicado</span></div>
+            <p>Este sábado 30, 10:00 a.m., en el parque Reducto N.° 2.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">La junta vecinal ve exactamente por qué se rechazó un aviso y puede corregirlo y reenviarlo — el mismo trato honesto que ya tiene el dueño de negocio con su ficha.</p>
+  </div>
+
+</div>
+

@@ -1,0 +1,15 @@
+{
+  "name": "app-vecinos-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "paquetes/*"
+  ],
+  "scripts": {
+    "movil": "npm run start --workspace=apps/movil",
+    "api": "npm run dev --workspace=apps/api",
+    "tipos:build": "npm run build --workspace=paquetes/tipos",
+    "meilisearch": "cd herramientas/meilisearch && .\\meilisearch.exe --db-path ./data --http-addr 127.0.0.1:7700 --no-analytics --env development"
+  }
+}
