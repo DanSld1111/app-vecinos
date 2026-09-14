@@ -35,7 +35,7 @@ async function bootstrap() {
   // separados por coma; sin definir, se usa esta lista de puertos locales típicos de
   // desarrollo (Vite/Expo con autoPort pueden variar de puerto, por eso varios).
   const origenesPermitidos = (
-    process.env.CORS_ORIGENES_PERMITIDOS ??
+    process.env.CORS_ORIGENES_PERMITIDOS?.trim() ||
     "http://localhost:5183,http://localhost:8081,http://localhost:8082,http://localhost:19006"
   )
     .split(",")
