@@ -1,0 +1,11 @@
+[build]
+  command = "cd ../.. && npm install && npm run build --workspace=apps/admin"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
