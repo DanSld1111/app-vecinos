@@ -144,7 +144,7 @@ export class NegociosController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Negocio> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.negocios.actualizarFoto(id, archivo.filename, req.user);
+    return this.negocios.actualizarFoto(id, archivo, req.user);
   }
 
   @Post(":id/ofertas")
@@ -177,7 +177,7 @@ export class NegociosController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Producto> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.negocios.actualizarFotoProducto(id, productoId, archivo.filename, req.user);
+    return this.negocios.actualizarFotoProducto(id, productoId, archivo, req.user);
   }
 
   @Post(":id/galeria")
@@ -189,7 +189,7 @@ export class NegociosController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Negocio> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.negocios.agregarFotoGaleria(id, archivo.filename, req.user);
+    return this.negocios.agregarFotoGaleria(id, archivo, req.user);
   }
 
   @Delete(":id/galeria")

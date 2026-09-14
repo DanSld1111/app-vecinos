@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { BaseDatosModule } from "./comun/base-datos/base-datos.module";
+import { AlmacenamientoModule } from "./comun/almacenamiento/almacenamiento.module";
 import { AuditoriaModule } from "./comun/auditoria/auditoria.module";
 import { NotificacionesPushModule } from "./comun/notificaciones-push/notificaciones-push.module";
 import { GeografiaModule } from "./modulos/geografia/geografia.module";
@@ -30,6 +31,7 @@ import { ArquetiposModule } from "./modulos/arquetipos/arquetipos.module";
     // límite más estricto vía @Throttle() en cada controlador. Ver docs/tecnica/11-plan-seguridad.md.
     ThrottlerModule.forRoot([{ name: "default", ttl: 60_000, limit: 100 }]),
     BaseDatosModule,
+    AlmacenamientoModule,
     AuditoriaModule,
     NotificacionesPushModule,
     AuthModule,

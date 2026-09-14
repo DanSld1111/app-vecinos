@@ -1,12 +1,11 @@
 import { randomUUID } from "crypto";
-import { join } from "path";
-import { unlink } from "fs/promises";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Categoria } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
+import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { CrearCategoriaDto } from "./dto/crear-categoria.dto";
 import { ActualizarCategoriaDto } from "./dto/actualizar-categoria.dto";
-import { DIRECTORIO_FOTOS_CATEGORIA } from "./foto-categoria.config";
+import { CARPETA_FOTOS_CATEGORIA } from "./foto-categoria.config";
 
 interface FilaCategoria {
   id: string;
@@ -47,7 +46,10 @@ function slugificar(texto: string): string {
 
 @Injectable()
 export class CategoriasService {
-  constructor(private readonly bd: BaseDatosService) {}
+  constructor(
+    private readonly bd: BaseDatosService,
+    private readonly almacenamiento: AlmacenamientoService,
+  ) {}
 
   /**
    * Sin paginación a propósito: es el catálogo completo de categorías de la app
@@ -99,21 +101,14 @@ export class CategoriasService {
     return aCategoria(await this.obtenerFilaOFallar(id));
   }
 
-  /** Igual que NegociosService.actualizarFoto: borra el archivo anterior del disco al reemplazarlo. */
-  async actualizarFoto(id: string, nombreArchivo: string): Promise<Categoria> {
+  /** Igual que NegociosService.actualizarFoto: borra el archivo anterior de Supabase Storage al reemplazarlo. */
+  async actualizarFoto(id: string, archivo: Express.Multer.File): Promise<Categoria> {
     const fila = await this.obtenerFilaOFallar(id);
     const anterior = fila.foto_url;
 
-    await this.bd.consultar("UPDATE categorias SET foto_url = $2 WHERE id = $1", [
-      id,
-      `/uploads/categorias/${nombreArchivo}`,
-    ]);
-
-    if (anterior?.startsWith("/uploads/categorias/")) {
-      await unlink(join(DIRECTORIO_FOTOS_CATEGORIA, anterior.replace("/uploads/categorias/", ""))).catch(
-        () => undefined,
-      );
-    }
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_CATEGORIA, archivo.buffer, archivo.originalname, archivo.mimetype);
+    await this.bd.consultar("UPDATE categorias SET foto_url = $2 WHERE id = $1", [id, url]);
+    await this.almacenamiento.eliminarPorUrl(anterior);
 
     return aCategoria(await this.obtenerFilaOFallar(id));
   }

@@ -77,6 +77,6 @@ export class AnunciosController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Anuncio> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.anuncios.actualizarFoto(id, archivo.filename, req.user.id);
+    return this.anuncios.actualizarFoto(id, archivo, req.user.id);
   }
 }

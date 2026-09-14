@@ -73,7 +73,7 @@ export class CuentasController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Cuenta> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.cuentas.actualizarFotoPropia(req.user.id, archivo.filename);
+    return this.cuentas.actualizarFotoPropia(req.user.id, archivo);
   }
 
   @Post()

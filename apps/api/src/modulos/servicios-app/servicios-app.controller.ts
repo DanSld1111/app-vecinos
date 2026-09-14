@@ -53,6 +53,6 @@ export class ServiciosAppController {
     @Req() req: SolicitudConCuenta,
   ): Promise<ServicioApp> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.servicios.actualizarFoto(slug, archivo.filename, req.user.id);
+    return this.servicios.actualizarFoto(slug, archivo, req.user.id);
   }
 }

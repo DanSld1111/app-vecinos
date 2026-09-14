@@ -1,17 +1,16 @@
 import { randomUUID } from "crypto";
-import { join } from "path";
-import { unlink } from "fs/promises";
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcryptjs";
 import { Cuenta, ResultadoPaginado } from "@app-vecinos/tipos";
 import { BaseDatosService, Consultable } from "../../comun/base-datos/base-datos.service";
+import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
 import { codificarCursor, decodificarCursor } from "../../comun/paginacion";
 import { SELECT_CUENTA, FilaCuenta, FilaCuentaConHash, aCuenta } from "./cuentas.mapeo";
 import { CrearCuentaDto } from "./dto/crear-cuenta.dto";
 import { ActualizarCuentaDto } from "./dto/actualizar-cuenta.dto";
 import { ActualizarPerfilDto } from "./dto/actualizar-perfil.dto";
-import { DIRECTORIO_FOTOS_CUENTA } from "./foto-cuenta.config";
+import { CARPETA_FOTOS_CUENTA } from "./foto-cuenta.config";
 
 const RONDAS_BCRYPT = 10;
 
@@ -43,6 +42,7 @@ export class CuentasService {
   constructor(
     private readonly bd: BaseDatosService,
     private readonly auditoria: AuditoriaService,
+    private readonly almacenamiento: AlmacenamientoService,
   ) {}
 
   /**
@@ -195,16 +195,14 @@ export class CuentasService {
     await this.auditoria.registrar("cambiar-clave-propia", "cuenta", id, id);
   }
 
-  /** Igual que NegociosService.actualizarFoto: borra el archivo anterior del disco al reemplazarlo. */
-  async actualizarFotoPropia(id: string, nombreArchivo: string): Promise<Cuenta> {
+  /** Igual que NegociosService.actualizarFoto: borra el archivo anterior de Supabase Storage al reemplazarlo. */
+  async actualizarFotoPropia(id: string, archivo: Express.Multer.File): Promise<Cuenta> {
     const anterior = (await this.obtenerPorId(id))?.fotoUrl;
     if (anterior === undefined) throw new NotFoundException(`No existe una cuenta con id "${id}"`);
 
-    await this.bd.consultar("UPDATE cuentas SET foto_url = $2 WHERE id = $1", [id, `/uploads/cuentas/${nombreArchivo}`]);
-
-    if (anterior?.startsWith("/uploads/cuentas/")) {
-      await unlink(join(DIRECTORIO_FOTOS_CUENTA, anterior.replace("/uploads/cuentas/", ""))).catch(() => undefined);
-    }
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_CUENTA, archivo.buffer, archivo.originalname, archivo.mimetype);
+    await this.bd.consultar("UPDATE cuentas SET foto_url = $2 WHERE id = $1", [id, url]);
+    await this.almacenamiento.eliminarPorUrl(anterior);
 
     return (await this.obtenerPorId(id))!;
   }

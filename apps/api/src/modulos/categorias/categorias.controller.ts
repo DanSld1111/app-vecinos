@@ -52,6 +52,6 @@ export class CategoriasController {
     @UploadedFile() archivo: Express.Multer.File | undefined,
   ): Promise<Categoria> {
     if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
-    return this.categorias.actualizarFoto(id, archivo.filename);
+    return this.categorias.actualizarFoto(id, archivo);
   }
 }

@@ -1,20 +1,20 @@
 import { randomUUID } from "crypto";
-import { join } from "path";
-import { unlink } from "fs/promises";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Anuncio } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
+import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
 import { CrearAnuncioDto } from "./dto/crear-anuncio.dto";
 import { ActualizarAnuncioDto } from "./dto/actualizar-anuncio.dto";
 import { COLUMNAS_ANUNCIO, FilaAnuncio, aAnuncio } from "./anuncios.mapeo";
-import { DIRECTORIO_FOTOS_ANUNCIO } from "./foto-anuncio.config";
+import { CARPETA_FOTOS_ANUNCIO } from "./foto-anuncio.config";
 
 @Injectable()
 export class AnunciosService {
   constructor(
     private readonly bd: BaseDatosService,
     private readonly auditoria: AuditoriaService,
+    private readonly almacenamiento: AlmacenamientoService,
   ) {}
 
   /**
@@ -104,27 +104,18 @@ export class AnunciosService {
     const fila = await this.obtenerFilaOFallar(id);
     await this.bd.consultar("DELETE FROM anuncios WHERE id = $1", [id]);
     await this.auditoria.registrar("eliminar", "anuncio", id, cuentaQueActua);
-    if (fila.imagen_url?.startsWith("/uploads/anuncios/")) {
-      await unlink(join(DIRECTORIO_FOTOS_ANUNCIO, fila.imagen_url.replace("/uploads/anuncios/", ""))).catch(
-        () => undefined,
-      );
-    }
+    await this.almacenamiento.eliminarPorUrl(fila.imagen_url);
   }
 
-  /** Igual que NegociosService.actualizarFoto: borra el archivo anterior del disco al reemplazarlo. */
-  async actualizarFoto(id: string, nombreArchivo: string, cuentaQueActua: string): Promise<Anuncio> {
+  /** Igual que NegociosService.actualizarFoto: borra el archivo anterior de Supabase Storage al reemplazarlo. */
+  async actualizarFoto(id: string, archivo: Express.Multer.File, cuentaQueActua: string): Promise<Anuncio> {
     const fila = await this.obtenerFilaOFallar(id);
     const anterior = fila.imagen_url;
 
-    await this.bd.consultar("UPDATE anuncios SET imagen_url = $2 WHERE id = $1", [
-      id,
-      `/uploads/anuncios/${nombreArchivo}`,
-    ]);
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_ANUNCIO, archivo.buffer, archivo.originalname, archivo.mimetype);
+    await this.bd.consultar("UPDATE anuncios SET imagen_url = $2 WHERE id = $1", [id, url]);
     await this.auditoria.registrar("actualizar_foto", "anuncio", id, cuentaQueActua);
-
-    if (anterior?.startsWith("/uploads/anuncios/")) {
-      await unlink(join(DIRECTORIO_FOTOS_ANUNCIO, anterior.replace("/uploads/anuncios/", ""))).catch(() => undefined);
-    }
+    await this.almacenamiento.eliminarPorUrl(anterior);
 
     return aAnuncio(await this.obtenerFilaOFallar(id));
   }

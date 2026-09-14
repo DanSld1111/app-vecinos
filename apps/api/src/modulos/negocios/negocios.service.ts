@@ -1,17 +1,16 @@
 import { randomUUID } from "crypto";
-import { join } from "path";
-import { unlink } from "fs/promises";
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { Cuenta, Negocio, OfertaNegocio, Producto, ResultadoPaginado } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
+import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { codificarCursor, decodificarCursor } from "../../comun/paginacion";
 import { dentroDelAlcance } from "../../comun/alcance";
 import { BusquedaService } from "../busqueda/busqueda.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
 import { COLUMNAS_NEGOCIO, FilaNegocio, aNegocio } from "./negocios.mapeo";
 import { FilaProducto, aProducto } from "./productos.mapeo";
-import { DIRECTORIO_FOTOS_NEGOCIO } from "./foto-negocio.config";
-import { DIRECTORIO_FOTOS_PRODUCTO } from "./foto-producto.config";
+import { CARPETA_FOTOS_NEGOCIO } from "./foto-negocio.config";
+import { CARPETA_FOTOS_PRODUCTO } from "./foto-producto.config";
 import { ListarNegociosDto } from "./dto/listar-negocios.dto";
 import { CrearNegocioDto } from "./dto/crear-negocio.dto";
 import { ActualizarInfoNegocioDto } from "./dto/actualizar-info-negocio.dto";
@@ -34,6 +33,7 @@ export class NegociosService {
     private readonly bd: BaseDatosService,
     private readonly busqueda: BusquedaService,
     private readonly auditoria: AuditoriaService,
+    private readonly almacenamiento: AlmacenamientoService,
   ) {}
 
   /**
@@ -411,17 +411,12 @@ export class NegociosService {
    * archivo anterior si había uno (evita que se acumulen fotos huérfanas en disco cada vez
    * que alguien reemplaza su foto). Ver docs/decisiones/0021-endurecimiento-post-diagnostico.md.
    */
-  async actualizarFoto(id: string, nombreArchivo: string, cuenta: Cuenta): Promise<Negocio> {
+  async actualizarFoto(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<Negocio> {
     this.verificarPropiedad(cuenta, id);
     const anterior = await this.obtenerFilaAdminOFallar(id);
-    await this.bd.consultar("UPDATE negocios SET foto_principal_url = $2, actualizado_en = now() WHERE id = $1", [
-      id,
-      `/uploads/negocios/${nombreArchivo}`,
-    ]);
-    if (anterior.foto_principal_url?.startsWith("/uploads/negocios/")) {
-      const archivoAnterior = join(DIRECTORIO_FOTOS_NEGOCIO, anterior.foto_principal_url.replace("/uploads/negocios/", ""));
-      await unlink(archivoAnterior).catch(() => undefined); // no existir ya no es un error real acá
-    }
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_NEGOCIO, archivo.buffer, archivo.originalname, archivo.mimetype);
+    await this.bd.consultar("UPDATE negocios SET foto_principal_url = $2, actualizado_en = now() WHERE id = $1", [id, url]);
+    await this.almacenamiento.eliminarPorUrl(anterior.foto_principal_url); // no existir ya no es un error real acá
     return aNegocio(await this.obtenerFilaAdminOFallar(id));
   }
 
@@ -432,7 +427,7 @@ export class NegociosService {
   async actualizarFotoProducto(
     negocioId: string,
     productoId: string,
-    nombreArchivo: string,
+    archivo: Express.Multer.File,
     cuenta: Cuenta,
   ): Promise<Producto> {
     this.verificarPropiedad(cuenta, negocioId);
@@ -443,13 +438,9 @@ export class NegociosService {
     if (!rows[0]) throw new NotFoundException(`No existe un producto con id "${productoId}" en este negocio.`);
     const anterior = rows[0].foto_url;
 
-    await this.bd.consultar("UPDATE productos SET foto_url = $2 WHERE id = $1", [
-      productoId,
-      `/uploads/productos/${nombreArchivo}`,
-    ]);
-    if (anterior?.startsWith("/uploads/productos/")) {
-      await unlink(join(DIRECTORIO_FOTOS_PRODUCTO, anterior.replace("/uploads/productos/", ""))).catch(() => undefined);
-    }
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_PRODUCTO, archivo.buffer, archivo.originalname, archivo.mimetype);
+    await this.bd.consultar("UPDATE productos SET foto_url = $2 WHERE id = $1", [productoId, url]);
+    await this.almacenamiento.eliminarPorUrl(anterior);
 
     const { rows: actualizado } = await this.bd.consultar<FilaProducto>(
       "SELECT id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, foto_url FROM productos WHERE id = $1",
@@ -459,15 +450,16 @@ export class NegociosService {
   }
 
   /** Hasta 6 fotos — solo se usan cuando el negocio no tiene menú/catálogo/servicios/ofertas (GaleriaNegocio.tsx). */
-  async agregarFotoGaleria(id: string, nombreArchivo: string, cuenta: Cuenta): Promise<Negocio> {
+  async agregarFotoGaleria(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<Negocio> {
     this.verificarPropiedad(cuenta, id);
     const anterior = await this.obtenerFilaAdminOFallar(id);
     if (anterior.fotos_galeria.length >= 6) {
       throw new ForbiddenException("Ya se subieron las 6 fotos de galería permitidas — borra alguna primero.");
     }
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_NEGOCIO, archivo.buffer, archivo.originalname, archivo.mimetype);
     await this.bd.consultar(
       "UPDATE negocios SET fotos_galeria = array_append(fotos_galeria, $2), actualizado_en = now() WHERE id = $1",
-      [id, `/uploads/negocios/${nombreArchivo}`],
+      [id, url],
     );
     return aNegocio(await this.obtenerFilaAdminOFallar(id));
   }
@@ -479,9 +471,7 @@ export class NegociosService {
       "UPDATE negocios SET fotos_galeria = array_remove(fotos_galeria, $2), actualizado_en = now() WHERE id = $1",
       [id, url],
     );
-    if (url.startsWith("/uploads/negocios/")) {
-      await unlink(join(DIRECTORIO_FOTOS_NEGOCIO, url.replace("/uploads/negocios/", ""))).catch(() => undefined);
-    }
+    await this.almacenamiento.eliminarPorUrl(url);
     return aNegocio(await this.obtenerFilaAdminOFallar(id));
   }
 }

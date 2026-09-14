@@ -1,23 +1,15 @@
-import { randomUUID } from "crypto";
-import { extname, join } from "path";
 import { BadRequestException } from "@nestjs/common";
-import { diskStorage } from "multer";
+import { memoryStorage } from "multer";
 
-// Almacenamiento local en disco — no hay CDN todavía (Cloudflare Images sigue en
-// docs/tecnica/10-fases-pendientes.pdf, Etapa 4). Es un punto de partida real y funcional
-// para el piloto: cuando exista CDN, solo cambia esta configuración, el resto del código
-// (columna foto_principal_url con una URL) no se entera de dónde vive el archivo.
-export const DIRECTORIO_FOTOS_NEGOCIO = join(__dirname, "..", "..", "..", "uploads", "negocios");
+// Buffer en memoria, no disco (ver decisión 0044) — se sube a Supabase Storage vía
+// AlmacenamientoService. Render y cualquier host sin disco persistente pierden un
+// diskStorage local en cada redeploy; con esto el archivo sobrevive a los redeploys.
+export const CARPETA_FOTOS_NEGOCIO = "negocios";
 
 const TIPOS_PERMITIDOS = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export const opcionesUploadFotoNegocio = {
-  storage: diskStorage({
-    destination: DIRECTORIO_FOTOS_NEGOCIO,
-    filename: (_req, archivo, callback) => {
-      callback(null, `${randomUUID()}${extname(archivo.originalname).toLowerCase()}`);
-    },
-  }),
+  storage: memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB — generoso para una foto de celular, sin dejar subir cualquier cosa
   fileFilter: (_req: unknown, archivo: Express.Multer.File, callback: (error: Error | null, aceptar: boolean) => void) => {
     if (!TIPOS_PERMITIDOS.has(archivo.mimetype)) {
