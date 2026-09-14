@@ -127,7 +127,7 @@ function EditorNegocio({ negocio, token, volverALista }: { negocio: Negocio; tok
         </View>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll} contentContainerStyle={styles.tabs}>
         {(["info", "horario", "fotos", "ofertas", "estado"] as Tab[]).map((t) => (
           <Pressable key={t} style={[styles.tab, tab === t && styles.tabActivo]} onPress={() => setTab(t)}>
             <Text style={[styles.tabTexto, tab === t && styles.tabTextoActivo]}>{ETIQUETA_TAB[t]}</Text>
@@ -691,6 +691,10 @@ function crearEstilos(colores: PaletaColores) {
     titulo: { ...tipografia.displayGrande, fontSize: 20, color: colores.texto },
     subtitulo: { ...tipografia.cuerpo, color: colores.textoSuave, marginBottom: espaciado.md },
 
+    // Sin esto, el ScrollView horizontal de pestañas se estira como flex:1 en React Native
+    // Web (sin `style` propio, RNW le aplica flexGrow por defecto) y se come el espacio del
+    // contenido de abajo, dejando un hueco vacío enorme antes de que empiece cada pestaña.
+    tabsScroll: { flexGrow: 0, flexShrink: 0 },
     tabs: { flexDirection: "row", gap: espaciado.xs, paddingHorizontal: espaciado.lg, marginBottom: espaciado.sm },
     tab: { paddingVertical: espaciado.xs, paddingHorizontal: espaciado.sm },
     tabActivo: { borderBottomWidth: 2, borderBottomColor: colores.primario },
