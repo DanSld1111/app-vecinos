@@ -12,6 +12,10 @@ export interface Consultable {
 export class BaseDatosService implements OnModuleDestroy, Consultable {
   private readonly pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    // Postgres local no expone TLS; cualquier host remoto (Supabase, Railway, etc.) sí lo exige.
+    ssl: /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL ?? "")
+      ? undefined
+      : { rejectUnauthorized: false },
   });
 
   consultar<T extends QueryResultRow = QueryResultRow>(texto: string, valores: unknown[] = []) {
