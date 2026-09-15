@@ -4,8 +4,8 @@ export const marca = {
   dominio: "elisur.app",
   correoContacto: "contacto@elisur.app",
   colores: {
-    primario: "#1f8a5a",
-    secundario: "#146641",
+    primario: "#1a531a",
+    secundario: "#123d13",
     acento: "#ef7148",
   },
   rutasDeRecursos: {
