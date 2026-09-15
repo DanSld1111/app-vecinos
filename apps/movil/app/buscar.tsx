@@ -202,7 +202,11 @@ export default function BuscarPantallaCompleta() {
                     style={styles.visitado}
                     onPress={() => router.push(`/negocio/${negocio.id}`)}
                   >
-                    <AvatarNegocio nombre={negocio.nombre} size={56} />
+                    {negocio.fotoPrincipalUrl ? (
+                      <Image source={{ uri: urlCompleta(negocio.fotoPrincipalUrl) }} style={styles.fotoVisitado} />
+                    ) : (
+                      <AvatarNegocio nombre={negocio.nombre} size={56} />
+                    )}
                     <Text style={styles.nombreVisitado} numberOfLines={2}>
                       {negocio.nombre}
                     </Text>
@@ -443,6 +447,11 @@ function crearEstilos(colores: PaletaColores) {
       alignItems: "center",
       gap: 6,
       marginRight: espaciado.md,
+    },
+    fotoVisitado: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
     },
     nombreVisitado: {
       ...tipografia.pie,
