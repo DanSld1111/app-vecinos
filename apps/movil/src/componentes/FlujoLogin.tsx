@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import Svg, { Path } from "react-native-svg";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { marca } from "../config/marca";
 import { useComunidadActiva } from "../estado/comunidadActiva";
 import { useSesion } from "../estado/useSesion";
-import { IlustracionSaludo } from "./IlustracionSaludo";
 import { BotonPrimario } from "./BotonPrimario";
 
 type Paso = "ingreso" | "registro" | "olvide-correo" | "olvide-codigo";
@@ -61,14 +61,18 @@ export function FlujoLogin() {
   );
 }
 
-function EncabezadoMarca() {
-  const colores = useColores();
-  const styles = crearEstilos(colores);
+function IsotipoBlanco({ size = 26 }: { size?: number }) {
   return (
-    <View style={styles.marcaMini}>
-      <IlustracionSaludo size={30} />
-      <Text style={styles.marcaNombre}>{marca.nombreApp}</Text>
-    </View>
+    <Svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+      <Path
+        d="M13 11 H23 M13 11 V29 M13 20 H20 M13 29 H21"
+        stroke="#fff"
+        strokeWidth={3.6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path d="M21 21 C21 15 26 11.5 31 10.5 C29.5 16 26 20 21 21 Z" fill="#fff" />
+    </Svg>
   );
 }
 
@@ -172,69 +176,79 @@ function PantallaIngreso({
   const puedeContinuar = /\S+@\S+\.\S+/.test(correo) && contrasena.length > 0 && !cargando;
 
   return (
-    <View style={styles.pantalla}>
-      <EncabezadoMarca />
+    <View style={styles.pantallaIngreso}>
+      <View style={styles.circuloA} />
+      <View style={styles.circuloB} />
 
-      <Text style={styles.tituloPaso}>Encuentra todo{"\n"}lo de tu barrio</Text>
-      <Text style={styles.descPaso}>Ingresa con tu correo y clave para entrar o crear tu cuenta.</Text>
-
-      <CampoTexto
-        label="Correo"
-        placeholder="tucorreo@ejemplo.com"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        value={correo}
-        onChangeText={(v) => {
-          setCorreo(v);
-          limpiarError();
-        }}
-      />
-      <CampoClave
-        label="Contraseña"
-        placeholder="Tu contraseña"
-        valor={contrasena}
-        onCambiar={(v) => {
-          setContrasena(v);
-          limpiarError();
-        }}
-      />
-
-      <Pressable onPress={onOlvideClave} style={{ alignSelf: "flex-end", marginBottom: espaciado.md }}>
-        <Text style={styles.enlaceTextoFuerte}>¿Olvidaste tu contraseña?</Text>
-      </Pressable>
-
-      <MensajeError mensaje={error} />
-
-      <BotonPrimario
-        texto={cargando ? "Ingresando…" : "Continuar"}
-        onPress={puedeContinuar ? () => iniciarSesion(correo.trim(), contrasena) : () => {}}
-        style={{ opacity: puedeContinuar ? 1 : 0.45, marginBottom: espaciado.lg, marginTop: espaciado.sm }}
-      />
-      {cargando ? <ActivityIndicator color={colores.primarioFuerte} style={{ marginTop: -espaciado.md, marginBottom: espaciado.md }} /> : null}
-
-      <Pressable onPress={onIrARegistro} style={styles.enlaceCentrado}>
-        <Text style={styles.enlaceTexto}>
-          ¿Todavía no tienes cuenta? <Text style={styles.enlaceTextoFuerte}>Crear una</Text>
-        </Text>
-      </Pressable>
-
-      <View style={styles.divisorFila}>
-        <View style={styles.divisorLinea} />
-        <Text style={styles.divisorTexto}>o</Text>
-        <View style={styles.divisorLinea} />
+      <View style={styles.insignia}>
+        <IsotipoBlanco size={26} />
       </View>
-
-      <BotonGoogle />
-
-      <Pressable style={styles.saltar} onPress={onSaltar}>
-        <Text style={styles.saltarTexto}>Continuar sin iniciar sesión (modo prueba)</Text>
-      </Pressable>
-
-      <Text style={styles.pieLegal}>
-        Al continuar aceptas los <Text style={styles.pieLegalFuerte}>Términos</Text> y la{" "}
-        <Text style={styles.pieLegalFuerte}>Política de Privacidad</Text> de {marca.nombreApp}.
+      <Text style={styles.insigniaTexto}>{marca.nombreApp}</Text>
+      <Text style={styles.tituloIngreso}>
+        Uniendo a cada vecino para hacer crecer la comunidad de nuestro distrito
       </Text>
+
+      <View style={styles.tarjetaIngreso}>
+        <Text style={styles.tarjetaTitulo}>Ingresar</Text>
+
+        <CampoTexto
+          label="Correo"
+          placeholder="tucorreo@ejemplo.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          value={correo}
+          onChangeText={(v) => {
+            setCorreo(v);
+            limpiarError();
+          }}
+        />
+        <CampoClave
+          label="Contraseña"
+          placeholder="Tu contraseña"
+          valor={contrasena}
+          onCambiar={(v) => {
+            setContrasena(v);
+            limpiarError();
+          }}
+        />
+
+        <Pressable onPress={onOlvideClave} style={{ alignSelf: "flex-end", marginBottom: espaciado.md }}>
+          <Text style={styles.enlaceTextoFuerte}>¿Olvidaste tu contraseña?</Text>
+        </Pressable>
+
+        <MensajeError mensaje={error} />
+
+        <BotonPrimario
+          texto={cargando ? "Ingresando…" : "Continuar"}
+          onPress={puedeContinuar ? () => iniciarSesion(correo.trim(), contrasena) : () => {}}
+          style={{ opacity: puedeContinuar ? 1 : 0.45, marginBottom: espaciado.lg, marginTop: espaciado.sm }}
+        />
+        {cargando ? <ActivityIndicator color={colores.primarioFuerte} style={{ marginTop: -espaciado.md, marginBottom: espaciado.md }} /> : null}
+
+        <Pressable onPress={onIrARegistro} style={styles.enlaceCentrado}>
+          <Text style={styles.enlaceTexto}>
+            ¿Todavía no tienes cuenta? <Text style={styles.enlaceTextoFuerte}>Crear una</Text>
+          </Text>
+        </Pressable>
+
+        <View style={styles.divisorFila}>
+          <View style={styles.divisorLinea} />
+          <Text style={styles.divisorTexto}>o</Text>
+          <View style={styles.divisorLinea} />
+        </View>
+
+        <BotonGoogle />
+
+        <Pressable style={styles.saltar} onPress={onSaltar}>
+          <Text style={styles.saltarTexto}>Continuar sin iniciar sesión (modo prueba)</Text>
+        </Pressable>
+
+        <Text style={styles.pieLegal}>
+          Al continuar aceptas los <Text style={styles.pieLegalFuerte}>Términos</Text> y la{" "}
+          <Text style={styles.pieLegalFuerte}>Política de Privacidad</Text> de {marca.nombreApp}.
+        </Text>
+      </View>
     </View>
   );
 }
@@ -540,16 +554,68 @@ function crearEstilos(colores: PaletaColores) {
       paddingTop: espaciado.xxl,
       paddingBottom: espaciado.xl,
     },
-    marcaMini: {
-      flexDirection: "row",
+
+    pantallaIngreso: {
+      flex: 1,
+      backgroundColor: colores.primario,
+      paddingHorizontal: espaciado.xl,
+      paddingTop: espaciado.xxl,
+      paddingBottom: espaciado.xl,
+      overflow: "hidden",
+    },
+    circuloA: {
+      position: "absolute",
+      top: -60,
+      right: -60,
+      width: 180,
+      height: 180,
+      borderRadius: 90,
+      backgroundColor: colores.primarioFuerte,
+      opacity: 0.35,
+    },
+    circuloB: {
+      position: "absolute",
+      bottom: -90,
+      left: -70,
+      width: 220,
+      height: 220,
+      borderRadius: 110,
+      backgroundColor: "#000",
+      opacity: 0.12,
+    },
+    insignia: {
+      width: 44,
+      height: 44,
+      borderRadius: 13,
+      backgroundColor: "rgba(255,255,255,0.16)",
       alignItems: "center",
-      gap: espaciado.sm,
+      justifyContent: "center",
+      marginBottom: espaciado.sm,
+    },
+    insigniaTexto: {
+      ...tipografia.etiqueta,
+      color: "rgba(255,255,255,0.75)",
+      letterSpacing: 1,
+      marginBottom: 6,
+    },
+    tituloIngreso: {
+      ...tipografia.displayGrande,
+      fontSize: 21,
+      lineHeight: 28,
+      color: "#fff",
+      maxWidth: 260,
       marginBottom: espaciado.xl,
     },
-    marcaNombre: {
+    tarjetaIngreso: {
+      backgroundColor: colores.fondo,
+      borderRadius: radios.lg + 6,
+      padding: espaciado.lg,
+    },
+    tarjetaTitulo: {
       ...tipografia.display,
-      fontSize: 18,
-      color: colores.texto,
+      fontSize: 15,
+      color: colores.primario,
+      marginBottom: espaciado.md,
     },
     tituloPaso: {
       ...tipografia.displayGrande,
@@ -655,7 +721,7 @@ function crearEstilos(colores: PaletaColores) {
       fontSize: 11,
       color: colores.textoTenue,
       textAlign: "center",
-      marginTop: "auto",
+      marginTop: espaciado.sm,
     },
     pieLegalFuerte: {
       color: colores.textoSuave,
