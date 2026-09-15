@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { marca } from "../config/marca";
@@ -180,6 +180,7 @@ function PantallaIngreso({
       <View style={styles.circuloA} />
       <View style={styles.circuloB} />
 
+      <ScrollView contentContainerStyle={styles.scrollIngreso} showsVerticalScrollIndicator={false}>
       <View style={styles.insignia}>
         <IsotipoBlanco size={26} />
       </View>
@@ -249,6 +250,7 @@ function PantallaIngreso({
           <Text style={styles.pieLegalFuerte}>Política de Privacidad</Text> de {marca.nombreApp}.
         </Text>
       </View>
+      </ScrollView>
     </View>
   );
 }
@@ -558,10 +560,13 @@ function crearEstilos(colores: PaletaColores) {
     pantallaIngreso: {
       flex: 1,
       backgroundColor: colores.primario,
+      overflow: "hidden",
+    },
+    scrollIngreso: {
       paddingHorizontal: espaciado.xl,
       paddingTop: espaciado.xxl,
       paddingBottom: espaciado.xl,
-      overflow: "hidden",
+      flexGrow: 1,
     },
     circuloA: {
       position: "absolute",
