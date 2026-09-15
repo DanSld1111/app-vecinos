@@ -18,7 +18,11 @@ export default function LayoutServicios() {
         // Servicios) tiene headerShown:false — no tiene título del que heredar el back button.
         // Mismo patrón que ya usan buscar.tsx y cuenta/index.tsx en el resto de la app.
         headerLeft: () => (
-          <Pressable onPress={() => router.back()} hitSlop={10} style={{ paddingRight: 12 }}>
+          <Pressable
+            onPress={() => (router.canGoBack() ? router.back() : router.replace("/servicios"))}
+            hitSlop={10}
+            style={{ paddingRight: 12 }}
+          >
             <Ionicons name="chevron-back" size={26} color={colores.texto} />
           </Pressable>
         ),

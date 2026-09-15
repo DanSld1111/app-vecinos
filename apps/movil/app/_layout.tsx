@@ -68,7 +68,11 @@ export default function LayoutRaiz() {
                 // no tiene título del que heredar el back button nativo, y en algunos builds
                 // de iOS eso deja el header sin flecha visible. Ver servicios/_layout.tsx.
                 headerLeft: () => (
-                  <Pressable onPress={() => router.back()} hitSlop={10} style={{ paddingRight: 12 }}>
+                  <Pressable
+                    onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
+                    hitSlop={10}
+                    style={{ paddingRight: 12 }}
+                  >
                     <Ionicons name="chevron-back" size={26} color={colores.texto} />
                   </Pressable>
                 ),

@@ -19,14 +19,16 @@ export default function PantallaCuenta() {
   const token = useSesionCuenta((estado) => estado.token);
   const cerrarSesion = useSesionCuenta((estado) => estado.cerrarSesion);
 
+  const volver = () => (router.canGoBack() ? router.back() : router.replace("/perfil"));
+
   if (!cuenta || !token) {
-    return <LoginCuenta onCerrar={() => router.back()} />;
+    return <LoginCuenta onCerrar={volver} />;
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: colores.fondo }}>
       <View style={styles.barra}>
-        <Pressable style={styles.volver} onPress={() => router.back()} hitSlop={8}>
+        <Pressable style={styles.volver} onPress={volver} hitSlop={8}>
           <Ionicons name="close" size={20} color={colores.textoSuave} />
         </Pressable>
         <View style={{ flex: 1 }}>

@@ -89,7 +89,10 @@ export default function BuscarPantallaCompleta() {
   return (
     <View style={styles.contenedor}>
       <View style={styles.header}>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable
+          style={styles.backBtn}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
+        >
           <Ionicons name="arrow-back" size={18} color={colores.texto} />
         </Pressable>
         <View style={styles.inputFila}>
