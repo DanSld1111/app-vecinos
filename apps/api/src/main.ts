@@ -21,6 +21,16 @@ async function bootstrap() {
   // detección. El genérico <NestExpressApplication> habilita useStaticAssets() abajo.
   const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter());
 
+  // Render (como casi todo PaaS) pone la API detrás de su propio proxy — sin esto, Express ve
+  // como "IP del cliente" la del proxy interno, la misma para todo el mundo. El rate-limiting
+  // de @nestjs/throttler (ver app.module.ts) usa esa IP para separar a cada quien: sin
+  // "trust proxy", terminaba compartiendo un único cupo de intentos entre TODOS los usuarios a
+  // la vez — cualquiera podía agotar el límite de 5/min de login y dejar a todo el mundo
+  // bloqueado un minuto (confirmado en vivo: 3 pedidos con distinta IP falsa en la cabecera
+  // X-Forwarded-For consumían el mismo contador). "1" = confía en el primer proxy que reenvía
+  // la petición, que es exactamente el de Render.
+  app.set("trust proxy", 1);
+
   // Sirve las fotos subidas (apps/api/uploads/) — almacenamiento local de paso, ver
   // foto-negocio.config.ts. Fuera del prefijo /v1 a propósito: son archivos estáticos,
   // no rutas de la API, y foto_principal_url ya se guarda como "/uploads/negocios/...".
