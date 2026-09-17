@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Animated, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColores } from "../../src/disenio";
 import { useTema } from "../../src/estado/useTema";
 import { useComunidadActiva } from "../../src/estado/comunidadActiva";
@@ -73,12 +72,6 @@ export default function LayoutTabs() {
   const colores = useColores();
   const { comunidad, establecerComunidad } = useComunidadActiva();
   const { data: comunidades } = useComunidadesActivas();
-  // Alto real de la "barrita" de inicio del iPhone (0 en Android o en la web normal, ~34px en
-  // un iPhone con notch/Dynamic Island cuando la app corre a pantalla completa — instalada
-  // desde "Agregar a inicio", o con viewport-fit=cover). Sin esto, la barra de tabs terminaba
-  // 34px antes del borde físico y esa franja quedaba pintada del verde de fondo (ver decisión
-  // 0058) en vez del blanco/superficie de la barra.
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!comunidad && comunidades && comunidades.length > 0) {
@@ -91,11 +84,17 @@ export default function LayoutTabs() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
+        // Sin "height"/"paddingBottom" fijos a propósito: @react-navigation/bottom-tabs ya
+        // calcula esos dos solo, sumando insets.bottom automáticamente (ver
+        // BottomTabBar.js::getTabBarHeight) — pero solo si el estilo que le pasamos NO los
+        // pisa. Fijarlos acá (como estaba antes) siempre ganaba por encima de ese cálculo, con
+        // o sin SafeAreaProvider en el árbol: por eso la barra terminaba antes del borde físico
+        // del iPhone y esa franja se veía del color de lo que hubiera detrás (ver decisión
+        // 0059). "paddingTop" sí es seguro fijarlo: el notch/Dynamic Island no le pega a la
+        // barra de abajo.
         tabBarStyle: {
           backgroundColor: colores.superficie,
           borderTopColor: colores.borde,
-          height: 68 + insets.bottom,
-          paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 8,
         },
       }}
