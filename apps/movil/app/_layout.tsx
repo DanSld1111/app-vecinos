@@ -57,6 +57,10 @@ export default function LayoutRaiz() {
             screenOptions={{
               headerShown: false,
               contentStyle: { backgroundColor: colores.fondo },
+              // Sin esto, cada pantalla nueva aparece de golpe en vez de deslizarse — se nota
+              // sobre todo en la versión web (el nativo ya trae una transición por defecto,
+              // pero no tan consistente entre iOS/Android como fijarla explícita acá).
+              animation: "slide_from_right",
             }}
           >
             <Stack.Screen name="(tabs)" />

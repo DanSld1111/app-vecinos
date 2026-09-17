@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, ViewStyle } from "react-native";
+import { useRef } from "react";
+import { Animated, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 
 export function BotonPrimario({
@@ -14,16 +15,27 @@ export function BotonPrimario({
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  // Escala sutil al presionar — mismo feedback táctil que se espera de un botón nativo,
+  // sin esto un botón web se siente "plano" comparado con iOS/Android.
+  const escala = useRef(new Animated.Value(1)).current;
+
+  function presionar(hacia: number) {
+    Animated.spring(escala, { toValue: hacia, useNativeDriver: true, speed: 40, bounciness: 6 }).start();
+  }
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.base, variante === "primario" ? styles.primario : styles.fantasma, style]}
-    >
-      <Text style={variante === "primario" ? styles.textoPrimario : styles.textoFantasma}>
-        {texto}
-      </Text>
-    </Pressable>
+    <Animated.View style={[{ transform: [{ scale: escala }] }, style]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={() => presionar(0.96)}
+        onPressOut={() => presionar(1)}
+        style={[styles.base, variante === "primario" ? styles.primario : styles.fantasma]}
+      >
+        <Text style={variante === "primario" ? styles.textoPrimario : styles.textoFantasma}>
+          {texto}
+        </Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "App Vecinos",
+    "name": "ELISUR",
     "slug": "app-vecinos",
     "scheme": "app-vecinos",
     "version": "1.0.0",
@@ -40,7 +40,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "themeColor": "#1a531a",
+      "backgroundColor": "#1a531a"
     }
   }
 }

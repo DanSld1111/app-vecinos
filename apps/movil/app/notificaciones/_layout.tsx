@@ -14,6 +14,7 @@ export default function LayoutNotificaciones() {
         headerShadowVisible: false,
         headerBackTitle: "Atrás",
         contentStyle: { backgroundColor: colores.fondo },
+        animation: "slide_from_right",
         // Botón de volver propio para "index": la pantalla anterior (un tab, headerShown:false)
         // no tiene título del que heredar el back button nativo, y en algunos builds de iOS eso
         // deja el header sin flecha visible. Ver servicios/_layout.tsx para el mismo caso.

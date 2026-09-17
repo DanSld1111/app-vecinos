@@ -1,0 +1,16 @@
+{
+  "name": "ELISUR — Tu barrio, un solo lugar",
+  "short_name": "ELISUR",
+  "description": "Negocios, avisos y comunidad de tu distrito, todo en un solo lugar.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a531a",
+  "theme_color": "#1a531a",
+  "lang": "es-PE",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
