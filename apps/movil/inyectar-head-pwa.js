@@ -35,8 +35,11 @@ const etiquetas = [
   '<link rel="manifest" href="/manifest.json">',
   ...TAMANOS_SPLASH.map((s) => `<link rel="apple-touch-startup-image" href="/${s.archivo}" media="${s.media}">`),
   // Mismo verde de marca desde antes de que cargue el bundle — evita el flash blanco entre la
-  // splash screen de iOS y el primer render real.
-  `<style>html,body{background-color:${VERDE_MARCA}}</style>`,
+  // splash screen de iOS y el primer render real. Se retira apenas la app monta (ver script
+  // más abajo): dejarlo para siempre es lo que causaba la franja verde bajo la barra de tabs
+  // (decisión 0058) — cualquier zona que la app no pinte de por sí queda mostrando este verde
+  // en vez del fondo real (blanco en modo claro, casi negro en oscuro).
+  `<style id="carga-elisur-fondo">html,body{background-color:${VERDE_MARCA}}</style>`,
 ].join("\n");
 
 // Pantalla de carga: mismo isotipo de marca (la "E" + la hoja, ver IlustracionSaludo.tsx) pero
@@ -96,6 +99,8 @@ const PANTALLA_CARGA = `
       if (raiz && raiz.children.length > 0) {
         carga.classList.add("oculto");
         setTimeout(function () { carga.remove(); }, 500);
+        var fondo = document.getElementById("carga-elisur-fondo");
+        if (fondo) fondo.remove();
       } else {
         requestAnimationFrame(verificar);
       }
