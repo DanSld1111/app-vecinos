@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { entorno } from "../config/entorno";
 
 export interface UsuarioSesion {
@@ -59,78 +61,97 @@ async function llamarAuthVecino<T>(ruta: string, cuerpo: object): Promise<T> {
   return datos as T;
 }
 
-export const useSesion = create<EstadoSesion>((set) => ({
-  autenticado: false,
-  usuario: null,
-  token: null,
-  cargando: false,
-  error: null,
+/**
+ * `persist` guarda `autenticado`/`usuario`/`token` con AsyncStorage (localStorage por debajo
+ * en web) — sin esto, cerrar la app (o el acceso directo instalado en el celular, que en iOS
+ * mata el proceso entero en vez de solo pausarlo) borraba la sesión aunque el token siguiera
+ * siendo válido por 30 días (`JWT_EXPIRES_IN_VECINO`), porque el store de zustand vivía solo
+ * en memoria. Reportado en vivo por un vecino real. Mismo patrón ya usado en
+ * `useSesionCuenta.ts` (modo gestión) — no se persiste `cargando`/`error`, y no hace falta
+ * validar el token al cargar: si venció, la primera petición autenticada que falle con 401 lo
+ * resuelve (ver `registrarManejadorSesionExpirada` en `clienteApi.ts`).
+ */
+export const useSesion = create<EstadoSesion>()(
+  persist(
+    (set) => ({
+      autenticado: false,
+      usuario: null,
+      token: null,
+      cargando: false,
+      error: null,
 
-  registrar: async (datos) => {
-    set({ cargando: true, error: null });
-    try {
-      const { token, usuario } = await llamarAuthVecino<RespuestaAuth>("registro", datos);
-      set({ autenticado: true, usuario, token, cargando: false });
-      return true;
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : "No se pudo crear la cuenta.", cargando: false });
-      return false;
-    }
-  },
+      registrar: async (datos) => {
+        set({ cargando: true, error: null });
+        try {
+          const { token, usuario } = await llamarAuthVecino<RespuestaAuth>("registro", datos);
+          set({ autenticado: true, usuario, token, cargando: false });
+          return true;
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : "No se pudo crear la cuenta.", cargando: false });
+          return false;
+        }
+      },
 
-  iniciarSesion: async (correo, contrasena) => {
-    set({ cargando: true, error: null });
-    try {
-      const { token, usuario } = await llamarAuthVecino<RespuestaAuth>("iniciar-sesion", { correo, contrasena });
-      set({ autenticado: true, usuario, token, cargando: false });
-      return true;
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : "No se pudo iniciar sesión.", cargando: false });
-      return false;
-    }
-  },
+      iniciarSesion: async (correo, contrasena) => {
+        set({ cargando: true, error: null });
+        try {
+          const { token, usuario } = await llamarAuthVecino<RespuestaAuth>("iniciar-sesion", { correo, contrasena });
+          set({ autenticado: true, usuario, token, cargando: false });
+          return true;
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : "No se pudo iniciar sesión.", cargando: false });
+          return false;
+        }
+      },
 
-  olvideClave: async (correo) => {
-    set({ cargando: true, error: null });
-    try {
-      await llamarAuthVecino("olvide-clave", { correo });
-      set({ cargando: false });
-      return true;
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : "No se pudo procesar la solicitud.", cargando: false });
-      return false;
-    }
-  },
+      olvideClave: async (correo) => {
+        set({ cargando: true, error: null });
+        try {
+          await llamarAuthVecino("olvide-clave", { correo });
+          set({ cargando: false });
+          return true;
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : "No se pudo procesar la solicitud.", cargando: false });
+          return false;
+        }
+      },
 
-  restablecerClave: async (correo, codigo, nuevaContrasena) => {
-    set({ cargando: true, error: null });
-    try {
-      await llamarAuthVecino("restablecer-clave", { correo, codigo, nuevaContrasena });
-      set({ cargando: false });
-      return true;
-    } catch (error) {
-      set({ error: error instanceof Error ? error.message : "No se pudo restablecer la contraseña.", cargando: false });
-      return false;
-    }
-  },
+      restablecerClave: async (correo, codigo, nuevaContrasena) => {
+        set({ cargando: true, error: null });
+        try {
+          await llamarAuthVecino("restablecer-clave", { correo, codigo, nuevaContrasena });
+          set({ cargando: false });
+          return true;
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : "No se pudo restablecer la contraseña.", cargando: false });
+          return false;
+        }
+      },
 
-  continuarComoInvitado: () => set({ autenticado: true, usuario: null, token: null, error: null }),
+      continuarComoInvitado: () => set({ autenticado: true, usuario: null, token: null, error: null }),
 
-  cerrarSesion: () =>
-    set((estado) => {
-      // Borra el token de push guardado en el servidor antes de perder el de sesión — si no,
-      // quedaría enviando notificaciones a un celular donde ya nadie iba a verlas con esa
-      // cuenta. Best-effort: si falla (sin red, etc.) no bloquea el cierre de sesión.
-      if (estado.token) {
-        const tokenSesion = estado.token;
-        fetch(`${entorno.apiUrl}/auth/vecino/push-token`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenSesion}` },
-          body: JSON.stringify({ pushToken: null }),
-        }).catch(() => {});
-      }
-      return { autenticado: false, usuario: null, token: null, error: null };
+      cerrarSesion: () =>
+        set((estado) => {
+          // Borra el token de push guardado en el servidor antes de perder el de sesión — si no,
+          // quedaría enviando notificaciones a un celular donde ya nadie iba a verlas con esa
+          // cuenta. Best-effort: si falla (sin red, etc.) no bloquea el cierre de sesión.
+          if (estado.token) {
+            const tokenSesion = estado.token;
+            fetch(`${entorno.apiUrl}/auth/vecino/push-token`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenSesion}` },
+              body: JSON.stringify({ pushToken: null }),
+            }).catch(() => {});
+          }
+          return { autenticado: false, usuario: null, token: null, error: null };
+        }),
+
+      limpiarError: () => set({ error: null }),
     }),
-
-  limpiarError: () => set({ error: null }),
-}));
+    {
+      name: "elisur-sesion-vecino",
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (estado) => ({ autenticado: estado.autenticado, usuario: estado.usuario, token: estado.token }),
+    },
+  ),
+);

@@ -125,10 +125,16 @@ lanzamiento público** (importante) y **mantenimiento continuo** (para siempre).
 
 ## Qué NO es una preocupación de seguridad hoy (para no perder tiempo ahí)
 
-- El **almacenamiento del token en memoria** (Zustand, sin `localStorage`) en `apps/admin` y
-  `apps/movil` — se pierde la sesión al recargar, lo cual es una molestia de UX, pero es
-  justamente lo que hace que un XSS (si alguna vez existiera uno) no pueda robarse un token
-  persistente del navegador. No cambiar esto a `localStorage` sin evaluar el trade-off.
+- **Nota histórica, ya no vigente**: esta sección decía que el token vivía solo en memoria
+  (Zustand, sin `localStorage`) en `apps/admin` y `apps/movil`, a propósito, para que un XSS no
+  pudiera robar un token persistente. Eso cambió: las tres sesiones de `apps/movil` (vecino,
+  "modo gestión", y la de `apps/admin`) ya usan `persist` con `AsyncStorage`/`localStorage` —
+  perder la sesión al cerrar la app instalada en el celular (reportado en vivo por un vecino
+  real, el token de vecino dura 30 días) resultó un costo de UX mayor que el riesgo real: no se ha
+  encontrado ningún XSS en el proyecto (ver diagnóstico de la Parte 2 más arriba: cero
+  `dangerouslySetInnerHTML` en `apps/admin` ni `apps/movil`, todo el render pasa por el escapado
+  automático de React). Si algún día se detecta o se sospecha un XSS, revertir esto es la
+  primera mitigación a aplicar.
 - El proyecto **no es todavía un repositorio git** (`git rev-parse` confirma que no lo es), así
   que no hay riesgo de secretos filtrados en historial de commits — pero en cuanto se inicialice
   git, `.env` ya está correctamente en `.gitignore`.
