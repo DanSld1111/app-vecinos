@@ -343,7 +343,7 @@ export function Distritos() {
                     </div>
                   ) : null}
 
-                  {distrito.activo && !sinComunidades && comunidadesDelDistrito.every((c) => !c.activo) ? (
+                  {distrito.activo && (sinComunidades || comunidadesDelDistrito.every((c) => !c.activo)) ? (
                     confirmandoDesactivarDistrito === distrito.ubigeo ? (
                       <div className="form-inline-comunidad">
                         <span className="sub" style={{ flex: 1 }}>
