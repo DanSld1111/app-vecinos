@@ -102,6 +102,9 @@ export default function Perfil() {
   const alternarTema = useTema((estado) => estado.alternar);
   const { activas: notificacionesActivas, decidir } = useNotificaciones();
   const cerrarSesion = useSesion((estado) => estado.cerrarSesion);
+  const usuario = useSesion((estado) => estado.usuario);
+  // usuario es null en "modo prueba" (continuarComoInvitado) — ahí no hay nombre real que mostrar.
+  const nombreMostrado = usuario ? usuario.nombre : "Invitado";
 
   function compartirApp() {
     Share.share({
@@ -121,7 +124,7 @@ export default function Perfil() {
           </View>
         </View>
         <View style={styles.headerTexto}>
-          <Text style={styles.titulo}>{textos.perfil.titulo}</Text>
+          <Text style={styles.titulo}>{nombreMostrado}</Text>
           <View style={styles.filaZona}>
             <Text style={styles.vecinoDe}>Vecino de</Text>
             <View style={styles.pillZona}>
