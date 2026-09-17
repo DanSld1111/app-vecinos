@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { marca } from "../config/marca";
@@ -165,6 +166,7 @@ function PantallaIngreso({
   onSaltar: () => void;
 }) {
   const colores = useColores();
+  const insets = useSafeAreaInsets();
   const styles = crearEstilos(colores);
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -180,7 +182,10 @@ function PantallaIngreso({
       <View style={styles.circuloA} />
       <View style={styles.circuloB} />
 
-      <ScrollView contentContainerStyle={styles.scrollIngreso} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollIngreso, { paddingTop: espaciado.xxl + insets.top }]}
+        showsVerticalScrollIndicator={false}
+      >
       <View style={styles.insignia}>
         <IsotipoBlanco size={26} />
       </View>

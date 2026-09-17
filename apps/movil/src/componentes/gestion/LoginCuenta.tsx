@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../disenio";
 import { useSesionCuenta } from "../../estado/useSesionCuenta";
 
@@ -83,7 +84,8 @@ export function LoginCuenta({ onCerrar }: { onCerrar: () => void }) {
 
 function PantallaIngreso({ onOlvideClave, onCerrar }: { onOlvideClave: () => void; onCerrar: () => void }) {
   const colores = useColores();
-  const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
+  const styles = crearEstilos(colores, insets.top);
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const iniciarSesion = useSesionCuenta((estado) => estado.iniciarSesion);
@@ -156,7 +158,8 @@ function PantallaIngreso({ onOlvideClave, onCerrar }: { onOlvideClave: () => voi
 
 function PantallaOlvideClave({ onVolver, onEnviado }: { onVolver: () => void; onEnviado: (correo: string) => void }) {
   const colores = useColores();
-  const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
+  const styles = crearEstilos(colores, insets.top);
   const [correo, setCorreo] = useState("");
   const olvideClave = useSesionCuenta((estado) => estado.olvideClave);
   const cargando = useSesionCuenta((estado) => estado.cargando);
@@ -205,7 +208,8 @@ function PantallaOlvideClave({ onVolver, onEnviado }: { onVolver: () => void; on
 
 function PantallaRestablecerClave({ correo, onListo, onVolver }: { correo: string; onListo: () => void; onVolver: () => void }) {
   const colores = useColores();
-  const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
+  const styles = crearEstilos(colores, insets.top);
   const [codigo, setCodigo] = useState("");
   const [clave, setClave] = useState("");
   const [confirmar, setConfirmar] = useState("");
@@ -281,9 +285,9 @@ function PantallaRestablecerClave({ correo, onListo, onVolver }: { correo: strin
   );
 }
 
-function crearEstilos(colores: PaletaColores) {
+function crearEstilos(colores: PaletaColores, insetTop = 0) {
   return StyleSheet.create({
-    pantalla: { flex: 1, backgroundColor: colores.fondo, paddingHorizontal: espaciado.xl, paddingTop: espaciado.xl, paddingBottom: espaciado.xl },
+    pantalla: { flex: 1, backgroundColor: colores.fondo, paddingHorizontal: espaciado.xl, paddingTop: espaciado.xl + insetTop, paddingBottom: espaciado.xl },
     volver: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: espaciado.lg, alignSelf: "flex-start" },
     volverTexto: { ...tipografia.cuerpoDestacado, fontSize: 13, color: colores.textoSuave },
     marcaMini: { flexDirection: "row", alignItems: "center", gap: espaciado.sm, marginBottom: espaciado.lg },

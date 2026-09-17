@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, tipografia, useColores } from "../../src/disenio";
 import { useSesionCuenta } from "../../src/estado/useSesionCuenta";
 import { LoginCuenta } from "../../src/componentes/gestion/LoginCuenta";
@@ -15,6 +16,7 @@ import { PantallaMisAvisos } from "../../src/componentes/gestion/PantallaMisAvis
 export default function PantallaCuenta() {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
   const cuenta = useSesionCuenta((estado) => estado.cuenta);
   const token = useSesionCuenta((estado) => estado.token);
   const cerrarSesion = useSesionCuenta((estado) => estado.cerrarSesion);
@@ -27,7 +29,7 @@ export default function PantallaCuenta() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colores.fondo }}>
-      <View style={styles.barra}>
+      <View style={[styles.barra, { paddingTop: espaciado.md + insets.top }]}>
         <Pressable style={styles.volver} onPress={volver} hitSlop={8}>
           <Ionicons name="close" size={20} color={colores.textoSuave} />
         </Pressable>

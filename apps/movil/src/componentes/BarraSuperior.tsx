@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, tipografia, useColores } from "../disenio";
 import { IlustracionSaludo } from "./IlustracionSaludo";
 import { saludoSegunHora } from "../utilidades/saludo";
@@ -17,9 +18,12 @@ export function BarraSuperior({
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  // Sin esto, en una app instalada a pantalla completa (sin la barra de Safari cubriendo esa
+  // zona) el saludo queda pegado al notch/Dynamic Island — ver decisión 0061.
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.contenedor}>
+    <View style={[styles.contenedor, { paddingTop: espaciado.sm + insets.top }]}>
       <Pressable style={styles.saludoBloque} onPress={onAbrirComunidad}>
         <IlustracionSaludo />
         <View>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { marca } from "../../src/config/marca";
 import { textos } from "../../src/i18n/es";
@@ -93,6 +94,7 @@ function FilaInterruptor({
 export default function Perfil() {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
   const { comunidad } = useComunidadActiva();
   const [hojaComunidadVisible, setHojaComunidadVisible] = useState(false);
   const [hojaSobreComunidadVisible, setHojaSobreComunidadVisible] = useState(false);
@@ -108,7 +110,7 @@ export default function Perfil() {
   }
 
   return (
-    <ScrollView style={styles.contenedor} contentContainerStyle={styles.contenido}>
+    <ScrollView style={styles.contenedor} contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}>
       <View style={styles.header}>
         <View style={styles.avatarWrap}>
           <View style={styles.avatar}>

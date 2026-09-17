@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Aviso } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { useTema } from "../../src/estado/useTema";
@@ -35,6 +36,7 @@ export default function Comunidad() {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
+  const insets = useSafeAreaInsets();
   const { comunidad } = useComunidadActiva();
   const [filtro, setFiltro] = useState<FiltroComunidad>("todo");
   const { data: avisos, isLoading, isError, isRefetching, refetch } = useAvisos(comunidad?.id);
@@ -52,7 +54,7 @@ export default function Comunidad() {
   return (
     <ScrollView
       style={styles.contenedor}
-      contentContainerStyle={styles.contenido}
+      contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor={colores.primario} />
       }

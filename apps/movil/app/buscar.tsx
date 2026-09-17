@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../src/disenio";
 import { useComunidadActiva } from "../src/estado/comunidadActiva";
 import { useNegocios } from "../src/datos/hooks/useNegocios";
@@ -38,6 +39,7 @@ function formatearPrecio(precio: number) {
 export default function BuscarPantallaCompleta() {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
   const { comunidad } = useComunidadActiva();
   const [texto, setTexto] = useState("");
   const [tendenciasExpandidas, setTendenciasExpandidas] = useState(false);
@@ -88,7 +90,7 @@ export default function BuscarPantallaCompleta() {
 
   return (
     <View style={styles.contenedor}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: espaciado.sm + insets.top }]}>
         <Pressable
           style={styles.backBtn}
           onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { ImageBackground, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { ServicioApp } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../../src/disenio";
@@ -53,6 +54,7 @@ export default function Servicios() {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
   const { data: servicios } = useServiciosApp();
   const { comunidad } = useComunidadActiva();
   const { data: negocios } = useNegocios({ comunidadId: comunidad?.id ?? "" });
@@ -73,7 +75,7 @@ export default function Servicios() {
   }
 
   return (
-    <ScrollView style={styles.contenedor} contentContainerStyle={styles.contenido}>
+    <ScrollView style={styles.contenedor} contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}>
       <Text style={styles.titulo}>Servicios</Text>
       <Text style={styles.subtitulo}>Todo lo que tu barrio ofrece, en un solo lugar.</Text>
 
