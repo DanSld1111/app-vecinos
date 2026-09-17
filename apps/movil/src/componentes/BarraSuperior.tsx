@@ -59,7 +59,9 @@ function crearEstilos(colores: PaletaColores) {
     hora: {
       ...tipografia.etiqueta,
       fontSize: 11,
-      color: colores.textoTenue,
+      // textoSuave, no textoTenue: a 11px, el gris pálido de textoTenue casi no tiene
+      // contraste contra el fondo y se ve borroso/ilegible — reportado en vivo por un usuario.
+      color: colores.textoSuave,
       textTransform: "uppercase",
     },
     nombre: {
