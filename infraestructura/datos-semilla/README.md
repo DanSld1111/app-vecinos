@@ -20,15 +20,24 @@ workspaces — correr `npm install` en la raíz del monorepo al menos una vez).
 
 ## Qué NO carga (a propósito)
 
-- **El catálogo UBIGEO completo del Perú (1874 distritos).** El doc maestro lo pide para Etapa 2,
-  pero requiere una fuente oficial (INEI) — no corresponde fabricar 1870 filas con datos inventados.
-  Cuando se consiga esa fuente, se agrega como su propio script/seed, sin tocar este.
 - `productos` y `profesionales`: no existe mock de ejemplo para ninguna de las dos todavía.
+
+## Catálogo UBIGEO completo (`0002_catalogo-ubigeo-nacional.sql`)
+
+25 departamentos, 196 provincias y 1892 distritos del Perú — fuente real, no inventada, ver
+[`fuentes-externas/ubigeo-peru-aumentado/README.md`](fuentes-externas/ubigeo-peru-aumentado/README.md).
+Generado por `generar-catalogo-ubigeo.js` (no editar el `.sql` a mano). Se aplica DESPUÉS de
+`0001_piloto.sql` — usa `ON CONFLICT DO NOTHING`, así que el piloto (San Borja/Miraflores/
+Surco/Surquillo) queda intacto; todo lo demás entra `activo=false`, listo para activarse el
+día que se expanda a una comunidad nueva. **Ya aplicado a la base de producción en Supabase**
+(2026-09-17).
 
 ## Orden de aplicación
 
 ```bash
-for f in infraestructura/migraciones/0*.sql infraestructura/datos-semilla/0001_piloto.sql; do
+for f in infraestructura/migraciones/0*.sql \
+         infraestructura/datos-semilla/0001_piloto.sql \
+         infraestructura/datos-semilla/0002_catalogo-ubigeo-nacional.sql; do
   psql "$DATABASE_URL" < "$f"
 done
 ```
