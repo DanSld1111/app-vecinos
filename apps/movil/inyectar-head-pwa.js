@@ -28,7 +28,11 @@ const TAMANOS_SPLASH = [
 
 const etiquetas = [
   '<meta name="apple-mobile-web-app-capable" content="yes">',
-  '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">',
+  // "black-translucent" (probado primero) hace que iOS dibuje la barra de estado como un
+  // vidrio esmerilado semitransparente sobre el contenido — el efecto de difuminado que
+  // reportó el usuario sobre el saludo de Inicio era justamente eso, no un problema de
+  // contraste de color. "default" deja la barra de estado sólida, sin ese efecto.
+  '<meta name="apple-mobile-web-app-status-bar-style" content="default">',
   '<meta name="apple-mobile-web-app-title" content="ELISUR">',
   '<meta name="mobile-web-app-capable" content="yes">',
   '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
