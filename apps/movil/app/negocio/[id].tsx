@@ -1,4 +1,5 @@
-import { Animated, Image, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { textos } from "../../src/i18n/es";
@@ -20,6 +21,8 @@ import { ResumenHorario } from "../../src/componentes/ResumenHorario";
 import { useProductosPorNegocio } from "../../src/datos/hooks/useProductos";
 import { resolverArquetipoFicha } from "../../src/utilidades/arquetipoFicha";
 import { urlCompleta } from "../../src/utilidades/media";
+import { marca } from "../../src/config/marca";
+import { ResenasNegocio } from "../../src/componentes/ResenasNegocio";
 
 function EsqueletoFicha() {
   const colores = useColores();
@@ -76,6 +79,16 @@ export default function FichaNegocio() {
     Linking.openURL(`tel:${negocio!.telefono}`);
   }
 
+  async function compartir() {
+    try {
+      await Share.share({
+        message: `${negocio!.nombre}\n\n${negocio!.descripcion}\n\nEncuéntralo en ${marca.nombreApp}.`,
+      });
+    } catch {
+      // El usuario canceló o la plataforma no soporta compartir nativo — no es un error real.
+    }
+  }
+
   const arquetipo = resolverArquetipoFicha(negocio, categorias);
 
   let contenido;
@@ -107,7 +120,12 @@ export default function FichaNegocio() {
         <SinFoto tamanoIcono={32} style={styles.fotoPrincipal} />
       )}
 
-      <Text style={styles.nombre}>{negocio.nombre}</Text>
+      <View style={styles.filaNombre}>
+        <Text style={[styles.nombre, { flex: 1 }]}>{negocio.nombre}</Text>
+        <Pressable onPress={compartir} hitSlop={10} style={styles.botonCompartir}>
+          <Ionicons name="share-social-outline" size={20} color={colores.textoSuave} />
+        </Pressable>
+      </View>
       <Text style={styles.descripcion}>{negocio.descripcion}</Text>
 
       <View style={styles.accionRow}>
@@ -131,6 +149,9 @@ export default function FichaNegocio() {
 
       <Text style={styles.encabezado}>{textos.ficha.horario}</Text>
       <ResumenHorario horarios={negocio.horarios} />
+
+      <Text style={styles.encabezado}>Reseñas</Text>
+      <ResenasNegocio negocioId={negocio.id} />
 
       {negocio.verificadoEn ? (
         <Text style={styles.verificado}>Datos verificados el {negocio.verificadoEn}</Text>
@@ -164,9 +185,17 @@ function crearEstilos(colores: PaletaColores) {
       width: "80%",
       marginBottom: espaciado.sm,
     },
+    filaNombre: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: espaciado.sm,
+    },
     nombre: {
       ...tipografia.titulo,
       color: colores.texto,
+    },
+    botonCompartir: {
+      padding: 4,
     },
     descripcion: {
       ...tipografia.cuerpo,

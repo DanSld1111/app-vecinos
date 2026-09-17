@@ -12,3 +12,4 @@ export * from "./plantilla";
 export * from "./arquetipo";
 export * from "./usuario";
 export * from "./servicio";
+export * from "./resena";

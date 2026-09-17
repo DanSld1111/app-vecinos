@@ -20,7 +20,9 @@ import { useColores } from "../src/disenio";
 import { useTema } from "../src/estado/useTema";
 import { BannerSinConexion } from "../src/componentes/BannerSinConexion";
 import { FlujoLogin } from "../src/componentes/FlujoLogin";
+import { Onboarding } from "../src/componentes/Onboarding";
 import { useSesion } from "../src/estado/useSesion";
+import { useOnboarding } from "../src/estado/useOnboarding";
 
 export default function LayoutRaiz() {
   const colores = useColores();
@@ -35,6 +37,7 @@ export default function LayoutRaiz() {
     PlusJakartaSans_800ExtraBold,
   });
   const autenticado = useSesion((estado) => estado.autenticado);
+  const onboardingVisto = useOnboarding((estado) => estado.visto);
 
   if (!fuentesListas) {
     return <View style={{ flex: 1, backgroundColor: colores.fondo }} />;
@@ -47,6 +50,8 @@ export default function LayoutRaiz() {
         <BannerSinConexion />
         {!autenticado ? (
           <FlujoLogin />
+        ) : !onboardingVisto ? (
+          <Onboarding />
         ) : (
           <Stack
             screenOptions={{

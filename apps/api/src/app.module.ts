@@ -17,6 +17,7 @@ import { ServiciosAppModule } from "./modulos/servicios-app/servicios-app.module
 import { PublicidadModule } from "./modulos/publicidad/publicidad.module";
 import { NovedadesModule } from "./modulos/novedades/novedades.module";
 import { ArquetiposModule } from "./modulos/arquetipos/arquetipos.module";
+import { ResenasModule } from "./modulos/resenas/resenas.module";
 
 // Etapa 2 cerrada: los 7 módulos que definía docs/tecnica/10-fases-pendientes.pdf ya existen.
 // NovedadesModule y ArquetiposModule se sumaron después (ver docs/decisiones/0034-conexion-real-paneles.md)
@@ -46,6 +47,7 @@ import { ArquetiposModule } from "./modulos/arquetipos/arquetipos.module";
     PublicidadModule,
     NovedadesModule,
     ArquetiposModule,
+    ResenasModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
