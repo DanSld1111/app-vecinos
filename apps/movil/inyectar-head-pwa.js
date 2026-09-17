@@ -40,6 +40,17 @@ const etiquetas = [
   // (decisión 0058) — cualquier zona que la app no pinte de por sí queda mostrando este verde
   // en vez del fondo real (blanco en modo claro, casi negro en oscuro).
   `<style id="carga-elisur-fondo">html,body{background-color:${VERDE_MARCA}}</style>`,
+  // Bug conocido de Safari/iOS en apps instaladas a pantalla completa ("standalone"): "100%"/
+  // "100vh" (lo que usa el reset de expo-router, #expo-reset más arriba) no siempre coincide
+  // con el alto real visible en ese modo — deja un espacio de sobra abajo, distinto del área
+  // segura del home indicator (eso ya lo maneja bien la librería de navegación, ver decisión
+  // 0059). "100dvh" ("dynamic viewport height") sí lo mide bien; con @supports cae de vuelta a
+  // "100%" en donde no exista soporte (Android/navegadores viejos, donde nunca fue un problema).
+  `<style id="carga-elisur-dvh">
+    @supports (height: 100dvh) {
+      html, body, #root { height: 100dvh; }
+    }
+  </style>`,
 ].join("\n");
 
 // Pantalla de carga: mismo isotipo de marca (la "E" + la hoja, ver IlustracionSaludo.tsx) pero
