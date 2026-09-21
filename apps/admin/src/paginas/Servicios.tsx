@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { EstadoServicioApp, ServicioApp } from "@app-vecinos/tipos";
 import { useServiciosApp } from "../estado/useServiciosApp";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
-import { entorno } from "../config/entorno";
+import { urlCompleta } from "../utilidades/media";
 
 // A qué pantalla real navega cada servicio sigue fijo en el código de apps/movil — activar acá
 // uno de los que todavía no tiene pantalla propia (Taxi, Turismo, etc.) cambia cómo se ve la
@@ -54,7 +54,7 @@ export function Servicios() {
             <div className="tarjeta-servicio" key={servicio.slug}>
               <div className="foto-servicio">
                 {servicio.fotoUrl ? (
-                  <img src={`${entorno.origenApi}${servicio.fotoUrl}`} alt="" />
+                  <img src={urlCompleta(servicio.fotoUrl)} alt="" />
                 ) : (
                   <span className="sin-foto-servicio">🖼️</span>
                 )}
@@ -150,7 +150,7 @@ function ModalServicio({
           <label>Foto de fondo de la tarjeta</label>
           <div className="selector-imagen">
             <div className="slot-imagen">
-              {servicio.fotoUrl ? <img src={`${entorno.origenApi}${servicio.fotoUrl}`} alt="" /> : "🖼️"}
+              {servicio.fotoUrl ? <img src={urlCompleta(servicio.fotoUrl)} alt="" /> : "🖼️"}
             </div>
             <div>
               <p>Solo se usa mientras el servicio está "Disponible" — en "Próximamente" no se muestra.</p>

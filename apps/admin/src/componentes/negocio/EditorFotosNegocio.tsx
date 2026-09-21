@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Negocio } from "@app-vecinos/tipos";
 import { useNegocios } from "../../estado/useNegocios";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
-import { entorno } from "../../config/entorno";
+import { urlCompleta } from "../../utilidades/media";
 
 const TIPOS_ACEPTADOS = "image/jpeg,image/png,image/webp";
 const MAX_FOTOS_GALERIA = 6;
@@ -47,7 +47,7 @@ export function EditorFotosNegocio({ negocio }: { negocio: Negocio }) {
 
             {negocio.fotoPrincipalUrl ? (
               <div className="slot-foto-principal slot-foto-principal--con-foto">
-                <img src={`${entorno.origenApi}${negocio.fotoPrincipalUrl}`} alt={`Foto de ${negocio.nombre}`} />
+                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt={`Foto de ${negocio.nombre}`} />
               </div>
             ) : (
               <div className="slot-foto-principal">
@@ -91,7 +91,7 @@ export function EditorFotosNegocio({ negocio }: { negocio: Negocio }) {
           <div className="pantalla-tel">
             <div className="mini-ficha-foto">
               {negocio.fotoPrincipalUrl ? (
-                <img src={`${entorno.origenApi}${negocio.fotoPrincipalUrl}`} alt="" />
+                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
               ) : (
                 "🖼️"
               )}
@@ -152,7 +152,7 @@ function EditorGaleria({ negocioId, token, fotos }: { negocioId: string; token: 
       <div className="grid-galeria">
         {fotos.map((url) => (
           <div className="slot-galeria" key={url}>
-            <img src={`${entorno.origenApi}${url}`} alt="" />
+            <img src={urlCompleta(url)} alt="" />
             <button
               type="button"
               className="btn-borrar-galeria"

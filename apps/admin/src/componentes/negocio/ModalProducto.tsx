@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
-import { entorno } from "../../config/entorno";
 import { DatosProducto } from "../../datos/productosApi";
+import { urlCompleta } from "../../utilidades/media";
 
 const TIPOS_ACEPTADOS = "image/jpeg,image/png,image/webp";
 
@@ -84,7 +84,7 @@ export function ModalProducto({
                 <img src={previsualizacion} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : producto?.fotoUrl ? (
                 <img
-                  src={`${entorno.origenApi}${producto.fotoUrl}`}
+                  src={urlCompleta(producto.fotoUrl)}
                   alt=""
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />

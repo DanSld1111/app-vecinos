@@ -1511,6 +1511,24 @@ tr:last-child td {
 .estado-negocio-pill.inactivo { background: #eceae2; color: var(--texto-tenue); }
 .flecha-fila { color: var(--texto-tenue); font-size: 15px; flex: none; }
 
+/* ---- Completitud de la ficha en el listado ---- */
+.foto-negocio { overflow: hidden; }
+.foto-negocio img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.completitud-neg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+.completitud-neg .marcas { display: flex; gap: 3px; flex: none; }
+/* Lo que falta se ve apagado, no en rojo: una ficha a medias no es un error, es trabajo pendiente. */
+.completitud-neg .marca { opacity: 0.22; filter: grayscale(1); font-size: 12px; line-height: 1; }
+.completitud-neg .marca.ok { opacity: 1; filter: none; }
+.completitud-neg .falta { color: var(--oro); font-weight: 700; }
+.completitud-neg .lista { color: var(--verde-fuerte); font-weight: 700; }
+
 /* ---- Toggle "crear dueño" ---- */
 .toggle-dueno {
   display: flex;

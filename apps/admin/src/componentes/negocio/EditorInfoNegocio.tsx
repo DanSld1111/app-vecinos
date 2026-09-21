@@ -4,8 +4,8 @@ import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { IconoCategoria } from "../IconoCategoria";
-import { entorno } from "../../config/entorno";
 import { SelectorUbicacion } from "./SelectorUbicacion";
+import { urlCompleta } from "../../utilidades/media";
 
 const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
 
@@ -134,7 +134,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
           <div className="pantalla-tel">
             <div className="mini-ficha-foto">
               {negocio.fotoPrincipalUrl ? (
-                <img src={`${entorno.origenApi}${negocio.fotoPrincipalUrl}`} alt="" />
+                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
               ) : (
                 <IconoCategoria nombre={categoria?.icono ?? "storefront-outline"} size={22} />
               )}

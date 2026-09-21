@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Negocio, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
-import { entorno } from "../../config/entorno";
 import * as api from "../../datos/productosApi";
 import { DatosProducto } from "../../datos/productosApi";
 import { ModalProducto } from "./ModalProducto";
+import { urlCompleta } from "../../utilidades/media";
 
 /**
  * La carta del negocio: productos agrupados por sección, con foto, precio en la moneda del
@@ -167,7 +167,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
               >
                 <span style={{ color: "var(--texto-tenue)", fontSize: 13 }}>⠿</span>
                 <div className="foto-servicio">
-                  {producto.fotoUrl ? <img src={`${entorno.origenApi}${producto.fotoUrl}`} alt="" /> : "🖼️"}
+                  {producto.fotoUrl ? <img src={urlCompleta(producto.fotoUrl)} alt="" /> : "🖼️"}
                 </div>
                 <span className="nombre-producto-foto" style={{ flex: 1 }}>
                   {producto.nombre}
@@ -206,7 +206,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                 {papelera.map((producto) => (
                   <div className="fila-producto-foto" key={producto.id}>
                     <div className="foto-servicio">
-                      {producto.fotoUrl ? <img src={`${entorno.origenApi}${producto.fotoUrl}`} alt="" /> : "🖼️"}
+                      {producto.fotoUrl ? <img src={urlCompleta(producto.fotoUrl)} alt="" /> : "🖼️"}
                     </div>
                     <span className="nombre-producto-foto" style={{ flex: 1 }}>
                       {producto.nombre}

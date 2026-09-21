@@ -4,7 +4,6 @@ import { Negocio } from "@app-vecinos/tipos";
 import { useNegocios } from "../estado/useNegocios";
 import { useCuentas } from "../estado/useCuentas";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
-import { entorno } from "../config/entorno";
 import { generarContrasenaTemporal } from "../utilidades/contrasena";
 import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
 import { EditorInfoNegocio } from "../componentes/negocio/EditorInfoNegocio";
@@ -13,6 +12,7 @@ import { EditorFotosNegocio } from "../componentes/negocio/EditorFotosNegocio";
 import { EditorProductosNegocio } from "../componentes/negocio/EditorProductosNegocio";
 import { EditorOfertasNegocio } from "../componentes/negocio/EditorOfertasNegocio";
 import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio";
+import { urlCompleta } from "../utilidades/media";
 
 type Pestana = "info" | "horario" | "fotos" | "productos" | "ofertas" | "dueno" | "estado";
 
@@ -79,7 +79,7 @@ export function FichaNegocio() {
           <div className="foto-negocio" style={{ width: 52, height: 52, flexShrink: 0 }}>
             {negocio.fotoPrincipalUrl ? (
               <img
-                src={`${entorno.origenApi}${negocio.fotoPrincipalUrl}`}
+                src={urlCompleta(negocio.fotoPrincipalUrl)}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
               />

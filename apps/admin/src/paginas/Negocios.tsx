@@ -9,6 +9,8 @@ import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { generarContrasenaTemporal } from "../utilidades/contrasena";
 import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
 import { IconoCategoria } from "../componentes/IconoCategoria";
+import { fichaCompleta, partesDeFicha, resumenDeLoQueFalta } from "../utilidades/completitudNegocio";
+import { urlCompleta } from "../utilidades/media";
 
 type FiltroEstado = "todos" | "activo" | "por_verificar" | "inactivo";
 
@@ -39,6 +41,7 @@ export function Negocios() {
   const comunidades = useGeografia((estado) => estado.comunidades);
   const token = useSesionAdmin((estado) => estado.token)!;
   const cargarCuentas = useCuentas((estado) => estado.cargar);
+  const cuentas = useCuentas((estado) => estado.cuentas);
   const crearCuenta = useCuentas((estado) => estado.crear);
   const categorias = useCategorias((estado) => estado.categorias);
 
@@ -53,12 +56,19 @@ export function Negocios() {
   const [busqueda, setBusqueda] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState<FiltroEstado>("todos");
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
+  const [soloIncompletos, setSoloIncompletos] = useState(false);
   const [modalNuevo, setModalNuevo] = useState(false);
   const [passwordPendiente, setPasswordPendiente] = useState<PasswordPendiente | null>(null);
 
   const categoriaPorId = useMemo(
     () => Object.fromEntries(categorias.map((c) => [c.id, c])),
     [categorias]
+  );
+
+  /** Qué negocios ya tienen un dueño vinculado — es una de las partes de la ficha. */
+  const negociosConDueno = useMemo(
+    () => new Set(cuentas.filter((c) => c.rol === "dueno_negocio").flatMap((c) => c.negocioIds)),
+    [cuentas]
   );
 
   const comunidadFiltro = comunidadIdFiltro ? comunidades.find((c) => c.id === comunidadIdFiltro) : null;
@@ -68,18 +78,19 @@ export function Negocios() {
     const coincideCategoria = !categoriaId || negocio.categoriaIds.includes(categoriaId);
     const coincideComunidad = !comunidadIdFiltro || negocio.comunidadId === comunidadIdFiltro;
     const coincideEstado = estadoFiltro === "todos" || negocio.estado === estadoFiltro;
-    return coincideBusqueda && coincideCategoria && coincideComunidad && coincideEstado;
+    const coincideCompletitud = !soloIncompletos || !fichaCompleta(negocio, negociosConDueno.has(negocio.id));
+    return coincideBusqueda && coincideCategoria && coincideComunidad && coincideEstado && coincideCompletitud;
   });
 
-  const resumen = useMemo(() => {
-    const activos = negociosMock.filter((n) => n.estado === "activo").length;
-    return {
+  const resumen = useMemo(
+    () => ({
       total: negociosMock.length,
-      activos,
+      activos: negociosMock.filter((n) => n.estado === "activo").length,
       porVerificar: negociosMock.filter((n) => n.estado === "por_verificar").length,
-      porcentajeVerificado: negociosMock.length ? Math.round((activos / negociosMock.length) * 100) : 0,
-    };
-  }, [negociosMock]);
+      incompletas: negociosMock.filter((n) => !fichaCompleta(n, negociosConDueno.has(n.id))).length,
+    }),
+    [negociosMock, negociosConDueno]
+  );
 
   async function alCrearDueno(negocioId: string, nombre: string, correo: string) {
     const contrasena = generarContrasenaTemporal();
@@ -143,10 +154,10 @@ export function Negocios() {
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>📊</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}>📝</div>
           <div>
-            <b>{resumen.porcentajeVerificado}%</b>
-            <span>Verificados</span>
+            <b>{resumen.incompletas}</b>
+            <span>Fichas incompletas</span>
           </div>
         </div>
       </div>
@@ -184,6 +195,13 @@ export function Negocios() {
           <button className={`chip-filtro ${estadoFiltro === "inactivo" ? "activo" : ""}`} onClick={() => setEstadoFiltro("inactivo")}>
             Inactivos
           </button>
+          <button
+            className={`chip-filtro ${soloIncompletos ? "activo" : ""}`}
+            onClick={() => setSoloIncompletos((v) => !v)}
+            title="Negocios a los que les falta foto, horario, descripción, categoría o dueño"
+          >
+            📝 Solo incompletos
+          </button>
         </div>
         <div className="fila-filtro">
           <button className={`chip-filtro ${categoriaId === null ? "activo" : ""}`} onClick={() => setCategoriaId(null)}>
@@ -202,19 +220,42 @@ export function Negocios() {
       </div>
 
       <div className="lista-negocios">
-        {negocios.map((negocio) => (
+        {negocios.map((negocio) => {
+          const partes = partesDeFicha(negocio, negociosConDueno.has(negocio.id));
+          const falta = resumenDeLoQueFalta(negocio, negociosConDueno.has(negocio.id));
+          return (
           <div
             className="fila-negocio"
             key={negocio.id}
             onClick={() => navegar(`/negocios/${negocio.id}`)}
           >
-            <div className="foto-negocio">🖼️</div>
+            <div className="foto-negocio">
+              {negocio.fotoPrincipalUrl ? (
+                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
+              ) : (
+                "🖼️"
+              )}
+            </div>
             <div className="info-negocio">
               <div className="nombre-fila-neg">
                 <b>{negocio.nombre}</b>
                 {negocio.verificadoEn ? <span className="check-verificado">✓</span> : null}
               </div>
               <div className="direccion-neg">{negocio.direccion}</div>
+              <div className="completitud-neg">
+                <span className="marcas">
+                  {partes.map((parte) => (
+                    <span
+                      key={parte.clave}
+                      className={`marca ${parte.completa ? "ok" : ""}`}
+                      title={`${parte.etiqueta}: ${parte.completa ? "lista" : "pendiente"}`}
+                    >
+                      {parte.icono}
+                    </span>
+                  ))}
+                </span>
+                {falta ? <span className="falta">{falta}</span> : <span className="lista">Ficha completa</span>}
+              </div>
             </div>
             <div className="cats-negocio">
               {negocio.categoriaIds.slice(0, 2).map((id) => (
@@ -226,7 +267,8 @@ export function Negocios() {
             {pillEstado(negocio.estado)}
             <span className="flecha-fila">›</span>
           </div>
-        ))}
+          );
+        })}
         {negocios.length === 0 ? (
           <div className="panel" style={{ padding: 32, textAlign: "center", color: "var(--texto-tenue)" }}>
             No hay negocios que coincidan con el filtro.

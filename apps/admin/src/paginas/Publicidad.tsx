@@ -3,7 +3,7 @@ import { Anuncio, UbicacionAnuncio } from "@app-vecinos/tipos";
 import { useAnuncios } from "../estado/useAnuncios";
 import { useNegocios } from "../estado/useNegocios";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
-import { entorno } from "../config/entorno";
+import { urlCompleta } from "../utilidades/media";
 
 const NOMBRE_UBICACION: Record<UbicacionAnuncio, string> = {
   carrusel_inicio: "Carrusel Inicio",
@@ -183,7 +183,7 @@ export function Publicidad() {
               return (
                 <div className="fila-anuncio" key={anuncio.id}>
                   <div className="foto-anuncio">
-                    {anuncio.imagenUrl ? <img src={`${entorno.origenApi}${anuncio.imagenUrl}`} alt="" /> : "🖼️"}
+                    {anuncio.imagenUrl ? <img src={urlCompleta(anuncio.imagenUrl)} alt="" /> : "🖼️"}
                   </div>
                   <div className="info-anuncio">
                     <b>{anuncio.nombre}</b>
@@ -242,7 +242,7 @@ export function Publicidad() {
                 <>
                   <div className="mini-carrusel">
                     {ejemploCarrusel.imagenUrl ? (
-                      <img className="mini-thumb" src={`${entorno.origenApi}${ejemploCarrusel.imagenUrl}`} alt="" />
+                      <img className="mini-thumb" src={urlCompleta(ejemploCarrusel.imagenUrl)} alt="" />
                     ) : (
                       <div className="mini-thumb" />
                     )}
@@ -274,7 +274,7 @@ export function Publicidad() {
               {ejemploBanner ? (
                 <div className="mini-banner-buscar">
                   {ejemploBanner.imagenUrl ? (
-                    <img className="mini-icono" src={`${entorno.origenApi}${ejemploBanner.imagenUrl}`} alt="" />
+                    <img className="mini-icono" src={urlCompleta(ejemploBanner.imagenUrl)} alt="" />
                   ) : (
                     <div className="mini-icono">★</div>
                   )}
@@ -390,7 +390,7 @@ function ModalAnuncio({
           <label>Imagen</label>
           <div className="selector-imagen">
             <div className="slot-imagen">
-              {anuncio?.imagenUrl ? <img src={`${entorno.origenApi}${anuncio.imagenUrl}`} alt="" /> : "🖼️"}
+              {anuncio?.imagenUrl ? <img src={urlCompleta(anuncio.imagenUrl)} alt="" /> : "🖼️"}
             </div>
             <div>
               <p>
