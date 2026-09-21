@@ -12,6 +12,7 @@ const NOMBRE_ROL: Record<RolCuenta, string> = {
   dueno_negocio: "Dueño de negocio",
   junta_vecinal: "Junta vecinal",
   validador_contenido: "Validador",
+  gestor_negocios: "Gestor de negocios",
 };
 
 const COLOR_ROL: Record<RolCuenta, string> = {
@@ -19,6 +20,7 @@ const COLOR_ROL: Record<RolCuenta, string> = {
   dueno_negocio: "var(--verde)",
   junta_vecinal: "var(--azul)",
   validador_contenido: "var(--coral)",
+  gestor_negocios: "var(--morado)",
 };
 
 const COLOR_ROL_SUAVE: Record<RolCuenta, string> = {
@@ -26,6 +28,7 @@ const COLOR_ROL_SUAVE: Record<RolCuenta, string> = {
   dueno_negocio: "var(--verde-suave)",
   junta_vecinal: "var(--azul-suave)",
   validador_contenido: "var(--coral-suave)",
+  gestor_negocios: "var(--morado-suave)",
 };
 
 const COLOR_ROL_TEXTO: Record<RolCuenta, string> = {
@@ -33,6 +36,7 @@ const COLOR_ROL_TEXTO: Record<RolCuenta, string> = {
   dueno_negocio: "var(--verde-fuerte)",
   junta_vecinal: "var(--azul)",
   validador_contenido: "var(--coral-fuerte)",
+  gestor_negocios: "var(--morado)",
 };
 
 function iniciales(nombre: string): string {
@@ -94,6 +98,7 @@ export function Cuentas() {
       duenos: cuentas.filter((c) => c.rol === "dueno_negocio").length,
       juntas: cuentas.filter((c) => c.rol === "junta_vecinal").length,
       validadores: cuentas.filter((c) => c.rol === "validador_contenido").length,
+      gestores: cuentas.filter((c) => c.rol === "gestor_negocios").length,
     }),
     [cuentas]
   );
@@ -113,6 +118,7 @@ export function Cuentas() {
       return nombres.length > 1 ? [nombres[0], `+${nombres.length - 1} más`] : nombres;
     }
     if (cuenta.rol === "super_admin") return ["Acceso total"];
+    if (cuenta.rol === "gestor_negocios") return ["Todos los negocios"];
     if (cuenta.distritosAsignados.length === 0) return ["Todos los distritos"];
     return cuenta.distritosAsignados.map((u) => distritos.find((d) => d.ubigeo === u)?.nombre ?? u);
   }
@@ -215,6 +221,13 @@ export function Cuentas() {
           <div>
             <b>{resumen.validadores}</b>
             <span>Validadores</span>
+          </div>
+        </div>
+        <div className="mini-stat">
+          <div className="icono" style={{ background: "var(--morado-suave)" }}>🏪</div>
+          <div>
+            <b>{resumen.gestores}</b>
+            <span>Gestores de negocios</span>
           </div>
         </div>
       </div>

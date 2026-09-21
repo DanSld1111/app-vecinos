@@ -1,7 +1,13 @@
 import { RolCuenta } from "@app-vecinos/tipos";
 import { IsArray, IsEmail, IsIn, IsString } from "class-validator";
 
-const ROLES: RolCuenta[] = ["super_admin", "dueno_negocio", "junta_vecinal", "validador_contenido"];
+const ROLES: RolCuenta[] = [
+  "super_admin",
+  "dueno_negocio",
+  "junta_vecinal",
+  "validador_contenido",
+  "gestor_negocios",
+];
 
 export class ActualizarCuentaDto {
   @IsString()

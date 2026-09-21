@@ -177,9 +177,14 @@ export class NegociosService {
     return rows[0];
   }
 
-  /** Puede tocar la ficha: el propio dueño asignado, o cualquier super_admin. */
+  /**
+   * Puede tocar la ficha: el propio dueño asignado, o cualquier cuenta con acceso total al
+   * módulo de negocios (super_admin y gestor_negocios). El gestor no tiene alcance por
+   * distrito aquí — a diferencia de aprobar/despublicar/rechazar más abajo — porque el pedido
+   * fue que administre TODOS los negocios, no un subconjunto.
+   */
   private verificarPropiedad(cuenta: Cuenta, negocioId: string): void {
-    if (cuenta.rol === "super_admin") return;
+    if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
     if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
     throw new ForbiddenException("No administras este negocio.");
   }

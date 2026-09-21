@@ -55,7 +55,7 @@ export class NegociosController {
 
   @Get("admin")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("super_admin")
+  @Roles("super_admin", "gestor_negocios")
   listarAdmin(@Query() paginacion: PaginacionAdminDto): Promise<ResultadoPaginado<Negocio>> {
     return this.negocios.listarAdmin(paginacion.cursor, paginacion.limite);
   }
@@ -83,7 +83,7 @@ export class NegociosController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("super_admin")
+  @Roles("super_admin", "gestor_negocios")
   crear(@Body() dto: CrearNegocioDto): Promise<Negocio> {
     return this.negocios.crear(dto);
   }
@@ -195,21 +195,21 @@ export class NegociosController {
 
   @Patch(":id/aprobar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("validador_contenido", "super_admin")
+  @Roles("validador_contenido", "super_admin", "gestor_negocios")
   aprobar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
     return this.negocios.aprobar(id, req.user);
   }
 
   @Patch(":id/despublicar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("validador_contenido", "super_admin")
+  @Roles("validador_contenido", "super_admin", "gestor_negocios")
   despublicar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
     return this.negocios.despublicar(id, req.user);
   }
 
   @Patch(":id/rechazar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("validador_contenido", "super_admin")
+  @Roles("validador_contenido", "super_admin", "gestor_negocios")
   rechazar(
     @Param("id") id: string,
     @Body() dto: RechazarNegocioDto,

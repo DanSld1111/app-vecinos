@@ -1,4 +1,9 @@
-export type RolCuenta = "super_admin" | "dueno_negocio" | "junta_vecinal" | "validador_contenido";
+export type RolCuenta =
+  | "super_admin"
+  | "dueno_negocio"
+  | "junta_vecinal"
+  | "validador_contenido"
+  | "gestor_negocios";
 
 export interface Cuenta {
   id: string;

@@ -8,6 +8,7 @@ const NOMBRE_ROL: Record<RolCuenta, string> = {
   dueno_negocio: "Dueño de negocio",
   junta_vecinal: "Junta vecinal",
   validador_contenido: "Validador de contenido",
+  gestor_negocios: "Gestor de negocios",
 };
 
 const REGLAS_CLAVE = [

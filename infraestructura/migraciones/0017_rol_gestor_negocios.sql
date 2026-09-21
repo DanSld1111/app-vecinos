@@ -1,0 +1,14 @@
+-- Nuevo rol de cuenta: gestor_negocios.
+--
+-- `rol` en la tabla `cuentas` es un ENUM de Postgres (no un TEXT libre), así que un rol nuevo
+-- necesita agregar el valor al tipo antes de que la API pueda insertar una fila con él —
+-- si no, el INSERT falla con "invalid input value for enum rol_cuenta".
+--
+-- Acceso total al módulo de negocios (dar de alta, editar cualquier ficha, publicar/
+-- despublicar/rechazar) sin el resto de lo que ve super_admin (distritos, categorías,
+-- cuentas, publicidad, etc.). Ver docs/decisiones/0070-rol-gestor-negocios.md.
+--
+-- ALTER TYPE ... ADD VALUE no puede ejecutarse dentro de una transacción explícita en versiones
+-- de Postgres anteriores a la 12 — este archivo se aplica solo (sin BEGIN/COMMIT propio), igual
+-- que el resto de migraciones de este directorio.
+ALTER TYPE rol_cuenta ADD VALUE 'gestor_negocios';

@@ -47,6 +47,10 @@ function itemsPorRol(rol: RolCuenta, pendientes: number): ItemNav[] {
         { a: "/validacion", texto: "Cola de validación", contador: pendientes },
         { a: "/validacion/historial", texto: "Historial" },
       ];
+    // Acceso total al módulo de negocios (alta, edición, publicar/despublicar) pero nada más
+    // del panel — sin distritos, cuentas, categorías ni el resto de módulos de super_admin.
+    case "gestor_negocios":
+      return [{ a: "/negocios", texto: "Negocios" }];
   }
 }
 
@@ -55,6 +59,7 @@ const NOMBRE_ROL: Record<RolCuenta, string> = {
   dueno_negocio: "Dueño de negocio",
   junta_vecinal: "Junta vecinal",
   validador_contenido: "Validador de contenido",
+  gestor_negocios: "Gestor de negocios",
 };
 
 export function LayoutAdmin() {
@@ -93,9 +98,11 @@ export function LayoutAdmin() {
 
   // El Dashboard también muestra "distritos activos"/"comunidades" sin pasar antes por
   // /distritos — mismo motivo que categorías arriba: no puede esperar a la primera visita
-  // a esa pantalla. Solo lo necesita super_admin (es quien ve Dashboard y Distritos).
+  // a esa pantalla. super_admin lo necesita para Dashboard/Distritos, y gestor_negocios para
+  // los selectores de distrito/comunidad al dar de alta un negocio (Negocios.tsx) y para el
+  // mapa de ubicación en la ficha (SelectorUbicacion).
   useEffect(() => {
-    if (token && cuenta?.rol === "super_admin") cargarGeografia(token);
+    if (token && (cuenta?.rol === "super_admin" || cuenta?.rol === "gestor_negocios")) cargarGeografia(token);
   }, [token, cuenta?.rol, cargarGeografia]);
 
   if (!cuenta) return null;

@@ -30,7 +30,13 @@ import { PaginacionAdminDto } from "../../comun/dto/paginacion-admin.dto";
 import { opcionesUploadFotoCuenta } from "./foto-cuenta.config";
 
 /** Cualquier rol autenticado puede autoservirse su propia cuenta — ver rutas /cuentas/yo/... */
-const TODOS_LOS_ROLES: RolCuenta[] = ["super_admin", "dueno_negocio", "junta_vecinal", "validador_contenido"];
+const TODOS_LOS_ROLES: RolCuenta[] = [
+  "super_admin",
+  "dueno_negocio",
+  "junta_vecinal",
+  "validador_contenido",
+  "gestor_negocios",
+];
 
 type SolicitudConCuenta = { user: Cuenta };
 

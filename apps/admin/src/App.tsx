@@ -45,6 +45,8 @@ function RutaInicial() {
       return <Navigate to="/mis-avisos" replace />;
     case "validador_contenido":
       return <Navigate to="/validacion" replace />;
+    case "gestor_negocios":
+      return <Navigate to="/negocios" replace />;
   }
 }
 
