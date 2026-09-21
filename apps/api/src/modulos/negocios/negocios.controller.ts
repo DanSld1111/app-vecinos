@@ -200,6 +200,13 @@ export class NegociosController {
     return this.negocios.aprobar(id, req.user);
   }
 
+  @Patch(":id/despublicar")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("validador_contenido", "super_admin")
+  despublicar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
+    return this.negocios.despublicar(id, req.user);
+  }
+
   @Patch(":id/rechazar")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("validador_contenido", "super_admin")

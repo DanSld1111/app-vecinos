@@ -1,10 +1,12 @@
-import { Negocio, OfertaNegocio } from "@app-vecinos/tipos";
+import { Moneda, Negocio, OfertaNegocio } from "@app-vecinos/tipos";
 
 export interface OfertaConNegocio {
   negocioId: string;
   negocioNombre: string;
   /** No hay foto propia por oferta en el modelo — se reusa la foto principal del negocio. */
   negocioFotoUrl: string | null;
+  /** La moneda es del negocio, no de la oferta — el carrusel junta ofertas de varios. */
+  moneda: Moneda;
   oferta: OfertaNegocio;
 }
 
@@ -17,6 +19,7 @@ export function recolectarOfertas(negocios: Negocio[]): OfertaConNegocio[] {
         negocioId: negocio.id,
         negocioNombre: negocio.nombre,
         negocioFotoUrl: negocio.fotoPrincipalUrl,
+        moneda: negocio.moneda,
         oferta,
       });
     }

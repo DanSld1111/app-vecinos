@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { Categoria, Cuenta, DiaSemana, Horarios, Negocio, Producto } from "@app-vecinos/tipos";
+import { Categoria, Cuenta, DiaSemana, Horarios, Negocio, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../disenio";
 import { useTema } from "../../estado/useTema";
 import { apiGet } from "../../datos/api/clienteApi";
@@ -376,7 +376,8 @@ function TabOfertas({ negocio, token }: { negocio: Negocio; token: string }) {
               <View style={{ flex: 1 }}>
                 <Text style={styles.filaTitulo}>{oferta.etiqueta} · {oferta.nombre}</Text>
                 <Text style={styles.filaCuerpo}>
-                  {oferta.precioOriginal ? `S/${oferta.precioOriginal} → ` : ""}S/{oferta.precio}
+                  {oferta.precioOriginal ? `${formatearPrecio(oferta.precioOriginal, negocio.moneda)} → ` : ""}
+                  {formatearPrecio(oferta.precio, negocio.moneda)}
                 </Text>
               </View>
               <Pressable onPress={() => eliminarOferta(negocio.id, indice, token)} hitSlop={8}>

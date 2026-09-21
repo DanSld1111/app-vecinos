@@ -4,6 +4,7 @@ const TABS = [
   { a: "/mi-negocio", fin: true, icono: "📋", texto: "Información" },
   { a: "/mi-negocio/horario", fin: false, icono: "🕒", texto: "Horario" },
   { a: "/mi-negocio/fotos", fin: false, icono: "📷", texto: "Fotos" },
+  { a: "/mi-negocio/productos", fin: false, icono: "🍽️", texto: "Productos" },
   { a: "/mi-negocio/ofertas", fin: false, icono: "🏷️", texto: "Ofertas" },
   { a: "/mi-negocio/estado", fin: false, icono: "✅", texto: "Estado" },
 ];

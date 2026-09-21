@@ -1,16 +1,12 @@
 import { useMemo, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { Producto } from "@app-vecinos/tipos";
+import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
 import { ChipCategoria } from "./ChipCategoria";
 import { SinFoto } from "./SinFoto";
 
-function formatearPrecio(precio: number) {
-  return `S/ ${precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2)}`;
-}
-
-export function CatalogoNegocio({ productos }: { productos: Producto[] }) {
+export function CatalogoNegocio({ productos, moneda }: { productos: Producto[]; moneda: Moneda }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
   const subcategorias = useMemo(
@@ -50,7 +46,7 @@ export function CatalogoNegocio({ productos }: { productos: Producto[] }) {
               <Text style={styles.nombre} numberOfLines={1}>
                 {producto.nombre}
               </Text>
-              <Text style={styles.precio}>{formatearPrecio(producto.precio)}</Text>
+              <Text style={styles.precio}>{formatearPrecio(producto.precio, moneda)}</Text>
             </View>
           </View>
         ))}

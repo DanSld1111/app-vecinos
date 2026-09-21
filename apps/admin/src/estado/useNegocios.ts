@@ -35,6 +35,8 @@ interface EstadoNegocios {
   cargarHistorial: (token: string) => Promise<void>;
   crear: (datos: NegocioNuevo, token: string) => Promise<string | null>;
   aprobar: (id: string, token: string) => Promise<void>;
+  /** Baja el negocio de la app sin borrarlo — se puede volver a publicar con `aprobar`. */
+  despublicar: (id: string, token: string) => Promise<void>;
   rechazar: (id: string, motivo: string, token: string) => Promise<void>;
   actualizarInfo: (id: string, datos: InfoEditable, token: string) => Promise<boolean>;
   actualizarHorarios: (id: string, horarios: Horarios, token: string) => Promise<boolean>;
@@ -141,26 +143,36 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
     }
   },
 
+  // Aprobar, rechazar y despublicar actualizan el negocio en el sitio, no lo sacan de la lista.
+  // Antes lo quitaban, porque este store solo se usaba desde la cola de validación; ahora
+  // también lo usa la ficha del panel (`/negocios/:id`), donde quitarlo dejaba la pantalla en
+  // "No encontramos este negocio" justo después de publicar. La cola filtra por estado.
   aprobar: async (id, token) => {
     try {
-      await apiFetch<Negocio>(`/negocios/${id}/aprobar`, { metodo: "PATCH", token });
-      // Se saca de la lista en vez de actualizarlo en el sitio: este store solo tiene sentido
-      // acá poblado con "pendientes" (GET /negocios/pendientes) — una vez aprobado ya no es
-      // parte de esa lista, igual que ya hace useAvisos.aprobar/rechazar.
-      set((estado) => ({ negocios: estado.negocios.filter((n) => n.id !== id) }));
+      const actualizado = await apiFetch<Negocio>(`/negocios/${id}/aprobar`, { metodo: "PATCH", token });
+      set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
     } catch (error) {
       set({ error: mensajeError(error, "No se pudo aprobar el negocio.") });
     }
   },
 
+  despublicar: async (id, token) => {
+    try {
+      const actualizado = await apiFetch<Negocio>(`/negocios/${id}/despublicar`, { metodo: "PATCH", token });
+      set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo despublicar el negocio.") });
+    }
+  },
+
   rechazar: async (id, motivo, token) => {
     try {
-      await apiFetch<Negocio>(`/negocios/${id}/rechazar`, {
+      const actualizado = await apiFetch<Negocio>(`/negocios/${id}/rechazar`, {
         metodo: "PATCH",
         token,
         cuerpo: { motivo },
       });
-      set((estado) => ({ negocios: estado.negocios.filter((n) => n.id !== id) }));
+      set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
     } catch (error) {
       set({ error: mensajeError(error, "No se pudo rechazar el negocio.") });
     }

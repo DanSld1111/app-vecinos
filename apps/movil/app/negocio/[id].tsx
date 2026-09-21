@@ -93,7 +93,7 @@ export default function FichaNegocio() {
 
   let contenido;
   if (arquetipo === "servicios" && negocio.serviciosOfrecidos?.length) {
-    contenido = <ServiciosNegocio servicios={negocio.serviciosOfrecidos} />;
+    contenido = <ServiciosNegocio servicios={negocio.serviciosOfrecidos} moneda={negocio.moneda} />;
   } else if (arquetipo === "categorias" && negocio.rubrosDisponibles?.length) {
     contenido = <CategoriasRubroNegocio rubros={negocio.rubrosDisponibles} />;
   } else if (arquetipo === "ofertas" && (negocio.ofertas?.length || negocio.pasillos?.length)) {
@@ -102,12 +102,13 @@ export default function FichaNegocio() {
         ofertas={negocio.ofertas ?? []}
         pasillos={negocio.pasillos ?? []}
         negocioFotoUrl={negocio.fotoPrincipalUrl}
+        moneda={negocio.moneda}
       />
     );
   } else if (arquetipo === "catalogo" && productos && productos.length > 0) {
-    contenido = <CatalogoNegocio productos={productos} />;
+    contenido = <CatalogoNegocio productos={productos} moneda={negocio.moneda} />;
   } else if (productos && productos.length > 0) {
-    contenido = <MenuNegocio productos={productos} />;
+    contenido = <MenuNegocio productos={productos} moneda={negocio.moneda} />;
   } else {
     contenido = <GaleriaNegocio fotos={negocio.fotosGaleria} />;
   }

@@ -324,6 +324,26 @@ export class NegociosService {
   }
 
   /**
+   * Bajar un negocio de la app sin borrarlo: cerró, se mudó, o hay algo que revisar. Se puede
+   * volver a publicar con `aprobar()` — `verificado_en` no se toca, así que no pierde el
+   * registro de que en algún momento fue verificado.
+   */
+  async despublicar(id: string, cuenta: Cuenta): Promise<Negocio> {
+    const fila = await this.obtenerFilaAdminOFallar(id);
+    if (!dentroDelAlcance(cuenta, fila.distrito_ubigeo)) {
+      throw new ForbiddenException("Este negocio no está dentro de tus distritos asignados.");
+    }
+    await this.bd.consultar(
+      "UPDATE negocios SET estado = 'inactivo', validado_por_cuenta_id = $2, actualizado_en = now() WHERE id = $1",
+      [id, cuenta.id],
+    );
+    const negocio = aNegocio(await this.obtenerFilaAdminOFallar(id));
+    await this.busqueda.sincronizarNegocio(negocio); // deja de ser público — sale del índice
+    await this.auditoria.registrar("despublicar", "negocio", id, cuenta.id);
+    return negocio;
+  }
+
+  /**
    * Mismo criterio que ya tenía apps/admin/src/estado/useNegocios.ts: si ya estaba verificado
    * antes (edición), un rechazo lo vuelve a dejar "activo" con lo último aprobado — nunca lo
    * saca de la app por corregir un dato. Si era alta nueva, queda "inactivo" hasta corregirlo.

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import { ServicioOfrecido } from "@app-vecinos/tipos";
+import { Moneda, ServicioOfrecido, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { useTema } from "../estado/useTema";
 
@@ -12,11 +12,7 @@ const EMOJI_POR_SERVICIO: Record<string, string> = {
   "Baño y corte": "✂️",
 };
 
-function formatearPrecio(precio: number) {
-  return `S/ ${precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2)}`;
-}
-
-export function ServiciosNegocio({ servicios }: { servicios: ServicioOfrecido[] }) {
+export function ServiciosNegocio({ servicios, moneda }: { servicios: ServicioOfrecido[]; moneda: Moneda }) {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
@@ -35,7 +31,7 @@ export function ServiciosNegocio({ servicios }: { servicios: ServicioOfrecido[] 
             <Text style={styles.nombre}>{servicio.nombre}</Text>
             {servicio.detalle ? <Text style={styles.detalle}>{servicio.detalle}</Text> : null}
           </View>
-          <Text style={styles.precio}>{formatearPrecio(servicio.precio)}</Text>
+          <Text style={styles.precio}>{formatearPrecio(servicio.precio, moneda)}</Text>
         </View>
       ))}
       <Text style={styles.nota}>Tarifas referenciales — confirma el precio final con el negocio.</Text>

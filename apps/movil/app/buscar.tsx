@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../src/disenio";
 import { useComunidadActiva } from "../src/estado/comunidadActiva";
 import { useNegocios } from "../src/datos/hooks/useNegocios";
@@ -31,10 +32,6 @@ const TENDENCIAS: { termino: string; categoria: string }[] = [
   { termino: "ferretería", categoria: "Hogar" },
   { termino: "tejidos", categoria: "Moda" },
 ];
-
-function formatearPrecio(precio: number) {
-  return `S/ ${precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2)}`;
-}
 
 export default function BuscarPantallaCompleta() {
   const colores = useColores();
@@ -167,7 +164,7 @@ export default function BuscarPantallaCompleta() {
               <Text style={styles.ofertasEyebrow}>Solo para ti</Text>
               <Text style={styles.ofertasTitulo}>Ofertas de tus negocios de siempre</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filaOfertas}>
-                {ofertas.map(({ negocioId, negocioNombre, negocioFotoUrl, oferta }) => (
+                {ofertas.map(({ negocioId, negocioNombre, negocioFotoUrl, oferta, moneda }) => (
                   <Pressable
                     key={`${negocioId}-${oferta.nombre}`}
                     style={styles.tarjetaOferta}
@@ -187,9 +184,9 @@ export default function BuscarPantallaCompleta() {
                         {oferta.nombre}
                       </Text>
                       {oferta.precioOriginal ? (
-                        <Text style={styles.precioAntesOferta}>{formatearPrecio(oferta.precioOriginal)}</Text>
+                        <Text style={styles.precioAntesOferta}>{formatearPrecio(oferta.precioOriginal, moneda)}</Text>
                       ) : null}
-                      <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio)}</Text>
+                      <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio, moneda)}</Text>
                     </View>
                   </Pressable>
                 ))}

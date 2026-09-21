@@ -1,12 +1,8 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import { Producto } from "@app-vecinos/tipos";
+import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
 import { SinFoto } from "./SinFoto";
-
-function formatearPrecio(precio: number) {
-  return `S/ ${precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2)}`;
-}
 
 function agruparPorCategoria(productos: Producto[]) {
   const grupos: { categoria: string; items: Producto[] }[] = [];
@@ -21,7 +17,7 @@ function agruparPorCategoria(productos: Producto[]) {
   return grupos;
 }
 
-function ItemMenu({ producto, styles }: { producto: Producto; styles: ReturnType<typeof crearEstilos> }) {
+function ItemMenu({ producto, styles, moneda }: { producto: Producto; styles: ReturnType<typeof crearEstilos>; moneda: Moneda }) {
   return (
     <View style={styles.item}>
       {producto.fotoUrl ? (
@@ -35,13 +31,13 @@ function ItemMenu({ producto, styles }: { producto: Producto; styles: ReturnType
         <Text style={styles.itemDescripcion} numberOfLines={2}>
           {producto.descripcion}
         </Text>
-        <Text style={styles.itemPrecio}>{formatearPrecio(producto.precio)}</Text>
+        <Text style={styles.itemPrecio}>{formatearPrecio(producto.precio, moneda)}</Text>
       </View>
     </View>
   );
 }
 
-export function MenuNegocio({ productos }: { productos: Producto[] }) {
+export function MenuNegocio({ productos, moneda }: { productos: Producto[]; moneda: Moneda }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
 
@@ -55,7 +51,7 @@ export function MenuNegocio({ productos }: { productos: Producto[] }) {
         <View key={grupo.categoria} style={styles.grupo}>
           <Text style={styles.tituloGrupo}>{grupo.categoria}</Text>
           {grupo.items.map((producto) => (
-            <ItemMenu key={producto.id} producto={producto} styles={styles} />
+            <ItemMenu key={producto.id} producto={producto} styles={styles} moneda={moneda} />
           ))}
         </View>
       ))}

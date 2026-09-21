@@ -1,23 +1,21 @@
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { OfertaNegocio } from "@app-vecinos/tipos";
+import { Moneda, OfertaNegocio, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { useTema } from "../estado/useTema";
 import { urlCompleta } from "../utilidades/media";
 import { SinFoto } from "./SinFoto";
 
-function formatearPrecio(precio: number) {
-  return `S/ ${precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2)}`;
-}
-
 export function OfertasPasillosNegocio({
   ofertas,
   pasillos,
   negocioFotoUrl,
+  moneda,
 }: {
   ofertas: OfertaNegocio[];
   pasillos: string[];
   /** No hay foto propia por oferta en el modelo — se reusa la foto principal del negocio. */
   negocioFotoUrl?: string | null;
+  moneda: Moneda;
 }) {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
@@ -44,9 +42,9 @@ export function OfertasPasillosNegocio({
                     {oferta.nombre}
                   </Text>
                   {oferta.precioOriginal ? (
-                    <Text style={styles.precioAntes}>{formatearPrecio(oferta.precioOriginal)}</Text>
+                    <Text style={styles.precioAntes}>{formatearPrecio(oferta.precioOriginal, moneda)}</Text>
                   ) : null}
-                  <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio)}</Text>
+                  <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio, moneda)}</Text>
                 </View>
               </View>
             ))}

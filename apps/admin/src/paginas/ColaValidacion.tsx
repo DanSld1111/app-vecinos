@@ -61,9 +61,12 @@ export function ColaValidacion() {
   );
 
   const items: ItemCola[] = useMemo(() => {
-    // negocios ya viene filtrado por el servidor a "por_verificar" + alcance de esta cuenta
-    // (GET /negocios/pendientes) — no hace falta repetir ese filtro acá.
+    // El servidor ya devuelve solo "por_verificar" dentro del alcance de esta cuenta
+    // (GET /negocios/pendientes), pero el filtro se repite acá porque aprobar/rechazar ahora
+    // actualizan el negocio en el sitio en vez de sacarlo de la lista (lo necesita la ficha del
+    // panel, ver decisión 0067) — sin esto, lo recién resuelto seguiría mostrándose en la cola.
     const pendientesNegocio: ItemCola[] = negocios
+      .filter((n) => n.estado === "por_verificar")
       .map((n) => ({
         tipo: "negocio",
         id: n.id,

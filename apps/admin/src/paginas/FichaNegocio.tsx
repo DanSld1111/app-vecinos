@@ -10,15 +10,17 @@ import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada"
 import { EditorInfoNegocio } from "../componentes/negocio/EditorInfoNegocio";
 import { EditorHorarioNegocio } from "../componentes/negocio/EditorHorarioNegocio";
 import { EditorFotosNegocio } from "../componentes/negocio/EditorFotosNegocio";
+import { EditorProductosNegocio } from "../componentes/negocio/EditorProductosNegocio";
 import { EditorOfertasNegocio } from "../componentes/negocio/EditorOfertasNegocio";
 import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio";
 
-type Pestana = "info" | "horario" | "fotos" | "ofertas" | "dueno" | "estado";
+type Pestana = "info" | "horario" | "fotos" | "productos" | "ofertas" | "dueno" | "estado";
 
 const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "info", icono: "📋", texto: "Información" },
   { id: "horario", icono: "🕒", texto: "Horario" },
   { id: "fotos", icono: "📷", texto: "Fotos" },
+  { id: "productos", icono: "🍽️", texto: "Productos" },
   { id: "ofertas", icono: "🏷️", texto: "Ofertas" },
   { id: "dueno", icono: "👤", texto: "Dueño" },
   { id: "estado", icono: "✅", texto: "Estado" },
@@ -110,6 +112,7 @@ export function FichaNegocio() {
       {pestana === "info" ? <EditorInfoNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "horario" ? <EditorHorarioNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "fotos" ? <EditorFotosNegocio key={negocio.id} negocio={negocio} /> : null}
+      {pestana === "productos" ? <EditorProductosNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "ofertas" ? <EditorOfertasNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "dueno" ? <PestanaDueno negocio={negocio} /> : null}
       {pestana === "estado" ? <PestanaEstado negocio={negocio} /> : null}
@@ -120,12 +123,15 @@ export function FichaNegocio() {
 function PestanaEstado({ negocio }: { negocio: Negocio }) {
   const token = useSesionAdmin((estado) => estado.token)!;
   const aprobar = useNegocios((estado) => estado.aprobar);
-  const [publicando, setPublicando] = useState(false);
+  const despublicar = useNegocios((estado) => estado.despublicar);
+  const [trabajando, setTrabajando] = useState(false);
+  const [confirmandoBaja, setConfirmandoBaja] = useState(false);
 
-  async function publicar() {
-    setPublicando(true);
-    await aprobar(negocio.id, token);
-    setPublicando(false);
+  async function ejecutar(accion: () => Promise<void>) {
+    setTrabajando(true);
+    await accion();
+    setTrabajando(false);
+    setConfirmandoBaja(false);
   }
 
   return (
@@ -133,13 +139,42 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
       negocio={negocio}
       acciones={
         negocio.estado === "activo" ? (
-          <span style={{ fontSize: 12, color: "var(--texto-suave)" }}>
-            La ficha ya está publicada. Cualquier cambio que hagas se ve en la app de inmediato.
-          </span>
+          confirmandoBaja ? (
+            <>
+              <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
+                ¿Bajar "{negocio.nombre}" de la app? Deja de aparecer en Buscar y su ficha no se puede abrir.
+                Nada se borra: puedes volver a publicarlo cuando quieras.
+              </span>
+              <button
+                className="btn btn-primario"
+                style={{ background: "var(--rojo)" }}
+                disabled={trabajando}
+                onClick={() => ejecutar(() => despublicar(negocio.id, token))}
+              >
+                {trabajando ? "Bajando…" : "Sí, despublicar"}
+              </button>
+              <button className="btn btn-fantasma" onClick={() => setConfirmandoBaja(false)}>
+                Cancelar
+              </button>
+            </>
+          ) : (
+            <>
+              <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
+                La ficha está publicada. Cualquier cambio que hagas se ve en la app de inmediato.
+              </span>
+              <button className="btn btn-fantasma" onClick={() => setConfirmandoBaja(true)}>
+                Despublicar
+              </button>
+            </>
+          )
         ) : (
           <>
-            <button className="btn btn-primario" disabled={publicando} onClick={publicar}>
-              {publicando ? "Publicando…" : "Publicar en la app"}
+            <button
+              className="btn btn-primario"
+              disabled={trabajando}
+              onClick={() => ejecutar(() => aprobar(negocio.id, token))}
+            >
+              {trabajando ? "Publicando…" : "Publicar en la app"}
             </button>
             <span style={{ fontSize: 12, color: "var(--texto-suave)" }}>
               Desde ese momento los vecinos pueden encontrarlo.
