@@ -65,8 +65,7 @@ function FormularioInfo({ negocio }: { negocio: Negocio }) {
       <div className="layout-editor">
         <div className="tarjeta">
           <div className="nota-info">
-            ℹ️ Los cambios en nombre, dirección o categoría vuelven a pasar por validación antes de
-            publicarse. Descripción, teléfono y WhatsApp se guardan directo.
+            ℹ️ Los cambios se guardan directo y se ven en la app de inmediato.
           </div>
 
           <div className="campo-modal">

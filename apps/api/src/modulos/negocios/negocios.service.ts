@@ -341,25 +341,28 @@ export class NegociosService {
     return negocio;
   }
 
-  /** Cambios sensibles (nombre, dirección, categorías) vuelven a mandar el negocio a revisión. */
+  /**
+   * Editar NO manda el negocio a revisión — ni para el dueño ni para el admin: el cambio se ve
+   * en la app de inmediato (decisión del usuario, ver docs/decisiones/0066-edicion-sin-validacion.md).
+   *
+   * Antes, tocar nombre/dirección/categorías se consideraba "cambio sensible" y devolvía el
+   * negocio a `por_verificar`, lo que lo sacaba de la app pública (`obtenerPorId()` filtra por
+   * estado activo) hasta que alguien volviera a aprobarlo — corregir una tilde bajaba la ficha
+   * sin avisar. La cola de validación sigue existiendo para los negocios recién creados, que
+   * nacen en `por_verificar` hasta que se publican.
+   */
   async actualizarInfo(id: string, dto: ActualizarInfoNegocioDto, cuenta: Cuenta): Promise<Negocio> {
     this.verificarPropiedad(cuenta, id);
-    const anterior = await this.obtenerFilaAdminOFallar(id);
-    const categoriasAnteriores = [...anterior.categoria_ids].sort().join(",");
-    const categoriasNuevas = [...dto.categoriaIds].sort().join(",");
-    const cambioSensible =
-      dto.nombre !== anterior.nombre || dto.direccion !== anterior.direccion || categoriasNuevas !== categoriasAnteriores;
+    await this.obtenerFilaAdminOFallar(id);
 
     await this.bd.transaccion(async (db) => {
       await db.consultar(
         `UPDATE negocios
          SET nombre = $2, descripcion = $3, direccion = $4, telefono = $5, whatsapp = $6,
-             estado = CASE WHEN $7 THEN 'por_verificar'::estado_negocio ELSE estado END,
-             motivo_rechazo = CASE WHEN $7 THEN NULL ELSE motivo_rechazo END,
              -- coordenada y moneda son opcionales: si no vienen, se deja lo que ya había
              -- (por eso el CASE y no un COALESCE sobre el valor nuevo).
-             coordenada = CASE WHEN $8 THEN ST_SetSRID(ST_MakePoint($9, $10), 4326)::geography ELSE coordenada END,
-             moneda = COALESCE($11, moneda),
+             coordenada = CASE WHEN $7 THEN ST_SetSRID(ST_MakePoint($8, $9), 4326)::geography ELSE coordenada END,
+             moneda = COALESCE($10, moneda),
              actualizado_en = now()
          WHERE id = $1`,
         [
@@ -369,7 +372,6 @@ export class NegociosService {
           dto.direccion,
           dto.telefono ?? null,
           dto.whatsapp ?? null,
-          cambioSensible,
           Boolean(dto.coordenada),
           dto.coordenada?.lng ?? 0,
           dto.coordenada?.lat ?? 0,
@@ -385,9 +387,10 @@ export class NegociosService {
       }
     });
     const negocio = aNegocio(await this.obtenerFilaAdminOFallar(id));
-    // Un cambio sensible lo vuelve "por_verificar" (se saca del índice hasta que se re-apruebe);
-    // uno no sensible (descripción/teléfono/WhatsApp) se sigue viendo "activo" y se re-indexa.
+    // El estado no cambia al editar, pero el índice de búsqueda sí tiene que reflejar el nombre
+    // o la dirección nuevos.
     await this.busqueda.sincronizarNegocio(negocio);
+    await this.auditoria.registrar("actualizar", "negocio", id, cuenta.id);
     return negocio;
   }
 

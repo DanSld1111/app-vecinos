@@ -189,7 +189,7 @@ function TabInformacion({ negocio, token }: { negocio: Negocio; token: string })
     <ScrollView style={styles.contenidoTab} contentContainerStyle={{ paddingBottom: espaciado.xxl }}>
       <View style={[styles.cajaNota, styles.cajaNotaEspera]}>
         <Text style={[styles.textoNota, { color: oscuro ? "#e0b565" : "#b8862e" }]}>
-          Los cambios en nombre, dirección o categoría vuelven a pasar por validación antes de publicarse. Descripción, teléfono y WhatsApp se guardan directo.
+          Los cambios se guardan directo y se ven en la app de inmediato.
         </Text>
       </View>
 
