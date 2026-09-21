@@ -1,4 +1,9 @@
-import { IsArray, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsArray, IsIn, IsOptional, IsString, ValidateNested } from "class-validator";
+import { Moneda } from "@app-vecinos/tipos";
+import { CoordenadaDto } from "./coordenada.dto";
+
+const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
 
 export class ActualizarInfoNegocioDto {
   @IsString()
@@ -23,4 +28,18 @@ export class ActualizarInfoNegocioDto {
   @IsOptional()
   @IsString()
   whatsapp?: string | null;
+
+  /**
+   * Ubicación exacta. Opcional: si no viene, se deja la que ya tenía — al crear un negocio
+   * desde el panel se le asigna el centro de la comunidad, y esto es lo que permite
+   * corregirla después (antes no había forma, todos quedaban clavados en el mismo punto).
+   */
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CoordenadaDto)
+  coordenada?: CoordenadaDto;
+
+  @IsOptional()
+  @IsIn(MONEDAS)
+  moneda?: Moneda;
 }

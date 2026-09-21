@@ -1,4 +1,5 @@
 import { Coordenada } from "./geografia";
+import { Moneda } from "./comun";
 
 export type DiaSemana =
   | "lunes"
@@ -45,6 +46,8 @@ export interface Negocio {
   telefono: string | null;
   whatsapp: string | null;
   horarios: Horarios;
+  /** Moneda de todos los precios de este negocio (productos, ofertas y servicios). */
+  moneda: Moneda;
   fotoPrincipalUrl: string | null;
   estado: EstadoNegocio;
   verificadoEn: string | null;

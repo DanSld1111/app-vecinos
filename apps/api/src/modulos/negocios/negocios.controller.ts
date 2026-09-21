@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Patch,
@@ -32,6 +33,8 @@ import { PaginacionAdminDto } from "../../comun/dto/paginacion-admin.dto";
 import { opcionesUploadFotoNegocio } from "./foto-negocio.config";
 import { opcionesUploadFotoProducto } from "./foto-producto.config";
 import { AgregarFotoGaleriaDto } from "./dto/agregar-foto-galeria.dto";
+import { GuardarProductoDto } from "./dto/guardar-producto.dto";
+import { ReordenarProductosDto } from "./dto/reordenar-productos.dto";
 
 type SolicitudConCuenta = { user: Cuenta };
 
@@ -95,6 +98,89 @@ export class NegociosController {
   @Get(":id/productos")
   listarProductos(@Param("id") id: string): Promise<Producto[]> {
     return this.negocios.listarProductos(id);
+  }
+
+  // Rutas literales antes de las que llevan ":productoId" — si no, Nest tomaría "papelera" y
+  // "orden" como si fueran ids de producto.
+  @Get(":id/productos/papelera")
+  @UseGuards(JwtAuthGuard)
+  listarProductosPapelera(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Producto[]> {
+    return this.negocios.listarProductosPapelera(id, req.user);
+  }
+
+  @Put(":id/productos/orden")
+  @UseGuards(JwtAuthGuard)
+  reordenarProductos(
+    @Param("id") id: string,
+    @Body() dto: ReordenarProductosDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Producto[]> {
+    return this.negocios.reordenarProductos(id, dto.idsEnOrden, req.user);
+  }
+
+  @Post(":id/productos")
+  @UseGuards(JwtAuthGuard)
+  crearProducto(
+    @Param("id") id: string,
+    @Body() dto: GuardarProductoDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Producto> {
+    return this.negocios.crearProducto(id, dto, req.user);
+  }
+
+  @Put(":id/productos/:productoId")
+  @UseGuards(JwtAuthGuard)
+  actualizarProducto(
+    @Param("id") id: string,
+    @Param("productoId") productoId: string,
+    @Body() dto: GuardarProductoDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Producto> {
+    return this.negocios.actualizarProducto(id, productoId, dto, req.user);
+  }
+
+  /** A la papelera — recuperable con el endpoint de restaurar. */
+  @Delete(":id/productos/:productoId")
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async eliminarProducto(
+    @Param("id") id: string,
+    @Param("productoId") productoId: string,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<void> {
+    await this.negocios.eliminarProducto(id, productoId, req.user);
+  }
+
+  @Patch(":id/productos/:productoId/restaurar")
+  @UseGuards(JwtAuthGuard)
+  restaurarProducto(
+    @Param("id") id: string,
+    @Param("productoId") productoId: string,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Producto> {
+    return this.negocios.restaurarProducto(id, productoId, req.user);
+  }
+
+  /** Borrado real (fila + foto). Solo desde la papelera, sin vuelta atrás. */
+  @Delete(":id/productos/:productoId/definitivo")
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async eliminarProductoDefinitivo(
+    @Param("id") id: string,
+    @Param("productoId") productoId: string,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<void> {
+    await this.negocios.eliminarProductoDefinitivo(id, productoId, req.user);
+  }
+
+  @Delete(":id/productos/:productoId/foto")
+  @UseGuards(JwtAuthGuard)
+  quitarFotoProducto(
+    @Param("id") id: string,
+    @Param("productoId") productoId: string,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Producto> {
+    return this.negocios.quitarFotoProducto(id, productoId, req.user);
   }
 
   @Patch(":id/aprobar")

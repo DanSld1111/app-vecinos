@@ -9,7 +9,12 @@ export interface FilaProducto {
   categoria_menu: string;
   destacado: boolean;
   foto_url: string | null;
+  orden: number;
 }
+
+/** Las mismas columnas en todas las consultas de producto — antes se repetía la lista a mano. */
+export const COLUMNAS_PRODUCTO =
+  "id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, foto_url, orden";
 
 export function aProducto(fila: FilaProducto): Producto {
   return {
@@ -21,5 +26,6 @@ export function aProducto(fila: FilaProducto): Producto {
     categoriaMenu: fila.categoria_menu,
     destacado: fila.destacado,
     fotoUrl: fila.foto_url,
+    orden: fila.orden,
   };
 }

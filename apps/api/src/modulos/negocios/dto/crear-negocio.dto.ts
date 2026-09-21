@@ -1,4 +1,6 @@
-import { ArrayMinSize, IsArray, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { ArrayMinSize, IsArray, IsOptional, IsString, ValidateNested } from "class-validator";
+import { CoordenadaDto } from "./coordenada.dto";
 
 export class CrearNegocioDto {
   @IsString()
@@ -25,4 +27,10 @@ export class CrearNegocioDto {
   @IsOptional()
   @IsString()
   whatsapp?: string | null;
+
+  /** Si no viene, se usa el centro de la comunidad como aproximación (se corrige después en la ficha). */
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CoordenadaDto)
+  coordenada?: CoordenadaDto;
 }

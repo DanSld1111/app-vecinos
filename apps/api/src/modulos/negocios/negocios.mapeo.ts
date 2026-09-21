@@ -1,4 +1,4 @@
-import { Negocio, Horarios } from "@app-vecinos/tipos";
+import { Negocio, Horarios, Moneda } from "@app-vecinos/tipos";
 
 export interface FilaNegocio {
   id: string;
@@ -10,6 +10,7 @@ export interface FilaNegocio {
   telefono: string | null;
   whatsapp: string | null;
   horarios: Horarios;
+  moneda: Moneda;
   foto_principal_url: string | null;
   estado: Negocio["estado"];
   verificado_en: string | null;
@@ -41,6 +42,7 @@ export function aNegocio(fila: FilaNegocio): Negocio {
     telefono: fila.telefono,
     whatsapp: fila.whatsapp,
     horarios: fila.horarios,
+    moneda: fila.moneda,
     fotoPrincipalUrl: fila.foto_principal_url,
     estado: fila.estado,
     verificadoEn: fila.verificado_en,
@@ -59,7 +61,7 @@ export function aNegocio(fila: FilaNegocio): Negocio {
 
 export const COLUMNAS_NEGOCIO = `
   n.id, n.comunidad_id, n.distrito_ubigeo, n.nombre, n.descripcion, n.direccion,
-  n.telefono, n.whatsapp, n.horarios, n.foto_principal_url, n.estado, n.verificado_en,
+  n.telefono, n.whatsapp, n.horarios, n.moneda, n.foto_principal_url, n.estado, n.verificado_en,
   n.validado_por_cuenta_id, n.motivo_rechazo, n.fuente, n.creado_en, n.actualizado_en,
   n.servicios_ofrecidos, n.rubros_disponibles, n.ofertas, n.pasillos, n.fotos_galeria,
   ST_Y(n.coordenada::geometry) AS lat, ST_X(n.coordenada::geometry) AS lng,

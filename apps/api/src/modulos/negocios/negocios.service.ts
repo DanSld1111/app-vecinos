@@ -8,7 +8,7 @@ import { dentroDelAlcance } from "../../comun/alcance";
 import { BusquedaService } from "../busqueda/busqueda.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
 import { COLUMNAS_NEGOCIO, FilaNegocio, aNegocio } from "./negocios.mapeo";
-import { FilaProducto, aProducto } from "./productos.mapeo";
+import { FilaProducto, aProducto, COLUMNAS_PRODUCTO } from "./productos.mapeo";
 import { CARPETA_FOTOS_NEGOCIO } from "./foto-negocio.config";
 import { CARPETA_FOTOS_PRODUCTO } from "./foto-producto.config";
 import { ListarNegociosDto } from "./dto/listar-negocios.dto";
@@ -16,6 +16,7 @@ import { CrearNegocioDto } from "./dto/crear-negocio.dto";
 import { ActualizarInfoNegocioDto } from "./dto/actualizar-info-negocio.dto";
 import { ActualizarHorariosDto } from "./dto/actualizar-horarios.dto";
 import { AgregarOfertaDto } from "./dto/agregar-oferta.dto";
+import { GuardarProductoDto } from "./dto/guardar-producto.dto";
 
 const HORARIO_SEMANA_CERRADA = {
   lunes: { cerrado: true },
@@ -141,12 +142,17 @@ export class NegociosService {
    * Sin filtrar por estado del negocio: si alguien pide el menú de un id inexistente o
    * inactivo, simplemente no hay filas — no hace falta una segunda consulta para saberlo.
    */
+  /**
+   * Lectura pública (la carta que ve el vecino): nunca lo que está en la papelera. El orden lo
+   * fija el dueño arrastrando dentro de cada sección — `nombre` solo desempata productos que
+   * nunca se reordenaron (todos con orden 0).
+   */
   async listarProductos(negocioId: string): Promise<Producto[]> {
     const { rows } = await this.bd.consultar<FilaProducto>(
-      `SELECT id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, foto_url
+      `SELECT ${COLUMNAS_PRODUCTO}
        FROM productos
-       WHERE negocio_id = $1
-       ORDER BY categoria_menu, nombre`,
+       WHERE negocio_id = $1 AND eliminado_en IS NULL
+       ORDER BY categoria_menu, orden, nombre`,
       [negocioId],
     );
     return rows.map(aProducto);
@@ -255,7 +261,9 @@ export class NegociosService {
         [dto.comunidadId],
       );
       if (!filaComunidad[0]) throw new NotFoundException(`No existe una comunidad con id "${dto.comunidadId}"`);
-      const { lat, lng } = filaComunidad[0];
+      // Si el alta no trae la ubicación exacta, se usa el centro de la comunidad como
+      // aproximación y se corrige después desde la ficha (PUT :id/info acepta `coordenada`).
+      const { lat, lng } = dto.coordenada ?? filaComunidad[0];
 
       await db.consultar(
         `INSERT INTO negocios (id, comunidad_id, distrito_ubigeo, nombre, descripcion, coordenada, direccion,
@@ -348,9 +356,25 @@ export class NegociosService {
          SET nombre = $2, descripcion = $3, direccion = $4, telefono = $5, whatsapp = $6,
              estado = CASE WHEN $7 THEN 'por_verificar'::estado_negocio ELSE estado END,
              motivo_rechazo = CASE WHEN $7 THEN NULL ELSE motivo_rechazo END,
+             -- coordenada y moneda son opcionales: si no vienen, se deja lo que ya había
+             -- (por eso el CASE y no un COALESCE sobre el valor nuevo).
+             coordenada = CASE WHEN $8 THEN ST_SetSRID(ST_MakePoint($9, $10), 4326)::geography ELSE coordenada END,
+             moneda = COALESCE($11, moneda),
              actualizado_en = now()
          WHERE id = $1`,
-        [id, dto.nombre, dto.descripcion, dto.direccion, dto.telefono ?? null, dto.whatsapp ?? null, cambioSensible],
+        [
+          id,
+          dto.nombre,
+          dto.descripcion,
+          dto.direccion,
+          dto.telefono ?? null,
+          dto.whatsapp ?? null,
+          cambioSensible,
+          Boolean(dto.coordenada),
+          dto.coordenada?.lng ?? 0,
+          dto.coordenada?.lat ?? 0,
+          dto.moneda ?? null,
+        ],
       );
       await db.consultar("DELETE FROM negocio_categorias WHERE negocio_id = $1", [id]);
       for (const categoriaId of dto.categoriaIds) {
@@ -442,11 +466,136 @@ export class NegociosService {
     await this.bd.consultar("UPDATE productos SET foto_url = $2 WHERE id = $1", [productoId, url]);
     await this.almacenamiento.eliminarPorUrl(anterior);
 
-    const { rows: actualizado } = await this.bd.consultar<FilaProducto>(
-      "SELECT id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, foto_url FROM productos WHERE id = $1",
-      [productoId],
+    return this.obtenerProductoOFallar(negocioId, productoId);
+  }
+
+  /** Quitar la foto sin borrar el producto — también borra el archivo de Supabase Storage. */
+  async quitarFotoProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<Producto> {
+    this.verificarPropiedad(cuenta, negocioId);
+    const anterior = await this.obtenerProductoOFallar(negocioId, productoId);
+    await this.bd.consultar("UPDATE productos SET foto_url = NULL WHERE id = $1", [productoId]);
+    await this.almacenamiento.eliminarPorUrl(anterior.fotoUrl);
+    return this.obtenerProductoOFallar(negocioId, productoId);
+  }
+
+  // ---- CRUD de productos ----
+  // Antes solo existían "listar" y "cambiar la foto": los productos únicamente podían entrar por
+  // carga de datos directa a la base. Ver docs/decisiones/0065-crud-productos.md.
+
+  private async obtenerProductoOFallar(negocioId: string, productoId: string): Promise<Producto> {
+    const { rows } = await this.bd.consultar<FilaProducto>(
+      `SELECT ${COLUMNAS_PRODUCTO} FROM productos WHERE id = $1 AND negocio_id = $2`,
+      [productoId, negocioId],
     );
-    return aProducto(actualizado[0]);
+    if (!rows[0]) throw new NotFoundException(`No existe un producto con id "${productoId}" en este negocio.`);
+    return aProducto(rows[0]);
+  }
+
+  async crearProducto(negocioId: string, dto: GuardarProductoDto, cuenta: Cuenta): Promise<Producto> {
+    this.verificarPropiedad(cuenta, negocioId);
+    await this.obtenerFilaAdminOFallar(negocioId);
+    const id = `prod-${randomUUID()}`;
+    // Entra al final de su sección, no al principio — quien lo agrega espera verlo abajo.
+    await this.bd.consultar(
+      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, orden)
+       VALUES ($1, $2, $3, $4, $5, $6, $7,
+               COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0))`,
+      [id, negocioId, dto.nombre, dto.descripcion, dto.precio, dto.categoriaMenu, dto.destacado ?? false],
+    );
+    await this.auditoria.registrar("crear", "producto", id, cuenta.id, { negocioId });
+    return this.obtenerProductoOFallar(negocioId, id);
+  }
+
+  async actualizarProducto(
+    negocioId: string,
+    productoId: string,
+    dto: GuardarProductoDto,
+    cuenta: Cuenta,
+  ): Promise<Producto> {
+    this.verificarPropiedad(cuenta, negocioId);
+    const anterior = await this.obtenerProductoOFallar(negocioId, productoId);
+    // Si cambió de sección, se manda al final de la nueva: su posición anterior no significa
+    // nada en otra lista.
+    const cambioDeSeccion = dto.categoriaMenu !== anterior.categoriaMenu;
+    await this.bd.consultar(
+      `UPDATE productos
+       SET nombre = $3, descripcion = $4, precio = $5, categoria_menu = $6, destacado = $7,
+           orden = CASE WHEN $8
+                        THEN COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0)
+                        ELSE orden END
+       WHERE id = $1 AND negocio_id = $2`,
+      [
+        productoId,
+        negocioId,
+        dto.nombre,
+        dto.descripcion,
+        dto.precio,
+        dto.categoriaMenu,
+        dto.destacado ?? false,
+        cambioDeSeccion,
+      ],
+    );
+    await this.auditoria.registrar("actualizar", "producto", productoId, cuenta.id, { negocioId });
+    return this.obtenerProductoOFallar(negocioId, productoId);
+  }
+
+  /** A la papelera (borrado lógico, recuperable). No se purga sola: ver eliminarProductoDefinitivo. */
+  async eliminarProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<void> {
+    this.verificarPropiedad(cuenta, negocioId);
+    const { rowCount } = await this.bd.consultar(
+      "UPDATE productos SET eliminado_en = now() WHERE id = $1 AND negocio_id = $2 AND eliminado_en IS NULL",
+      [productoId, negocioId],
+    );
+    if (!rowCount) throw new NotFoundException(`No existe un producto vigente con id "${productoId}" en este negocio.`);
+    await this.auditoria.registrar("eliminar", "producto", productoId, cuenta.id, { negocioId });
+  }
+
+  async restaurarProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<Producto> {
+    this.verificarPropiedad(cuenta, negocioId);
+    const { rowCount } = await this.bd.consultar(
+      "UPDATE productos SET eliminado_en = NULL WHERE id = $1 AND negocio_id = $2 AND eliminado_en IS NOT NULL",
+      [productoId, negocioId],
+    );
+    if (!rowCount) throw new NotFoundException(`No hay un producto en la papelera con id "${productoId}".`);
+    await this.auditoria.registrar("restaurar", "producto", productoId, cuenta.id, { negocioId });
+    return this.obtenerProductoOFallar(negocioId, productoId);
+  }
+
+  /** Único borrado real: saca la fila y la foto de Supabase Storage. Sin vuelta atrás. */
+  async eliminarProductoDefinitivo(negocioId: string, productoId: string, cuenta: Cuenta): Promise<void> {
+    this.verificarPropiedad(cuenta, negocioId);
+    const producto = await this.obtenerProductoOFallar(negocioId, productoId);
+    await this.bd.consultar("DELETE FROM productos WHERE id = $1 AND negocio_id = $2", [productoId, negocioId]);
+    await this.almacenamiento.eliminarPorUrl(producto.fotoUrl);
+    await this.auditoria.registrar("eliminar_definitivo", "producto", productoId, cuenta.id, { negocioId });
+  }
+
+  /** La papelera es por negocio, no global: se ve dentro de la misma pestaña de productos. */
+  async listarProductosPapelera(negocioId: string, cuenta: Cuenta): Promise<Producto[]> {
+    this.verificarPropiedad(cuenta, negocioId);
+    const { rows } = await this.bd.consultar<FilaProducto>(
+      `SELECT ${COLUMNAS_PRODUCTO}
+       FROM productos
+       WHERE negocio_id = $1 AND eliminado_en IS NOT NULL
+       ORDER BY eliminado_en DESC`,
+      [negocioId],
+    );
+    return rows.map(aProducto);
+  }
+
+  /** Recibe los ids en el orden final (tras arrastrar) y les asigna 0..n de una sola vez. */
+  async reordenarProductos(negocioId: string, idsEnOrden: string[], cuenta: Cuenta): Promise<Producto[]> {
+    this.verificarPropiedad(cuenta, negocioId);
+    await this.bd.transaccion(async (db) => {
+      for (const [indice, productoId] of idsEnOrden.entries()) {
+        await db.consultar("UPDATE productos SET orden = $3 WHERE id = $1 AND negocio_id = $2", [
+          productoId,
+          negocioId,
+          indice,
+        ]);
+      }
+    });
+    return this.listarProductos(negocioId);
   }
 
   /** Hasta 6 fotos — solo se usan cuando el negocio no tiene menú/catálogo/servicios/ofertas (GaleriaNegocio.tsx). */
