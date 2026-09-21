@@ -218,17 +218,17 @@ export class NegociosController {
     return this.negocios.rechazar(id, dto.motivo, req.user);
   }
 
-  /** Reversible — a diferencia de "eliminar" más abajo. Solo super_admin. */
+  /** Reversible — a diferencia de "eliminar" más abajo. super_admin y gestor_negocios (0071). */
   @Patch(":id/archivar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("super_admin")
+  @Roles("super_admin", "gestor_negocios")
   archivar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
     return this.negocios.archivar(id, req.user);
   }
 
   @Patch(":id/restaurar-archivo")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("super_admin")
+  @Roles("super_admin", "gestor_negocios")
   restaurarArchivo(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
     return this.negocios.restaurarArchivo(id, req.user);
   }
@@ -237,7 +237,7 @@ export class NegociosController {
   @Delete(":id")
   @HttpCode(204)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("super_admin")
+  @Roles("super_admin", "gestor_negocios")
   async eliminar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<void> {
     await this.negocios.eliminar(id, req.user);
   }

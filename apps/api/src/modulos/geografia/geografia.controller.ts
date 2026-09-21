@@ -22,10 +22,14 @@ export class GeografiaController {
     return this.geografia.detectarPorCoordenada(query.lat, query.lng);
   }
 
-  /** Panel admin: todas las comunidades, no solo las activas (a diferencia del GET público de arriba). */
+  /**
+   * Panel admin: todas las comunidades, no solo las activas (a diferencia del GET público de
+   * arriba). gestor_negocios también la necesita: es el desplegable "Comunidad" del alta de
+   * negocio — crear/activar/desactivar comunidad sigue siendo solo super_admin, más abajo.
+   */
   @Get("todas")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("super_admin")
+  @Roles("super_admin", "gestor_negocios")
   listarTodas(): Promise<Comunidad[]> {
     return this.geografia.listarTodasComunidades();
   }

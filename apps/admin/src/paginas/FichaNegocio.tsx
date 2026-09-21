@@ -28,7 +28,7 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
 
 /** gestor_negocios es administrativo: da de alta y conecta con el dueño — nada de lo
  * operativo (horario, fotos, productos, ofertas, publicar). Ver docs/decisiones/0071. */
-const PESTANAS_GESTOR: Pestana[] = ["info", "dueno"];
+const PESTANAS_GESTOR: Pestana[] = ["info", "dueno", "estado"];
 
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;
@@ -173,12 +173,17 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
     setConfirmandoArchivar(false);
   }
 
+  // Publicar/despublicar es del validador de contenido — un gestor administrativo no lo tiene
+  // (ver 0071), así que ni se le ofrecen los botones: le saldría un 403 al tocarlos.
+  const puedeValidar = cuenta?.rol === "super_admin" || cuenta?.rol === "validador_contenido";
+  const puedeArchivarOEliminar = cuenta?.rol === "super_admin" || cuenta?.rol === "gestor_negocios";
+
   return (
     <>
       <EditorEstadoNegocio
         negocio={negocio}
         acciones={
-          negocio.estado === "activo" ? (
+          !puedeValidar ? undefined : negocio.estado === "activo" ? (
             confirmandoBaja ? (
               <>
                 <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
@@ -224,9 +229,9 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
         }
       />
 
-      {/* Archivar y Eliminar: solo super_admin. Ni el gestor administrativo ni el dueño los ven —
-          ver docs/decisiones/0071-plan-v2-modulo-negocios.md. */}
-      {cuenta?.rol === "super_admin" ? (
+      {/* Archivar y Eliminar: super_admin y gestor_negocios (0071 — ampliado a pedido del
+          usuario tras el primer uso real del rol). El dueño no las ve. */}
+      {puedeArchivarOEliminar ? (
         <div className="tarjeta" style={{ marginTop: 14, borderColor: "var(--rojo)" }}>
           <p style={{ fontSize: 11.5, color: "var(--texto-suave)", margin: "0 0 12px" }}>
             Estas dos acciones son distintas de despublicar: no ocultan la ficha un rato, la sacan del
