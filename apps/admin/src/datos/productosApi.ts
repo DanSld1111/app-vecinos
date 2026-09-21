@@ -13,6 +13,8 @@ export interface DatosProducto {
   precio: number;
   categoriaMenu: string;
   destacado: boolean;
+  /** Campos propios de la categoría del negocio (ej. talla en Moda) — vacío si no aplica. */
+  atributos?: Record<string, string>;
 }
 
 export const listarProductos = (negocioId: string) =>

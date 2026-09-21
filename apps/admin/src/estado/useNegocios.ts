@@ -24,9 +24,10 @@ interface EstadoNegocios {
   error: string | null;
   /** Dueño de negocio: solo los suyos, sin importar su estado. */
   cargarMios: (token: string) => Promise<void>;
-  /** Panel del super-admin: todos los negocios, sin importar su estado. */
-  cargarAdmin: (token: string) => Promise<void>;
-  cargarMasAdmin: (token: string) => Promise<void>;
+  /** Panel del super-admin/gestor: todos los negocios, sin importar su estado.
+   * `soloArchivados` trae la vista "Ver archivados" en vez del listado normal. */
+  cargarAdmin: (token: string, soloArchivados?: boolean) => Promise<void>;
+  cargarMasAdmin: (token: string, soloArchivados?: boolean) => Promise<void>;
   /** Un negocio suelto, sin importar su estado — para abrir su ficha directo por URL. */
   cargarUno: (id: string, token: string) => Promise<Negocio | null>;
   /** Cola de validación: solo por_verificar, ya acotados por el servidor al alcance de la cuenta. */
@@ -38,6 +39,11 @@ interface EstadoNegocios {
   /** Baja el negocio de la app sin borrarlo — se puede volver a publicar con `aprobar`. */
   despublicar: (id: string, token: string) => Promise<void>;
   rechazar: (id: string, motivo: string, token: string) => Promise<void>;
+  /** Reversible: sale del listado normal, queda en "Ver archivados" hasta restaurarse. */
+  archivar: (id: string, token: string) => Promise<void>;
+  restaurarArchivo: (id: string, token: string) => Promise<void>;
+  /** Definitivo — quita el negocio del store al confirmar el borrado en el servidor. */
+  eliminar: (id: string, token: string) => Promise<boolean>;
   actualizarInfo: (id: string, datos: InfoEditable, token: string) => Promise<boolean>;
   actualizarHorarios: (id: string, horarios: Horarios, token: string) => Promise<boolean>;
   agregarOferta: (id: string, oferta: OfertaNegocio, token: string) => Promise<void>;
@@ -70,10 +76,13 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
     }
   },
 
-  cargarAdmin: async (token) => {
+  cargarAdmin: async (token, soloArchivados = false) => {
     set({ cargando: true, error: null });
     try {
-      const { items, cursorSiguiente } = await apiFetch<ResultadoPaginado<Negocio>>("/negocios/admin", { token });
+      const query = soloArchivados ? "?archivados=true" : "";
+      const { items, cursorSiguiente } = await apiFetch<ResultadoPaginado<Negocio>>(`/negocios/admin${query}`, {
+        token,
+      });
       set({ negocios: items, cursorSiguiente, cargando: false });
     } catch (error) {
       set({ error: mensajeError(error, "No se pudieron cargar los negocios."), cargando: false });
@@ -97,15 +106,15 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
     }
   },
 
-  cargarMasAdmin: async (token) => {
+  cargarMasAdmin: async (token, soloArchivados = false) => {
     const cursor = get().cursorSiguiente;
     if (!cursor) return;
     set({ cargandoMas: true });
     try {
-      const { items, cursorSiguiente } = await apiFetch<ResultadoPaginado<Negocio>>(
-        `/negocios/admin?cursor=${encodeURIComponent(cursor)}`,
-        { token },
-      );
+      const query = `cursor=${encodeURIComponent(cursor)}${soloArchivados ? "&archivados=true" : ""}`;
+      const { items, cursorSiguiente } = await apiFetch<ResultadoPaginado<Negocio>>(`/negocios/admin?${query}`, {
+        token,
+      });
       set((estado) => ({ negocios: [...estado.negocios, ...items], cursorSiguiente, cargandoMas: false }));
     } catch (error) {
       set({ error: mensajeError(error, "No se pudieron cargar más negocios."), cargandoMas: false });
@@ -175,6 +184,38 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
       set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
     } catch (error) {
       set({ error: mensajeError(error, "No se pudo rechazar el negocio.") });
+    }
+  },
+
+  archivar: async (id, token) => {
+    try {
+      await apiFetch<Negocio>(`/negocios/${id}/archivar`, { metodo: "PATCH", token });
+      // Sale de la vista normal — el listado normal lo filtra por archivadoEn, así que se quita
+      // del store en vez de solo actualizarlo (a diferencia de aprobar/despublicar/rechazar).
+      set((estado) => ({ negocios: estado.negocios.filter((n) => n.id !== id) }));
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo archivar el negocio.") });
+    }
+  },
+
+  restaurarArchivo: async (id, token) => {
+    try {
+      await apiFetch<Negocio>(`/negocios/${id}/restaurar-archivo`, { metodo: "PATCH", token });
+      // Mismo criterio que archivar: sale de la vista donde estaba (archivados).
+      set((estado) => ({ negocios: estado.negocios.filter((n) => n.id !== id) }));
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo restaurar el negocio.") });
+    }
+  },
+
+  eliminar: async (id, token) => {
+    try {
+      await apiFetch<void>(`/negocios/${id}`, { metodo: "DELETE", token });
+      set((estado) => ({ negocios: estado.negocios.filter((n) => n.id !== id) }));
+      return true;
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo eliminar el negocio.") });
+      return false;
     }
   },
 

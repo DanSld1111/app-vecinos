@@ -29,7 +29,7 @@ import { ActualizarInfoNegocioDto } from "./dto/actualizar-info-negocio.dto";
 import { ActualizarHorariosDto } from "./dto/actualizar-horarios.dto";
 import { AgregarOfertaDto } from "./dto/agregar-oferta.dto";
 import { RechazarNegocioDto } from "./dto/rechazar-negocio.dto";
-import { PaginacionAdminDto } from "../../comun/dto/paginacion-admin.dto";
+import { ListarNegociosAdminDto } from "./dto/listar-negocios-admin.dto";
 import { opcionesUploadFotoNegocio } from "./foto-negocio.config";
 import { opcionesUploadFotoProducto } from "./foto-producto.config";
 import { AgregarFotoGaleriaDto } from "./dto/agregar-foto-galeria.dto";
@@ -56,8 +56,8 @@ export class NegociosController {
   @Get("admin")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("super_admin", "gestor_negocios")
-  listarAdmin(@Query() paginacion: PaginacionAdminDto): Promise<ResultadoPaginado<Negocio>> {
-    return this.negocios.listarAdmin(paginacion.cursor, paginacion.limite);
+  listarAdmin(@Query() paginacion: ListarNegociosAdminDto): Promise<ResultadoPaginado<Negocio>> {
+    return this.negocios.listarAdmin(paginacion.cursor, paginacion.limite, paginacion.archivados === "true");
   }
 
   @Get("pendientes")
@@ -195,27 +195,51 @@ export class NegociosController {
 
   @Patch(":id/aprobar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("validador_contenido", "super_admin", "gestor_negocios")
+  @Roles("validador_contenido", "super_admin")
   aprobar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
     return this.negocios.aprobar(id, req.user);
   }
 
   @Patch(":id/despublicar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("validador_contenido", "super_admin", "gestor_negocios")
+  @Roles("validador_contenido", "super_admin")
   despublicar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
     return this.negocios.despublicar(id, req.user);
   }
 
   @Patch(":id/rechazar")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("validador_contenido", "super_admin", "gestor_negocios")
+  @Roles("validador_contenido", "super_admin")
   rechazar(
     @Param("id") id: string,
     @Body() dto: RechazarNegocioDto,
     @Req() req: SolicitudConCuenta,
   ): Promise<Negocio> {
     return this.negocios.rechazar(id, dto.motivo, req.user);
+  }
+
+  /** Reversible — a diferencia de "eliminar" más abajo. Solo super_admin. */
+  @Patch(":id/archivar")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("super_admin")
+  archivar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
+    return this.negocios.archivar(id, req.user);
+  }
+
+  @Patch(":id/restaurar-archivo")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("super_admin")
+  restaurarArchivo(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
+    return this.negocios.restaurarArchivo(id, req.user);
+  }
+
+  /** Definitivo, sin vuelta atrás — el panel pide confirmación antes de llamar esto. */
+  @Delete(":id")
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("super_admin")
+  async eliminar(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<void> {
+    await this.negocios.eliminar(id, req.user);
   }
 
   @Put(":id/info")

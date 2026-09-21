@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Negocio } from "@app-vecinos/tipos";
 import { useNegocios } from "../estado/useNegocios";
 import { useCuentas } from "../estado/useCuentas";
@@ -26,6 +26,10 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "estado", icono: "✅", texto: "Estado" },
 ];
 
+/** gestor_negocios es administrativo: da de alta y conecta con el dueño — nada de lo
+ * operativo (horario, fotos, productos, ofertas, publicar). Ver docs/decisiones/0071. */
+const PESTANAS_GESTOR: Pestana[] = ["info", "dueno"];
+
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;
   if (estado === "por_verificar") return <span className="estado-negocio-pill verificar">Sin publicar</span>;
@@ -41,13 +45,15 @@ function pillEstado(estado: Negocio["estado"]) {
 export function FichaNegocio() {
   const { id = "" } = useParams();
   const token = useSesionAdmin((estado) => estado.token)!;
+  const cuenta = useSesionAdmin((estado) => estado.cuenta);
   const negocios = useNegocios((estado) => estado.negocios);
   const cargarUno = useNegocios((estado) => estado.cargarUno);
   const [buscando, setBuscando] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const pestanas = cuenta?.rol === "gestor_negocios" ? PESTANAS.filter((p) => PESTANAS_GESTOR.includes(p.id)) : PESTANAS;
   const pestanaUrl = searchParams.get("tab") as Pestana | null;
-  const pestana: Pestana = PESTANAS.some((p) => p.id === pestanaUrl) ? (pestanaUrl as Pestana) : "info";
+  const pestana: Pestana = pestanas.some((p) => p.id === pestanaUrl) ? (pestanaUrl as Pestana) : "info";
   const negocio = negocios.find((n) => n.id === id) ?? null;
 
   useEffect(() => {
@@ -97,7 +103,7 @@ export function FichaNegocio() {
       </div>
 
       <div className="tabs-negocio">
-        {PESTANAS.map((p) => (
+        {pestanas.map((p) => (
           <button
             key={p.id}
             type="button"
@@ -121,68 +127,208 @@ export function FichaNegocio() {
 }
 
 function PestanaEstado({ negocio }: { negocio: Negocio }) {
+  const navegar = useNavigate();
   const token = useSesionAdmin((estado) => estado.token)!;
+  const cuenta = useSesionAdmin((estado) => estado.cuenta);
   const aprobar = useNegocios((estado) => estado.aprobar);
   const despublicar = useNegocios((estado) => estado.despublicar);
+  const archivar = useNegocios((estado) => estado.archivar);
+  const restaurarArchivo = useNegocios((estado) => estado.restaurarArchivo);
+  const eliminar = useNegocios((estado) => estado.eliminar);
   const [trabajando, setTrabajando] = useState(false);
   const [confirmandoBaja, setConfirmandoBaja] = useState(false);
+  const [confirmandoArchivar, setConfirmandoArchivar] = useState(false);
+  const [confirmandoEliminar, setConfirmandoEliminar] = useState(false);
+
+  if (negocio.archivadoEn) {
+    return (
+      <div className="tarjeta-estado-grande pendiente">
+        <div className="icono-estado-grande">📦</div>
+        <div style={{ flex: 1 }}>
+          <h3>Este negocio está archivado</h3>
+          <p>No aparece en el listado ni en la app. Se puede restaurar en cualquier momento.</p>
+        </div>
+        <button
+          className="btn btn-primario"
+          disabled={trabajando}
+          onClick={async () => {
+            setTrabajando(true);
+            await restaurarArchivo(negocio.id, token);
+            // Sale de la vista "archivados" del store al restaurarse — misma razón que el
+            // redirect de Archivar: la ficha ya no tiene qué mostrar acá.
+            navegar("/negocios");
+          }}
+        >
+          {trabajando ? "Restaurando…" : "Restaurar"}
+        </button>
+      </div>
+    );
+  }
 
   async function ejecutar(accion: () => Promise<void>) {
     setTrabajando(true);
     await accion();
     setTrabajando(false);
     setConfirmandoBaja(false);
+    setConfirmandoArchivar(false);
   }
 
   return (
-    <EditorEstadoNegocio
-      negocio={negocio}
-      acciones={
-        negocio.estado === "activo" ? (
-          confirmandoBaja ? (
-            <>
-              <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
-                ¿Bajar "{negocio.nombre}" de la app? Deja de aparecer en Buscar y su ficha no se puede abrir.
-                Nada se borra: puedes volver a publicarlo cuando quieras.
-              </span>
-              <button
-                className="btn btn-primario"
-                style={{ background: "var(--rojo)" }}
-                disabled={trabajando}
-                onClick={() => ejecutar(() => despublicar(negocio.id, token))}
-              >
-                {trabajando ? "Bajando…" : "Sí, despublicar"}
-              </button>
-              <button className="btn btn-fantasma" onClick={() => setConfirmandoBaja(false)}>
-                Cancelar
-              </button>
-            </>
+    <>
+      <EditorEstadoNegocio
+        negocio={negocio}
+        acciones={
+          negocio.estado === "activo" ? (
+            confirmandoBaja ? (
+              <>
+                <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
+                  ¿Bajar "{negocio.nombre}" de la app? Deja de aparecer en Buscar y su ficha no se puede abrir.
+                  Nada se borra: puedes volver a publicarlo cuando quieras.
+                </span>
+                <button
+                  className="btn btn-primario"
+                  style={{ background: "var(--rojo)" }}
+                  disabled={trabajando}
+                  onClick={() => ejecutar(() => despublicar(negocio.id, token))}
+                >
+                  {trabajando ? "Bajando…" : "Sí, despublicar"}
+                </button>
+                <button className="btn btn-fantasma" onClick={() => setConfirmandoBaja(false)}>
+                  Cancelar
+                </button>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
+                  La ficha está publicada. Cualquier cambio que hagas se ve en la app de inmediato.
+                </span>
+                <button className="btn btn-fantasma" onClick={() => setConfirmandoBaja(true)}>
+                  Despublicar
+                </button>
+              </>
+            )
           ) : (
             <>
-              <span style={{ fontSize: 12, color: "var(--texto-suave)", flex: 1 }}>
-                La ficha está publicada. Cualquier cambio que hagas se ve en la app de inmediato.
-              </span>
-              <button className="btn btn-fantasma" onClick={() => setConfirmandoBaja(true)}>
-                Despublicar
+              <button
+                className="btn btn-primario"
+                disabled={trabajando}
+                onClick={() => ejecutar(() => aprobar(negocio.id, token))}
+              >
+                {trabajando ? "Publicando…" : "Publicar en la app"}
               </button>
+              <span style={{ fontSize: 12, color: "var(--texto-suave)" }}>
+                Desde ese momento los vecinos pueden encontrarlo.
+              </span>
             </>
           )
-        ) : (
-          <>
-            <button
-              className="btn btn-primario"
-              disabled={trabajando}
-              onClick={() => ejecutar(() => aprobar(negocio.id, token))}
+        }
+      />
+
+      {/* Archivar y Eliminar: solo super_admin. Ni el gestor administrativo ni el dueño los ven —
+          ver docs/decisiones/0071-plan-v2-modulo-negocios.md. */}
+      {cuenta?.rol === "super_admin" ? (
+        <div className="tarjeta" style={{ marginTop: 14, borderColor: "var(--rojo)" }}>
+          <p style={{ fontSize: 11.5, color: "var(--texto-suave)", margin: "0 0 12px" }}>
+            Estas dos acciones son distintas de despublicar: no ocultan la ficha un rato, la sacan del
+            listado del panel (Archivar, reversible) o la borran de verdad (Eliminar, definitivo). No
+            hay papelera para negocios — esa es solo de productos.
+          </p>
+          <div style={{ display: "flex", gap: 10 }}>
+            <div
+              style={{
+                flex: 1,
+                background: "var(--oro-suave)",
+                borderRadius: 10,
+                padding: "12px 14px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
             >
-              {trabajando ? "Publicando…" : "Publicar en la app"}
-            </button>
-            <span style={{ fontSize: 12, color: "var(--texto-suave)" }}>
-              Desde ese momento los vecinos pueden encontrarlo.
-            </span>
-          </>
-        )
-      }
-    />
+              <b style={{ fontSize: 12, color: "var(--oro)" }}>📦 Archivar</b>
+              {confirmandoArchivar ? (
+                <>
+                  <span style={{ fontSize: 11.5, color: "var(--texto-suave)" }}>
+                    Sale del listado. Se puede restaurar desde "Ver archivados".
+                  </span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button
+                      className="btn-accion-mini"
+                      disabled={trabajando}
+                      onClick={async () => {
+                        setTrabajando(true);
+                        await archivar(negocio.id, token);
+                        // Sale del store al archivarse — igual que al eliminar, la ficha ya no
+                        // tiene qué mostrar, así que se vuelve al listado en vez de dejarla en
+                        // "No encontramos este negocio".
+                        navegar("/negocios");
+                      }}
+                    >
+                      Sí, archivar
+                    </button>
+                    <button className="btn-accion-mini" onClick={() => setConfirmandoArchivar(false)}>
+                      Cancelar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button className="btn-accion-mini" style={{ alignSelf: "flex-start" }} onClick={() => setConfirmandoArchivar(true)}>
+                  Archivar negocio
+                </button>
+              )}
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                background: "var(--rojo-suave)",
+                borderRadius: 10,
+                padding: "12px 14px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
+            >
+              <b style={{ fontSize: 12, color: "var(--rojo)" }}>🗑️ Eliminar</b>
+              {confirmandoEliminar ? (
+                <>
+                  <span style={{ fontSize: 11.5, color: "var(--rojo)", fontWeight: 700 }}>
+                    ¿Eliminar "{negocio.nombre}"? Se borran también sus productos y fotos. Esta acción no
+                    se puede deshacer.
+                  </span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button
+                      className="btn-accion-mini"
+                      style={{ color: "var(--rojo)" }}
+                      disabled={trabajando}
+                      onClick={async () => {
+                        setTrabajando(true);
+                        const ok = await eliminar(negocio.id, token);
+                        setTrabajando(false);
+                        if (ok) navegar("/negocios");
+                      }}
+                    >
+                      Sí, eliminar
+                    </button>
+                    <button className="btn-accion-mini" onClick={() => setConfirmandoEliminar(false)}>
+                      Cancelar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button
+                  className="btn-accion-mini"
+                  style={{ alignSelf: "flex-start", color: "var(--rojo)" }}
+                  onClick={() => setConfirmandoEliminar(true)}
+                >
+                  Eliminar negocio
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
 

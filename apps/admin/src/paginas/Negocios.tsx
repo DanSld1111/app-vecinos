@@ -8,7 +8,6 @@ import { useCategorias } from "../estado/useCategorias";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { generarContrasenaTemporal } from "../utilidades/contrasena";
 import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
-import { IconoCategoria } from "../componentes/IconoCategoria";
 import { fichaCompleta, partesDeFicha, resumenDeLoQueFalta } from "../utilidades/completitudNegocio";
 import { urlCompleta } from "../utilidades/media";
 
@@ -45,10 +44,12 @@ export function Negocios() {
   const crearCuenta = useCuentas((estado) => estado.crear);
   const categorias = useCategorias((estado) => estado.categorias);
 
+  const [verArchivados, setVerArchivados] = useState(false);
+
   useEffect(() => {
     cargarCuentas(token);
-    cargarNegocios(token);
-  }, [cargarCuentas, cargarNegocios, token]);
+    cargarNegocios(token, verArchivados);
+  }, [cargarCuentas, cargarNegocios, token, verArchivados]);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const comunidadIdFiltro = searchParams.get("comunidadId");
@@ -202,76 +203,71 @@ export function Negocios() {
           >
             📝 Solo incompletos
           </button>
+          <button
+            className={`chip-filtro ${verArchivados ? "activo" : ""}`}
+            onClick={() => setVerArchivados((v) => !v)}
+            title="Negocios archivados — no aparecen en la app ni en el listado normal"
+          >
+            📦 Ver archivados
+          </button>
         </div>
         <div className="fila-filtro">
-          <button className={`chip-filtro ${categoriaId === null ? "activo" : ""}`} onClick={() => setCategoriaId(null)}>
-            Todas las categorías
-          </button>
-          {categorias.slice(0, 6).map((cat) => (
-            <button
-              key={cat.id}
-              className={`chip-filtro ${categoriaId === cat.id ? "activo" : ""}`}
-              onClick={() => setCategoriaId(cat.id)}
-            >
-              <IconoCategoria nombre={cat.icono} size={13} /> {cat.nombre}
-            </button>
-          ))}
+          {/* Un desplegable en vez de chips: con 14 categorías (y creciendo) una fila de
+              botones se amontona — el select escala igual con 14 que con 40. */}
+          <select
+            className="select-filtro"
+            value={categoriaId ?? ""}
+            onChange={(e) => setCategoriaId(e.target.value || null)}
+          >
+            <option value="">Todas las categorías</option>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.nombre}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      <div className="lista-negocios">
+      <div className="grid-negocios">
         {negocios.map((negocio) => {
           const partes = partesDeFicha(negocio, negociosConDueno.has(negocio.id));
+          const completadas = partes.filter((p) => p.completa).length;
           const falta = resumenDeLoQueFalta(negocio, negociosConDueno.has(negocio.id));
           return (
-          <div
-            className="fila-negocio"
-            key={negocio.id}
-            onClick={() => navegar(`/negocios/${negocio.id}`)}
-          >
-            <div className="foto-negocio">
-              {negocio.fotoPrincipalUrl ? (
-                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
-              ) : (
-                "🖼️"
-              )}
-            </div>
-            <div className="info-negocio">
-              <div className="nombre-fila-neg">
-                <b>{negocio.nombre}</b>
-                {negocio.verificadoEn ? <span className="check-verificado">✓</span> : null}
+            <div className="tarjeta-negocio" key={negocio.id} onClick={() => navegar(`/negocios/${negocio.id}`)}>
+              <div className="foto-tarjeta">
+                {negocio.fotoPrincipalUrl ? <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" /> : "🖼️"}
+                <span className="estado-flotante">{pillEstado(negocio.estado)}</span>
               </div>
-              <div className="direccion-neg">{negocio.direccion}</div>
-              <div className="completitud-neg">
-                <span className="marcas">
-                  {partes.map((parte) => (
-                    <span
-                      key={parte.clave}
-                      className={`marca ${parte.completa ? "ok" : ""}`}
-                      title={`${parte.etiqueta}: ${parte.completa ? "lista" : "pendiente"}`}
-                    >
-                      {parte.icono}
+              <div className="cuerpo-tarjeta">
+                <b>
+                  {negocio.nombre} {negocio.verificadoEn ? <span className="check-verificado">✓</span> : null}
+                </b>
+                <span className="direccion-tarjeta">{negocio.direccion}</span>
+                <div className="cats-negocio">
+                  {negocio.categoriaIds.slice(0, 2).map((id) => (
+                    <span className="cat-tag" key={id}>
+                      {categoriaPorId[id]?.nombre ?? id}
                     </span>
                   ))}
-                </span>
-                {falta ? <span className="falta">{falta}</span> : <span className="lista">Ficha completa</span>}
+                </div>
+                <div className="progreso-tarjeta" title={falta ?? "Ficha completa"}>
+                  <div className="barra-progreso">
+                    <i style={{ width: `${(completadas / partes.length) * 100}%` }} />
+                  </div>
+                  <span className="frac-progreso">{completadas === partes.length ? "Completa" : `${completadas}/${partes.length}`}</span>
+                </div>
               </div>
             </div>
-            <div className="cats-negocio">
-              {negocio.categoriaIds.slice(0, 2).map((id) => (
-                <span className="cat-tag" key={id}>
-                  {categoriaPorId[id]?.nombre ?? id}
-                </span>
-              ))}
-            </div>
-            {pillEstado(negocio.estado)}
-            <span className="flecha-fila">›</span>
-          </div>
           );
         })}
         {negocios.length === 0 ? (
-          <div className="panel" style={{ padding: 32, textAlign: "center", color: "var(--texto-tenue)" }}>
-            No hay negocios que coincidan con el filtro.
+          <div
+            className="panel"
+            style={{ gridColumn: "1 / -1", padding: 32, textAlign: "center", color: "var(--texto-tenue)" }}
+          >
+            {verArchivados ? "No hay negocios archivados." : "No hay negocios que coincidan con el filtro."}
           </div>
         ) : null}
       </div>
@@ -280,7 +276,7 @@ export function Negocios() {
           className="btn-accion-mini"
           style={{ display: "block", margin: "16px auto 0" }}
           disabled={cargandoMasNegocios}
-          onClick={() => cargarMasNegocios(token)}
+          onClick={() => cargarMasNegocios(token, verArchivados)}
         >
           {cargandoMasNegocios ? "Cargando…" : "Cargar más negocios"}
         </button>
@@ -391,82 +387,98 @@ function ModalNuevoNegocio({
         <h3>Nuevo negocio</h3>
         <p className="sub">Alta rápida — la ficha completa (fotos, horario, descripción) se termina de llenar después.</p>
 
-        <div className="campo-modal">
-          <label>Nombre del negocio</label>
-          <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Panadería San José" autoFocus />
-        </div>
-
-        <div className="campo-modal">
-          <label>Distrito</label>
-          <select value={distritoUbigeo} onChange={(e) => alCambiarDistrito(e.target.value)}>
-            {distritos.map((d) => (
-              <option key={d.ubigeo} value={d.ubigeo}>
-                {d.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="campo-modal">
-          <label>Comunidad</label>
-          <select value={comunidadId} onChange={(e) => setComunidadId(e.target.value)}>
-            {comunidadesDelDistrito.length === 0 ? <option value="">Sin comunidades en este distrito</option> : null}
-            {comunidadesDelDistrito.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="campo-modal">
-          <label>Categoría</label>
-          <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
-            {categorias.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="campo-modal">
-          <label>Dirección</label>
-          <input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ej. Av. Aviación 2400" />
-        </div>
-
-        <div className="campo-modal">
-          <label>Teléfono (opcional)</label>
-          <input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej. 01 234 5678" />
-        </div>
-
-        <div className="campo-modal">
-          <label>WhatsApp (opcional)</label>
-          <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ej. 987654321" />
-        </div>
-
-        <div className="toggle-dueno" onClick={() => setCrearDueno((v) => !v)}>
-          <div className={`switch ${crearDueno ? "" : "off"}`}>
-            <i />
+        <div className="seccion-alta">
+          <div className="titulo-seccion-alta">🏷️ Identidad</div>
+          <div className="campo-modal">
+            <label>Nombre del negocio</label>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Panadería San José" autoFocus />
           </div>
-          <div>
-            <b>Crear cuenta de dueño ahora</b>
-            <span>La persona podrá entrar a administrar su ficha con una clave temporal</span>
+          <div className="campo-modal" style={{ marginBottom: 0 }}>
+            <label>Categoría</label>
+            <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
+              {categorias.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {crearDueno ? (
-          <div className="seccion-dueno-inline">
+        <div className="seccion-alta">
+          <div className="titulo-seccion-alta">📍 Ubicación</div>
+          <div className="fila-2-campos-alta">
             <div className="campo-modal">
-              <label>Nombre del dueño</label>
-              <input value={nombreDueno} onChange={(e) => setNombreDueno(e.target.value)} placeholder="Nombre completo" />
+              <label>Distrito</label>
+              <select value={distritoUbigeo} onChange={(e) => alCambiarDistrito(e.target.value)}>
+                {distritos.map((d) => (
+                  <option key={d.ubigeo} value={d.ubigeo}>
+                    {d.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="campo-modal">
+              <label>Comunidad</label>
+              <select value={comunidadId} onChange={(e) => setComunidadId(e.target.value)}>
+                {comunidadesDelDistrito.length === 0 ? <option value="">Sin comunidades en este distrito</option> : null}
+                {comunidadesDelDistrito.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="campo-modal" style={{ marginBottom: 0 }}>
+            <label>Dirección</label>
+            <input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ej. Av. Aviación 2400" />
+          </div>
+        </div>
+
+        <div className="seccion-alta">
+          <div className="titulo-seccion-alta">
+            📞 Contacto <span className="opcional">(opcional)</span>
+          </div>
+          <div className="fila-2-campos-alta">
+            <div className="campo-modal" style={{ marginBottom: 0 }}>
+              <label>Teléfono</label>
+              <input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej. 01 234 5678" />
             </div>
             <div className="campo-modal" style={{ marginBottom: 0 }}>
-              <label>Correo</label>
-              <input value={correoDueno} onChange={(e) => setCorreoDueno(e.target.value)} placeholder="correo@ejemplo.com" />
+              <label>WhatsApp</label>
+              <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ej. 987654321" />
             </div>
           </div>
-        ) : null}
+        </div>
+
+        <div className="seccion-alta" style={{ paddingBottom: 0 }}>
+          <div className="titulo-seccion-alta">
+            👤 Dueño <span className="opcional">(opcional, se puede hacer después)</span>
+          </div>
+          <div className="toggle-dueno" onClick={() => setCrearDueno((v) => !v)}>
+            <div className={`switch ${crearDueno ? "" : "off"}`}>
+              <i />
+            </div>
+            <div>
+              <b>Crear cuenta de dueño ahora</b>
+              <span>La persona podrá entrar a administrar su ficha con una clave temporal</span>
+            </div>
+          </div>
+
+          {crearDueno ? (
+            <div className="seccion-dueno-inline">
+              <div className="campo-modal">
+                <label>Nombre del dueño</label>
+                <input value={nombreDueno} onChange={(e) => setNombreDueno(e.target.value)} placeholder="Nombre completo" />
+              </div>
+              <div className="campo-modal" style={{ marginBottom: 0 }}>
+                <label>Correo</label>
+                <input value={correoDueno} onChange={(e) => setCorreoDueno(e.target.value)} placeholder="correo@ejemplo.com" />
+              </div>
+            </div>
+          ) : null}
+        </div>
 
         <div className="modal-footer">
           <button className="btn-cancelar" onClick={onCancelar}>

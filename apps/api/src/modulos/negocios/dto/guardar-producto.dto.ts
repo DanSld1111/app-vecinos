@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsOptional, IsString, MaxLength, Min } from "class-validator";
+import { IsBoolean, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from "class-validator";
 
 /** Mismos campos al crear y al editar — el id va en la ruta, no en el cuerpo. */
 export class GuardarProductoDto {
@@ -22,4 +22,10 @@ export class GuardarProductoDto {
   @IsOptional()
   @IsBoolean()
   destacado?: boolean;
+
+  /** Campos según la categoría del negocio (ej. talla/color en Moda) — clave del
+   * AtributoProductoDef → valor. Vacío u omitido si la categoría no define ninguno. */
+  @IsOptional()
+  @IsObject()
+  atributos?: Record<string, string>;
 }

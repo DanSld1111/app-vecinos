@@ -11,6 +11,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Platos de fondo",
     destacado: true,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1666613710161-65834b55cef8?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -22,6 +23,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Platos de fondo",
     destacado: false,
     orden: 1,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1613160775314-a41c5b364ec3?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -33,6 +35,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Parrillas",
     destacado: true,
     orden: 0,
+    atributos: {},
     // Misma foto que el negocio y el anuncio de El Fogón — es literalmente el mismo plato.
     fotoUrl: "https://images.unsplash.com/photo-1558030137-a56c1b004fa3?auto=format&fit=crop&w=500&q=80",
   },
@@ -45,6 +48,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Parrillas",
     destacado: false,
     orden: 1,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1561626423-a51b45aef0a1?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -56,6 +60,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Entradas",
     destacado: false,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1572179118614-0d36cfad8028?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -67,6 +72,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Postres",
     destacado: false,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1579513570356-2c6a017b822a?auto=format&fit=crop&w=500&q=80",
   },
 
@@ -80,6 +86,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Pan del día",
     destacado: true,
     orden: 0,
+    atributos: {},
     // Misma foto que el negocio — es literalmente el mismo pan.
     fotoUrl: "https://images.unsplash.com/photo-1549413468-cd78edb7e75c?auto=format&fit=crop&w=500&q=80",
   },
@@ -92,6 +99,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Pastelería",
     destacado: true,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1464941913535-1f37bfb72880?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -103,6 +111,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Salados",
     destacado: false,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1556280725-d0a1d82c811b?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -114,6 +123,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Desayunos",
     destacado: false,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?auto=format&fit=crop&w=500&q=80",
   },
 
@@ -127,6 +137,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Tortas",
     destacado: true,
     orden: 0,
+    atributos: {},
     // Misma foto que el negocio y el anuncio de Postres Doña Herminia — es literalmente la misma torta.
     fotoUrl: "https://images.unsplash.com/photo-1607877107150-de8a24f3900b?auto=format&fit=crop&w=500&q=80",
   },
@@ -139,6 +150,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Postres individuales",
     destacado: true,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1611755257881-842a74333310?auto=format&fit=crop&w=500&q=80",
   },
 
@@ -152,6 +164,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Chompas",
     destacado: true,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1604573824419-289a9a10672c?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -163,6 +176,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Accesorios",
     destacado: false,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1491245257527-395e9c480145?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -174,6 +188,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Accesorios",
     destacado: false,
     orden: 1,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1601225465185-780ff6d957b4?auto=format&fit=crop&w=500&q=80",
   },
 
@@ -187,6 +202,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Vestidos",
     destacado: true,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1517970640957-23d07d5ed08c?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -198,6 +214,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Accesorios",
     destacado: false,
     orden: 2,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1760624294582-5341f33f9fa4?auto=format&fit=crop&w=500&q=80",
   },
   {
@@ -209,6 +226,7 @@ export const productosMock: Producto[] = [
     categoriaMenu: "Blusas",
     destacado: false,
     orden: 0,
+    atributos: {},
     fotoUrl: "https://images.unsplash.com/photo-1600953601811-844d4bd38541?auto=format&fit=crop&w=500&q=80",
   },
 ];

@@ -125,22 +125,30 @@ export const useCuentas = create<EstadoCuentas>((set, get) => ({
     }
   },
 
-  // Sin endpoint propio: PUT /cuentas/:id reemplaza el array completo de negocios asignados
-  // (ver docs/decisiones/0007-modulo-cuentas-auth.md). Estas dos funciones arman ese array
-  // completo a partir del estado actual y llaman al mismo "actualizar".
+  // Endpoint angosto (PATCH/DELETE /cuentas/:id/negocios/:negocioId) — a propósito, no el PUT
+  // genérico de "actualizar": es la única puerta que se le abrió a gestor_negocios, que no
+  // puede tocar el resto de una cuenta (nombre, correo, rol). Ver docs/decisiones/0071.
   agregarNegocio: async (cuentaId, negocioId, token) => {
-    const cuenta = get().cuentas.find((c) => c.id === cuentaId);
-    if (!cuenta || cuenta.negocioIds.includes(negocioId)) return;
-    await get().actualizar(cuentaId, { ...cuenta, negocioIds: [...cuenta.negocioIds, negocioId] }, token);
+    try {
+      const actualizada = await apiFetch<Cuenta>(`/cuentas/${cuentaId}/negocios/${negocioId}`, {
+        metodo: "PATCH",
+        token,
+      });
+      set((estado) => ({ cuentas: estado.cuentas.map((c) => (c.id === cuentaId ? actualizada : c)) }));
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo vincular el negocio.") });
+    }
   },
 
   quitarNegocio: async (cuentaId, negocioId, token) => {
-    const cuenta = get().cuentas.find((c) => c.id === cuentaId);
-    if (!cuenta) return;
-    await get().actualizar(
-      cuentaId,
-      { ...cuenta, negocioIds: cuenta.negocioIds.filter((id) => id !== negocioId) },
-      token,
-    );
+    try {
+      const actualizada = await apiFetch<Cuenta>(`/cuentas/${cuentaId}/negocios/${negocioId}`, {
+        metodo: "DELETE",
+        token,
+      });
+      set((estado) => ({ cuentas: estado.cuentas.map((c) => (c.id === cuentaId ? actualizada : c)) }));
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo desvincular el negocio.") });
+    }
   },
 }));

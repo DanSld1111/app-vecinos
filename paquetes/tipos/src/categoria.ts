@@ -9,6 +9,20 @@
  */
 export type ArquetipoFicha = "menu" | "catalogo" | "servicios" | "categorias" | "ofertas";
 
+/**
+ * Un campo propio de los productos de negocios de esta categoría — ej. "Talla" en Moda,
+ * "Nivel de picante" en Comida. Ver docs/decisiones/0071-plan-v2-modulo-negocios.md.
+ * Borrador inicial, pensado para que se ajuste con el tiempo — no es un esquema cerrado.
+ */
+export interface AtributoProductoDef {
+  /** Clave estable para guardar en Producto.atributos — no cambiar una vez usada en datos reales. */
+  clave: string;
+  etiqueta: string;
+  tipo: "opciones" | "texto";
+  /** Solo si tipo = "opciones". */
+  opciones?: string[];
+}
+
 export interface Categoria {
   id: string;
   padreId: string | null;
@@ -22,4 +36,6 @@ export interface Categoria {
   arquetipoFicha?: ArquetipoFicha;
   /** Referencia a un `Arquetipo` real (paquetes/tipos/src/arquetipo.ts), gestionado desde el módulo Arquetipos del admin. */
   arquetipoId?: string;
+  /** Vacío o ausente = los productos de esta categoría no tienen atributos especiales. */
+  atributosProducto?: AtributoProductoDef[];
 }

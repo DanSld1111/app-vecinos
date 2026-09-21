@@ -17,9 +17,11 @@ interface FilaCategoria {
   orden: number;
   arquetipo_ficha: Categoria["arquetipoFicha"] | null;
   arquetipo_id: string | null;
+  atributos_producto: Categoria["atributosProducto"] | null;
 }
 
-const COLUMNAS = "id, padre_id, nombre, slug, icono, foto_url, orden, arquetipo_ficha, arquetipo_id";
+const COLUMNAS =
+  "id, padre_id, nombre, slug, icono, foto_url, orden, arquetipo_ficha, arquetipo_id, atributos_producto";
 
 function aCategoria(fila: FilaCategoria): Categoria {
   return {
@@ -32,6 +34,7 @@ function aCategoria(fila: FilaCategoria): Categoria {
     orden: fila.orden,
     arquetipoFicha: fila.arquetipo_ficha ?? undefined,
     arquetipoId: fila.arquetipo_id ?? undefined,
+    atributosProducto: fila.atributos_producto ?? undefined,
   };
 }
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
 import { DatosProducto } from "../../datos/productosApi";
 import { urlCompleta } from "../../utilidades/media";
 
@@ -15,6 +15,7 @@ export function ModalProducto({
   moneda,
   seccionSugerida,
   secciones,
+  atributosDef = [],
   onGuardar,
   onEliminar,
   onQuitarFoto,
@@ -25,6 +26,9 @@ export function ModalProducto({
   moneda: Moneda;
   seccionSugerida: string;
   secciones: string[];
+  /** Campos propios de la categoría del negocio (talla en Moda, picante en Comida…). Vacío =
+   * esta categoría no define ninguno, y el formulario se queda como estaba. */
+  atributosDef?: AtributoProductoDef[];
   onGuardar: (datos: DatosProducto, fotoNueva: File | null) => Promise<void>;
   onEliminar?: () => Promise<void>;
   onQuitarFoto?: () => Promise<void>;
@@ -35,6 +39,7 @@ export function ModalProducto({
   const [precio, setPrecio] = useState(producto ? String(producto.precio) : "");
   const [categoriaMenu, setCategoriaMenu] = useState(producto?.categoriaMenu ?? seccionSugerida);
   const [destacado, setDestacado] = useState(producto?.destacado ?? false);
+  const [atributos, setAtributos] = useState<Record<string, string>>(producto?.atributos ?? {});
   const [fotoNueva, setFotoNueva] = useState<File | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +64,7 @@ export function ModalProducto({
           precio: Number(precio),
           categoriaMenu: categoriaMenu.trim(),
           destacado,
+          atributos,
         },
         fotoNueva,
       );
@@ -170,6 +176,34 @@ export function ModalProducto({
                 </datalist>
               </div>
             </div>
+
+            {atributosDef.length > 0 ? (
+              <div className="fila-2-campos">
+                {atributosDef.map((def) => (
+                  <div className="campo-modal" key={def.clave}>
+                    <label>{def.etiqueta}</label>
+                    {def.tipo === "opciones" ? (
+                      <select
+                        value={atributos[def.clave] ?? ""}
+                        onChange={(e) => setAtributos((a) => ({ ...a, [def.clave]: e.target.value }))}
+                      >
+                        <option value="">—</option>
+                        {(def.opciones ?? []).map((op) => (
+                          <option key={op} value={op}>
+                            {op}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        value={atributos[def.clave] ?? ""}
+                        onChange={(e) => setAtributos((a) => ({ ...a, [def.clave]: e.target.value }))}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : null}
 
             <div className="toggle-dueno" onClick={() => setDestacado((v) => !v)} style={{ marginTop: 4 }}>
               <div className={`switch ${destacado ? "" : "off"}`}>

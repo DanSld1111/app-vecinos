@@ -13,6 +13,7 @@ export interface FilaNegocio {
   moneda: Moneda;
   foto_principal_url: string | null;
   estado: Negocio["estado"];
+  archivado_en: string | null;
   verificado_en: string | null;
   validado_por_cuenta_id: string | null;
   motivo_rechazo: string | null;
@@ -45,6 +46,7 @@ export function aNegocio(fila: FilaNegocio): Negocio {
     moneda: fila.moneda,
     fotoPrincipalUrl: fila.foto_principal_url,
     estado: fila.estado,
+    archivadoEn: fila.archivado_en,
     verificadoEn: fila.verificado_en,
     validadoPorCuentaId: fila.validado_por_cuenta_id,
     motivoRechazo: fila.motivo_rechazo,
@@ -61,7 +63,7 @@ export function aNegocio(fila: FilaNegocio): Negocio {
 
 export const COLUMNAS_NEGOCIO = `
   n.id, n.comunidad_id, n.distrito_ubigeo, n.nombre, n.descripcion, n.direccion,
-  n.telefono, n.whatsapp, n.horarios, n.moneda, n.foto_principal_url, n.estado, n.verificado_en,
+  n.telefono, n.whatsapp, n.horarios, n.moneda, n.foto_principal_url, n.estado, n.archivado_en, n.verificado_en,
   n.validado_por_cuenta_id, n.motivo_rechazo, n.fuente, n.creado_en, n.actualizado_en,
   n.servicios_ofrecidos, n.rubros_disponibles, n.ofertas, n.pasillos, n.fotos_galeria,
   ST_Y(n.coordenada::geometry) AS lat, ST_X(n.coordenada::geometry) AS lng,

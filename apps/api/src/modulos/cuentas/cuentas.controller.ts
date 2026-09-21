@@ -50,9 +50,16 @@ type SolicitudConCuenta = { user: Cuenta };
 export class CuentasController {
   constructor(private readonly cuentas: CuentasService) {}
 
+  /**
+   * gestor_negocios también llega acá — únicamente para elegir a qué cuenta "dueño de
+   * negocio" vincular un negocio. `soloRol` no viene del cliente: se decide aquí según quién
+   * pregunta, así un gestor nunca ve validadores, otros gestores ni cuentas de super_admin.
+   */
   @Get()
-  listar(@Query() paginacion: PaginacionAdminDto): Promise<ResultadoPaginado<Cuenta>> {
-    return this.cuentas.listar(paginacion.cursor, paginacion.limite);
+  @Roles("super_admin", "gestor_negocios")
+  listar(@Query() paginacion: PaginacionAdminDto, @Req() req: SolicitudConCuenta): Promise<ResultadoPaginado<Cuenta>> {
+    const soloRol = req.user.rol === "gestor_negocios" ? "dueno_negocio" : undefined;
+    return this.cuentas.listar(paginacion.cursor, paginacion.limite, soloRol);
   }
 
   // "yo" antes de ":id" a propósito — si no, Nest lo capturaría como un id literal. Estas
@@ -82,14 +89,42 @@ export class CuentasController {
     return this.cuentas.actualizarFotoPropia(req.user.id, archivo);
   }
 
+  /** gestor_negocios también crea cuentas — con el rol forzado a "dueño de negocio" dentro
+   * del service, no aquí: ver CuentasService.crear(). */
   @Post()
+  @Roles("super_admin", "gestor_negocios")
   crear(@Body() dto: CrearCuentaDto, @Req() req: SolicitudConCuenta): Promise<Cuenta> {
-    return this.cuentas.crear(dto, req.user.id);
+    return this.cuentas.crear(dto, req.user.id, req.user.rol);
   }
 
   @Put(":id")
   actualizar(@Param("id") id: string, @Body() dto: ActualizarCuentaDto): Promise<Cuenta> {
     return this.cuentas.actualizar(id, dto);
+  }
+
+  /**
+   * Angosto a propósito: vincula o quita UN negocio de UNA cuenta "dueño de negocio", nada
+   * más — a diferencia de PUT /cuentas/:id (que puede cambiar nombre, correo y rol de
+   * cualquier cuenta), esta es la única puerta que se abrió para gestor_negocios.
+   */
+  @Patch(":id/negocios/:negocioId")
+  @Roles("super_admin", "gestor_negocios")
+  vincularNegocio(
+    @Param("id") id: string,
+    @Param("negocioId") negocioId: string,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Cuenta> {
+    return this.cuentas.vincularNegocio(id, negocioId, req.user.id);
+  }
+
+  @Delete(":id/negocios/:negocioId")
+  @Roles("super_admin", "gestor_negocios")
+  desvincularNegocio(
+    @Param("id") id: string,
+    @Param("negocioId") negocioId: string,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Cuenta> {
+    return this.cuentas.desvincularNegocio(id, negocioId, req.user.id);
   }
 
   @Delete(":id")

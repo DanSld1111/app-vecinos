@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcryptjs";
-import { Cuenta, ResultadoPaginado } from "@app-vecinos/tipos";
+import { Cuenta, ResultadoPaginado, RolCuenta } from "@app-vecinos/tipos";
 import { BaseDatosService, Consultable } from "../../comun/base-datos/base-datos.service";
 import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
@@ -51,9 +51,19 @@ export class CuentasService {
    * keyset (creado_en, id), y de paso es más útil en un panel admin ("¿qué cuenta se creó
    * últimoo?") que el alfabético que tenía antes.
    */
-  async listar(cursor: string | undefined, limite: number): Promise<ResultadoPaginado<Cuenta>> {
+  /**
+   * `soloRol`: gestor_negocios solo llega a este listado para elegir a quién vincular un
+   * negocio — el controller fuerza `soloRol = "dueno_negocio"` para ese rol, nunca lo decide
+   * el cliente, así nunca ve validadores, otros gestores ni cuentas de super_admin.
+   */
+  async listar(cursor: string | undefined, limite: number, soloRol?: RolCuenta): Promise<ResultadoPaginado<Cuenta>> {
     const condiciones = ["c.eliminado_en IS NULL"];
     const valores: unknown[] = [];
+
+    if (soloRol) {
+      valores.push(soloRol);
+      condiciones.push(`c.rol = $${valores.length}`);
+    }
 
     const cursorDecodificado = decodificarCursor(cursor);
     if (cursorDecodificado) {
@@ -86,7 +96,16 @@ export class CuentasService {
     return rows[0] ? aCuenta(rows[0]) : null;
   }
 
-  async crear(dto: CrearCuentaDto, creadaPorCuentaId: string): Promise<Cuenta> {
+  /**
+   * `creadorRol`: gestor_negocios solo puede crear cuentas "dueño de negocio" — es lo único
+   * para lo que se le abrió este endpoint (ver docs/decisiones/0071). super_admin no tiene
+   * esta restricción. El controller es quien decide si puede llamar al endpoint; esto es la
+   * segunda capa, la que evita que arme una cuenta de otro rol a mano contra la API.
+   */
+  async crear(dto: CrearCuentaDto, creadaPorCuentaId: string, creadorRol?: RolCuenta): Promise<Cuenta> {
+    if (creadorRol === "gestor_negocios" && dto.rol !== "dueno_negocio") {
+      throw new ForbiddenException("Como gestor de negocios, solo puedes crear cuentas de dueño de negocio.");
+    }
     const id = `cuenta-${randomUUID()}`;
     const hash = await bcrypt.hash(dto.contrasena, RONDAS_BCRYPT);
 
@@ -130,6 +149,41 @@ export class CuentasService {
       }
       throw error;
     }
+  }
+
+  /**
+   * Vincular/desvincular un negocio a una cuenta "dueño de negocio" — a propósito mucho más
+   * angosto que `actualizar()` (que puede cambiar nombre, correo y rol de cualquier cuenta):
+   * esta es la única puerta que se le abrió a gestor_negocios, y por diseño no puede tocar
+   * nada más de la cuenta. Ver docs/decisiones/0071.
+   */
+  async vincularNegocio(cuentaId: string, negocioId: string, actorId: string): Promise<Cuenta> {
+    const cuenta = await this.obtenerFilaDuenoOFallar(cuentaId);
+    await this.bd.consultar(
+      "INSERT INTO cuenta_negocios (cuenta_id, negocio_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+      [cuentaId, negocioId],
+    );
+    await this.auditoria.registrar("vincular-negocio", "cuenta", cuentaId, actorId, { negocioId });
+    return (await this.obtenerPorId(cuentaId)) ?? cuenta;
+  }
+
+  async desvincularNegocio(cuentaId: string, negocioId: string, actorId: string): Promise<Cuenta> {
+    const cuenta = await this.obtenerFilaDuenoOFallar(cuentaId);
+    await this.bd.consultar("DELETE FROM cuenta_negocios WHERE cuenta_id = $1 AND negocio_id = $2", [
+      cuentaId,
+      negocioId,
+    ]);
+    await this.auditoria.registrar("desvincular-negocio", "cuenta", cuentaId, actorId, { negocioId });
+    return (await this.obtenerPorId(cuentaId)) ?? cuenta;
+  }
+
+  private async obtenerFilaDuenoOFallar(cuentaId: string): Promise<Cuenta> {
+    const cuenta = await this.obtenerPorId(cuentaId);
+    if (!cuenta) throw new NotFoundException(`No existe una cuenta con id "${cuentaId}"`);
+    if (cuenta.rol !== "dueno_negocio") {
+      throw new ForbiddenException("Solo se puede vincular un negocio a una cuenta con rol \"dueño de negocio\".");
+    }
+    return cuenta;
   }
 
   /**

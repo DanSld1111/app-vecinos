@@ -52,7 +52,7 @@ export class NegociosService {
         `SELECT ${COLUMNAS_NEGOCIO}
          FROM negocios n
          LEFT JOIN negocio_categorias nc ON nc.negocio_id = n.id
-         WHERE n.comunidad_id = $1 AND n.estado = 'activo' AND n.nombre ILIKE $2
+         WHERE n.comunidad_id = $1 AND n.estado = 'activo' AND n.archivado_en IS NULL AND n.nombre ILIKE $2
          GROUP BY n.id
          ORDER BY n.nombre
          LIMIT $3`,
@@ -67,7 +67,7 @@ export class NegociosService {
       `SELECT ${COLUMNAS_NEGOCIO}
        FROM negocios n
        LEFT JOIN negocio_categorias nc ON nc.negocio_id = n.id
-       WHERE n.id = ANY($1) AND n.estado = 'activo'
+       WHERE n.id = ANY($1) AND n.estado = 'activo' AND n.archivado_en IS NULL
        GROUP BY n.id`,
       [ids],
     );
@@ -82,7 +82,7 @@ export class NegociosService {
    * nunca algo que un vecino real deba ver — no es un filtro más, es una regla fija.
    */
   async listar(filtro: ListarNegociosDto): Promise<ResultadoPaginado<Negocio>> {
-    const condiciones: string[] = ["n.comunidad_id = $1", "n.estado = 'activo'"];
+    const condiciones: string[] = ["n.comunidad_id = $1", "n.estado = 'activo'", "n.archivado_en IS NULL"];
     const valores: unknown[] = [filtro.comunidadId];
 
     if (filtro.categoriaId) {
@@ -130,7 +130,7 @@ export class NegociosService {
       `SELECT ${COLUMNAS_NEGOCIO}
        FROM negocios n
        LEFT JOIN negocio_categorias nc ON nc.negocio_id = n.id
-       WHERE n.id = $1 AND n.estado = 'activo'
+       WHERE n.id = $1 AND n.estado = 'activo' AND n.archivado_en IS NULL
        GROUP BY n.id`,
       [id],
     );
@@ -160,7 +160,7 @@ export class NegociosService {
 
   /** Para la ficha del panel: cualquier estado, pero solo para quien administra ese negocio. */
   async obtenerParaAdmin(id: string, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarAccesoBasico(cuenta, id);
     return aNegocio(await this.obtenerFilaAdminOFallar(id));
   }
 
@@ -178,15 +178,27 @@ export class NegociosService {
   }
 
   /**
-   * Puede tocar la ficha: el propio dueño asignado, o cualquier cuenta con acceso total al
-   * módulo de negocios (super_admin y gestor_negocios). El gestor no tiene alcance por
-   * distrito aquí — a diferencia de aprobar/despublicar/rechazar más abajo — porque el pedido
-   * fue que administre TODOS los negocios, no un subconjunto.
+   * Acceso básico a la ficha: verla y editar información general (nombre, categoría,
+   * dirección, contacto). Incluye a gestor_negocios a propósito — es justo lo que su rol
+   * administrativo necesita para dar de alta y completar un negocio — pero NO a lo operativo
+   * (horario, fotos, productos, ofertas), que usa verificarGestionOperativa() más abajo.
    */
-  private verificarPropiedad(cuenta: Cuenta, negocioId: string): void {
+  private verificarAccesoBasico(cuenta: Cuenta, negocioId: string): void {
     if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
     if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
     throw new ForbiddenException("No administras este negocio.");
+  }
+
+  /**
+   * Gestión operativa del día a día: horario, fotos, productos, ofertas y galería. Ver
+   * docs/decisiones/0071-plan-v2-modulo-negocios.md — gestor_negocios queda deliberadamente
+   * afuera de este círculo: es un rol administrativo (alta + vínculo con el dueño), no quien
+   * lleva el negocio.
+   */
+  private verificarGestionOperativa(cuenta: Cuenta, negocioId: string): void {
+    if (cuenta.rol === "super_admin") return;
+    if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
+    throw new ForbiddenException("Esta acción es del dueño del negocio — un gestor administrativo no la tiene.");
   }
 
   /** Dueño de negocio: solo los suyos, sin importar su estado — necesita ver hasta lo rechazado. */
@@ -221,8 +233,16 @@ export class NegociosService {
    * Panel del super-admin: todos los negocios, sin importar su estado — paginado (antes traía
    * todo de una vez, sin límite; ver docs/decisiones/0021-endurecimiento-post-diagnostico.md).
    */
-  async listarAdmin(cursor: string | undefined, limite: number): Promise<ResultadoPaginado<Negocio>> {
-    const condiciones = ["true"];
+  /**
+   * `soloArchivados`: por defecto el listado del panel no muestra lo archivado (igual que un
+   * `eliminado_en` normal) — se pide explícitamente para ver esa vista ("Ver archivados").
+   */
+  async listarAdmin(
+    cursor: string | undefined,
+    limite: number,
+    soloArchivados = false,
+  ): Promise<ResultadoPaginado<Negocio>> {
+    const condiciones = [soloArchivados ? "n.archivado_en IS NOT NULL" : "n.archivado_en IS NULL"];
     const valores: unknown[] = [];
 
     const cursorDecodificado = decodificarCursor(cursor);
@@ -373,6 +393,55 @@ export class NegociosService {
   }
 
   /**
+   * Archivar: reversible. Sale del listado del panel (y de la app, igual que "despublicar")
+   * pero la fila y su historial —productos, reseñas— quedan intactos, listos para restaurar.
+   * Pensado para negocios que cerraron o se dieron de alta por error, no para una baja
+   * temporal (eso ya lo cubre despublicar). Solo super_admin — ver @Roles en el controller.
+   */
+  async archivar(id: string, cuenta: Cuenta): Promise<Negocio> {
+    await this.obtenerFilaAdminOFallar(id);
+    await this.bd.consultar("UPDATE negocios SET archivado_en = now(), actualizado_en = now() WHERE id = $1", [id]);
+    const negocio = aNegocio(await this.obtenerFilaAdminOFallar(id));
+    await this.busqueda.sincronizarNegocio({ ...negocio, estado: "inactivo" }); // fuera del índice mientras esté archivado
+    await this.auditoria.registrar("archivar", "negocio", id, cuenta.id);
+    return negocio;
+  }
+
+  async restaurarArchivo(id: string, cuenta: Cuenta): Promise<Negocio> {
+    await this.obtenerFilaAdminOFallar(id);
+    await this.bd.consultar("UPDATE negocios SET archivado_en = NULL, actualizado_en = now() WHERE id = $1", [id]);
+    const negocio = aNegocio(await this.obtenerFilaAdminOFallar(id));
+    await this.busqueda.sincronizarNegocio(negocio); // vuelve al índice si su estado sigue siendo "activo"
+    await this.auditoria.registrar("restaurar-archivo", "negocio", id, cuenta.id);
+    return negocio;
+  }
+
+  /**
+   * Borrado definitivo — sin vuelta atrás, a diferencia de Archivar. La fila se borra de
+   * verdad; productos, categorías del negocio y reseñas se van con ella en cascada (migración
+   * 0018), y los anuncios que la referenciaban quedan huérfanos (negocio_id → NULL) en vez de
+   * borrarse. El panel pide confirmación antes de llegar hasta acá — esto no vuelve a preguntar.
+   */
+  async eliminar(id: string, cuenta: Cuenta): Promise<void> {
+    const fila = await this.obtenerFilaAdminOFallar(id);
+    const negocio = aNegocio(fila);
+    const { rows: fotosProducto } = await this.bd.consultar<{ foto_url: string | null }>(
+      "SELECT foto_url FROM productos WHERE negocio_id = $1 AND foto_url IS NOT NULL",
+      [id],
+    );
+
+    await this.busqueda.sincronizarNegocio({ ...negocio, estado: "inactivo" });
+    await this.bd.consultar("DELETE FROM negocios WHERE id = $1", [id]);
+
+    await Promise.all([
+      this.almacenamiento.eliminarPorUrl(negocio.fotoPrincipalUrl),
+      ...negocio.fotosGaleria.map((url) => this.almacenamiento.eliminarPorUrl(url)),
+      ...fotosProducto.map((p) => this.almacenamiento.eliminarPorUrl(p.foto_url)),
+    ]);
+    await this.auditoria.registrar("eliminar", "negocio", id, cuenta.id, { nombre: negocio.nombre });
+  }
+
+  /**
    * Editar NO manda el negocio a revisión — ni para el dueño ni para el admin: el cambio se ve
    * en la app de inmediato (decisión del usuario, ver docs/decisiones/0066-edicion-sin-validacion.md).
    *
@@ -383,7 +452,7 @@ export class NegociosService {
    * nacen en `por_verificar` hasta que se publican.
    */
   async actualizarInfo(id: string, dto: ActualizarInfoNegocioDto, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarAccesoBasico(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
 
     await this.bd.transaccion(async (db) => {
@@ -426,7 +495,7 @@ export class NegociosService {
   }
 
   async actualizarHorarios(id: string, horarios: ActualizarHorariosDto, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarGestionOperativa(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
     await this.bd.consultar("UPDATE negocios SET horarios = $2, actualizado_en = now() WHERE id = $1", [
       id,
@@ -436,7 +505,7 @@ export class NegociosService {
   }
 
   async agregarOferta(id: string, dto: AgregarOfertaDto, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarGestionOperativa(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
     const oferta: OfertaNegocio = {
       nombre: dto.nombre,
@@ -452,7 +521,7 @@ export class NegociosService {
   }
 
   async eliminarOferta(id: string, indice: number, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarGestionOperativa(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
     // El cast ::int es obligatorio: sin él, Postgres resuelve "jsonb - $2" con el operador de
     // texto (borra por clave, no por posición) y la operación no hace nada, sin error visible.
@@ -470,7 +539,7 @@ export class NegociosService {
    * que alguien reemplaza su foto). Ver docs/decisiones/0021-endurecimiento-post-diagnostico.md.
    */
   async actualizarFoto(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarGestionOperativa(cuenta, id);
     const anterior = await this.obtenerFilaAdminOFallar(id);
     const url = await this.almacenamiento.subir(CARPETA_FOTOS_NEGOCIO, archivo.buffer, archivo.originalname, archivo.mimetype);
     await this.bd.consultar("UPDATE negocios SET foto_principal_url = $2, actualizado_en = now() WHERE id = $1", [id, url]);
@@ -488,7 +557,7 @@ export class NegociosService {
     archivo: Express.Multer.File,
     cuenta: Cuenta,
   ): Promise<Producto> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const { rows } = await this.bd.consultar<{ foto_url: string | null }>(
       "SELECT foto_url FROM productos WHERE id = $1 AND negocio_id = $2",
       [productoId, negocioId],
@@ -505,7 +574,7 @@ export class NegociosService {
 
   /** Quitar la foto sin borrar el producto — también borra el archivo de Supabase Storage. */
   async quitarFotoProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<Producto> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const anterior = await this.obtenerProductoOFallar(negocioId, productoId);
     await this.bd.consultar("UPDATE productos SET foto_url = NULL WHERE id = $1", [productoId]);
     await this.almacenamiento.eliminarPorUrl(anterior.fotoUrl);
@@ -526,15 +595,24 @@ export class NegociosService {
   }
 
   async crearProducto(negocioId: string, dto: GuardarProductoDto, cuenta: Cuenta): Promise<Producto> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     await this.obtenerFilaAdminOFallar(negocioId);
     const id = `prod-${randomUUID()}`;
     // Entra al final de su sección, no al principio — quien lo agrega espera verlo abajo.
     await this.bd.consultar(
-      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, orden)
-       VALUES ($1, $2, $3, $4, $5, $6, $7,
+      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, atributos, orden)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
                COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0))`,
-      [id, negocioId, dto.nombre, dto.descripcion, dto.precio, dto.categoriaMenu, dto.destacado ?? false],
+      [
+        id,
+        negocioId,
+        dto.nombre,
+        dto.descripcion,
+        dto.precio,
+        dto.categoriaMenu,
+        dto.destacado ?? false,
+        JSON.stringify(dto.atributos ?? {}),
+      ],
     );
     await this.auditoria.registrar("crear", "producto", id, cuenta.id, { negocioId });
     return this.obtenerProductoOFallar(negocioId, id);
@@ -546,14 +624,14 @@ export class NegociosService {
     dto: GuardarProductoDto,
     cuenta: Cuenta,
   ): Promise<Producto> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const anterior = await this.obtenerProductoOFallar(negocioId, productoId);
     // Si cambió de sección, se manda al final de la nueva: su posición anterior no significa
     // nada en otra lista.
     const cambioDeSeccion = dto.categoriaMenu !== anterior.categoriaMenu;
     await this.bd.consultar(
       `UPDATE productos
-       SET nombre = $3, descripcion = $4, precio = $5, categoria_menu = $6, destacado = $7,
+       SET nombre = $3, descripcion = $4, precio = $5, categoria_menu = $6, destacado = $7, atributos = $9,
            orden = CASE WHEN $8
                         THEN COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0)
                         ELSE orden END
@@ -567,6 +645,7 @@ export class NegociosService {
         dto.categoriaMenu,
         dto.destacado ?? false,
         cambioDeSeccion,
+        JSON.stringify(dto.atributos ?? {}),
       ],
     );
     await this.auditoria.registrar("actualizar", "producto", productoId, cuenta.id, { negocioId });
@@ -575,7 +654,7 @@ export class NegociosService {
 
   /** A la papelera (borrado lógico, recuperable). No se purga sola: ver eliminarProductoDefinitivo. */
   async eliminarProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<void> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const { rowCount } = await this.bd.consultar(
       "UPDATE productos SET eliminado_en = now() WHERE id = $1 AND negocio_id = $2 AND eliminado_en IS NULL",
       [productoId, negocioId],
@@ -585,7 +664,7 @@ export class NegociosService {
   }
 
   async restaurarProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<Producto> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const { rowCount } = await this.bd.consultar(
       "UPDATE productos SET eliminado_en = NULL WHERE id = $1 AND negocio_id = $2 AND eliminado_en IS NOT NULL",
       [productoId, negocioId],
@@ -597,7 +676,7 @@ export class NegociosService {
 
   /** Único borrado real: saca la fila y la foto de Supabase Storage. Sin vuelta atrás. */
   async eliminarProductoDefinitivo(negocioId: string, productoId: string, cuenta: Cuenta): Promise<void> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const producto = await this.obtenerProductoOFallar(negocioId, productoId);
     await this.bd.consultar("DELETE FROM productos WHERE id = $1 AND negocio_id = $2", [productoId, negocioId]);
     await this.almacenamiento.eliminarPorUrl(producto.fotoUrl);
@@ -606,7 +685,7 @@ export class NegociosService {
 
   /** La papelera es por negocio, no global: se ve dentro de la misma pestaña de productos. */
   async listarProductosPapelera(negocioId: string, cuenta: Cuenta): Promise<Producto[]> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     const { rows } = await this.bd.consultar<FilaProducto>(
       `SELECT ${COLUMNAS_PRODUCTO}
        FROM productos
@@ -619,7 +698,7 @@ export class NegociosService {
 
   /** Recibe los ids en el orden final (tras arrastrar) y les asigna 0..n de una sola vez. */
   async reordenarProductos(negocioId: string, idsEnOrden: string[], cuenta: Cuenta): Promise<Producto[]> {
-    this.verificarPropiedad(cuenta, negocioId);
+    this.verificarGestionOperativa(cuenta, negocioId);
     await this.bd.transaccion(async (db) => {
       for (const [indice, productoId] of idsEnOrden.entries()) {
         await db.consultar("UPDATE productos SET orden = $3 WHERE id = $1 AND negocio_id = $2", [
@@ -634,7 +713,7 @@ export class NegociosService {
 
   /** Hasta 6 fotos — solo se usan cuando el negocio no tiene menú/catálogo/servicios/ofertas (GaleriaNegocio.tsx). */
   async agregarFotoGaleria(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarGestionOperativa(cuenta, id);
     const anterior = await this.obtenerFilaAdminOFallar(id);
     if (anterior.fotos_galeria.length >= 6) {
       throw new ForbiddenException("Ya se subieron las 6 fotos de galería permitidas — borra alguna primero.");
@@ -648,7 +727,7 @@ export class NegociosService {
   }
 
   async eliminarFotoGaleria(id: string, url: string, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarPropiedad(cuenta, id);
+    this.verificarGestionOperativa(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
     await this.bd.consultar(
       "UPDATE negocios SET fotos_galeria = array_remove(fotos_galeria, $2), actualizado_en = now() WHERE id = $1",

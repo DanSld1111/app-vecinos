@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Negocio, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
+import { useCategorias } from "../../estado/useCategorias";
 import * as api from "../../datos/productosApi";
 import { DatosProducto } from "../../datos/productosApi";
 import { ModalProducto } from "./ModalProducto";
@@ -52,6 +53,16 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   }, [productos]);
 
   const precioDe = (valor: number) => formatearPrecio(valor, negocio.moneda);
+
+  // La categoría principal (la primera de la lista) define qué campos extra pide el producto —
+  // ej. talla/color en Moda. Un negocio con varias categorías no combina sus plantillas: la
+  // primera es la que manda, igual que el resto del panel la trata como "la" categoría del
+  // negocio. Ver docs/decisiones/0071-plan-v2-modulo-negocios.md.
+  const categorias = useCategorias((estado) => estado.categorias);
+  const atributosDef = useMemo(() => {
+    const categoriaPrincipal = categorias.find((c) => c.id === negocio.categoriaIds[0]);
+    return categoriaPrincipal?.atributosProducto ?? [];
+  }, [categorias, negocio.categoriaIds]);
 
   async function guardar(datos: DatosProducto, fotoNueva: File | null) {
     // Al crear, la foto va en un segundo paso: hasta que el producto no existe no hay id al que
@@ -262,6 +273,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           moneda={negocio.moneda}
           seccionSugerida={creandoEn ?? ""}
           secciones={secciones.map((s) => s.nombre)}
+          atributosDef={atributosDef}
           onGuardar={guardar}
           onCerrar={() => {
             setEditando(null);

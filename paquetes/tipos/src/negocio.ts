@@ -50,6 +50,9 @@ export interface Negocio {
   moneda: Moneda;
   fotoPrincipalUrl: string | null;
   estado: EstadoNegocio;
+  /** Archivado (reversible, distinto de "despublicado"): retirado del listado y de la búsqueda
+   * hasta que alguien lo restaure. null = no archivado. Ver docs/decisiones/0071. */
+  archivadoEn: string | null;
   verificadoEn: string | null;
   /** Cuenta (Validador de contenido) que aprobó o rechazó el último envío. null mientras esté "por_verificar". */
   validadoPorCuentaId: string | null;
