@@ -95,6 +95,16 @@ export class NegociosController {
     return negocio;
   }
 
+  /**
+   * Igual que el anterior pero sin filtrar por estado: la ficha del panel necesita abrir
+   * negocios que todavía no se publicaron (el endpoint público solo devuelve los activos).
+   */
+  @Get(":id/admin")
+  @UseGuards(JwtAuthGuard)
+  obtenerParaAdmin(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<Negocio> {
+    return this.negocios.obtenerParaAdmin(id, req.user);
+  }
+
   @Get(":id/productos")
   listarProductos(@Param("id") id: string): Promise<Producto[]> {
     return this.negocios.listarProductos(id);

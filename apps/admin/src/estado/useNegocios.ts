@@ -10,7 +10,9 @@ type NegocioNuevo = Pick<
 type InfoEditable = Pick<
   Negocio,
   "nombre" | "descripcion" | "categoriaIds" | "direccion" | "telefono" | "whatsapp"
->;
+> &
+  // Opcionales en la API: si no van, se deja lo que ya había (ver PUT :id/info).
+  Partial<Pick<Negocio, "coordenada" | "moneda">>;
 
 interface EstadoNegocios {
   negocios: Negocio[];
@@ -25,6 +27,8 @@ interface EstadoNegocios {
   /** Panel del super-admin: todos los negocios, sin importar su estado. */
   cargarAdmin: (token: string) => Promise<void>;
   cargarMasAdmin: (token: string) => Promise<void>;
+  /** Un negocio suelto, sin importar su estado — para abrir su ficha directo por URL. */
+  cargarUno: (id: string, token: string) => Promise<Negocio | null>;
   /** Cola de validación: solo por_verificar, ya acotados por el servidor al alcance de la cuenta. */
   cargarPendientes: (token: string) => Promise<void>;
   /** Historial: ya resueltos, acotados por el servidor al alcance de la cuenta. */
@@ -71,6 +75,23 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
       set({ negocios: items, cursorSiguiente, cargando: false });
     } catch (error) {
       set({ error: mensajeError(error, "No se pudieron cargar los negocios."), cargando: false });
+    }
+  },
+
+  cargarUno: async (id, token) => {
+    try {
+      const negocio = await apiFetch<Negocio>(`/negocios/${id}/admin`, { token });
+      // Se mezcla en la lista para que la ficha y el listado compartan la misma fuente: así
+      // cualquier edición se refleja en los dos sin recargar.
+      set((estado) => ({
+        negocios: estado.negocios.some((n) => n.id === id)
+          ? estado.negocios.map((n) => (n.id === id ? negocio : n))
+          : [...estado.negocios, negocio],
+      }));
+      return negocio;
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo cargar el negocio.") });
+      return null;
     }
   },
 

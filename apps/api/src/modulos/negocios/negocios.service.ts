@@ -158,6 +158,12 @@ export class NegociosService {
     return rows.map(aProducto);
   }
 
+  /** Para la ficha del panel: cualquier estado, pero solo para quien administra ese negocio. */
+  async obtenerParaAdmin(id: string, cuenta: Cuenta): Promise<Negocio> {
+    this.verificarPropiedad(cuenta, id);
+    return aNegocio(await this.obtenerFilaAdminOFallar(id));
+  }
+
   private async obtenerFilaAdminOFallar(id: string): Promise<FilaNegocio> {
     const { rows } = await this.bd.consultar<FilaNegocio>(
       `SELECT ${COLUMNAS_NEGOCIO}

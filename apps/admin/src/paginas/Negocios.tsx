@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { EstadoNegocio, Negocio } from "@app-vecinos/tipos";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { EstadoNegocio } from "@app-vecinos/tipos";
 import { useNegocios } from "../estado/useNegocios";
 import { useGeografia } from "../estado/useGeografia";
 import { useCuentas } from "../estado/useCuentas";
@@ -26,6 +26,7 @@ interface PasswordPendiente {
 }
 
 export function Negocios() {
+  const navegar = useNavigate();
   const negociosMock = useNegocios((estado) => estado.negocios);
   const cargandoNegocios = useNegocios((estado) => estado.cargando);
   const errorNegocios = useNegocios((estado) => estado.error);
@@ -37,10 +38,8 @@ export function Negocios() {
   const distritos = useGeografia((estado) => estado.distritos);
   const comunidades = useGeografia((estado) => estado.comunidades);
   const token = useSesionAdmin((estado) => estado.token)!;
-  const cuentas = useCuentas((estado) => estado.cuentas);
   const cargarCuentas = useCuentas((estado) => estado.cargar);
   const crearCuenta = useCuentas((estado) => estado.crear);
-  const agregarNegocio = useCuentas((estado) => estado.agregarNegocio);
   const categorias = useCategorias((estado) => estado.categorias);
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export function Negocios() {
   const [busqueda, setBusqueda] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState<FiltroEstado>("todos");
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
-  const [negocioSeleccionado, setNegocioSeleccionado] = useState<Negocio | null>(null);
   const [modalNuevo, setModalNuevo] = useState(false);
   const [passwordPendiente, setPasswordPendiente] = useState<PasswordPendiente | null>(null);
 
@@ -82,10 +80,6 @@ export function Negocios() {
       porcentajeVerificado: negociosMock.length ? Math.round((activos / negociosMock.length) * 100) : 0,
     };
   }, [negociosMock]);
-
-  function duenoDe(negocioId: string) {
-    return cuentas.find((c) => c.rol === "dueno_negocio" && c.negocioIds.includes(negocioId)) ?? null;
-  }
 
   async function alCrearDueno(negocioId: string, nombre: string, correo: string) {
     const contrasena = generarContrasenaTemporal();
@@ -210,9 +204,9 @@ export function Negocios() {
       <div className="lista-negocios">
         {negocios.map((negocio) => (
           <div
-            className={`fila-negocio ${negocioSeleccionado?.id === negocio.id ? "seleccionada" : ""}`}
+            className="fila-negocio"
             key={negocio.id}
-            onClick={() => setNegocioSeleccionado(negocio)}
+            onClick={() => navegar(`/negocios/${negocio.id}`)}
           >
             <div className="foto-negocio">🖼️</div>
             <div className="info-negocio">
@@ -262,20 +256,11 @@ export function Negocios() {
             const id = await crearNegocio(datos, token);
             if (!id) return;
             setModalNuevo(false);
-            if (dueno) alCrearDueno(id, dueno.nombre, dueno.correo);
+            if (dueno) await alCrearDueno(id, dueno.nombre, dueno.correo);
+            // Alta rápida: se crea con lo mínimo y se cae directo en la ficha para completar
+            // foto, horario y productos con la lista de "qué falta" a la vista.
+            navegar(`/negocios/${id}`);
           }}
-        />
-      ) : null}
-
-      {negocioSeleccionado ? (
-        <DrawerNegocio
-          negocio={negocioSeleccionado}
-          categoriaPorId={categoriaPorId}
-          dueno={duenoDe(negocioSeleccionado.id)}
-          cuentasDueno={cuentas.filter((c) => c.rol === "dueno_negocio")}
-          onCerrar={() => setNegocioSeleccionado(null)}
-          onCrearDueno={(nombre, correo) => alCrearDueno(negocioSeleccionado.id, nombre, correo)}
-          onVincularDueno={(cuentaId) => agregarNegocio(cuentaId, negocioSeleccionado.id, token)}
         />
       ) : null}
 
@@ -451,200 +436,5 @@ function ModalNuevoNegocio({
         </div>
       </div>
     </div>
-  );
-}
-
-function DrawerNegocio({
-  negocio,
-  categoriaPorId,
-  dueno,
-  cuentasDueno,
-  onCerrar,
-  onCrearDueno,
-  onVincularDueno,
-}: {
-  negocio: Negocio;
-  categoriaPorId: Record<string, { nombre: string; icono: string }>;
-  dueno: ReturnType<typeof useCuentas.getState>["cuentas"][number] | null;
-  cuentasDueno: ReturnType<typeof useCuentas.getState>["cuentas"];
-  onCerrar: () => void;
-  onCrearDueno: (nombre: string, correo: string) => void;
-  onVincularDueno: (cuentaId: string) => void;
-}) {
-  const [modoAsignacion, setModoAsignacion] = useState<"ninguno" | "crear" | "vincular">("ninguno");
-  const [nombreDueno, setNombreDueno] = useState("");
-  const [correoDueno, setCorreoDueno] = useState("");
-  const [cuentaAVincular, setCuentaAVincular] = useState("");
-
-  function confirmarDueno() {
-    if (!nombreDueno.trim() || !correoDueno.trim()) return;
-    onCrearDueno(nombreDueno.trim(), correoDueno.trim());
-    setModoAsignacion("ninguno");
-    setNombreDueno("");
-    setCorreoDueno("");
-  }
-
-  function confirmarVinculo() {
-    if (!cuentaAVincular) return;
-    onVincularDueno(cuentaAVincular);
-    setModoAsignacion("ninguno");
-    setCuentaAVincular("");
-  }
-
-  return (
-    <>
-      <div className="fondo-drawer" onClick={onCerrar} />
-      <div className="drawer">
-        <div className="drawer-cierre">
-          <button onClick={onCerrar} type="button">✕</button>
-        </div>
-
-        <div className="drawer-foto">🖼️</div>
-        <div className="drawer-titulo">
-          <b>{negocio.nombre}</b>
-        </div>
-        <p className="drawer-desc">{negocio.descripcion || "Sin descripción todavía."}</p>
-
-        {negocio.estado === "por_verificar" ? (
-          <div className="aviso-pendiente-drawer">⏳ Este negocio está esperando validación de contenido.</div>
-        ) : null}
-        {negocio.motivoRechazo ? (
-          <div className="aviso-rechazo-drawer">✕ Último rechazo: {negocio.motivoRechazo}</div>
-        ) : null}
-
-        <div className="drawer-seccion">
-          <div className="etiqueta">Dueño del negocio</div>
-          {dueno ? (
-            <div className="drawer-dueno-card">
-              <div className="avatar-dueno">👤</div>
-              <div>
-                <b>{dueno.nombre}</b>
-                <span>{dueno.correo}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="drawer-sin-dueno">
-              <p>Este negocio todavía no tiene una cuenta de dueño vinculada.</p>
-
-              {modoAsignacion === "crear" ? (
-                <div className="form-inline-dueno">
-                  <input
-                    autoFocus
-                    placeholder="Nombre del dueño"
-                    value={nombreDueno}
-                    onChange={(e) => setNombreDueno(e.target.value)}
-                  />
-                  <input
-                    placeholder="Correo"
-                    value={correoDueno}
-                    onChange={(e) => setCorreoDueno(e.target.value)}
-                  />
-                  <div className="fila-botones-inline">
-                    <button
-                      style={{ background: "var(--coral)", color: "#fff" }}
-                      onClick={confirmarDueno}
-                      type="button"
-                    >
-                      Crear cuenta
-                    </button>
-                    <button
-                      style={{ background: "var(--superficie-hundida)", color: "var(--texto-suave)" }}
-                      onClick={() => setModoAsignacion("ninguno")}
-                      type="button"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              ) : modoAsignacion === "vincular" ? (
-                <div className="form-inline-dueno">
-                  {cuentasDueno.length === 0 ? (
-                    <p style={{ fontSize: 11, color: "var(--coral-fuerte)", margin: 0 }}>
-                      Todavía no hay ninguna cuenta con rol "Dueño de negocio" creada.
-                    </p>
-                  ) : (
-                    <select value={cuentaAVincular} onChange={(e) => setCuentaAVincular(e.target.value)} autoFocus>
-                      <option value="">— seleccionar cuenta —</option>
-                      {cuentasDueno.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.nombre} ({c.correo}){c.negocioIds.length > 0 ? ` — ya administra ${c.negocioIds.length}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  <div className="fila-botones-inline">
-                    <button
-                      style={{ background: "var(--coral)", color: "#fff" }}
-                      onClick={confirmarVinculo}
-                      disabled={!cuentaAVincular}
-                      type="button"
-                    >
-                      Vincular
-                    </button>
-                    <button
-                      style={{ background: "var(--superficie-hundida)", color: "var(--texto-suave)" }}
-                      onClick={() => setModoAsignacion("ninguno")}
-                      type="button"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="fila-botones-inline">
-                  <button className="btn-crear-dueno" onClick={() => setModoAsignacion("crear")} type="button">
-                    ＋ Crear cuenta nueva
-                  </button>
-                  <button
-                    className="btn-crear-dueno"
-                    style={{ background: "var(--azul)" }}
-                    onClick={() => setModoAsignacion("vincular")}
-                    type="button"
-                  >
-                    🔗 Vincular existente
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="drawer-seccion">
-          <div className="etiqueta">Detalles</div>
-          <div className="drawer-fila-dato">
-            <span className="icono-dato">📍</span>
-            {negocio.direccion}
-          </div>
-          <div className="drawer-fila-dato">
-            <span className="icono-dato">🏷️</span>
-            {negocio.categoriaIds.map((id) => categoriaPorId[id]?.nombre ?? id).join(", ") || "Sin categoría"}
-          </div>
-          <div className="drawer-fila-dato">
-            <span className="icono-dato">📞</span>
-            {negocio.telefono || "Sin teléfono"}
-          </div>
-          <div className="drawer-fila-dato">
-            <span className="icono-dato">💬</span>
-            {negocio.whatsapp || "Sin WhatsApp"}
-          </div>
-        </div>
-
-        <div className="drawer-acciones">
-          {negocio.estado === "por_verificar" ? (
-            <Link className="btn-drawer-validacion" to="/validacion">
-              Ir a Cola de validación →
-            </Link>
-          ) : null}
-          <button
-            className="btn-drawer-primario"
-            disabled
-            title="El editor completo de ficha (horario, fotos, ofertas) todavía no está construido"
-            style={{ opacity: 0.55, cursor: "not-allowed" }}
-          >
-            Editar ficha completa → (próximamente)
-          </button>
-        </div>
-      </div>
-    </>
   );
 }
