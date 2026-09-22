@@ -26,10 +26,10 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "estado", icono: "✅", texto: "Estado" },
 ];
 
-/** gestor_negocios es administrativo: da de alta, conecta con el dueño y carga los primeros
- * productos del alta — nada del resto de lo operativo (horario, fotos, ofertas, publicar).
+/** gestor_negocios es administrativo: da de alta, conecta con el dueño, carga los primeros
+ * productos y la foto del negocio — nada del resto de lo operativo (horario, ofertas, publicar).
  * Ver docs/decisiones/0071. */
-const PESTANAS_GESTOR: Pestana[] = ["info", "dueno", "productos", "estado"];
+const PESTANAS_GESTOR: Pestana[] = ["info", "dueno", "fotos", "productos", "estado"];
 
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;

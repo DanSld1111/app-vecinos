@@ -191,10 +191,11 @@ export class NegociosService {
   }
 
   /**
-   * Gestión operativa del día a día: horario, fotos, ofertas y galería. Ver
+   * Gestión operativa del día a día: horario y ofertas. Ver
    * docs/decisiones/0071-plan-v2-modulo-negocios.md — gestor_negocios queda deliberadamente
    * afuera de este círculo: es un rol administrativo (alta + vínculo con el dueño), no quien
-   * lleva el negocio. (Productos es la excepción — ver verificarAccesoProductos() más abajo.)
+   * lleva el negocio. (Productos y fotos son la excepción — ver verificarAccesoProductos() y
+   * verificarAccesoFotos() más abajo.)
    */
   private verificarGestionOperativa(cuenta: Cuenta, negocioId: string): void {
     if (cuenta.rol === "super_admin") return;
@@ -205,11 +206,22 @@ export class NegociosService {
   /**
    * Productos: a diferencia del resto de lo operativo, sí incluye a gestor_negocios — el paso 3
    * del alta en pantalla completa (agregar el primer producto) lo necesita, y de ahí se decidió
-   * abrirlo para productos en general, no solo el primero. Horario, fotos, ofertas y galería
-   * siguen siendo exclusivos del dueño vía verificarGestionOperativa(). Ver
+   * abrirlo para productos en general, no solo el primero. Ver
    * docs/decisiones/0071-plan-v2-modulo-negocios.md.
    */
   private verificarAccesoProductos(cuenta: Cuenta, negocioId: string): void {
+    if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
+    if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
+    throw new ForbiddenException("No administras este negocio.");
+  }
+
+  /**
+   * Foto principal y galería: mismo criterio que productos — gestor_negocios completa la ficha
+   * recién dada de alta (foto incluida) sin depender de que el dueño ya tenga cuenta. Horario y
+   * ofertas siguen siendo exclusivos del dueño vía verificarGestionOperativa(). Ver
+   * docs/decisiones/0071-plan-v2-modulo-negocios.md.
+   */
+  private verificarAccesoFotos(cuenta: Cuenta, negocioId: string): void {
     if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
     if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
     throw new ForbiddenException("No administras este negocio.");
@@ -553,7 +565,7 @@ export class NegociosService {
    * que alguien reemplaza su foto). Ver docs/decisiones/0021-endurecimiento-post-diagnostico.md.
    */
   async actualizarFoto(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarGestionOperativa(cuenta, id);
+    this.verificarAccesoFotos(cuenta, id);
     const anterior = await this.obtenerFilaAdminOFallar(id);
     const url = await this.almacenamiento.subir(CARPETA_FOTOS_NEGOCIO, archivo.buffer, archivo.originalname, archivo.mimetype);
     await this.bd.consultar("UPDATE negocios SET foto_principal_url = $2, actualizado_en = now() WHERE id = $1", [id, url]);
@@ -727,7 +739,7 @@ export class NegociosService {
 
   /** Hasta 6 fotos — solo se usan cuando el negocio no tiene menú/catálogo/servicios/ofertas (GaleriaNegocio.tsx). */
   async agregarFotoGaleria(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarGestionOperativa(cuenta, id);
+    this.verificarAccesoFotos(cuenta, id);
     const anterior = await this.obtenerFilaAdminOFallar(id);
     if (anterior.fotos_galeria.length >= 6) {
       throw new ForbiddenException("Ya se subieron las 6 fotos de galería permitidas — borra alguna primero.");
@@ -741,7 +753,7 @@ export class NegociosService {
   }
 
   async eliminarFotoGaleria(id: string, url: string, cuenta: Cuenta): Promise<Negocio> {
-    this.verificarGestionOperativa(cuenta, id);
+    this.verificarAccesoFotos(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
     await this.bd.consultar(
       "UPDATE negocios SET fotos_galeria = array_remove(fotos_galeria, $2), actualizado_en = now() WHERE id = $1",
