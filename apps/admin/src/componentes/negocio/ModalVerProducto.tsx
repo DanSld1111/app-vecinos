@@ -29,9 +29,22 @@ export function ModalVerProducto({
         <h3>{producto.nombre}</h3>
         {producto.destacado ? <span className="pill pill-oro">Más pedido</span> : null}
 
-        <div className="foto-servicio" style={{ width: "100%", aspectRatio: "1.6", borderRadius: 10, margin: "12px 0" }}>
+        <div
+          style={{
+            width: "100%",
+            aspectRatio: "1.6",
+            borderRadius: 10,
+            margin: "12px 0",
+            overflow: "hidden",
+            background: "var(--superficie-hundida)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 32,
+          }}
+        >
           {producto.fotoUrl ? (
-            <img src={urlCompleta(producto.fotoUrl)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={urlCompleta(producto.fotoUrl)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           ) : (
             "🖼️"
           )}

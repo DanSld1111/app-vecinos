@@ -89,16 +89,26 @@ export function ModalProducto({
         <div style={{ display: "grid", gridTemplateColumns: "130px minmax(0,1fr)", gap: 14 }}>
           <div>
             <div
-              className="foto-servicio"
-              style={{ width: "100%", aspectRatio: "1", borderRadius: 10, overflow: "hidden" }}
+              style={{
+                width: "100%",
+                aspectRatio: "1",
+                borderRadius: 10,
+                overflow: "hidden",
+                background: "var(--superficie-hundida)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--texto-tenue)",
+                fontSize: 28,
+              }}
             >
               {previsualizacion ? (
-                <img src={previsualizacion} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <img src={previsualizacion} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               ) : producto?.fotoUrl ? (
                 <img
                   src={urlCompleta(producto.fotoUrl)}
                   alt=""
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               ) : (
                 "🖼️"
