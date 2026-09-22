@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
 import { DatosProducto } from "../../datos/productosApi";
 import { urlCompleta } from "../../utilidades/media";
+import { SelectorColorAtributo } from "./SelectorColorAtributo";
 
 const TIPOS_ACEPTADOS = "image/jpeg,image/png,image/webp";
 
@@ -16,6 +17,7 @@ export function ModalProducto({
   seccionSugerida,
   secciones,
   atributosDef = [],
+  mostrarSeccion = true,
   onGuardar,
   onEliminar,
   onQuitarFoto,
@@ -29,6 +31,10 @@ export function ModalProducto({
   /** Campos propios de la categoría del negocio (talla en Moda, picante en Comida…). Vacío =
    * esta categoría no define ninguno, y el formulario se queda como estaba. */
   atributosDef?: AtributoProductoDef[];
+  /** false = la categoría del negocio no usa carta/menú (todo lo que no sea "menu" en
+   * ArquetipoFicha) — el campo no tiene sentido ahí, así que ni se muestra: el producto se
+   * guarda con categoriaMenu = "General" sin pedírselo a la persona. */
+  mostrarSeccion?: boolean;
   onGuardar: (datos: DatosProducto, fotoNueva: File | null) => Promise<void>;
   onEliminar?: () => Promise<void>;
   onQuitarFoto?: () => Promise<void>;
@@ -37,7 +43,7 @@ export function ModalProducto({
   const [nombre, setNombre] = useState(producto?.nombre ?? "");
   const [descripcion, setDescripcion] = useState(producto?.descripcion ?? "");
   const [precio, setPrecio] = useState(producto ? String(producto.precio) : "");
-  const [categoriaMenu, setCategoriaMenu] = useState(producto?.categoriaMenu ?? seccionSugerida);
+  const [categoriaMenu, setCategoriaMenu] = useState(producto?.categoriaMenu || seccionSugerida || "General");
   const [destacado, setDestacado] = useState(producto?.destacado ?? false);
   const [atributos, setAtributos] = useState<Record<string, string>>(producto?.atributos ?? {});
   const [fotoNueva, setFotoNueva] = useState<File | null>(null);
@@ -156,25 +162,27 @@ export function ModalProducto({
                 placeholder="Ej. Con papas fritas, arroz y ensalada criolla."
               />
             </div>
-            <div className="fila-2-campos">
+            <div className={mostrarSeccion ? "fila-2-campos" : undefined}>
               <div className="campo-modal">
                 <label>Precio ({SIMBOLO_MONEDA[moneda]})</label>
                 <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Ej. 28" />
               </div>
-              <div className="campo-modal">
-                <label>Sección del menú</label>
-                <input
-                  value={categoriaMenu}
-                  onChange={(e) => setCategoriaMenu(e.target.value)}
-                  placeholder="Ej. Platos de fondo"
-                  list="secciones-menu"
-                />
-                <datalist id="secciones-menu">
-                  {secciones.map((s) => (
-                    <option key={s} value={s} />
-                  ))}
-                </datalist>
-              </div>
+              {mostrarSeccion ? (
+                <div className="campo-modal">
+                  <label>Sección del menú</label>
+                  <input
+                    value={categoriaMenu}
+                    onChange={(e) => setCategoriaMenu(e.target.value)}
+                    placeholder="Ej. Platos de fondo"
+                    list="secciones-menu"
+                  />
+                  <datalist id="secciones-menu">
+                    {secciones.map((s) => (
+                      <option key={s} value={s} />
+                    ))}
+                  </datalist>
+                </div>
+              ) : null}
             </div>
 
             {atributosDef.length > 0 ? (
@@ -194,6 +202,11 @@ export function ModalProducto({
                           </option>
                         ))}
                       </select>
+                    ) : def.tipo === "color" ? (
+                      <SelectorColorAtributo
+                        valor={atributos[def.clave] ?? ""}
+                        onCambiar={(clave) => setAtributos((a) => ({ ...a, [def.clave]: clave }))}
+                      />
                     ) : (
                       <input
                         value={atributos[def.clave] ?? ""}

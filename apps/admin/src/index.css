@@ -3038,6 +3038,23 @@ tr:last-child td {
 .selector-categoria-fila:hover { background: var(--superficie-hundida); }
 .selector-categoria-fila.activa { background: var(--verde-suave); color: var(--verde-fuerte); }
 
+/* ---- Acciones CRUD por fila (Ver/Editar/Eliminar) ---- */
+.btn-icono-crud {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--borde);
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.btn-icono-crud:hover { border-color: var(--verde); }
+.btn-icono-crud--rojo { border-color: var(--rojo); background: var(--rojo-suave); color: var(--rojo); }
+
 /* ---- Registrar negocio: pantalla completa por pasos ---- */
 .pantalla-registro {
   display: flex;

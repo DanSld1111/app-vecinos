@@ -5,6 +5,7 @@ import { useCategorias } from "../../estado/useCategorias";
 import * as api from "../../datos/productosApi";
 import { DatosProducto } from "../../datos/productosApi";
 import { ModalProducto } from "./ModalProducto";
+import { ModalVerProducto } from "./ModalVerProducto";
 import { urlCompleta } from "../../utilidades/media";
 
 /**
@@ -20,6 +21,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   const [papelera, setPapelera] = useState<Producto[]>([]);
   const [verPapelera, setVerPapelera] = useState(false);
   const [editando, setEditando] = useState<Producto | null>(null);
+  const [viendo, setViendo] = useState<Producto | null>(null);
   const [creandoEn, setCreandoEn] = useState<string | null>(null);
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const [confirmandoBorrado, setConfirmandoBorrado] = useState<string | null>(null);
@@ -59,10 +61,14 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   // primera es la que manda, igual que el resto del panel la trata como "la" categoría del
   // negocio. Ver docs/decisiones/0071-plan-v2-modulo-negocios.md.
   const categorias = useCategorias((estado) => estado.categorias);
-  const atributosDef = useMemo(() => {
-    const categoriaPrincipal = categorias.find((c) => c.id === negocio.categoriaIds[0]);
-    return categoriaPrincipal?.atributosProducto ?? [];
-  }, [categorias, negocio.categoriaIds]);
+  const categoriaPrincipal = useMemo(
+    () => categorias.find((c) => c.id === negocio.categoriaIds[0]),
+    [categorias, negocio.categoriaIds],
+  );
+  const atributosDef = categoriaPrincipal?.atributosProducto ?? [];
+  // "Sección del menú" solo tiene sentido para categorías tipo carta (restaurantes) — para
+  // catálogo, servicios, rubros u ofertas es un campo sin relación con lo que se está cargando.
+  const mostrarSeccion = categoriaPrincipal?.arquetipoFicha === "menu";
 
   async function guardar(datos: DatosProducto, fotoNueva: File | null) {
     // Al crear, la foto va en un segundo paso: hasta que el producto no existe no hay id al que
@@ -144,25 +150,14 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
 
       {secciones.map((seccion) => (
         <div key={seccion.nombre} style={{ marginBottom: 18 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 8,
-              marginBottom: 8,
-            }}
-          >
-            <b style={{ fontSize: 12.5 }}>
+          {mostrarSeccion ? (
+            <b style={{ fontSize: 12.5, display: "block", marginBottom: 8 }}>
               {seccion.nombre}{" "}
               <span style={{ color: "var(--texto-tenue)", fontWeight: 400 }}>
                 · {seccion.productos.length} producto{seccion.productos.length === 1 ? "" : "s"}
               </span>
             </b>
-            <button className="btn-accion-mini" onClick={() => setCreandoEn(seccion.nombre)}>
-              ＋ Agregar aquí
-            </button>
-          </div>
+          ) : null}
 
           <div className="lista-fotos-producto">
             {seccion.productos.map((producto) => (
@@ -190,9 +185,21 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                   ) : null}
                 </span>
                 <b style={{ fontSize: 12.5, whiteSpace: "nowrap" }}>{precioDe(producto.precio)}</b>
-                <button className="btn-accion-mini" onClick={() => setEditando(producto)}>
-                  Editar
-                </button>
+                <div style={{ display: "flex", gap: 4 }}>
+                  <button className="btn-icono-crud" title="Ver" onClick={() => setViendo(producto)}>
+                    👁️
+                  </button>
+                  <button className="btn-icono-crud" title="Editar" onClick={() => setEditando(producto)}>
+                    ✏️
+                  </button>
+                  <button
+                    className="btn-icono-crud btn-icono-crud--rojo"
+                    title="Enviar a papelera"
+                    onClick={() => accion(() => api.eliminarProducto(negocio.id, producto.id, token))}
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -267,6 +274,19 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
         ) : null}
       </div>
 
+      {viendo ? (
+        <ModalVerProducto
+          producto={viendo}
+          moneda={negocio.moneda}
+          atributosDef={atributosDef}
+          onCerrar={() => setViendo(null)}
+          onEditar={() => {
+            setEditando(viendo);
+            setViendo(null);
+          }}
+        />
+      ) : null}
+
       {editando || creandoEn !== null ? (
         <ModalProducto
           producto={editando}
@@ -274,6 +294,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           seccionSugerida={creandoEn ?? ""}
           secciones={secciones.map((s) => s.nombre)}
           atributosDef={atributosDef}
+          mostrarSeccion={mostrarSeccion}
           onGuardar={guardar}
           onCerrar={() => {
             setEditando(null);

@@ -8,10 +8,12 @@ import { useCategorias } from "../estado/useCategorias";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { generarContrasenaTemporal } from "../utilidades/contrasena";
 import { urlCompleta } from "../utilidades/media";
+import { soloDigitos } from "../utilidades/telefono";
 import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
 import { SelectorCategoria } from "../componentes/negocio/SelectorCategoria";
 import { CampoDireccionConMapa } from "../componentes/negocio/CampoDireccionConMapa";
 import { ModalProducto } from "../componentes/negocio/ModalProducto";
+import { SelectorColorAtributo } from "../componentes/negocio/SelectorColorAtributo";
 import * as productosApi from "../datos/productosApi";
 import { DatosProducto } from "../datos/productosApi";
 
@@ -88,6 +90,7 @@ export function RegistrarNegocio() {
 
   const categoriaActual = categorias.find((c) => c.id === categoriaId) ?? null;
   const atributosDef = categoriaActual?.atributosProducto ?? [];
+  const mostrarSeccion = categoriaActual?.arquetipoFicha === "menu";
 
   // Dueño (paso 2)
   const cuentas = useCuentas((estado) => estado.cuentas);
@@ -280,11 +283,23 @@ export function RegistrarNegocio() {
                   <div className="fila-2-campos-alta">
                     <div className="campo-modal" style={{ marginBottom: 0 }}>
                       <label>Teléfono</label>
-                      <input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej. 01 234 5678" />
+                      <input
+                        value={telefono}
+                        onChange={(e) => setTelefono(soloDigitos(e.target.value))}
+                        inputMode="numeric"
+                        maxLength={9}
+                        placeholder="9 dígitos"
+                      />
                     </div>
                     <div className="campo-modal" style={{ marginBottom: 0 }}>
                       <label>WhatsApp</label>
-                      <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ej. 987654321" />
+                      <input
+                        value={whatsapp}
+                        onChange={(e) => setWhatsapp(soloDigitos(e.target.value))}
+                        inputMode="numeric"
+                        maxLength={9}
+                        placeholder="9 dígitos"
+                      />
                     </div>
                   </div>
                 </div>
@@ -488,6 +503,7 @@ export function RegistrarNegocio() {
           seccionSugerida=""
           secciones={[]}
           atributosDef={atributosDef}
+          mostrarSeccion={mostrarSeccion}
           onGuardar={guardarOtroProducto}
           onCerrar={() => setModalProducto(null)}
         />
@@ -499,6 +515,7 @@ export function RegistrarNegocio() {
           seccionSugerida={productoCreado.categoriaMenu}
           secciones={[productoCreado.categoriaMenu]}
           atributosDef={atributosDef}
+          mostrarSeccion={mostrarSeccion}
           onGuardar={guardarOtroProducto}
           onCerrar={() => setModalProducto(null)}
         />
@@ -597,6 +614,11 @@ function FormularioPrimerProducto({
                       </option>
                     ))}
                   </select>
+                ) : def.tipo === "color" ? (
+                  <SelectorColorAtributo
+                    valor={atributos[def.clave] ?? ""}
+                    onCambiar={(clave) => setAtributos((a) => ({ ...a, [def.clave]: clave }))}
+                  />
                 ) : (
                   <input
                     value={atributos[def.clave] ?? ""}

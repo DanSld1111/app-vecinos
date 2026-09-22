@@ -18,7 +18,8 @@ export interface AtributoProductoDef {
   /** Clave estable para guardar en Producto.atributos — no cambiar una vez usada en datos reales. */
   clave: string;
   etiqueta: string;
-  tipo: "opciones" | "texto";
+  /** "color" = combo con muestra de color (paleta fija, ver SelectorColorAtributo en el admin). */
+  tipo: "opciones" | "texto" | "color";
   /** Solo si tipo = "opciones". */
   opciones?: string[];
 }

@@ -7,6 +7,7 @@ import { IconoCategoria } from "../IconoCategoria";
 import { SelectorCategoria } from "./SelectorCategoria";
 import { CampoDireccionConMapa } from "./CampoDireccionConMapa";
 import { urlCompleta } from "../../utilidades/media";
+import { soloDigitos } from "../../utilidades/telefono";
 
 const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
 
@@ -76,11 +77,23 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
         <div className="fila-2-campos">
           <div className="campo-modal">
             <label>Teléfono</label>
-            <input value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+            <input
+              value={telefono}
+              onChange={(e) => setTelefono(soloDigitos(e.target.value))}
+              inputMode="numeric"
+              maxLength={9}
+              placeholder="9 dígitos"
+            />
           </div>
           <div className="campo-modal">
             <label>WhatsApp</label>
-            <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
+            <input
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(soloDigitos(e.target.value))}
+              inputMode="numeric"
+              maxLength={9}
+              placeholder="9 dígitos"
+            />
           </div>
         </div>
 
