@@ -4,6 +4,7 @@ import { LayoutAdmin } from "./componentes/LayoutAdmin";
 import { Login } from "./paginas/Login";
 import { Dashboard } from "./paginas/Dashboard";
 import { Negocios } from "./paginas/Negocios";
+import { RegistrarNegocio } from "./paginas/RegistrarNegocio";
 import { FichaNegocio } from "./paginas/FichaNegocio";
 import { Servicios } from "./paginas/Servicios";
 import { ColaValidacion } from "./paginas/ColaValidacion";
@@ -64,6 +65,7 @@ export function App() {
         <Route path="/" element={<RutaInicial />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/negocios" element={<Negocios />} />
+        <Route path="/negocios/nuevo" element={<RegistrarNegocio />} />
         <Route path="/negocios/:id" element={<FichaNegocio />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/distritos" element={<Distritos />} />

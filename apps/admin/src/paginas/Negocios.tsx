@@ -6,8 +6,6 @@ import { useGeografia } from "../estado/useGeografia";
 import { useCuentas } from "../estado/useCuentas";
 import { useCategorias } from "../estado/useCategorias";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
-import { generarContrasenaTemporal } from "../utilidades/contrasena";
-import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
 import { fichaCompleta, partesDeFicha, resumenDeLoQueFalta } from "../utilidades/completitudNegocio";
 import { urlCompleta } from "../utilidades/media";
 
@@ -19,13 +17,6 @@ function pillEstado(estado: EstadoNegocio) {
   return <span className="estado-negocio-pill inactivo">Inactivo</span>;
 }
 
-interface PasswordPendiente {
-  titulo: string;
-  nombre: string;
-  correo: string;
-  contrasena: string;
-}
-
 export function Negocios() {
   const navegar = useNavigate();
   const negociosMock = useNegocios((estado) => estado.negocios);
@@ -35,13 +26,10 @@ export function Negocios() {
   const cargarMasNegocios = useNegocios((estado) => estado.cargarMasAdmin);
   const cursorSiguienteNegocios = useNegocios((estado) => estado.cursorSiguiente);
   const cargandoMasNegocios = useNegocios((estado) => estado.cargandoMas);
-  const crearNegocio = useNegocios((estado) => estado.crear);
-  const distritos = useGeografia((estado) => estado.distritos);
   const comunidades = useGeografia((estado) => estado.comunidades);
   const token = useSesionAdmin((estado) => estado.token)!;
   const cargarCuentas = useCuentas((estado) => estado.cargar);
   const cuentas = useCuentas((estado) => estado.cuentas);
-  const crearCuenta = useCuentas((estado) => estado.crear);
   const categorias = useCategorias((estado) => estado.categorias);
 
   const [verArchivados, setVerArchivados] = useState(false);
@@ -58,8 +46,6 @@ export function Negocios() {
   const [estadoFiltro, setEstadoFiltro] = useState<FiltroEstado>("todos");
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
   const [soloIncompletos, setSoloIncompletos] = useState(false);
-  const [modalNuevo, setModalNuevo] = useState(false);
-  const [passwordPendiente, setPasswordPendiente] = useState<PasswordPendiente | null>(null);
 
   const categoriaPorId = useMemo(
     () => Object.fromEntries(categorias.map((c) => [c.id, c])),
@@ -72,7 +58,7 @@ export function Negocios() {
     [cuentas]
   );
 
-  const comunidadFiltro = comunidadIdFiltro ? comunidades.find((c) => c.id === comunidadIdFiltro) : null;
+  const comunidadFiltro = comunidadIdFiltro ? comunidades.find((c) => c.id === comunidadIdFiltro) ?? null : null;
 
   const negocios = negociosMock.filter((negocio) => {
     const coincideBusqueda = negocio.nombre.toLowerCase().includes(busqueda.toLowerCase());
@@ -93,16 +79,6 @@ export function Negocios() {
     [negociosMock, negociosConDueno]
   );
 
-  async function alCrearDueno(negocioId: string, nombre: string, correo: string) {
-    const contrasena = generarContrasenaTemporal();
-    const ok = await crearCuenta(
-      { nombre, correo, rol: "dueno_negocio", negocioIds: [negocioId], distritosAsignados: [] },
-      contrasena,
-      token,
-    );
-    if (ok) setPasswordPendiente({ titulo: "Cuenta creada", nombre, correo, contrasena });
-  }
-
   return (
     <>
       <div className="topbar">
@@ -112,7 +88,7 @@ export function Negocios() {
             {resumen.total} negocios registrados · {negocios.length} mostrados
           </p>
         </div>
-        <button className="btn btn-primario" onClick={() => setModalNuevo(true)}>
+        <button className="btn btn-primario" onClick={() => navegar("/negocios/nuevo")}>
           ＋ Nuevo negocio
         </button>
       </div>
@@ -178,40 +154,6 @@ export function Negocios() {
           <input placeholder="Buscar negocio…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
         </div>
         <div className="fila-filtro">
-          <button className={`chip-filtro ${estadoFiltro === "todos" ? "activo" : ""}`} onClick={() => setEstadoFiltro("todos")}>
-            Todos
-          </button>
-          <button
-            className={`chip-filtro estado-activo ${estadoFiltro === "activo" ? "activo" : ""}`}
-            onClick={() => setEstadoFiltro("activo")}
-          >
-            Activos
-          </button>
-          <button
-            className={`chip-filtro estado-verificar ${estadoFiltro === "por_verificar" ? "activo" : ""}`}
-            onClick={() => setEstadoFiltro("por_verificar")}
-          >
-            Por verificar
-          </button>
-          <button className={`chip-filtro ${estadoFiltro === "inactivo" ? "activo" : ""}`} onClick={() => setEstadoFiltro("inactivo")}>
-            Inactivos
-          </button>
-          <button
-            className={`chip-filtro ${soloIncompletos ? "activo" : ""}`}
-            onClick={() => setSoloIncompletos((v) => !v)}
-            title="Negocios a los que les falta foto, horario, descripción, categoría o dueño"
-          >
-            📝 Solo incompletos
-          </button>
-          <button
-            className={`chip-filtro ${verArchivados ? "activo" : ""}`}
-            onClick={() => setVerArchivados((v) => !v)}
-            title="Negocios archivados — no aparecen en la app ni en el listado normal"
-          >
-            📦 Ver archivados
-          </button>
-        </div>
-        <div className="fila-filtro">
           {/* Un desplegable en vez de chips: con 14 categorías (y creciendo) una fila de
               botones se amontona — el select escala igual con 14 que con 40. */}
           <select
@@ -226,6 +168,40 @@ export function Negocios() {
               </option>
             ))}
           </select>
+
+          <div className="segmentado">
+            <button className={estadoFiltro === "todos" ? "activo" : ""} onClick={() => setEstadoFiltro("todos")}>
+              Todos
+            </button>
+            <button className={estadoFiltro === "activo" ? "activo" : ""} onClick={() => setEstadoFiltro("activo")}>
+              Activos
+            </button>
+            <button
+              className={estadoFiltro === "por_verificar" ? "activo" : ""}
+              onClick={() => setEstadoFiltro("por_verificar")}
+            >
+              Por verificar
+            </button>
+            <button className={estadoFiltro === "inactivo" ? "activo" : ""} onClick={() => setEstadoFiltro("inactivo")}>
+              Inactivos
+            </button>
+          </div>
+
+          <button
+            className={`link-archivados ${verArchivados ? "activo" : ""}`}
+            onClick={() => setVerArchivados((v) => !v)}
+            title="Negocios archivados — no aparecen en la app ni en el listado normal"
+          >
+            📦 Ver archivados
+          </button>
+
+          <button
+            className={`pill-pendiente ${soloIncompletos ? "activo" : ""}`}
+            onClick={() => setSoloIncompletos((v) => !v)}
+            title="Negocios a los que les falta foto, horario, descripción, categoría o dueño"
+          >
+            ⚠️ Con algo pendiente
+          </button>
         </div>
       </div>
 
@@ -283,212 +259,6 @@ export function Negocios() {
       ) : null}
       </>
       )}
-
-      {modalNuevo ? (
-        <ModalNuevoNegocio
-          distritos={distritos}
-          comunidades={comunidades}
-          categorias={categorias}
-          onCancelar={() => setModalNuevo(false)}
-          onCrear={async (datos, dueno) => {
-            const id = await crearNegocio(datos, token);
-            if (!id) return;
-            setModalNuevo(false);
-            if (dueno) await alCrearDueno(id, dueno.nombre, dueno.correo);
-            // Alta rápida: se crea con lo mínimo y se cae directo en la ficha para completar
-            // foto, horario y productos con la lista de "qué falta" a la vista.
-            navegar(`/negocios/${id}`);
-          }}
-        />
-      ) : null}
-
-      {passwordPendiente ? (
-        <ModalContrasenaGenerada
-          titulo={passwordPendiente.titulo}
-          nombre={passwordPendiente.nombre}
-          correo={passwordPendiente.correo}
-          contrasena={passwordPendiente.contrasena}
-          onCerrar={() => setPasswordPendiente(null)}
-        />
-      ) : null}
     </>
-  );
-}
-
-function ModalNuevoNegocio({
-  distritos,
-  comunidades,
-  categorias,
-  onCancelar,
-  onCrear,
-}: {
-  distritos: ReturnType<typeof useGeografia.getState>["distritos"];
-  comunidades: ReturnType<typeof useGeografia.getState>["comunidades"];
-  categorias: ReturnType<typeof useCategorias.getState>["categorias"];
-  onCancelar: () => void;
-  onCrear: (
-    datos: {
-      nombre: string;
-      distritoUbigeo: string;
-      comunidadId: string;
-      categoriaIds: string[];
-      direccion: string;
-      telefono: string | null;
-      whatsapp: string | null;
-    },
-    dueno: { nombre: string; correo: string } | null
-  ) => void;
-}) {
-  const [nombre, setNombre] = useState("");
-  const [distritoUbigeo, setDistritoUbigeo] = useState(distritos[0]?.ubigeo ?? "");
-  const comunidadesDelDistrito = comunidades.filter((c) => c.distritoUbigeo === distritoUbigeo);
-  const [comunidadId, setComunidadId] = useState(comunidadesDelDistrito[0]?.id ?? "");
-  const [categoriaId, setCategoriaId] = useState(categorias[0]?.id ?? "");
-  const [direccion, setDireccion] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [crearDueno, setCrearDueno] = useState(false);
-  const [nombreDueno, setNombreDueno] = useState("");
-  const [correoDueno, setCorreoDueno] = useState("");
-
-  function alCambiarDistrito(nuevoUbigeo: string) {
-    setDistritoUbigeo(nuevoUbigeo);
-    const primeraComunidad = comunidades.find((c) => c.distritoUbigeo === nuevoUbigeo);
-    setComunidadId(primeraComunidad?.id ?? "");
-  }
-
-  const valido =
-    nombre.trim() &&
-    distritoUbigeo &&
-    comunidadId &&
-    categoriaId &&
-    direccion.trim() &&
-    (!crearDueno || (nombreDueno.trim() && correoDueno.trim()));
-
-  function confirmar() {
-    if (!valido) return;
-    onCrear(
-      {
-        nombre: nombre.trim(),
-        distritoUbigeo,
-        comunidadId,
-        categoriaIds: [categoriaId],
-        direccion: direccion.trim(),
-        telefono: telefono.trim() || null,
-        whatsapp: whatsapp.trim() || null,
-      },
-      crearDueno ? { nombre: nombreDueno.trim(), correo: correoDueno.trim() } : null
-    );
-  }
-
-  return (
-    <div className="overlay-modal" onClick={onCancelar}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        <h3>Nuevo negocio</h3>
-        <p className="sub">Alta rápida — la ficha completa (fotos, horario, descripción) se termina de llenar después.</p>
-
-        <div className="seccion-alta">
-          <div className="titulo-seccion-alta">🏷️ Identidad</div>
-          <div className="campo-modal">
-            <label>Nombre del negocio</label>
-            <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Panadería San José" autoFocus />
-          </div>
-          <div className="campo-modal" style={{ marginBottom: 0 }}>
-            <label>Categoría</label>
-            <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
-              {categorias.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="seccion-alta">
-          <div className="titulo-seccion-alta">📍 Ubicación</div>
-          <div className="fila-2-campos-alta">
-            <div className="campo-modal">
-              <label>Distrito</label>
-              <select value={distritoUbigeo} onChange={(e) => alCambiarDistrito(e.target.value)}>
-                {distritos.map((d) => (
-                  <option key={d.ubigeo} value={d.ubigeo}>
-                    {d.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="campo-modal">
-              <label>Comunidad</label>
-              <select value={comunidadId} onChange={(e) => setComunidadId(e.target.value)}>
-                {comunidadesDelDistrito.length === 0 ? <option value="">Sin comunidades en este distrito</option> : null}
-                {comunidadesDelDistrito.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="campo-modal" style={{ marginBottom: 0 }}>
-            <label>Dirección</label>
-            <input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ej. Av. Aviación 2400" />
-          </div>
-        </div>
-
-        <div className="seccion-alta">
-          <div className="titulo-seccion-alta">
-            📞 Contacto <span className="opcional">(opcional)</span>
-          </div>
-          <div className="fila-2-campos-alta">
-            <div className="campo-modal" style={{ marginBottom: 0 }}>
-              <label>Teléfono</label>
-              <input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Ej. 01 234 5678" />
-            </div>
-            <div className="campo-modal" style={{ marginBottom: 0 }}>
-              <label>WhatsApp</label>
-              <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ej. 987654321" />
-            </div>
-          </div>
-        </div>
-
-        <div className="seccion-alta" style={{ paddingBottom: 0 }}>
-          <div className="titulo-seccion-alta">
-            👤 Dueño <span className="opcional">(opcional, se puede hacer después)</span>
-          </div>
-          <div className="toggle-dueno" onClick={() => setCrearDueno((v) => !v)}>
-            <div className={`switch ${crearDueno ? "" : "off"}`}>
-              <i />
-            </div>
-            <div>
-              <b>Crear cuenta de dueño ahora</b>
-              <span>La persona podrá entrar a administrar su ficha con una clave temporal</span>
-            </div>
-          </div>
-
-          {crearDueno ? (
-            <div className="seccion-dueno-inline">
-              <div className="campo-modal">
-                <label>Nombre del dueño</label>
-                <input value={nombreDueno} onChange={(e) => setNombreDueno(e.target.value)} placeholder="Nombre completo" />
-              </div>
-              <div className="campo-modal" style={{ marginBottom: 0 }}>
-                <label>Correo</label>
-                <input value={correoDueno} onChange={(e) => setCorreoDueno(e.target.value)} placeholder="correo@ejemplo.com" />
-              </div>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="modal-footer">
-          <button className="btn-cancelar" onClick={onCancelar}>
-            Cancelar
-          </button>
-          <button className="btn-crear" disabled={!valido} onClick={confirmar}>
-            Crear negocio
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

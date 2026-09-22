@@ -4,7 +4,8 @@ import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { IconoCategoria } from "../IconoCategoria";
-import { SelectorUbicacion } from "./SelectorUbicacion";
+import { SelectorCategoria } from "./SelectorCategoria";
+import { CampoDireccionConMapa } from "./CampoDireccionConMapa";
 import { urlCompleta } from "../../utilidades/media";
 
 const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
@@ -70,14 +71,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
         </div>
         <div className="campo-modal">
           <label>Categoría</label>
-          <select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
-            <option value="">Sin categoría</option>
-            {categorias.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
+          <SelectorCategoria categorias={categorias} valor={categoriaId} onCambiar={setCategoriaId} placeholder="Sin categoría" />
         </div>
         <div className="fila-2-campos">
           <div className="campo-modal">
@@ -109,15 +103,12 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
           </p>
         </div>
 
-        <div className="campo-modal">
-          <label>Dirección</label>
-          <input value={direccion} onChange={(e) => setDireccion(e.target.value)} />
-        </div>
-
-        <div className="campo-modal">
-          <label>Ubicación en el mapa</label>
-          <SelectorUbicacion valor={coordenada} onCambiar={setCoordenada} />
-        </div>
+        <CampoDireccionConMapa
+          direccion={direccion}
+          coordenada={coordenada}
+          onCambiarDireccion={setDireccion}
+          onCambiarCoordenada={setCoordenada}
+        />
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 4 }}>
           <button className="btn btn-primario" disabled={guardando} onClick={guardar}>

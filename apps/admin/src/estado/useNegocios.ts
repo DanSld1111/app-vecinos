@@ -5,7 +5,9 @@ import { apiFetch, apiSubirArchivo, ErrorApi } from "../datos/clienteApi";
 type NegocioNuevo = Pick<
   Negocio,
   "nombre" | "distritoUbigeo" | "comunidadId" | "categoriaIds" | "direccion" | "telefono" | "whatsapp"
->;
+> &
+  // Opcional: si no viene, el servidor usa el centro de la comunidad (ver POST /negocios).
+  Partial<Pick<Negocio, "coordenada">>;
 
 type InfoEditable = Pick<
   Negocio,

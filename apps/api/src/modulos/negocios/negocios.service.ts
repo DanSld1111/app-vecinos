@@ -181,7 +181,8 @@ export class NegociosService {
    * Acceso básico a la ficha: verla y editar información general (nombre, categoría,
    * dirección, contacto). Incluye a gestor_negocios a propósito — es justo lo que su rol
    * administrativo necesita para dar de alta y completar un negocio — pero NO a lo operativo
-   * (horario, fotos, productos, ofertas), que usa verificarGestionOperativa() más abajo.
+   * (horario, fotos, ofertas), que usa verificarGestionOperativa() más abajo. Los productos
+   * tienen su propio permiso, más abierto — ver verificarAccesoProductos().
    */
   private verificarAccesoBasico(cuenta: Cuenta, negocioId: string): void {
     if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
@@ -190,15 +191,28 @@ export class NegociosService {
   }
 
   /**
-   * Gestión operativa del día a día: horario, fotos, productos, ofertas y galería. Ver
+   * Gestión operativa del día a día: horario, fotos, ofertas y galería. Ver
    * docs/decisiones/0071-plan-v2-modulo-negocios.md — gestor_negocios queda deliberadamente
    * afuera de este círculo: es un rol administrativo (alta + vínculo con el dueño), no quien
-   * lleva el negocio.
+   * lleva el negocio. (Productos es la excepción — ver verificarAccesoProductos() más abajo.)
    */
   private verificarGestionOperativa(cuenta: Cuenta, negocioId: string): void {
     if (cuenta.rol === "super_admin") return;
     if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
     throw new ForbiddenException("Esta acción es del dueño del negocio — un gestor administrativo no la tiene.");
+  }
+
+  /**
+   * Productos: a diferencia del resto de lo operativo, sí incluye a gestor_negocios — el paso 3
+   * del alta en pantalla completa (agregar el primer producto) lo necesita, y de ahí se decidió
+   * abrirlo para productos en general, no solo el primero. Horario, fotos, ofertas y galería
+   * siguen siendo exclusivos del dueño vía verificarGestionOperativa(). Ver
+   * docs/decisiones/0071-plan-v2-modulo-negocios.md.
+   */
+  private verificarAccesoProductos(cuenta: Cuenta, negocioId: string): void {
+    if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
+    if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
+    throw new ForbiddenException("No administras este negocio.");
   }
 
   /** Dueño de negocio: solo los suyos, sin importar su estado — necesita ver hasta lo rechazado. */
@@ -557,7 +571,7 @@ export class NegociosService {
     archivo: Express.Multer.File,
     cuenta: Cuenta,
   ): Promise<Producto> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const { rows } = await this.bd.consultar<{ foto_url: string | null }>(
       "SELECT foto_url FROM productos WHERE id = $1 AND negocio_id = $2",
       [productoId, negocioId],
@@ -574,7 +588,7 @@ export class NegociosService {
 
   /** Quitar la foto sin borrar el producto — también borra el archivo de Supabase Storage. */
   async quitarFotoProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<Producto> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const anterior = await this.obtenerProductoOFallar(negocioId, productoId);
     await this.bd.consultar("UPDATE productos SET foto_url = NULL WHERE id = $1", [productoId]);
     await this.almacenamiento.eliminarPorUrl(anterior.fotoUrl);
@@ -595,7 +609,7 @@ export class NegociosService {
   }
 
   async crearProducto(negocioId: string, dto: GuardarProductoDto, cuenta: Cuenta): Promise<Producto> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     await this.obtenerFilaAdminOFallar(negocioId);
     const id = `prod-${randomUUID()}`;
     // Entra al final de su sección, no al principio — quien lo agrega espera verlo abajo.
@@ -624,7 +638,7 @@ export class NegociosService {
     dto: GuardarProductoDto,
     cuenta: Cuenta,
   ): Promise<Producto> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const anterior = await this.obtenerProductoOFallar(negocioId, productoId);
     // Si cambió de sección, se manda al final de la nueva: su posición anterior no significa
     // nada en otra lista.
@@ -654,7 +668,7 @@ export class NegociosService {
 
   /** A la papelera (borrado lógico, recuperable). No se purga sola: ver eliminarProductoDefinitivo. */
   async eliminarProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<void> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const { rowCount } = await this.bd.consultar(
       "UPDATE productos SET eliminado_en = now() WHERE id = $1 AND negocio_id = $2 AND eliminado_en IS NULL",
       [productoId, negocioId],
@@ -664,7 +678,7 @@ export class NegociosService {
   }
 
   async restaurarProducto(negocioId: string, productoId: string, cuenta: Cuenta): Promise<Producto> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const { rowCount } = await this.bd.consultar(
       "UPDATE productos SET eliminado_en = NULL WHERE id = $1 AND negocio_id = $2 AND eliminado_en IS NOT NULL",
       [productoId, negocioId],
@@ -676,7 +690,7 @@ export class NegociosService {
 
   /** Único borrado real: saca la fila y la foto de Supabase Storage. Sin vuelta atrás. */
   async eliminarProductoDefinitivo(negocioId: string, productoId: string, cuenta: Cuenta): Promise<void> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const producto = await this.obtenerProductoOFallar(negocioId, productoId);
     await this.bd.consultar("DELETE FROM productos WHERE id = $1 AND negocio_id = $2", [productoId, negocioId]);
     await this.almacenamiento.eliminarPorUrl(producto.fotoUrl);
@@ -685,7 +699,7 @@ export class NegociosService {
 
   /** La papelera es por negocio, no global: se ve dentro de la misma pestaña de productos. */
   async listarProductosPapelera(negocioId: string, cuenta: Cuenta): Promise<Producto[]> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     const { rows } = await this.bd.consultar<FilaProducto>(
       `SELECT ${COLUMNAS_PRODUCTO}
        FROM productos
@@ -698,7 +712,7 @@ export class NegociosService {
 
   /** Recibe los ids en el orden final (tras arrastrar) y les asigna 0..n de una sola vez. */
   async reordenarProductos(negocioId: string, idsEnOrden: string[], cuenta: Cuenta): Promise<Producto[]> {
-    this.verificarGestionOperativa(cuenta, negocioId);
+    this.verificarAccesoProductos(cuenta, negocioId);
     await this.bd.transaccion(async (db) => {
       for (const [indice, productoId] of idsEnOrden.entries()) {
         await db.consultar("UPDATE productos SET orden = $3 WHERE id = $1 AND negocio_id = $2", [

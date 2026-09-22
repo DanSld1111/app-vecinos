@@ -42,6 +42,10 @@ export function SelectorUbicacion({
   const [latTexto, setLatTexto] = useState(String(valor.lat));
   const [lngTexto, setLngTexto] = useState(String(valor.lng));
   const [pegado, setPegado] = useState("");
+  // true justo antes de un onCambiar propio (arrastrar, clic, texto) — así el efecto de abajo
+  // distingue "me moví yo" de "me movieron desde afuera" (ej. al escribir la dirección, que
+  // geocodifica y sí debe mover el mapa) sin caer en un loop ni pelear con el arrastre.
+  const cambioPropioRef = useRef(false);
 
   useEffect(() => {
     if (!contenedorRef.current || mapaRef.current) return;
@@ -57,6 +61,7 @@ export function SelectorUbicacion({
       const nueva = { lat: Number(p.lat.toFixed(6)), lng: Number(p.lng.toFixed(6)) };
       setLatTexto(String(nueva.lat));
       setLngTexto(String(nueva.lng));
+      cambioPropioRef.current = true;
       onCambiar(nueva);
     });
     // Un clic en el mapa también mueve el pin — más rápido que arrastrarlo de lejos.
@@ -65,6 +70,7 @@ export function SelectorUbicacion({
       marcador.setLatLng(e.latlng);
       setLatTexto(String(nueva.lat));
       setLngTexto(String(nueva.lng));
+      cambioPropioRef.current = true;
       onCambiar(nueva);
     });
 
@@ -79,7 +85,27 @@ export function SelectorUbicacion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Si `valor` cambia desde AFUERA (ej. se geocodificó la dirección que se escribió en otro
+  // campo), el mapa sí debe seguirlo. Si el cambio lo originó este mismo componente (arrastrar,
+  // clic, texto/pegado — todos marcan cambioPropioRef antes de llamar a onCambiar), se ignora acá
+  // para no pelear con el gesto ni hacer saltar el mapa a mitad de una interacción.
+  useEffect(() => {
+    if (cambioPropioRef.current) {
+      cambioPropioRef.current = false;
+      return;
+    }
+    if (!mapaRef.current || !marcadorRef.current) return;
+    marcadorRef.current.setLatLng([valor.lat, valor.lng]);
+    mapaRef.current.setView([valor.lat, valor.lng], mapaRef.current.getZoom());
+    setLatTexto(String(valor.lat));
+    setLngTexto(String(valor.lng));
+    // Solo depende de la coordenada: si dependiera también de latTexto/lngTexto (que este mismo
+    // efecto toca) se dispararía a sí mismo en bucle.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valor.lat, valor.lng]);
+
   function moverA(lat: number, lng: number) {
+    cambioPropioRef.current = true;
     onCambiar({ lat, lng });
     marcadorRef.current?.setLatLng([lat, lng]);
     mapaRef.current?.setView([lat, lng], mapaRef.current.getZoom());
