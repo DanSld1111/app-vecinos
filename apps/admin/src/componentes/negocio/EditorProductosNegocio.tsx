@@ -6,6 +6,8 @@ import * as api from "../../datos/productosApi";
 import { DatosProducto } from "../../datos/productosApi";
 import { ModalProducto } from "./ModalProducto";
 import { ModalVerProducto } from "./ModalVerProducto";
+import { ModalConfirmar } from "../ModalConfirmar";
+import { useToasts } from "../../estado/useToasts";
 import { urlCompleta } from "../../utilidades/media";
 
 /**
@@ -25,7 +27,9 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   const [creandoEn, setCreandoEn] = useState<string | null>(null);
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const [confirmandoBorrado, setConfirmandoBorrado] = useState<string | null>(null);
+  const [enviandoAPapelera, setEnviandoAPapelera] = useState<Producto | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const avisos = useToasts((estado) => estado.mostrar);
 
   const recargar = useCallback(async () => {
     try {
@@ -73,6 +77,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   async function guardar(datos: DatosProducto, fotoNueva: File | null) {
     // Al crear, la foto va en un segundo paso: hasta que el producto no existe no hay id al que
     // asociarla. Para quien lo usa sigue siendo un solo formulario.
+    const eraEdicion = Boolean(editando);
     const guardado = editando
       ? await api.actualizarProducto(negocio.id, editando.id, datos, token)
       : await api.crearProducto(negocio.id, datos, token);
@@ -80,14 +85,17 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
     setEditando(null);
     setCreandoEn(null);
     await recargar();
+    avisos(eraEdicion ? "Producto guardado con éxito" : "Producto agregado con éxito");
   }
 
-  async function accion(fn: () => Promise<unknown>) {
+  async function accion(fn: () => Promise<unknown>, mensajeExito?: string) {
     try {
       await fn();
       await recargar();
+      if (mensajeExito) avisos(mensajeExito);
     } catch {
       setError("No se pudo completar la acción.");
+      avisos("No se pudo completar la acción.", "error");
     }
   }
 
@@ -195,7 +203,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                   <button
                     className="btn-icono-crud btn-icono-crud--rojo"
                     title="Enviar a papelera"
-                    onClick={() => accion(() => api.eliminarProducto(negocio.id, producto.id, token))}
+                    onClick={() => setEnviandoAPapelera(producto)}
                   >
                     🗑️
                   </button>
@@ -234,29 +242,21 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                     </span>
                     <button
                       className="btn-accion-mini"
-                      onClick={() => accion(() => api.restaurarProducto(negocio.id, producto.id, token))}
+                      onClick={() => accion(() => api.restaurarProducto(negocio.id, producto.id, token), "Producto restaurado con éxito")}
                     >
                       ↩️ Restaurar
                     </button>
                     {confirmandoBorrado === producto.id ? (
-                      <>
-                        <span style={{ fontSize: 11, color: "var(--rojo)" }}>¿Seguro? No se puede deshacer.</span>
-                        <button
-                          className="btn-accion-mini"
-                          style={{ color: "var(--rojo)" }}
-                          onClick={() =>
-                            accion(async () => {
-                              await api.eliminarDefinitivo(negocio.id, producto.id, token);
-                              setConfirmandoBorrado(null);
-                            })
-                          }
-                        >
-                          Sí, eliminar
-                        </button>
-                        <button className="btn-accion-mini" onClick={() => setConfirmandoBorrado(null)}>
-                          Cancelar
-                        </button>
-                      </>
+                      <ModalConfirmar
+                        titulo="¿Eliminar este producto para siempre?"
+                        mensaje={`"${producto.nombre}" y su foto se borran del todo — no se puede deshacer.`}
+                        textoConfirmar="Sí, eliminar para siempre"
+                        onCancelar={() => setConfirmandoBorrado(null)}
+                        onConfirmar={async () => {
+                          await accion(() => api.eliminarDefinitivo(negocio.id, producto.id, token), "Producto eliminado para siempre");
+                          setConfirmandoBorrado(null);
+                        }}
+                      />
                     ) : (
                       <button
                         className="btn-accion-mini"
@@ -303,7 +303,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           onEliminar={
             editando
               ? async () => {
-                  await accion(() => api.eliminarProducto(negocio.id, editando.id, token));
+                  await accion(() => api.eliminarProducto(negocio.id, editando.id, token), "Producto enviado a la papelera");
                   setEditando(null);
                 }
               : undefined
@@ -311,11 +311,24 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           onQuitarFoto={
             editando
               ? async () => {
-                  await accion(() => api.quitarFotoProducto(negocio.id, editando.id, token));
+                  await accion(() => api.quitarFotoProducto(negocio.id, editando.id, token), "Foto eliminada con éxito");
                   setEditando(null);
                 }
               : undefined
           }
+        />
+      ) : null}
+
+      {enviandoAPapelera ? (
+        <ModalConfirmar
+          titulo="¿Enviar este producto a la papelera?"
+          mensaje={`"${enviandoAPapelera.nombre}" deja de verse en la carta — se puede recuperar desde la papelera mientras no se borre para siempre.`}
+          textoConfirmar="Sí, enviar a papelera"
+          onCancelar={() => setEnviandoAPapelera(null)}
+          onConfirmar={async () => {
+            await accion(() => api.eliminarProducto(negocio.id, enviandoAPapelera.id, token), "Producto enviado a la papelera");
+            setEnviandoAPapelera(null);
+          }}
         />
       ) : null}
     </div>

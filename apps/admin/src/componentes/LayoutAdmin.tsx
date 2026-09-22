@@ -7,6 +7,7 @@ import { useCategorias } from "../estado/useCategorias";
 import { useGeografia } from "../estado/useGeografia";
 import { urlCompleta } from "../utilidades/media";
 import { SelectorNegocioSidebar } from "./SelectorNegocioSidebar";
+import { PilaToasts } from "./PilaToasts";
 
 interface ItemNav {
   a: string;
@@ -191,6 +192,7 @@ export function LayoutAdmin() {
       <div className="contenido">
         <Outlet />
       </div>
+      <PilaToasts />
     </div>
   );
 }

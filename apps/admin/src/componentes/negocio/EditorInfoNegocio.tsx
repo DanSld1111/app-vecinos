@@ -8,6 +8,7 @@ import { SelectorCategoria } from "./SelectorCategoria";
 import { CampoDireccionConMapa } from "./CampoDireccionConMapa";
 import { urlCompleta } from "../../utilidades/media";
 import { soloDigitos } from "../../utilidades/telefono";
+import { useToasts } from "../../estado/useToasts";
 
 const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
 
@@ -20,6 +21,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   const token = useSesionAdmin((estado) => estado.token)!;
   const actualizarInfo = useNegocios((estado) => estado.actualizarInfo);
   const categorias = useCategorias((estado) => estado.categorias);
+  const avisos = useToasts((estado) => estado.mostrar);
 
   const [nombre, setNombre] = useState(negocio.nombre);
   const [descripcion, setDescripcion] = useState(negocio.descripcion);
@@ -54,6 +56,9 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
     if (ok) {
       setGuardado(true);
       setTimeout(() => setGuardado(false), 2000);
+      avisos("Información guardada con éxito");
+    } else {
+      avisos("No se pudo guardar. Intenta de nuevo.", "error");
     }
   }
 

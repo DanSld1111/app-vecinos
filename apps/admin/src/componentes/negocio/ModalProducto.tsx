@@ -3,6 +3,7 @@ import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-veci
 import { DatosProducto } from "../../datos/productosApi";
 import { urlCompleta } from "../../utilidades/media";
 import { SelectorColorAtributo } from "./SelectorColorAtributo";
+import { ModalConfirmar } from "../ModalConfirmar";
 
 const TIPOS_ACEPTADOS = "image/jpeg,image/png,image/webp";
 
@@ -49,6 +50,7 @@ export function ModalProducto({
   const [fotoNueva, setFotoNueva] = useState<File | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmandoEliminar, setConfirmandoEliminar] = useState(false);
   const inputFoto = useRef<HTMLInputElement>(null);
 
   const precioValido = precio.trim() !== "" && Number.isFinite(Number(precio)) && Number(precio) >= 0;
@@ -82,7 +84,7 @@ export function ModalProducto({
 
   return (
     <div className="overlay-modal" onClick={onCerrar}>
-      <div className="modal-card" style={{ maxWidth: 560 }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-card" style={{ width: "min(680px, 94vw)" }} onClick={(e) => e.stopPropagation()}>
         <h3>{producto ? "Editar producto" : "Nuevo producto"}</h3>
         <p className="sub">Los precios de este negocio van en {SIMBOLO_MONEDA[moneda]} ({moneda}).</p>
 
@@ -248,7 +250,7 @@ export function ModalProducto({
               className="btn-cancelar"
               style={{ color: "var(--rojo)" }}
               disabled={guardando}
-              onClick={onEliminar}
+              onClick={() => setConfirmandoEliminar(true)}
             >
               🗑️ Enviar a papelera
             </button>
@@ -265,6 +267,19 @@ export function ModalProducto({
           </div>
         </div>
       </div>
+
+      {confirmandoEliminar && onEliminar ? (
+        <ModalConfirmar
+          titulo="¿Enviar este producto a la papelera?"
+          mensaje={`"${nombre}" deja de verse en la carta — se puede recuperar desde la papelera mientras no se borre para siempre.`}
+          textoConfirmar="Sí, enviar a papelera"
+          onCancelar={() => setConfirmandoEliminar(false)}
+          onConfirmar={async () => {
+            await onEliminar();
+            setConfirmandoEliminar(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

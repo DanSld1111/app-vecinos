@@ -3055,6 +3055,37 @@ tr:last-child td {
 .btn-icono-crud:hover { border-color: var(--verde); }
 .btn-icono-crud--rojo { border-color: var(--rojo); background: var(--rojo-suave); color: var(--rojo); }
 
+/* ---- Avisos flotantes (confirmación de guardar/eliminar/etc.) ---- */
+.pila-avisos {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.aviso-flotante {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--texto);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  animation: entrar-aviso 0.22s ease;
+  max-width: 340px;
+}
+.aviso-flotante--error { background: var(--rojo); }
+@keyframes entrar-aviso {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ---- Registrar negocio: pantalla completa por pasos ---- */
 .pantalla-registro {
   display: flex;
