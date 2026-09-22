@@ -32,7 +32,7 @@ export function ModalVerProducto({
         <div
           style={{
             width: "100%",
-            aspectRatio: "1.6",
+            maxHeight: 320,
             borderRadius: 10,
             margin: "12px 0",
             overflow: "hidden",
@@ -44,9 +44,15 @@ export function ModalVerProducto({
           }}
         >
           {producto.fotoUrl ? (
-            <img src={urlCompleta(producto.fotoUrl)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            // "contain", no "cover": acá se quiere ver la foto completa, no recortada a un
+            // recuadro — a diferencia de la miniatura de la fila, que sí puede recortar.
+            <img
+              src={urlCompleta(producto.fotoUrl)}
+              alt=""
+              style={{ width: "100%", maxHeight: 320, objectFit: "contain", display: "block" }}
+            />
           ) : (
-            "🖼️"
+            <div style={{ aspectRatio: "1.6", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>🖼️</div>
           )}
         </div>
 
