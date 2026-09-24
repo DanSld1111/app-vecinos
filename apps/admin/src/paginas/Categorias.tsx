@@ -3,6 +3,7 @@ import { Categoria } from "@app-vecinos/tipos";
 import { useCategorias } from "../estado/useCategorias";
 import { useNegocios } from "../estado/useNegocios";
 import { useArquetipos } from "../estado/useArquetipos";
+import { useServiciosApp } from "../estado/useServiciosApp";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { IconoCategoria } from "../componentes/IconoCategoria";
 import { SelectorIcono } from "../componentes/SelectorIcono";
@@ -21,17 +22,23 @@ export function Categorias() {
   const cargar = useCategorias((estado) => estado.cargar);
   const negocios = useNegocios((estado) => estado.negocios);
   const arquetipos = useArquetipos((estado) => estado.arquetipos);
+  const cargarArquetipos = useArquetipos((estado) => estado.cargar);
+  const servicios = useServiciosApp((estado) => estado.servicios);
+  const cargarServicios = useServiciosApp((estado) => estado.cargar);
   const token = useSesionAdmin((estado) => estado.token)!;
 
   useEffect(() => {
     cargar();
-  }, [cargar]);
+    cargarArquetipos(token);
+    cargarServicios();
+  }, [cargar, cargarArquetipos, cargarServicios, token]);
 
   const [busqueda, setBusqueda] = useState("");
   const [modalAbierto, setModalAbierto] = useState(false);
   const [editando, setEditando] = useState<Categoria | null>(null);
 
   const arquetipoPorId = useMemo(() => Object.fromEntries(arquetipos.map((a) => [a.id, a])), [arquetipos]);
+  const servicioPorSlug = useMemo(() => Object.fromEntries(servicios.map((s) => [s.slug, s])), [servicios]);
 
   const resumen = useMemo(() => {
     const conArquetipo = categorias.filter((c) => c.arquetipoId).length;
@@ -148,7 +155,12 @@ export function Categorias() {
                 <p className="nombre-cat">{cat.nombre}</p>
                 <span className="slug-cat">{cat.slug}</span>
               </div>
-              <span className={`badge-arq ${clase}`}>{sinDefinir ? "⚠️ Sin definir" : arq!.nombre}</span>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <span className={`badge-arq ${clase}`}>{sinDefinir ? "⚠️ Sin definir" : arq!.nombre}</span>
+                <span className={`badge-servicio ${cat.servicioSlug ? "" : "atencion"}`}>
+                  {cat.servicioSlug ? servicioPorSlug[cat.servicioSlug]?.nombre ?? cat.servicioSlug : "⚠️ Sin servicio"}
+                </span>
+              </div>
             </div>
           );
         })}
@@ -163,6 +175,7 @@ export function Categorias() {
         <ModalCategoria
           categoria={editando}
           arquetipos={arquetipos}
+          servicios={servicios}
           token={token}
           onCerrar={() => {
             setModalAbierto(false);
@@ -177,11 +190,13 @@ export function Categorias() {
 function ModalCategoria({
   categoria,
   arquetipos,
+  servicios,
   token,
   onCerrar,
 }: {
   categoria: Categoria | null;
   arquetipos: ReturnType<typeof useArquetipos.getState>["arquetipos"];
+  servicios: ReturnType<typeof useServiciosApp.getState>["servicios"];
   token: string;
   onCerrar: () => void;
 }) {
@@ -193,6 +208,7 @@ function ModalCategoria({
   const [nombre, setNombre] = useState(categoria?.nombre ?? "");
   const [icono, setIcono] = useState(categoria?.icono ?? "pricetag-outline");
   const [arquetipoId, setArquetipoId] = useState(categoria?.arquetipoId ?? "");
+  const [servicioSlug, setServicioSlug] = useState(categoria?.servicioSlug ?? "");
   const [guardando, setGuardando] = useState(false);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -209,8 +225,15 @@ function ModalCategoria({
     if (!nombre.trim()) return;
     setGuardando(true);
     const ok = categoria
-      ? await actualizar(categoria.id, { nombre: nombre.trim(), icono, arquetipoId: arquetipoId || null }, token)
-      : await crear({ nombre: nombre.trim(), icono, arquetipoId: arquetipoId || undefined }, token);
+      ? await actualizar(
+          categoria.id,
+          { nombre: nombre.trim(), icono, arquetipoId: arquetipoId || null, servicioSlug: servicioSlug || null },
+          token,
+        )
+      : await crear(
+          { nombre: nombre.trim(), icono, arquetipoId: arquetipoId || undefined, servicioSlug: servicioSlug || null },
+          token,
+        );
     setGuardando(false);
     if (ok) onCerrar();
   }
@@ -283,6 +306,22 @@ function ModalCategoria({
         {!categoria && nombre.trim() ? (
           <p className="ayuda-modal" style={{ marginTop: -8 }}>Slug: {slugificar(nombre)}</p>
         ) : null}
+
+        <div className="campo-modal">
+          <label>Servicio al que pertenece</label>
+          <select value={servicioSlug} onChange={(e) => setServicioSlug(e.target.value)}>
+            <option value="">— Sin asignar —</option>
+            {servicios.map((s) => (
+              <option key={s.slug} value={s.slug}>
+                {s.nombre}
+              </option>
+            ))}
+          </select>
+          <p className="ayuda-modal">
+            Decide en qué pantalla de la app aparecen los negocios de esta categoría, y qué categorías se
+            ofrecen al elegir este servicio en el alta de un negocio.
+          </p>
+        </div>
 
         <div className="campo-modal" style={{ marginTop: 4 }}>
           <label>Arquetipo de ficha</label>

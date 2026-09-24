@@ -9,6 +9,13 @@ export class ListarNegociosDto {
   @IsString()
   categoriaId?: string;
 
+  /** Pantalla de un servicio (Restaurantes, Market Space…) en vez de una categoría suelta —
+   * trae los negocios de TODAS las categorías de ese servicio. Ver
+   * docs/decisiones/0072-servicio-dueno-de-categoria.md. */
+  @IsOptional()
+  @IsString()
+  servicioSlug?: string;
+
   @IsOptional()
   @IsString()
   busqueda?: string;

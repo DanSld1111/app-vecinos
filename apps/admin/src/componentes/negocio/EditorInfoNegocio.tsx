@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Coordenada, Moneda, NOMBRE_MONEDA, Negocio, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
 import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
+import { useServiciosApp } from "../../estado/useServiciosApp";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { IconoCategoria } from "../IconoCategoria";
-import { SelectorCategoria } from "./SelectorCategoria";
+import { SelectorServicioYCategoria } from "./SelectorServicioYCategoria";
 import { CampoDireccionConMapa } from "./CampoDireccionConMapa";
 import { urlCompleta } from "../../utilidades/media";
 import { soloDigitos } from "../../utilidades/telefono";
@@ -21,7 +22,13 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   const token = useSesionAdmin((estado) => estado.token)!;
   const actualizarInfo = useNegocios((estado) => estado.actualizarInfo);
   const categorias = useCategorias((estado) => estado.categorias);
+  const servicios = useServiciosApp((estado) => estado.servicios);
+  const cargarServicios = useServiciosApp((estado) => estado.cargar);
   const avisos = useToasts((estado) => estado.mostrar);
+
+  useEffect(() => {
+    cargarServicios();
+  }, [cargarServicios]);
 
   const [nombre, setNombre] = useState(negocio.nombre);
   const [descripcion, setDescripcion] = useState(negocio.descripcion);
@@ -76,8 +83,12 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
           <textarea rows={3} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
         </div>
         <div className="campo-modal">
-          <label>Categoría</label>
-          <SelectorCategoria categorias={categorias} valor={categoriaId} onCambiar={setCategoriaId} placeholder="Sin categoría" />
+          <SelectorServicioYCategoria
+            servicios={servicios}
+            categorias={categorias}
+            categoriaId={categoriaId}
+            onCambiarCategoria={setCategoriaId}
+          />
         </div>
         <div className="fila-2-campos">
           <div className="campo-modal">

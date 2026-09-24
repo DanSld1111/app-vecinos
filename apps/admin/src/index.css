@@ -1438,6 +1438,17 @@ tr:last-child td {
 .badge-arq.ofertas { background: var(--coral-suave); color: var(--coral-fuerte); }
 .badge-arq.sindefinir { background: var(--rojo-suave); color: var(--rojo); }
 .badge-arq.personalizado { background: var(--morado-suave); color: var(--morado); }
+.badge-servicio {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3.5px 10.5px;
+  border-radius: 1149px;
+  background: var(--superficie-hundida);
+  color: var(--texto-suave);
+  border: 1px solid var(--borde);
+}
+.badge-servicio.atencion { background: var(--rojo-suave); color: var(--rojo); border-color: transparent; }
 
 /* ---- Modal Nueva categoría ---- */
 .previsualizacion-cat {

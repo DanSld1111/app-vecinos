@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { Categoria } from "@app-vecinos/tipos";
 import { apiFetch, apiSubirArchivo, ErrorApi } from "../datos/clienteApi";
 
-type CategoriaNueva = { nombre: string; icono: string; arquetipoId?: string };
-type CategoriaEditable = { nombre?: string; icono?: string; arquetipoId?: string | null };
+type CategoriaNueva = { nombre: string; icono: string; arquetipoId?: string; servicioSlug?: string | null };
+type CategoriaEditable = { nombre?: string; icono?: string; arquetipoId?: string | null; servicioSlug?: string | null };
 
 interface EstadoCategorias {
   categorias: Categoria[];

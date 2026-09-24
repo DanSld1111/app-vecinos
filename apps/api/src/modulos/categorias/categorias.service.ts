@@ -18,10 +18,11 @@ interface FilaCategoria {
   arquetipo_ficha: Categoria["arquetipoFicha"] | null;
   arquetipo_id: string | null;
   atributos_producto: Categoria["atributosProducto"] | null;
+  servicio_slug: string | null;
 }
 
 const COLUMNAS =
-  "id, padre_id, nombre, slug, icono, foto_url, orden, arquetipo_ficha, arquetipo_id, atributos_producto";
+  "id, padre_id, nombre, slug, icono, foto_url, orden, arquetipo_ficha, arquetipo_id, atributos_producto, servicio_slug";
 
 function aCategoria(fila: FilaCategoria): Categoria {
   return {
@@ -35,6 +36,7 @@ function aCategoria(fila: FilaCategoria): Categoria {
     arquetipoFicha: fila.arquetipo_ficha ?? undefined,
     arquetipoId: fila.arquetipo_id ?? undefined,
     atributosProducto: fila.atributos_producto ?? undefined,
+    servicioSlug: fila.servicio_slug,
   };
 }
 
@@ -83,9 +85,9 @@ export class CategoriasService {
       "SELECT COALESCE(MAX(orden), 0) + 1 AS siguiente FROM categorias",
     );
     await this.bd.consultar(
-      `INSERT INTO categorias (id, padre_id, nombre, slug, icono, orden, arquetipo_id)
-       VALUES ($1, NULL, $2, $3, $4, $5, $6)`,
-      [id, dto.nombre, slug, dto.icono, rows[0].siguiente, dto.arquetipoId ?? null],
+      `INSERT INTO categorias (id, padre_id, nombre, slug, icono, orden, arquetipo_id, servicio_slug)
+       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7)`,
+      [id, dto.nombre, slug, dto.icono, rows[0].siguiente, dto.arquetipoId ?? null, dto.servicioSlug ?? null],
     );
     return aCategoria(await this.obtenerFilaOFallar(id));
   }
@@ -97,9 +99,19 @@ export class CategoriasService {
        SET nombre = COALESCE($2, nombre),
            slug = CASE WHEN $2::text IS NOT NULL THEN $3 ELSE slug END,
            icono = COALESCE($4, icono),
-           arquetipo_id = CASE WHEN $5 THEN $6 ELSE arquetipo_id END
+           arquetipo_id = CASE WHEN $5 THEN $6 ELSE arquetipo_id END,
+           servicio_slug = CASE WHEN $7 THEN $8 ELSE servicio_slug END
        WHERE id = $1`,
-      [id, dto.nombre ?? null, dto.nombre ? slugificar(dto.nombre) : null, dto.icono ?? null, "arquetipoId" in dto, dto.arquetipoId ?? null],
+      [
+        id,
+        dto.nombre ?? null,
+        dto.nombre ? slugificar(dto.nombre) : null,
+        dto.icono ?? null,
+        "arquetipoId" in dto,
+        dto.arquetipoId ?? null,
+        "servicioSlug" in dto,
+        dto.servicioSlug ?? null,
+      ],
     );
     return aCategoria(await this.obtenerFilaOFallar(id));
   }

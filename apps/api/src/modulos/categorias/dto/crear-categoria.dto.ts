@@ -13,4 +13,8 @@ export class CrearCategoriaDto {
   @IsOptional()
   @IsString()
   arquetipoId?: string | null;
+
+  @IsOptional()
+  @IsString()
+  servicioSlug?: string | null;
 }

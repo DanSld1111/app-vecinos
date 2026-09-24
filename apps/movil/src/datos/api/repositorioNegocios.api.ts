@@ -20,6 +20,7 @@ export class RepositorioNegociosApi implements RepositorioNegocios {
     return apiGet<ResultadoPaginado<Negocio>>("/negocios", {
       comunidadId: filtro.comunidadId,
       categoriaId: filtro.categoriaId,
+      servicioSlug: filtro.servicioSlug,
       cursor: filtro.cursor,
       limite: filtro.limite,
     });

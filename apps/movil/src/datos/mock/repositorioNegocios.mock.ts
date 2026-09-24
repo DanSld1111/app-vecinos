@@ -1,6 +1,7 @@
 import { FiltroNegocios, Negocio, ResultadoPaginado } from "@app-vecinos/tipos";
 import { RepositorioNegocios } from "../contratos/repositorioNegocios";
 import { negociosMock } from "./negocios.mock";
+import { categoriasMock } from "./categorias.mock";
 
 const RETRASO_SIMULADO_MS = 300;
 
@@ -16,6 +17,13 @@ export class RepositorioNegociosMock implements RepositorioNegocios {
 
     if (filtro.categoriaId) {
       resultado = resultado.filter((n) => n.categoriaIds.includes(filtro.categoriaId as string));
+    }
+
+    if (filtro.servicioSlug) {
+      const categoriaIdsDelServicio = categoriasMock
+        .filter((c) => c.servicioSlug === filtro.servicioSlug)
+        .map((c) => c.id);
+      resultado = resultado.filter((n) => n.categoriaIds.some((id) => categoriaIdsDelServicio.includes(id)));
     }
 
     if (filtro.busqueda) {

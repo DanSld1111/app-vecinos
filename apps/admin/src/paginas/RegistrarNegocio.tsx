@@ -5,13 +5,14 @@ import { useNegocios } from "../estado/useNegocios";
 import { useGeografia } from "../estado/useGeografia";
 import { useCuentas } from "../estado/useCuentas";
 import { useCategorias } from "../estado/useCategorias";
+import { useServiciosApp } from "../estado/useServiciosApp";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { useToasts } from "../estado/useToasts";
 import { generarContrasenaTemporal } from "../utilidades/contrasena";
 import { urlCompleta } from "../utilidades/media";
 import { soloDigitos } from "../utilidades/telefono";
 import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
-import { SelectorCategoria } from "../componentes/negocio/SelectorCategoria";
+import { SelectorServicioYCategoria } from "../componentes/negocio/SelectorServicioYCategoria";
 import { CampoDireccionConMapa } from "../componentes/negocio/CampoDireccionConMapa";
 import { ModalProducto } from "../componentes/negocio/ModalProducto";
 import { SelectorColorAtributo } from "../componentes/negocio/SelectorColorAtributo";
@@ -40,6 +41,8 @@ export function RegistrarNegocio() {
   const distritos = useGeografia((estado) => estado.distritos);
   const comunidades = useGeografia((estado) => estado.comunidades);
   const categorias = useCategorias((estado) => estado.categorias);
+  const servicios = useServiciosApp((estado) => estado.servicios);
+  const cargarServicios = useServiciosApp((estado) => estado.cargar);
   const crearNegocio = useNegocios((estado) => estado.crear);
   const actualizarInfo = useNegocios((estado) => estado.actualizarInfo);
   const avisos = useToasts((estado) => estado.mostrar);
@@ -108,7 +111,8 @@ export function RegistrarNegocio() {
 
   useEffect(() => {
     cargarCuentas(token);
-  }, [cargarCuentas, token]);
+    cargarServicios();
+  }, [cargarCuentas, cargarServicios, token]);
 
   // Producto (paso 3/4)
   const [productoCreado, setProductoCreado] = useState<Producto | null>(null);
@@ -233,16 +237,16 @@ export function RegistrarNegocio() {
               <div className="tarjeta-paso-registro">
                 <div className="seccion-alta">
                   <div className="titulo-seccion-alta">🏷️ Identidad</div>
-                  <div className="fila-2-campos-alta">
-                    <div className="campo-modal">
-                      <label>Nombre del negocio</label>
-                      <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Panadería San José" autoFocus />
-                    </div>
-                    <div className="campo-modal">
-                      <label>Categoría</label>
-                      <SelectorCategoria categorias={categorias} valor={categoriaId} onCambiar={setCategoriaId} />
-                    </div>
+                  <div className="campo-modal">
+                    <label>Nombre del negocio</label>
+                    <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Panadería San José" autoFocus />
                   </div>
+                  <SelectorServicioYCategoria
+                    servicios={servicios}
+                    categorias={categorias}
+                    categoriaId={categoriaId}
+                    onCambiarCategoria={setCategoriaId}
+                  />
                 </div>
 
                 <div className="seccion-alta">

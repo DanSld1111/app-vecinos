@@ -14,4 +14,8 @@ export class ActualizarCategoriaDto {
   @IsOptional()
   @IsString()
   arquetipoId?: string | null;
+
+  @IsOptional()
+  @IsString()
+  servicioSlug?: string | null;
 }

@@ -92,6 +92,17 @@ export class NegociosService {
       );
     }
 
+    if (filtro.servicioSlug) {
+      valores.push(filtro.servicioSlug);
+      condiciones.push(
+        `EXISTS (
+           SELECT 1 FROM negocio_categorias x
+           JOIN categorias c ON c.id = x.categoria_id
+           WHERE x.negocio_id = n.id AND c.servicio_slug = $${valores.length}
+         )`,
+      );
+    }
+
     if (filtro.busqueda) {
       valores.push(`%${filtro.busqueda}%`);
       condiciones.push(`n.nombre ILIKE $${valores.length}`);

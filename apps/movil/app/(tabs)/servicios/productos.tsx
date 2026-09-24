@@ -1,5 +1,5 @@
 import { GuiaListado } from "../../../src/componentes/GuiaListado";
 
 export default function GuiaProductos() {
-  return <GuiaListado categoriaIdFija="cat-emprendimientos" />;
+  return <GuiaListado servicioSlugFijo="market-space" mostrarFiltroCategorias />;
 }

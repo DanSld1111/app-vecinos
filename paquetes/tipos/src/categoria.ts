@@ -39,4 +39,8 @@ export interface Categoria {
   arquetipoId?: string;
   /** Vacío o ausente = los productos de esta categoría no tienen atributos especiales. */
   atributosProducto?: AtributoProductoDef[];
+  /** A qué servicio pertenece (ServicioApp.slug) — filtra qué categorías se ofrecen al elegir
+   * el servicio en el alta de negocio, y qué negocios entran en la pantalla de ese servicio en
+   * la app. null = todavía sin asignar. Ver docs/decisiones/0072-servicio-dueno-de-categoria.md. */
+  servicioSlug: string | null;
 }

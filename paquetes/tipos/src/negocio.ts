@@ -76,6 +76,10 @@ export interface Negocio {
 export interface FiltroNegocios {
   comunidadId: string;
   categoriaId?: string;
+  /** Trae los negocios de TODAS las categorías de este servicio (Restaurantes, Market Space…) —
+   * distinto de categoriaId, que es una sola categoría suelta. Ver
+   * docs/decisiones/0072-servicio-dueno-de-categoria.md. */
+  servicioSlug?: string;
   busqueda?: string;
   cursor?: string;
   limite?: number;
