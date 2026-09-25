@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Animated, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { textos } from "../../src/i18n/es";
 import { repositorioNegocios } from "../../src/datos/fabricaRepositorios";
@@ -54,6 +54,7 @@ export default function FichaNegocio() {
   if (isLoading) {
     return (
       <View style={styles.contenedor}>
+        <Stack.Screen options={{ title: "" }} />
         <EsqueletoFicha />
       </View>
     );
@@ -62,6 +63,7 @@ export default function FichaNegocio() {
   if (isError) {
     return (
       <View style={styles.contenedor}>
+        <Stack.Screen options={{ title: "" }} />
         <EstadoError onReintentar={() => refetch()} />
       </View>
     );
@@ -70,6 +72,7 @@ export default function FichaNegocio() {
   if (!negocio) {
     return (
       <View style={styles.contenedor}>
+        <Stack.Screen options={{ title: "" }} />
         <EstadoVacio titulo="No encontramos este negocio." />
       </View>
     );
@@ -121,6 +124,7 @@ export default function FichaNegocio() {
 
   return (
     <ScrollView style={styles.contenedor} contentContainerStyle={styles.contenido}>
+      <Stack.Screen options={{ title: negocio.nombre }} />
       {negocio.fotoPrincipalUrl ? (
         <Image source={{ uri: urlCompleta(negocio.fotoPrincipalUrl) }} style={styles.fotoPrincipal} />
       ) : (
