@@ -31,6 +31,7 @@ export interface FilaNegocio {
   visitas_7d: string;
   /** Solo presente cuando la consulta la calculó (ver `listar()` con `lat`/`lng`). */
   distancia_m?: string | null;
+  acerca_del_negocio: string | null;
 }
 
 export function aNegocio(fila: FilaNegocio): Negocio {
@@ -63,6 +64,7 @@ export function aNegocio(fila: FilaNegocio): Negocio {
     fotosGaleria: fila.fotos_galeria,
     visitas7d: Number(fila.visitas_7d),
     distanciaM: fila.distancia_m != null ? Number(fila.distancia_m) : undefined,
+    acercaDelNegocio: fila.acerca_del_negocio,
   };
 }
 
@@ -70,7 +72,7 @@ export const COLUMNAS_NEGOCIO = `
   n.id, n.comunidad_id, n.distrito_ubigeo, n.nombre, n.descripcion, n.direccion,
   n.telefono, n.whatsapp, n.horarios, n.moneda, n.foto_principal_url, n.estado, n.archivado_en, n.verificado_en,
   n.validado_por_cuenta_id, n.motivo_rechazo, n.fuente, n.creado_en, n.actualizado_en,
-  n.servicios_ofrecidos, n.rubros_disponibles, n.ofertas, n.pasillos, n.fotos_galeria,
+  n.servicios_ofrecidos, n.rubros_disponibles, n.ofertas, n.pasillos, n.fotos_galeria, n.acerca_del_negocio,
   ST_Y(n.coordenada::geometry) AS lat, ST_X(n.coordenada::geometry) AS lng,
   COALESCE(array_agg(nc.categoria_id) FILTER (WHERE nc.categoria_id IS NOT NULL), '{}') AS categoria_ids,
   (SELECT COUNT(*) FROM negocio_visitas v WHERE v.negocio_id = n.id AND v.creado_en > now() - interval '7 days') AS visitas_7d

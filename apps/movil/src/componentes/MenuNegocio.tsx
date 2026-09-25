@@ -58,13 +58,33 @@ function ItemMenu({
   );
 }
 
-export function MenuNegocio({ productos, moneda }: { productos: Producto[]; moneda: Moneda }) {
+export function MenuNegocio({
+  productos,
+  moneda,
+  busqueda = "",
+}: {
+  productos: Producto[];
+  moneda: Moneda;
+  /** Viene del buscador del header de la ficha, no de uno propio — ver app/negocio/[id]/index.tsx. */
+  busqueda?: string;
+}) {
   const colores = useColores();
   const styles = crearEstilos(colores);
 
   if (productos.length === 0) return null;
-  const grupos = agruparPorCategoria(productos);
+  const termino = busqueda.trim().toLowerCase();
+  const filtrados = termino ? productos.filter((p) => p.nombre.toLowerCase().includes(termino)) : productos;
+  const grupos = agruparPorCategoria(filtrados);
   let indiceGlobal = 0;
+
+  if (filtrados.length === 0) {
+    return (
+      <View>
+        <Text style={styles.tituloSeccion}>Menú</Text>
+        <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -152,6 +172,12 @@ function crearEstilos(colores: PaletaColores) {
       ...tipografia.cuerpoDestacado,
       color: colores.primarioFuerte,
       marginTop: 2,
+    },
+    sinResultados: {
+      ...tipografia.cuerpo,
+      color: colores.textoTenue,
+      textAlign: "center",
+      paddingVertical: espaciado.lg,
     },
   });
 }

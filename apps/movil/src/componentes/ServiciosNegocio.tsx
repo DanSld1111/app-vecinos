@@ -14,17 +14,37 @@ const EMOJI_POR_SERVICIO: Record<string, string> = {
   "Baño y corte": "✂️",
 };
 
-export function ServiciosNegocio({ servicios, moneda }: { servicios: ServicioOfrecido[]; moneda: Moneda }) {
+export function ServiciosNegocio({
+  servicios,
+  moneda,
+  busqueda = "",
+}: {
+  servicios: ServicioOfrecido[];
+  moneda: Moneda;
+  /** Viene del buscador del header de la ficha — ver app/negocio/[id]/index.tsx. */
+  busqueda?: string;
+}) {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
 
   if (servicios.length === 0) return null;
+  const termino = busqueda.trim().toLowerCase();
+  const filtrados = termino ? servicios.filter((s) => s.nombre.toLowerCase().includes(termino)) : servicios;
+
+  if (filtrados.length === 0) {
+    return (
+      <View>
+        <Text style={styles.tituloSeccion}>Servicios y tarifas</Text>
+        <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
+      </View>
+    );
+  }
 
   return (
     <View>
       <Text style={styles.tituloSeccion}>Servicios y tarifas</Text>
-      {servicios.map((servicio, indice) => (
+      {filtrados.map((servicio, indice) => (
         <EntradaAnimada key={servicio.nombre} retraso={indice * 60} style={styles.fila}>
           {servicio.fotoUrl ? (
             <Image source={{ uri: urlCompleta(servicio.fotoUrl) }} style={styles.foto} />
@@ -100,6 +120,12 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       color: colores.textoTenue,
       fontStyle: "italic",
       marginTop: espaciado.sm,
+    },
+    sinResultados: {
+      ...tipografia.cuerpo,
+      color: colores.textoTenue,
+      textAlign: "center",
+      paddingVertical: espaciado.lg,
     },
   });
 }

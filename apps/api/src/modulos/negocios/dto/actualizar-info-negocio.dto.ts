@@ -42,4 +42,10 @@ export class ActualizarInfoNegocioDto {
   @IsOptional()
   @IsIn(MONEDAS)
   moneda?: Moneda;
+
+  /** Texto libre del dueño — se muestra en "Información del negocio". Puede llegar null para
+   * borrarlo. */
+  @IsOptional()
+  @IsString()
+  acercaDelNegocio?: string | null;
 }

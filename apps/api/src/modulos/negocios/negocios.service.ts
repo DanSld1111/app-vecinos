@@ -531,6 +531,7 @@ export class NegociosService {
              -- (por eso el CASE y no un COALESCE sobre el valor nuevo).
              coordenada = CASE WHEN $7 THEN ST_SetSRID(ST_MakePoint($8, $9), 4326)::geography ELSE coordenada END,
              moneda = COALESCE($10, moneda),
+             acerca_del_negocio = $11,
              actualizado_en = now()
          WHERE id = $1`,
         [
@@ -544,6 +545,7 @@ export class NegociosService {
           dto.coordenada?.lng ?? 0,
           dto.coordenada?.lat ?? 0,
           dto.moneda ?? null,
+          dto.acercaDelNegocio ?? null,
         ],
       );
       await db.consultar("DELETE FROM negocio_categorias WHERE negocio_id = $1", [id]);

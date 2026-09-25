@@ -81,6 +81,9 @@ export interface Negocio {
   /** Solo viene cuando `listar()` recibió `lat`/`lng` (la ubicación real del vecino) — metros en
    * línea recta desde ahí hasta el negocio. undefined si no se pidió con ubicación. */
   distanciaM?: number;
+  /** Texto libre que escribe el propio dueño desde el panel — se muestra en "Información del
+   * negocio". null mientras no lo complete (nunca se inventa un texto por defecto). */
+  acercaDelNegocio: string | null;
 }
 
 export interface FiltroNegocios {

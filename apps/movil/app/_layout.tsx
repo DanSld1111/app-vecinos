@@ -69,18 +69,17 @@ export default function LayoutRaiz() {
               }}
             >
               <Stack.Screen name="(tabs)" />
+              {/* Sin header nativo: trae su propio encabezado (flecha + buscador + favorito + ⋮)
+                  dentro del componente — mismo criterio que servicios/_layout.tsx. */}
+              <Stack.Screen name="negocio/[id]/index" options={{ headerShown: false }} />
               <Stack.Screen
-                name="negocio/[id]"
+                name="negocio/[id]/informacion"
                 options={{
                   headerShown: true,
                   title: "",
-                  headerBackTitle: "Atrás",
                   headerStyle: { backgroundColor: colores.fondo },
                   headerTintColor: colores.texto,
                   headerShadowVisible: false,
-                  // Botón de volver propio — la pantalla anterior (un tab, headerShown:false)
-                  // no tiene título del que heredar el back button nativo, y en algunos builds
-                  // de iOS eso deja el header sin flecha visible. Ver servicios/_layout.tsx.
                   headerLeft: () => (
                     <Pressable
                       onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
@@ -92,6 +91,7 @@ export default function LayoutRaiz() {
                   ),
                 }}
               />
+              <Stack.Screen name="favoritos" options={{ presentation: "fullScreenModal" }} />
               <Stack.Screen name="buscar" options={{ presentation: "fullScreenModal" }} />
               <Stack.Screen name="notificaciones" />
               <Stack.Screen name="cuenta/index" options={{ presentation: "fullScreenModal" }} />

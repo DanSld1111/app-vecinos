@@ -13,7 +13,15 @@ function horarioComercial(abre = "09:00", cierra = "21:00"): Horarios {
   };
 }
 
-type NegocioSemilla = Omit<Negocio, "validadoPorCuentaId" | "motivoRechazo" | "fotosGaleria" | "visitas7d">;
+type NegocioSemilla = Omit<
+  Negocio,
+  "validadoPorCuentaId" | "motivoRechazo" | "fotosGaleria" | "visitas7d" | "acercaDelNegocio"
+>;
+
+const ACERCA_DEL_NEGOCIO_MOCK: Record<string, string> = {
+  "neg-restaurante-fogon":
+    "Somos una familia sanborjina cocinando parrillas y criollo desde hace más de 15 años — todo a la carbón, sin apuro.",
+};
 
 /** Visitas de ejemplo de los últimos 7 días, a mano por id — así el orden y el badge "Popular"
  * de Inicio se ven variados en el modo mock en vez de todos en cero. */
@@ -244,4 +252,5 @@ export const negociosMock: Negocio[] = negociosSemilla.map((negocio) => ({
   // servicios u ofertas) — queda lista para cuando un negocio real no tenga nada de eso.
   fotosGaleria: [],
   visitas7d: VISITAS_7D_MOCK[negocio.id] ?? 0,
+  acercaDelNegocio: ACERCA_DEL_NEGOCIO_MOCK[negocio.id] ?? null,
 }));

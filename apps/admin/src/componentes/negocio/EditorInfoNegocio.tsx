@@ -38,6 +38,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   const [whatsapp, setWhatsapp] = useState(negocio.whatsapp ?? "");
   const [moneda, setMoneda] = useState<Moneda>(negocio.moneda);
   const [coordenada, setCoordenada] = useState<Coordenada>(negocio.coordenada);
+  const [acercaDelNegocio, setAcercaDelNegocio] = useState(negocio.acercaDelNegocio ?? "");
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
 
@@ -56,6 +57,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
         whatsapp: whatsapp.trim() || null,
         moneda,
         coordenada,
+        acercaDelNegocio: acercaDelNegocio.trim() || null,
       },
       token,
     );
@@ -138,6 +140,20 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
           onCambiarDireccion={setDireccion}
           onCambiarCoordenada={setCoordenada}
         />
+
+        <div className="campo-modal">
+          <label>Acerca del negocio</label>
+          <textarea
+            rows={4}
+            value={acercaDelNegocio}
+            onChange={(e) => setAcercaDelNegocio(e.target.value)}
+            placeholder="Cuéntales a tus vecinos algo más sobre tu negocio — historia, lo que lo distingue, etc."
+          />
+          <p style={{ fontSize: 11.5, color: "var(--texto-suave)", margin: "6px 0 0" }}>
+            Se muestra en "Información del negocio" dentro de la ficha, junto al mapa y el
+            horario. Opcional — si lo dejas vacío, esa sección no aparece.
+          </p>
+        </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 4 }}>
           <button className="btn btn-primario" disabled={guardando} onClick={guardar}>

@@ -14,7 +14,7 @@ type InfoEditable = Pick<
   "nombre" | "descripcion" | "categoriaIds" | "direccion" | "telefono" | "whatsapp"
 > &
   // Opcionales en la API: si no van, se deja lo que ya había (ver PUT :id/info).
-  Partial<Pick<Negocio, "coordenada" | "moneda">>;
+  Partial<Pick<Negocio, "coordenada" | "moneda" | "acercaDelNegocio">>;
 
 interface EstadoNegocios {
   negocios: Negocio[];

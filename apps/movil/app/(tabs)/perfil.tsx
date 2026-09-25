@@ -9,6 +9,7 @@ import { textos } from "../../src/i18n/es";
 import { useComunidadActiva } from "../../src/estado/comunidadActiva";
 import { useNotificaciones } from "../../src/estado/useNotificaciones";
 import { useSesion } from "../../src/estado/useSesion";
+import { useFavoritosIds } from "../../src/datos/hooks/useFavoritos";
 import { useTema } from "../../src/estado/useTema";
 import { HojaInferior } from "../../src/componentes/HojaInferior";
 import { SelectorComunidad } from "../../src/componentes/SelectorComunidad";
@@ -105,6 +106,7 @@ export default function Perfil() {
   const usuario = useSesion((estado) => estado.usuario);
   // usuario es null en "modo prueba" (continuarComoInvitado) — ahí no hay nombre real que mostrar.
   const nombreMostrado = usuario ? usuario.nombre : "Invitado";
+  const { data: idsFavoritos } = useFavoritosIds();
 
   function compartirApp() {
     Share.share({
@@ -134,30 +136,20 @@ export default function Perfil() {
         </View>
       </View>
 
-      <View style={styles.statsFila}>
-        <View style={styles.statSombra}>
-          <View style={styles.statCard}>
-            <View style={[styles.statIcono, { backgroundColor: colores.acentoSuave }]}>
-              <Ionicons name="star-outline" size={16} color={colores.acentoFuerte} />
-            </View>
-            <Text style={styles.statEtiqueta}>Reseñas</Text>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillTexto}>Próximamente</Text>
-            </View>
+      <Pressable style={styles.statSombra} onPress={() => router.push("/favoritos")}>
+        <View style={styles.statCardAncha}>
+          <View style={[styles.statIcono, { backgroundColor: colores.primarioSuave }]}>
+            <Ionicons name="heart" size={16} color={colores.primarioFuerte} />
           </View>
-        </View>
-        <View style={styles.statSombra}>
-          <View style={styles.statCard}>
-            <View style={[styles.statIcono, { backgroundColor: colores.primarioSuave }]}>
-              <Ionicons name="heart-outline" size={16} color={colores.primarioFuerte} />
-            </View>
-            <Text style={styles.statEtiqueta}>Favoritos</Text>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillTexto}>Próximamente</Text>
-            </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.statEtiquetaAncha}>Favoritos</Text>
+            <Text style={styles.statSubtextoAncha}>
+              {idsFavoritos ? `${idsFavoritos.length} negocio${idsFavoritos.length === 1 ? "" : "s"} guardado${idsFavoritos.length === 1 ? "" : "s"}` : "Negocios que guardaste"}
+            </Text>
           </View>
+          <Ionicons name="chevron-forward" size={18} color={colores.textoTenue} />
         </View>
-      </View>
+      </Pressable>
 
       <Text style={styles.etiquetaSeccion}>Preferencias</Text>
       <Grupo>
@@ -316,12 +308,7 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.primarioFuerte,
     },
 
-    statsFila: {
-      flexDirection: "row",
-      gap: espaciado.sm,
-    },
     statSombra: {
-      flex: 1,
       borderRadius: radios.lg,
       backgroundColor: colores.superficie,
       shadowColor: "#0f1f16",
@@ -330,41 +317,28 @@ function crearEstilos(colores: PaletaColores) {
       shadowRadius: 12,
       elevation: 2,
     },
-    statCard: {
-      borderRadius: radios.lg,
-      overflow: "hidden",
-      paddingVertical: espaciado.md,
+    statCardAncha: {
+      flexDirection: "row",
       alignItems: "center",
-      gap: 4,
-      opacity: 0.85,
+      gap: espaciado.md,
+      borderRadius: radios.lg,
+      padding: espaciado.md,
     },
     statIcono: {
-      width: 32,
-      height: 32,
+      width: 34,
+      height: 34,
       borderRadius: radios.md,
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 2,
     },
-    statEtiqueta: {
+    statEtiquetaAncha: {
+      ...tipografia.cuerpoDestacado,
+      color: colores.texto,
+    },
+    statSubtextoAncha: {
       ...tipografia.pie,
-      fontSize: 11,
-      fontWeight: "700",
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-    },
-    statPill: {
-      backgroundColor: colores.superficieHundida,
-      paddingHorizontal: espaciado.sm,
-      paddingVertical: 2,
-      borderRadius: radios.completo,
-      marginTop: 2,
-    },
-    statPillTexto: {
-      ...tipografia.pie,
-      fontSize: 10,
-      fontWeight: "700",
-      color: colores.textoTenue,
+      color: colores.textoSuave,
+      marginTop: 1,
     },
 
     etiquetaSeccion: {

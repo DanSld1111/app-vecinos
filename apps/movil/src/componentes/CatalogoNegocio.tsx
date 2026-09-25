@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Image, Linking, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, Linking, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
@@ -12,11 +12,14 @@ export function CatalogoNegocio({
   productos,
   moneda,
   whatsapp,
+  busqueda = "",
 }: {
   productos: Producto[];
   moneda: Moneda;
   /** Para el botón "Consultar por WhatsApp" en el detalle del producto — null si el negocio no puso uno. */
   whatsapp?: string | null;
+  /** Viene del buscador del header de la ficha, no de uno propio — ver app/negocio/[id]/index.tsx. */
+  busqueda?: string;
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
@@ -25,7 +28,6 @@ export function CatalogoNegocio({
     [productos]
   );
   const [filtro, setFiltro] = useState<string | null>(null);
-  const [busqueda, setBusqueda] = useState("");
   const [abierto, setAbierto] = useState<Producto | null>(null);
 
   if (productos.length === 0) return null;
@@ -45,17 +47,6 @@ export function CatalogoNegocio({
   return (
     <View>
       <Text style={styles.tituloSeccion}>Catálogo</Text>
-
-      <View style={styles.buscador}>
-        <Ionicons name="search" size={15} color={colores.textoTenue} />
-        <TextInput
-          value={busqueda}
-          onChangeText={setBusqueda}
-          placeholder="Buscar en este negocio…"
-          placeholderTextColor={colores.textoTenue}
-          style={styles.entradaBuscador}
-        />
-      </View>
 
       {subcategorias.length > 1 ? (
         <View style={styles.filaChips}>
@@ -145,23 +136,6 @@ function crearEstilos(colores: PaletaColores) {
       textTransform: "uppercase",
       marginTop: espaciado.md,
       marginBottom: espaciado.sm,
-    },
-    buscador: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: espaciado.sm,
-      backgroundColor: colores.superficieHundida,
-      borderRadius: radios.md,
-      paddingHorizontal: espaciado.md,
-      height: 40,
-      marginBottom: espaciado.sm,
-    },
-    entradaBuscador: {
-      flex: 1,
-      ...tipografia.cuerpo,
-      fontSize: 13,
-      color: colores.texto,
-      padding: 0,
     },
     filaChips: {
       flexDirection: "row",

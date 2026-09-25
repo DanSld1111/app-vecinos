@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Moneda, OfertaNegocio, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { useTema } from "../estado/useTema";
@@ -13,17 +11,19 @@ export function OfertasPasillosNegocio({
   pasillos,
   negocioFotoUrl,
   moneda,
+  busqueda = "",
 }: {
   ofertas: OfertaNegocio[];
   pasillos: string[];
   /** No hay foto propia por oferta en el modelo — se reusa la foto principal del negocio. */
   negocioFotoUrl?: string | null;
   moneda: Moneda;
+  /** Viene del buscador del header de la ficha, no de uno propio — ver app/negocio/[id]/index.tsx. */
+  busqueda?: string;
 }) {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
-  const [busqueda, setBusqueda] = useState("");
 
   if (ofertas.length === 0 && pasillos.length === 0) return null;
 
@@ -32,19 +32,6 @@ export function OfertasPasillosNegocio({
 
   return (
     <View>
-      {ofertas.length > 0 ? (
-        <View style={styles.buscador}>
-          <Ionicons name="search" size={15} color={colores.textoTenue} />
-          <TextInput
-            value={busqueda}
-            onChangeText={setBusqueda}
-            placeholder="Buscar producto en el super…"
-            placeholderTextColor={colores.textoTenue}
-            style={styles.entradaBuscador}
-          />
-        </View>
-      ) : null}
-
       {ofertas.length > 0 ? (
         <>
           <Text style={styles.tituloSeccion}>Ofertas de la semana</Text>
@@ -100,22 +87,6 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       textTransform: "uppercase",
       marginTop: espaciado.md,
       marginBottom: espaciado.sm,
-    },
-    buscador: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: espaciado.sm,
-      backgroundColor: colores.superficieHundida,
-      borderRadius: radios.md,
-      paddingHorizontal: espaciado.md,
-      height: 40,
-    },
-    entradaBuscador: {
-      flex: 1,
-      ...tipografia.cuerpo,
-      fontSize: 13,
-      color: colores.texto,
-      padding: 0,
     },
     sinResultados: {
       ...tipografia.cuerpo,
