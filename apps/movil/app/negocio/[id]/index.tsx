@@ -3,12 +3,14 @@ import { Alert, Animated, Linking, Pressable, ScrollView, Share, StyleSheet, Tex
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Calificacion } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../../src/disenio";
 import { textos } from "../../../src/i18n/es";
 import { repositorioNegocios } from "../../../src/datos/fabricaRepositorios";
 import { useNegocio } from "../../../src/datos/hooks/useNegocios";
 import { useCategorias } from "../../../src/datos/hooks/useCategorias";
 import { useFavoritosIds, useInvalidarFavoritos, alternarFavorito } from "../../../src/datos/hooks/useFavoritos";
+import { useMiCalificacion, useInvalidarCalificacion, calificar } from "../../../src/datos/hooks/useCalificacion";
 import { useSesion } from "../../../src/estado/useSesion";
 import { BotonPrimario } from "../../../src/componentes/BotonPrimario";
 import { EstadoError } from "../../../src/componentes/EstadoError";
@@ -22,6 +24,7 @@ import { OfertasPasillosNegocio } from "../../../src/componentes/OfertasPasillos
 import { GaleriaNegocio } from "../../../src/componentes/GaleriaNegocio";
 import { SinFoto } from "../../../src/componentes/SinFoto";
 import { MenuAccionesNegocio } from "../../../src/componentes/MenuAccionesNegocio";
+import { HojaCalificar } from "../../../src/componentes/HojaCalificar";
 import { useProductosPorNegocio } from "../../../src/datos/hooks/useProductos";
 import { resolverArquetipoFicha } from "../../../src/utilidades/arquetipoFicha";
 import { urlCompleta } from "../../../src/utilidades/media";
@@ -51,8 +54,11 @@ export default function FichaNegocio() {
   const token = useSesion((estado) => estado.token);
   const { data: idsFavoritos } = useFavoritosIds();
   const invalidarFavoritos = useInvalidarFavoritos();
+  const { data: miCalificacion } = useMiCalificacion(id);
+  const invalidarCalificacion = useInvalidarCalificacion(id);
   const [busqueda, setBusqueda] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
+  const [calificarVisible, setCalificarVisible] = useState(false);
   const [favoritoOptimista, setFavoritoOptimista] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -119,6 +125,23 @@ export default function FichaNegocio() {
   function verInformacion() {
     setMenuVisible(false);
     router.push(`/negocio/${negocio!.id}/informacion`);
+  }
+
+  function abrirCalificar() {
+    setMenuVisible(false);
+    if (!token) {
+      // Mismo criterio que favoritos: "modo prueba" no tiene cuenta a la que asociar la
+      // calificación, así que se explica en vez de fallar en silencio.
+      Alert.alert("Inicia sesión para calificar", "Necesitas tu cuenta de vecino — \"modo prueba\" no puede calificar negocios.");
+      return;
+    }
+    setCalificarVisible(true);
+  }
+
+  async function alCalificar(valor: Calificacion) {
+    if (!token) return;
+    await calificar(negocio!.id, valor, token);
+    invalidarCalificacion();
   }
 
   async function tocarFavorito() {
@@ -211,6 +234,20 @@ export default function FichaNegocio() {
 
         <Text style={styles.descripcion}>{negocio.descripcion}</Text>
 
+        <Pressable onPress={abrirCalificar} hitSlop={4} style={styles.filaCalificacion}>
+          <Ionicons name="star" size={13} color="#e0a835" />
+          {negocio.calificacionTotal > 0 ? (
+            <>
+              <Text style={styles.calificacionValor}>{negocio.calificacionPromedio}</Text>
+              <Text style={styles.calificacionTotal}>
+                ({negocio.calificacionTotal} calificaci{negocio.calificacionTotal === 1 ? "ón" : "ones"})
+              </Text>
+            </>
+          ) : (
+            <Text style={styles.calificacionTotal}>Sé el primero en calificar</Text>
+          )}
+        </Pressable>
+
         <View style={styles.accionRow}>
           <BotonPrimario texto={textos.ficha.whatsapp} onPress={abrirWhatsapp} style={styles.accionBoton} />
           <BotonPrimario texto={textos.ficha.llamar} onPress={llamar} variante="fantasma" style={styles.accionBoton} />
@@ -224,7 +261,16 @@ export default function FichaNegocio() {
         nombreNegocio={negocio.nombre}
         onCerrar={() => setMenuVisible(false)}
         onVerInformacion={verInformacion}
+        onCalificar={abrirCalificar}
         onCompartir={compartir}
+      />
+
+      <HojaCalificar
+        visible={calificarVisible}
+        nombreNegocio={negocio.nombre}
+        valorInicial={miCalificacion?.calificacion ?? null}
+        onCerrar={() => setCalificarVisible(false)}
+        onCalificar={alCalificar}
       />
     </View>
   );
@@ -291,6 +337,25 @@ function crearEstilos(colores: PaletaColores) {
       ...tipografia.cuerpo,
       color: colores.textoSuave,
       marginBottom: espaciado.md,
+    },
+    filaCalificacion: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      marginTop: -espaciado.sm,
+      marginBottom: espaciado.md,
+      alignSelf: "flex-start",
+    },
+    calificacionValor: {
+      ...tipografia.pie,
+      fontSize: 12.5,
+      fontFamily: "PlusJakartaSans_700Bold",
+      color: colores.texto,
+    },
+    calificacionTotal: {
+      ...tipografia.pie,
+      fontSize: 11,
+      color: colores.textoTenue,
     },
     accionRow: {
       flexDirection: "row",

@@ -27,12 +27,14 @@ export function MenuAccionesNegocio({
   nombreNegocio,
   onCerrar,
   onVerInformacion,
+  onCalificar,
   onCompartir,
 }: {
   visible: boolean;
   nombreNegocio: string;
   onCerrar: () => void;
   onVerInformacion: () => void;
+  onCalificar: () => void;
   onCompartir: () => void;
 }) {
   const colores = useColores();
@@ -42,6 +44,7 @@ export function MenuAccionesNegocio({
       <Text style={styles.nombre}>{nombreNegocio}</Text>
       <View style={styles.separador} />
       <FilaAccion icono="information-circle-outline" texto="Información del negocio" onPress={onVerInformacion} />
+      <FilaAccion icono="star-outline" texto="Calificar este negocio" onPress={onCalificar} />
       <FilaAccion icono="share-social-outline" texto="Compartir" onPress={onCompartir} />
     </HojaInferior>
   );

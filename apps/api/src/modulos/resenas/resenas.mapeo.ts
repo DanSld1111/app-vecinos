@@ -5,7 +5,9 @@ export interface FilaResena {
   negocio_id: string;
   usuario_id: string;
   usuario_nombre: string;
-  calificacion: number;
+  // numeric(2,1) en la base — node-pg lo devuelve como string para no perder precisión, no como
+  // number directo (mismo criterio que promedio en resenas.service.ts::resumen()).
+  calificacion: string;
   comentario: string | null;
   creado_en: string;
   actualizado_en: string;
@@ -24,7 +26,7 @@ export function aResena(fila: FilaResena): Resena {
     negocioId: fila.negocio_id,
     usuarioId: fila.usuario_id,
     usuarioNombre: fila.usuario_nombre,
-    calificacion: fila.calificacion as Resena["calificacion"],
+    calificacion: Number(fila.calificacion) as Resena["calificacion"],
     comentario: fila.comentario,
     creadoEn: fila.creado_en,
     actualizadoEn: fila.actualizado_en,

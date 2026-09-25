@@ -1,11 +1,14 @@
 import { IsIn, IsOptional, IsString, MaxLength } from "class-validator";
+import { Calificacion } from "@app-vecinos/tipos";
+
+const CALIFICACIONES: Calificacion[] = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
 export class CrearResenaDto {
   @IsString()
   negocioId!: string;
 
-  @IsIn([1, 2, 3, 4, 5])
-  calificacion!: 1 | 2 | 3 | 4 | 5;
+  @IsIn(CALIFICACIONES)
+  calificacion!: Calificacion;
 
   @IsOptional()
   @IsString()

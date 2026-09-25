@@ -1,5 +1,6 @@
 import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { Categoria, Negocio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { estadoHoyTexto } from "../utilidades/horarios";
@@ -28,9 +29,17 @@ export function TarjetaNegocioMenu({
 
   const contenidoTextos = (colorTexto: string, colorSubtitulo: string) => (
     <>
-      <Text style={[styles.nombre, { color: colorTexto }]} numberOfLines={1}>
-        {negocio.nombre}
-      </Text>
+      <View style={styles.filaNombre}>
+        <Text style={[styles.nombre, { color: colorTexto }]} numberOfLines={1}>
+          {negocio.nombre}
+        </Text>
+        {negocio.calificacionTotal > 0 ? (
+          <View style={styles.filaCalificacion}>
+            <Ionicons name="star" size={11} color="#e0a835" />
+            <Text style={[styles.calificacionTexto, { color: colorTexto }]}>{negocio.calificacionPromedio}</Text>
+          </View>
+        ) : null}
+      </View>
       <Text style={[styles.subtitulo, { color: colorSubtitulo }]} numberOfLines={1}>
         {nombresCategorias || negocio.direccion}
       </Text>
@@ -113,10 +122,27 @@ function crearEstilos(colores: PaletaColores) {
       gap: 2,
       marginTop: espaciado.lg,
     },
+    filaNombre: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+    },
     nombre: {
       ...tipografia.displaySeccion,
       fontSize: 15,
       color: "#ffffff",
+      flexShrink: 1,
+    },
+    filaCalificacion: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 2,
+      flexShrink: 0,
+    },
+    calificacionTexto: {
+      ...tipografia.pie,
+      fontSize: 11,
+      fontFamily: "PlusJakartaSans_700Bold",
     },
     subtitulo: {
       ...tipografia.pie,

@@ -84,6 +84,10 @@ export interface Negocio {
   /** Texto libre que escribe el propio dueño desde el panel — se muestra en "Información del
    * negocio". null mientras no lo complete (nunca se inventa un texto por defecto). */
   acercaDelNegocio: string | null;
+  /** null = todavía nadie lo calificó — nunca se muestra "0.0", se muestra "Sé el primero en
+   * calificar". Ver docs/decisiones/0076-calificacion-estrellas.md. */
+  calificacionPromedio: number | null;
+  calificacionTotal: number;
 }
 
 export interface FiltroNegocios {

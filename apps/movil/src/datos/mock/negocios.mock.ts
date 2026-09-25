@@ -15,12 +15,26 @@ function horarioComercial(abre = "09:00", cierra = "21:00"): Horarios {
 
 type NegocioSemilla = Omit<
   Negocio,
-  "validadoPorCuentaId" | "motivoRechazo" | "fotosGaleria" | "visitas7d" | "acercaDelNegocio"
+  | "validadoPorCuentaId"
+  | "motivoRechazo"
+  | "fotosGaleria"
+  | "visitas7d"
+  | "acercaDelNegocio"
+  | "calificacionPromedio"
+  | "calificacionTotal"
 >;
 
 const ACERCA_DEL_NEGOCIO_MOCK: Record<string, string> = {
   "neg-restaurante-fogon":
     "Somos una familia sanborjina cocinando parrillas y criollo desde hace más de 15 años — todo a la carbón, sin apuro.",
+};
+
+/** Promedio/total de ejemplo, a mano por id — así se ve la estrella junto al nombre en listados
+ * y el estado "Sé el primero en calificar" para los que no tienen ninguna. */
+const CALIFICACION_MOCK: Record<string, { promedio: number; total: number }> = {
+  "neg-restaurante-fogon": { promedio: 4.6, total: 12 },
+  "neg-veterinaria-aviacion": { promedio: 4.8, total: 5 },
+  "neg-panaderia-rosales": { promedio: 4.2, total: 8 },
 };
 
 /** Visitas de ejemplo de los últimos 7 días, a mano por id — así el orden y el badge "Popular"
@@ -253,4 +267,6 @@ export const negociosMock: Negocio[] = negociosSemilla.map((negocio) => ({
   fotosGaleria: [],
   visitas7d: VISITAS_7D_MOCK[negocio.id] ?? 0,
   acercaDelNegocio: ACERCA_DEL_NEGOCIO_MOCK[negocio.id] ?? null,
+  calificacionPromedio: CALIFICACION_MOCK[negocio.id]?.promedio ?? null,
+  calificacionTotal: CALIFICACION_MOCK[negocio.id]?.total ?? 0,
 }));

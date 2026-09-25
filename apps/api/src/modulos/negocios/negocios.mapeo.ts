@@ -32,6 +32,8 @@ export interface FilaNegocio {
   /** Solo presente cuando la consulta la calculó (ver `listar()` con `lat`/`lng`). */
   distancia_m?: string | null;
   acerca_del_negocio: string | null;
+  calificacion_promedio: string | null;
+  calificacion_total: string;
 }
 
 export function aNegocio(fila: FilaNegocio): Negocio {
@@ -65,6 +67,8 @@ export function aNegocio(fila: FilaNegocio): Negocio {
     visitas7d: Number(fila.visitas_7d),
     distanciaM: fila.distancia_m != null ? Number(fila.distancia_m) : undefined,
     acercaDelNegocio: fila.acerca_del_negocio,
+    calificacionPromedio: fila.calificacion_promedio != null ? Number(fila.calificacion_promedio) : null,
+    calificacionTotal: Number(fila.calificacion_total),
   };
 }
 
@@ -75,5 +79,7 @@ export const COLUMNAS_NEGOCIO = `
   n.servicios_ofrecidos, n.rubros_disponibles, n.ofertas, n.pasillos, n.fotos_galeria, n.acerca_del_negocio,
   ST_Y(n.coordenada::geometry) AS lat, ST_X(n.coordenada::geometry) AS lng,
   COALESCE(array_agg(nc.categoria_id) FILTER (WHERE nc.categoria_id IS NOT NULL), '{}') AS categoria_ids,
-  (SELECT COUNT(*) FROM negocio_visitas v WHERE v.negocio_id = n.id AND v.creado_en > now() - interval '7 days') AS visitas_7d
+  (SELECT COUNT(*) FROM negocio_visitas v WHERE v.negocio_id = n.id AND v.creado_en > now() - interval '7 days') AS visitas_7d,
+  (SELECT ROUND(AVG(calificacion), 1) FROM resenas r WHERE r.negocio_id = n.id AND NOT r.oculta) AS calificacion_promedio,
+  (SELECT COUNT(*) FROM resenas r WHERE r.negocio_id = n.id AND NOT r.oculta) AS calificacion_total
 `;

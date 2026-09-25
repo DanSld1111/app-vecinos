@@ -52,6 +52,12 @@ export function TarjetaNegocio({
                 <Text style={styles.badgePopularTexto}>🔥 Popular</Text>
               </View>
             ) : null}
+            {negocio.calificacionTotal > 0 ? (
+              <View style={styles.filaCalificacion}>
+                <Ionicons name="star" size={10} color="#e0a835" />
+                <Text style={styles.calificacionTexto}>{negocio.calificacionPromedio}</Text>
+              </View>
+            ) : null}
           </View>
           <Text style={styles.direccion} numberOfLines={1}>
             {negocio.direccion}
@@ -137,6 +143,17 @@ function crearEstilos(colores: PaletaColores) {
       fontSize: 9,
       fontFamily: "PlusJakartaSans_800ExtraBold",
       color: colores.acentoFuerte,
+    },
+    filaCalificacion: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 2,
+    },
+    calificacionTexto: {
+      ...tipografia.pie,
+      fontSize: 10.5,
+      fontFamily: "PlusJakartaSans_700Bold",
+      color: colores.texto,
     },
     filaTags: {
       flexDirection: "row",
