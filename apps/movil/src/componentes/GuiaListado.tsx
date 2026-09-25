@@ -115,14 +115,16 @@ export function GuiaListado({
         // Sin header nativo en esta pantalla (ver servicios/_layout.tsx) — la flecha de volver y
         // el padding de la muesca/notch corren por cuenta de este bloque.
         <View style={[styles.encabezadoServicio, { paddingTop: insets.top }]}>
-          <Pressable
-            onPress={() => (router.canGoBack() ? router.back() : router.replace("/servicios"))}
-            hitSlop={10}
-            style={styles.botonVolver}
-          >
-            <Ionicons name="chevron-back" size={24} color={colores.texto} />
-          </Pressable>
-          <Text style={styles.tituloServicio}>{titulo}</Text>
+          <View style={styles.filaTitulo}>
+            <Pressable
+              onPress={() => (router.canGoBack() ? router.back() : router.replace("/servicios"))}
+              hitSlop={10}
+              style={styles.botonVolver}
+            >
+              <Ionicons name="chevron-back" size={24} color={colores.texto} />
+            </Pressable>
+            <Text style={styles.tituloServicio}>{titulo}</Text>
+          </View>
           {subtitulo ? <Text style={styles.subtituloServicio}>{subtitulo}</Text> : null}
         </View>
       ) : null}
@@ -202,11 +204,15 @@ function crearEstilos(colores: PaletaColores) {
     encabezadoServicio: {
       marginBottom: espaciado.sm,
     },
+    filaTitulo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: espaciado.xs,
+      marginLeft: -espaciado.xs,
+    },
     botonVolver: {
       width: 32,
       height: 32,
-      marginLeft: -espaciado.xs,
-      marginBottom: espaciado.xs,
       alignItems: "center",
       justifyContent: "center",
     },
