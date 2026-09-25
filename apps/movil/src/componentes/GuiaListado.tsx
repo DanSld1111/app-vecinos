@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { router } from "expo-router";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from "@expo/vector-icons";
+import { Negocio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { textos } from "../i18n/es";
 import { useComunidadActiva } from "../estado/comunidadActiva";
@@ -10,9 +11,26 @@ import { useCategorias } from "../datos/hooks/useCategorias";
 import { useNegocios } from "../datos/hooks/useNegocios";
 import { ChipCategoria } from "./ChipCategoria";
 import { TarjetaNegocio } from "./TarjetaNegocio";
+import { TarjetaNegocioMenu } from "./TarjetaNegocioMenu";
+import { TarjetaNegocioCatalogo } from "./TarjetaNegocioCatalogo";
+import { EntradaAnimada } from "./EntradaAnimada";
 import { EstadoVacio } from "./EstadoVacio";
 import { EstadoError } from "./EstadoError";
 import { EsqueletoListaNegocios } from "./EsqueletoNegocio";
+
+/** Cuánto esperar sin que la persona escriba antes de volver a pedir — cada tecla antes disparaba
+ * un refetch propio (queryKey distinto por caracter). */
+const RETRASO_BUSQUEDA_MS = 350;
+
+/** A qué plantilla de tarjeta corresponde cada servicio — mismo criterio que el arquetipo de la
+ * ficha (menu/catalogo/…), esta vez para la tarjeta del listado. Ver
+ * docs/decisiones/0072-servicio-dueno-de-categoria.md. */
+const PLANTILLA_POR_SERVICIO: Record<string, "menu" | "catalogo"> = {
+  restaurantes: "menu",
+  "market-space": "catalogo",
+  turismo: "catalogo",
+  inmobiliaria: "catalogo",
+};
 
 export function GuiaListado({
   servicioSlugFijo,
@@ -34,7 +52,14 @@ export function GuiaListado({
   const { comunidad } = useComunidadActiva();
   const [categoriaId, setCategoriaId] = useState<string | undefined>(categoriaIdInicial);
   const [busqueda, setBusqueda] = useState("");
+  const [busquedaDebounced, setBusquedaDebounced] = useState("");
   const { data: categorias } = useCategorias();
+
+  useEffect(() => {
+    const temporizador = setTimeout(() => setBusquedaDebounced(busqueda), RETRASO_BUSQUEDA_MS);
+    return () => clearTimeout(temporizador);
+  }, [busqueda]);
+
   const {
     data: negocios,
     isLoading,
@@ -46,7 +71,7 @@ export function GuiaListado({
     // Si ya se eligió una categoría puntual dentro del servicio, esa manda — servicioSlug solo
     // aplica mientras no se haya acotado más.
     servicioSlug: categoriaId ? undefined : servicioSlugFijo,
-    busqueda: busqueda.trim() || undefined,
+    busqueda: busquedaDebounced.trim() || undefined,
     limite: 30,
   });
 
@@ -61,6 +86,19 @@ export function GuiaListado({
     [categoriasDelAmbito]
   );
 
+  const plantilla = servicioSlugFijo ? PLANTILLA_POR_SERVICIO[servicioSlugFijo] : undefined;
+  const esCatalogo = plantilla === "catalogo";
+
+  function alTocar(negocio: Negocio) {
+    router.push(`/negocio/${negocio.id}`);
+  }
+
+  function renderizarTarjeta(negocio: Negocio, indice: number) {
+    if (plantilla === "menu") return <TarjetaNegocioMenu negocio={negocio} onPress={() => alTocar(negocio)} />;
+    if (plantilla === "catalogo") return <TarjetaNegocioCatalogo negocio={negocio} onPress={() => alTocar(negocio)} />;
+    return <TarjetaNegocio negocio={negocio} onPress={() => alTocar(negocio)} />;
+  }
+
   return (
     <View style={styles.contenedor}>
       <View style={styles.buscador}>
@@ -72,6 +110,11 @@ export function GuiaListado({
           placeholderTextColor={colores.textoTenue}
           style={styles.entradaTexto}
         />
+        {busqueda ? (
+          <Pressable onPress={() => setBusqueda("")} hitSlop={8}>
+            <Ionicons name="close-circle" size={16} color={colores.textoTenue} />
+          </Pressable>
+        ) : null}
       </View>
 
       {mostrarFiltroCategorias ? (
@@ -101,13 +144,20 @@ export function GuiaListado({
         <EstadoError onReintentar={() => refetch()} />
       ) : (
         <FlashList
+          key={esCatalogo ? "grid" : "lista"}
           data={negocios?.items ?? []}
           keyExtractor={(item) => item.id}
+          numColumns={esCatalogo ? 2 : 1}
           contentContainerStyle={{ paddingBottom: espaciado.xl }}
-          ItemSeparatorComponent={() => <View style={{ height: espaciado.sm }} />}
+          ItemSeparatorComponent={esCatalogo ? undefined : () => <View style={{ height: espaciado.sm }} />}
           ListEmptyComponent={<EstadoVacio titulo={textos.buscar.sinResultados} />}
-          renderItem={({ item }) => (
-            <TarjetaNegocio negocio={item} onPress={() => router.push(`/negocio/${item.id}`)} />
+          renderItem={({ item, index }) => (
+            <EntradaAnimada
+              retraso={Math.min(index, 8) * 50}
+              style={esCatalogo ? styles.celdaGrid : undefined}
+            >
+              {renderizarTarjeta(item, index)}
+            </EntradaAnimada>
           )}
         />
       )}
@@ -152,6 +202,10 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.textoTenue,
       textTransform: "uppercase",
       marginBottom: espaciado.xs,
+    },
+    celdaGrid: {
+      flex: 1,
+      margin: espaciado.xs,
     },
   });
 }

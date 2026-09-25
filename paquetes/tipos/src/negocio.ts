@@ -24,6 +24,9 @@ export interface ServicioOfrecido {
   nombre: string;
   detalle?: string;
   precio: number;
+  /** Opcional — solo cuando ayuda a mostrar el servicio (un corte de cabello, un ambiente).
+   * Un trámite (una declaración, un certificado) normalmente no la necesita. */
+  fotoUrl?: string | null;
 }
 
 export interface OfertaNegocio {

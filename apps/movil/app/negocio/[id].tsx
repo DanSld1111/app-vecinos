@@ -106,7 +106,7 @@ export default function FichaNegocio() {
       />
     );
   } else if (arquetipo === "catalogo" && productos && productos.length > 0) {
-    contenido = <CatalogoNegocio productos={productos} moneda={negocio.moneda} />;
+    contenido = <CatalogoNegocio productos={productos} moneda={negocio.moneda} whatsapp={negocio.whatsapp} />;
   } else if (productos && productos.length > 0) {
     contenido = <MenuNegocio productos={productos} moneda={negocio.moneda} />;
   } else {

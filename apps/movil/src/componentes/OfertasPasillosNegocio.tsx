@@ -1,9 +1,12 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Moneda, OfertaNegocio, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { useTema } from "../estado/useTema";
 import { urlCompleta } from "../utilidades/media";
 import { SinFoto } from "./SinFoto";
+import { EntradaAnimada } from "./EntradaAnimada";
 
 export function OfertasPasillosNegocio({
   ofertas,
@@ -20,35 +23,56 @@ export function OfertasPasillosNegocio({
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
+  const [busqueda, setBusqueda] = useState("");
 
   if (ofertas.length === 0 && pasillos.length === 0) return null;
+
+  const termino = busqueda.trim().toLowerCase();
+  const ofertasFiltradas = termino ? ofertas.filter((o) => o.nombre.toLowerCase().includes(termino)) : ofertas;
 
   return (
     <View>
       {ofertas.length > 0 ? (
+        <View style={styles.buscador}>
+          <Ionicons name="search" size={15} color={colores.textoTenue} />
+          <TextInput
+            value={busqueda}
+            onChangeText={setBusqueda}
+            placeholder="Buscar producto en el super…"
+            placeholderTextColor={colores.textoTenue}
+            style={styles.entradaBuscador}
+          />
+        </View>
+      ) : null}
+
+      {ofertas.length > 0 ? (
         <>
           <Text style={styles.tituloSeccion}>Ofertas de la semana</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filaOfertas}>
-            {ofertas.map((oferta) => (
-              <View key={oferta.nombre} style={styles.tarjetaOferta}>
-                {negocioFotoUrl ? (
-                  <Image source={{ uri: urlCompleta(negocioFotoUrl) }} style={styles.foto} />
-                ) : (
-                  <SinFoto icono="pricetag-outline" tamanoIcono={18} style={styles.foto} />
-                )}
-                <Text style={styles.cinta}>{oferta.etiqueta}</Text>
-                <View style={styles.infoOferta}>
-                  <Text style={styles.nombreOferta} numberOfLines={1}>
-                    {oferta.nombre}
-                  </Text>
-                  {oferta.precioOriginal ? (
-                    <Text style={styles.precioAntes}>{formatearPrecio(oferta.precioOriginal, moneda)}</Text>
-                  ) : null}
-                  <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio, moneda)}</Text>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
+          {ofertasFiltradas.length === 0 ? (
+            <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filaOfertas}>
+              {ofertasFiltradas.map((oferta, indice) => (
+                <EntradaAnimada key={oferta.nombre} retraso={indice * 60} style={styles.tarjetaOferta}>
+                  {negocioFotoUrl ? (
+                    <Image source={{ uri: urlCompleta(negocioFotoUrl) }} style={styles.foto} />
+                  ) : (
+                    <SinFoto icono="pricetag-outline" tamanoIcono={18} style={styles.foto} />
+                  )}
+                  <Text style={styles.cinta}>{oferta.etiqueta}</Text>
+                  <View style={styles.infoOferta}>
+                    <Text style={styles.nombreOferta} numberOfLines={1}>
+                      {oferta.nombre}
+                    </Text>
+                    {oferta.precioOriginal ? (
+                      <Text style={styles.precioAntes}>{formatearPrecio(oferta.precioOriginal, moneda)}</Text>
+                    ) : null}
+                    <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio, moneda)}</Text>
+                  </View>
+                </EntradaAnimada>
+              ))}
+            </ScrollView>
+          )}
         </>
       ) : null}
 
@@ -76,6 +100,28 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       textTransform: "uppercase",
       marginTop: espaciado.md,
       marginBottom: espaciado.sm,
+    },
+    buscador: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: espaciado.sm,
+      backgroundColor: colores.superficieHundida,
+      borderRadius: radios.md,
+      paddingHorizontal: espaciado.md,
+      height: 40,
+    },
+    entradaBuscador: {
+      flex: 1,
+      ...tipografia.cuerpo,
+      fontSize: 13,
+      color: colores.texto,
+      padding: 0,
+    },
+    sinResultados: {
+      ...tipografia.cuerpo,
+      color: colores.textoTenue,
+      textAlign: "center",
+      paddingVertical: espaciado.md,
     },
     filaOfertas: {
       marginBottom: espaciado.xs,

@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { Moneda, ServicioOfrecido, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { useTema } from "../estado/useTema";
+import { urlCompleta } from "../utilidades/media";
+import { EntradaAnimada } from "./EntradaAnimada";
 
 const EMOJI_POR_SERVICIO: Record<string, string> = {
   "Lavado y secado": "🧺",
@@ -22,17 +24,21 @@ export function ServiciosNegocio({ servicios, moneda }: { servicios: ServicioOfr
   return (
     <View>
       <Text style={styles.tituloSeccion}>Servicios y tarifas</Text>
-      {servicios.map((servicio) => (
-        <View key={servicio.nombre} style={styles.fila}>
-          <View style={styles.icono}>
-            <Text style={styles.emoji}>{EMOJI_POR_SERVICIO[servicio.nombre] ?? "🏷️"}</Text>
-          </View>
+      {servicios.map((servicio, indice) => (
+        <EntradaAnimada key={servicio.nombre} retraso={indice * 60} style={styles.fila}>
+          {servicio.fotoUrl ? (
+            <Image source={{ uri: urlCompleta(servicio.fotoUrl) }} style={styles.foto} />
+          ) : (
+            <View style={styles.icono}>
+              <Text style={styles.emoji}>{EMOJI_POR_SERVICIO[servicio.nombre] ?? "🏷️"}</Text>
+            </View>
+          )}
           <View style={styles.info}>
             <Text style={styles.nombre}>{servicio.nombre}</Text>
             {servicio.detalle ? <Text style={styles.detalle}>{servicio.detalle}</Text> : null}
           </View>
           <Text style={styles.precio}>{formatearPrecio(servicio.precio, moneda)}</Text>
-        </View>
+        </EntradaAnimada>
       ))}
       <Text style={styles.nota}>Tarifas referenciales — confirma el precio final con el negocio.</Text>
     </View>
@@ -67,6 +73,11 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
     },
     emoji: {
       fontSize: 16,
+    },
+    foto: {
+      width: 34,
+      height: 34,
+      borderRadius: radios.sm,
     },
     info: {
       flex: 1,

@@ -3,6 +3,7 @@ import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
 import { SinFoto } from "./SinFoto";
+import { EntradaAnimada } from "./EntradaAnimada";
 
 function agruparPorCategoria(productos: Producto[]) {
   const grupos: { categoria: string; items: Producto[] }[] = [];
@@ -17,9 +18,19 @@ function agruparPorCategoria(productos: Producto[]) {
   return grupos;
 }
 
-function ItemMenu({ producto, styles, moneda }: { producto: Producto; styles: ReturnType<typeof crearEstilos>; moneda: Moneda }) {
+function ItemMenu({
+  producto,
+  styles,
+  moneda,
+  retraso,
+}: {
+  producto: Producto;
+  styles: ReturnType<typeof crearEstilos>;
+  moneda: Moneda;
+  retraso: number;
+}) {
   return (
-    <View style={styles.item}>
+    <EntradaAnimada retraso={retraso} style={styles.item}>
       {producto.fotoUrl ? (
         <Image source={{ uri: urlCompleta(producto.fotoUrl) }} style={styles.itemImagen} />
       ) : (
@@ -33,7 +44,7 @@ function ItemMenu({ producto, styles, moneda }: { producto: Producto; styles: Re
         </Text>
         <Text style={styles.itemPrecio}>{formatearPrecio(producto.precio, moneda)}</Text>
       </View>
-    </View>
+    </EntradaAnimada>
   );
 }
 
@@ -43,6 +54,7 @@ export function MenuNegocio({ productos, moneda }: { productos: Producto[]; mone
 
   if (productos.length === 0) return null;
   const grupos = agruparPorCategoria(productos);
+  let indiceGlobal = 0;
 
   return (
     <View>
@@ -50,9 +62,11 @@ export function MenuNegocio({ productos, moneda }: { productos: Producto[]; mone
       {grupos.map((grupo) => (
         <View key={grupo.categoria} style={styles.grupo}>
           <Text style={styles.tituloGrupo}>{grupo.categoria}</Text>
-          {grupo.items.map((producto) => (
-            <ItemMenu key={producto.id} producto={producto} styles={styles} moneda={moneda} />
-          ))}
+          {grupo.items.map((producto) => {
+            const retraso = indiceGlobal * 50;
+            indiceGlobal += 1;
+            return <ItemMenu key={producto.id} producto={producto} styles={styles} moneda={moneda} retraso={retraso} />;
+          })}
         </View>
       ))}
     </View>
