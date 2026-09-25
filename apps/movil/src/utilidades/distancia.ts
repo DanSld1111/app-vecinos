@@ -27,3 +27,10 @@ export function minutosCaminando(destino: Coordenada, origen?: Coordenada): numb
   const metros = metrosEntre(puntoDeReferencia, destino);
   return Math.max(1, Math.round(metros / VELOCIDAD_CAMINANDO_M_POR_MIN));
 }
+
+/** "320 m" bajo 1km, "1.2 km" de ahí para arriba — para mostrar la distancia real que ya calculó
+ * el backend (Negocio.distanciaM), no una aproximación local. */
+export function formatearDistancia(metros: number): string {
+  if (metros < 1000) return `${Math.round(metros / 10) * 10} m`;
+  return `${(metros / 1000).toFixed(1)} km`;
+}

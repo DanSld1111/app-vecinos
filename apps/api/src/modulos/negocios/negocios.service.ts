@@ -18,6 +18,10 @@ import { ActualizarHorariosDto } from "./dto/actualizar-horarios.dto";
 import { AgregarOfertaDto } from "./dto/agregar-oferta.dto";
 import { GuardarProductoDto } from "./dto/guardar-producto.dto";
 
+/** Más allá de esto no tiene sentido mostrar un negocio en "Cerca de ti" aunque sea muy popular
+ * — otro distrito, o un error de GPS. Ver docs/decisiones/0073-inicio-orden-real.md. */
+const DISTANCIA_MAXIMA_METROS = 6000;
+
 const HORARIO_SEMANA_CERRADA = {
   lunes: { cerrado: true },
   martes: { cerrado: true },
@@ -108,6 +112,23 @@ export class NegociosService {
       condiciones.push(`n.nombre ILIKE $${valores.length}`);
     }
 
+    // Con ubicación real del vecino: orden por distancia real (con tope — otro distrito o un
+    // error de GPS no debería aparecer en "Cerca de ti" por muchas visitas que tenga), desempate
+    // por popularidad. Sin ubicación: cae a popularidad — nunca al azar. Ver
+    // docs/decisiones/0073-inicio-orden-real.md.
+    let columnaDistancia = "NULL AS distancia_m";
+    let orden = `ORDER BY visitas_7d DESC, n.creado_en DESC, n.id DESC`;
+    if (filtro.lat != null && filtro.lng != null) {
+      valores.push(filtro.lng, filtro.lat);
+      const iLng = valores.length - 1;
+      const iLat = valores.length;
+      columnaDistancia = `ST_Distance(n.coordenada, ST_SetSRID(ST_MakePoint($${iLng}, $${iLat}), 4326)::geography) AS distancia_m`;
+      condiciones.push(
+        `ST_DWithin(n.coordenada, ST_SetSRID(ST_MakePoint($${iLng}, $${iLat}), 4326)::geography, ${DISTANCIA_MAXIMA_METROS})`,
+      );
+      orden = `ORDER BY distancia_m ASC, visitas_7d DESC`;
+    }
+
     const cursor = decodificarCursor(filtro.cursor);
     if (cursor) {
       valores.push(cursor.creadoEn, cursor.id);
@@ -118,12 +139,12 @@ export class NegociosService {
     valores.push(limite + 1);
 
     const { rows } = await this.bd.consultar<FilaNegocio>(
-      `SELECT ${COLUMNAS_NEGOCIO}
+      `SELECT ${COLUMNAS_NEGOCIO}, ${columnaDistancia}
        FROM negocios n
        LEFT JOIN negocio_categorias nc ON nc.negocio_id = n.id
        WHERE ${condiciones.join(" AND ")}
        GROUP BY n.id
-       ORDER BY n.creado_en DESC, n.id DESC
+       ${orden}
        LIMIT $${valores.length}`,
       valores,
     );
@@ -134,6 +155,16 @@ export class NegociosService {
     const cursorSiguiente = hayMas && ultimo ? codificarCursor({ creadoEn: ultimo.creadoEn, id: ultimo.id }) : null;
 
     return { items, cursorSiguiente };
+  }
+
+  /** Un renglón por apertura de ficha — público, sin cuenta, la vista de un vecino anónimo
+   * también cuenta. `visitas_7d` en negocios.mapeo.ts es lo único que lee esta tabla. Ver
+   * docs/decisiones/0073-inicio-orden-real.md. */
+  async registrarVisita(negocioId: string): Promise<void> {
+    await this.bd.consultar("INSERT INTO negocio_visitas (id, negocio_id) VALUES ($1, $2)", [
+      `visita-${randomUUID()}`,
+      negocioId,
+    ]);
   }
 
   async obtenerPorId(id: string): Promise<Negocio | null> {

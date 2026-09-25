@@ -110,6 +110,13 @@ export class NegociosController {
     return this.negocios.listarProductos(id);
   }
 
+  /** Público, sin cuenta — se llama al abrir la ficha, para el orden real de "Cerca de ti". */
+  @Post(":id/visitas")
+  @HttpCode(204)
+  async registrarVisita(@Param("id") id: string): Promise<void> {
+    await this.negocios.registrarVisita(id);
+  }
+
   // Rutas literales antes de las que llevan ":productoId" — si no, Nest tomaría "papelera" y
   // "orden" como si fueran ids de producto.
   @Get(":id/productos/papelera")

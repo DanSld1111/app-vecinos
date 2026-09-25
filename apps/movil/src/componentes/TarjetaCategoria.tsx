@@ -25,7 +25,7 @@ export function TarjetaCategoria({
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
-  const tamanio = grande ? 76 : 68;
+  const tamanio = grande ? 80 : 72;
   const escala = useAnimacionLatido(indice * 220);
 
   return (
@@ -37,7 +37,7 @@ export function TarjetaCategoria({
         />
       ) : (
         <View style={[styles.icono, { width: tamanio, height: tamanio }]}>
-          <IconoCategoria nombre={icono} size={grande ? 26 : 20} color={colores.primarioFuerte} />
+          <IconoCategoria nombre={icono} size={grande ? 28 : 24} color={colores.primarioFuerte} />
         </View>
       )}
       <Text style={styles.nombre} numberOfLines={2}>

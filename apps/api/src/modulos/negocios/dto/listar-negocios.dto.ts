@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsInt, IsOptional, IsString, Max, Min } from "class-validator";
+import { IsInt, IsLatitude, IsLongitude, IsOptional, IsString, Max, Min } from "class-validator";
 
 export class ListarNegociosDto {
   @IsString()
@@ -30,4 +30,16 @@ export class ListarNegociosDto {
   @Min(1)
   @Max(50)
   limite: number = 20;
+
+  /** Ubicación real del vecino — si vienen los dos, se ordena por distancia real (con tope) en
+   * vez de por fecha de alta. Ver docs/decisiones/0073-inicio-orden-real.md. */
+  @IsOptional()
+  @Type(() => Number)
+  @IsLatitude()
+  lat?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsLongitude()
+  lng?: number;
 }

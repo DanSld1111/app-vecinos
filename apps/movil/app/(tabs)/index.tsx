@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { PaletaColores, espaciado, tipografia, useColores } from "../../src/disenio";
 import { textos } from "../../src/i18n/es";
 import { useComunidadActiva } from "../../src/estado/comunidadActiva";
+import { useUbicacionUsuario } from "../../src/estado/useUbicacionUsuario";
 import { useCategorias } from "../../src/datos/hooks/useCategorias";
 import { useNegocios } from "../../src/datos/hooks/useNegocios";
 import { useAvisos } from "../../src/datos/hooks/useAvisos";
@@ -15,8 +16,6 @@ import { HojaInferior } from "../../src/componentes/HojaInferior";
 import { SelectorComunidad } from "../../src/componentes/SelectorComunidad";
 import { TarjetaCategoria } from "../../src/componentes/TarjetaCategoria";
 import { TarjetaCategoriaDestacada } from "../../src/componentes/TarjetaCategoriaDestacada";
-import { TarjetaDestacadoGrande } from "../../src/componentes/TarjetaDestacadoGrande";
-import { RielMiniNegocios } from "../../src/componentes/RielMiniNegocios";
 import { TarjetaNegocio } from "../../src/componentes/TarjetaNegocio";
 import { EstadoVacio } from "../../src/componentes/EstadoVacio";
 import { EstadoError } from "../../src/componentes/EstadoError";
@@ -36,6 +35,17 @@ export default function Inicio() {
   const [permisoVisible, setPermisoVisible] = useState(false);
   const permisoDecidido = useNotificaciones((estado) => estado.permisoDecidido);
   const { data: categorias } = useCategorias();
+  const { coordenada, permiso: permisoUbicacion, asegurarUbicacion } = useUbicacionUsuario();
+
+  useEffect(() => {
+    void asegurarUbicacion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Una sola lista — antes eran dos consultas separadas ("el más visitado" y "cerca de ti") con
+  // el mismo criterio de fondo (creado_en DESC) detrás de nombres que prometían otra cosa. Con
+  // ubicación, el backend ordena por distancia real (con tope) y desempata por popularidad; sin
+  // ella, cae a popularidad — nunca al azar. Ver docs/decisiones/0073-inicio-orden-real.md.
   const {
     data: negocios,
     isLoading,
@@ -43,13 +53,18 @@ export default function Inicio() {
     refetch,
   } = useNegocios({
     comunidadId: comunidad?.id ?? "",
-    limite: 6,
+    limite: 8,
+    lat: coordenada?.lat,
+    lng: coordenada?.lng,
   });
-  const { data: destacados } = useNegocios({ comunidadId: comunidad?.id ?? "", limite: 8 });
   const { data: avisos } = useAvisos(comunidad?.id);
 
-  const destacadoPrincipal = destacados?.items[0];
-  const destacadosRestantes = destacados?.items.slice(1) ?? [];
+  // El badge "🔥 Popular" es solo para quien de verdad está arriba en visitas reales — nunca el
+  // primero de la lista porque sí, y nunca si nadie tiene visitas todavía.
+  const idMasVisitado = (negocios?.items ?? []).reduce<{ id: string; visitas: number } | null>(
+    (mejor, n) => (n.visitas7d > 0 && (!mejor || n.visitas7d > mejor.visitas) ? { id: n.id, visitas: n.visitas7d } : mejor),
+    null,
+  )?.id;
 
   const categoriasDestacadas = (categorias ?? []).filter((c) => SLUGS_DESTACADOS.includes(c.slug));
   const categoriasResto = (categorias ?? []).filter((c) => !SLUGS_DESTACADOS.includes(c.slug));
@@ -81,8 +96,6 @@ export default function Inicio() {
         />
 
         <CarruselAvisos avisos={avisos ?? []} onPress={() => router.push("/comunidad")} />
-
-        <Text style={styles.encabezado}>{textos.inicio.categorias}</Text>
 
         {categoriasDestacadas.length > 0 ? (
           <View style={styles.filaDestacadas}>
@@ -116,24 +129,15 @@ export default function Inicio() {
 
         <CarruselPublicidad />
 
-        {destacadoPrincipal ? (
-          <>
-            <Text style={styles.encabezado}>El más visitado esta semana</Text>
-            <TarjetaDestacadoGrande
-              negocio={destacadoPrincipal}
-              onPress={() => router.push(`/negocio/${destacadoPrincipal.id}`)}
-            />
-          </>
-        ) : null}
-
-        {destacadosRestantes.length > 0 ? (
-          <RielMiniNegocios
-            negocios={destacadosRestantes}
-            onSeleccionar={(negocio) => router.push(`/negocio/${negocio.id}`)}
-          />
-        ) : null}
-
-        <Text style={styles.encabezado}>{textos.inicio.cercaDeTi}</Text>
+        <View style={styles.filaEncabezadoCerca}>
+          <Text style={styles.encabezado}>{textos.inicio.cercaDeTi}</Text>
+          {coordenada ? (
+            <View style={styles.indicadorUbicacion}>
+              <View style={styles.puntoVivo} />
+              <Text style={styles.indicadorUbicacionTexto}>Usando tu ubicación</Text>
+            </View>
+          ) : null}
+        </View>
         {isLoading ? (
           <EsqueletoListaNegocios cantidad={3} />
         ) : isError ? (
@@ -143,6 +147,7 @@ export default function Inicio() {
             <TarjetaNegocio
               key={negocio.id}
               negocio={negocio}
+              popular={negocio.id === idMasVisitado}
               onPress={() => router.push(`/negocio/${negocio.id}`)}
             />
           ))
@@ -150,6 +155,15 @@ export default function Inicio() {
           <EstadoVacio titulo={textos.buscar.sinResultados} />
         )}
       </ScrollView>
+
+      {permisoUbicacion === "denegado" ? (
+        <View style={styles.pieUbicacion}>
+          <Text style={styles.pieUbicacionIcono}>📍</Text>
+          <Text style={styles.pieUbicacionTexto}>
+            Si no activas tu ubicación, ordenamos igual por popularidad y usamos el centro del distrito.
+          </Text>
+        </View>
+      ) : null}
 
       <HojaInferior visible={hojaComunidadVisible} onCerrar={() => setHojaComunidadVisible(false)}>
         <SelectorComunidad onSeleccionar={() => setHojaComunidadVisible(false)} />
@@ -172,7 +186,9 @@ function crearEstilos(colores: PaletaColores) {
     contenido: {
       padding: espaciado.lg,
       paddingTop: espaciado.sm,
-      gap: espaciado.sm,
+      // Antes espaciado.sm (8): con "El más visitado" y "Cerca de ti" fundidos en una sola
+      // sección sobraba aire entre bloques — ver docs/decisiones/0073-inicio-orden-real.md.
+      gap: espaciado.xs,
     },
     // Sin marginTop: el ScrollView ya pone `gap` entre secciones — sumarle un margen acá
     // duplicaba el espacio en blanco entre una sección y la siguiente.
@@ -184,10 +200,52 @@ function crearEstilos(colores: PaletaColores) {
     filaDestacadas: {
       flexDirection: "row",
       gap: espaciado.sm,
-      marginBottom: espaciado.sm,
+      marginBottom: espaciado.xs,
     },
     filaCategorias: {
       gap: espaciado.xs,
+    },
+    filaEncabezadoCerca: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: espaciado.xs,
+    },
+    indicadorUbicacion: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    puntoVivo: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colores.primario,
+    },
+    indicadorUbicacionTexto: {
+      ...tipografia.pie,
+      fontSize: 10,
+      fontFamily: "PlusJakartaSans_700Bold",
+      color: colores.primarioFuerte,
+    },
+    pieUbicacion: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: espaciado.sm,
+      backgroundColor: colores.primarioFuerte,
+      marginHorizontal: espaciado.lg,
+      marginBottom: espaciado.sm,
+      padding: espaciado.sm + 2,
+      borderRadius: 12,
+    },
+    pieUbicacionIcono: {
+      fontSize: 16,
+    },
+    pieUbicacionTexto: {
+      ...tipografia.pie,
+      fontSize: 10.5,
+      color: "#ffffff",
+      flex: 1,
     },
   });
 }

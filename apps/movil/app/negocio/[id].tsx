@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { Animated, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { textos } from "../../src/i18n/es";
+import { repositorioNegocios } from "../../src/datos/fabricaRepositorios";
 import { useNegocio } from "../../src/datos/hooks/useNegocios";
 import { useCategorias } from "../../src/datos/hooks/useCategorias";
 import { BotonPrimario } from "../../src/componentes/BotonPrimario";
@@ -43,6 +45,11 @@ export default function FichaNegocio() {
   const { data: negocio, isLoading, isError, refetch } = useNegocio(id);
   const { data: productos } = useProductosPorNegocio(negocio?.id);
   const { data: categorias } = useCategorias();
+
+  useEffect(() => {
+    if (negocio?.id) void repositorioNegocios.registrarVisita(negocio.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [negocio?.id]);
 
   if (isLoading) {
     return (

@@ -60,7 +60,7 @@ export function CarruselAvisos({ avisos, onPress }: { avisos: Aviso[]; onPress: 
 
   return (
     <View>
-      <View style={{ height: 112 }}>
+      <View style={{ height: 120 }}>
         <FlashList
           ref={listaRef}
           horizontal
@@ -83,7 +83,7 @@ export function CarruselAvisos({ avisos, onPress }: { avisos: Aviso[]; onPress: 
                 style={StyleSheet.absoluteFill}
               />
               <View style={styles.insignia}>
-                <Ionicons name={iconos[item.categoria].icono} size={22} color="#ffffff" />
+                <Ionicons name={iconos[item.categoria].icono} size={24} color="#ffffff" />
               </View>
               <Text style={styles.etiqueta}>Aviso de la comunidad</Text>
               <Text style={styles.titulo} numberOfLines={2}>
@@ -108,7 +108,7 @@ export function CarruselAvisos({ avisos, onPress }: { avisos: Aviso[]; onPress: 
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     tarjeta: {
-      height: 104,
+      height: 112,
       borderRadius: radios.lg,
       padding: espaciado.md,
       justifyContent: "center",
@@ -119,8 +119,8 @@ function crearEstilos(colores: PaletaColores) {
       position: "absolute",
       right: espaciado.md,
       bottom: espaciado.md,
-      width: 44,
-      height: 44,
+      width: 48,
+      height: 48,
       borderRadius: radios.md,
       backgroundColor: "rgba(255,255,255,0.16)",
       alignItems: "center",

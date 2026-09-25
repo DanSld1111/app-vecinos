@@ -3,15 +3,31 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Negocio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { estaAbiertoAhora } from "../utilidades/horarios";
-import { minutosCaminando } from "../utilidades/distancia";
+import { formatearDistancia, minutosCaminando } from "../utilidades/distancia";
 import { urlCompleta } from "../utilidades/media";
 import { AvatarNegocio } from "./AvatarNegocio";
 
-export function TarjetaNegocio({ negocio, onPress }: { negocio: Negocio; onPress: () => void }) {
+export function TarjetaNegocio({
+  negocio,
+  popular = false,
+  onPress,
+}: {
+  negocio: Negocio;
+  /** Insignia "🔥 Popular" — la decide quien arma la lista (ej. Inicio, solo para el más
+   * visitado real), no este componente. */
+  popular?: boolean;
+  onPress: () => void;
+}) {
   const colores = useColores();
   const styles = crearEstilos(colores);
   const abierto = estaAbiertoAhora(negocio.horarios);
-  const minutos = minutosCaminando(negocio.coordenada);
+  // Con distancia real del backend (Negocio.distanciaM, viene cuando Inicio pidió con GPS):
+  // se muestra ella y los minutos que salen de ahí — no la aproximación desde el centro del
+  // distrito que usa minutosCaminando() sin ubicación real. Ver docs/decisiones/0073.
+  const tieneDistanciaReal = negocio.distanciaM != null;
+  const minutos = tieneDistanciaReal
+    ? Math.max(1, Math.round((negocio.distanciaM as number) / 80))
+    : minutosCaminando(negocio.coordenada);
 
   return (
     <View style={styles.sombra}>
@@ -31,6 +47,11 @@ export function TarjetaNegocio({ negocio, onPress }: { negocio: Negocio; onPress
                 <Ionicons name="checkmark" size={9} color="#fff" />
               </View>
             ) : null}
+            {popular ? (
+              <View style={styles.badgePopular}>
+                <Text style={styles.badgePopularTexto}>🔥 Popular</Text>
+              </View>
+            ) : null}
           </View>
           <Text style={styles.direccion} numberOfLines={1}>
             {negocio.direccion}
@@ -39,7 +60,13 @@ export function TarjetaNegocio({ negocio, onPress }: { negocio: Negocio; onPress
             <Text style={[styles.tag, abierto ? styles.tagAbierto : styles.tagCerrado]}>
               ● {abierto ? "Abierto" : "Cerrado"}
             </Text>
-            <Text style={styles.tagDistancia}>🚶 {minutos} min</Text>
+            {tieneDistanciaReal ? (
+              <Text style={styles.tagDistancia}>
+                📍 {formatearDistancia(negocio.distanciaM as number)} · {minutos} min
+              </Text>
+            ) : (
+              <Text style={styles.tagDistancia}>🚶 {minutos} min</Text>
+            )}
           </View>
         </View>
         <Ionicons name="chevron-forward" size={16} color={colores.textoTenue} />
@@ -98,6 +125,18 @@ function crearEstilos(colores: PaletaColores) {
     direccion: {
       ...tipografia.pie,
       color: colores.textoSuave,
+    },
+    badgePopular: {
+      backgroundColor: colores.acentoSuave,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: radios.completo,
+    },
+    badgePopularTexto: {
+      ...tipografia.pie,
+      fontSize: 9,
+      fontFamily: "PlusJakartaSans_800ExtraBold",
+      color: colores.acentoFuerte,
     },
     filaTags: {
       flexDirection: "row",

@@ -74,6 +74,13 @@ export interface Negocio {
   pasillos?: string[];
   /** Galería genérica (fachada, interior, etc.) — solo se usa en la ficha cuando el negocio no tiene menú/catálogo/servicios/ofertas. Hasta 6 fotos. */
   fotosGaleria: string[];
+  /** Visitas a la ficha en los últimos 7 días — sube con POST /negocios/:id/visitas. Se usa para
+   * el badge "Popular" y como desempate al ordenar por distancia en Inicio. Ver
+   * docs/decisiones/0073-inicio-orden-real.md. */
+  visitas7d: number;
+  /** Solo viene cuando `listar()` recibió `lat`/`lng` (la ubicación real del vecino) — metros en
+   * línea recta desde ahí hasta el negocio. undefined si no se pidió con ubicación. */
+  distanciaM?: number;
 }
 
 export interface FiltroNegocios {
@@ -86,4 +93,9 @@ export interface FiltroNegocios {
   busqueda?: string;
   cursor?: string;
   limite?: number;
+  /** Ubicación real del vecino (GPS del dispositivo) — si vienen los dos, `listar()` ordena por
+   * distancia real (con un tope de 6 km) en vez de por fecha de alta, y cada Negocio trae
+   * `distanciaM`. Ver docs/decisiones/0073-inicio-orden-real.md. */
+  lat?: number;
+  lng?: number;
 }

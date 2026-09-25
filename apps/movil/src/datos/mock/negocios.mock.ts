@@ -13,7 +13,18 @@ function horarioComercial(abre = "09:00", cierra = "21:00"): Horarios {
   };
 }
 
-type NegocioSemilla = Omit<Negocio, "validadoPorCuentaId" | "motivoRechazo" | "fotosGaleria">;
+type NegocioSemilla = Omit<Negocio, "validadoPorCuentaId" | "motivoRechazo" | "fotosGaleria" | "visitas7d">;
+
+/** Visitas de ejemplo de los últimos 7 días, a mano por id — así el orden y el badge "Popular"
+ * de Inicio se ven variados en el modo mock en vez de todos en cero. */
+const VISITAS_7D_MOCK: Record<string, number> = {
+  "neg-restaurante-fogon": 34,
+  "neg-veterinaria-aviacion": 21,
+  "neg-supermercado-sb": 18,
+  "neg-panaderia-rosales": 12,
+  "neg-lavanderia-rinconada": 6,
+  "neg-boutique-jardin": 4,
+};
 
 const negociosSemilla: NegocioSemilla[] = [
   {
@@ -232,4 +243,5 @@ export const negociosMock: Negocio[] = negociosSemilla.map((negocio) => ({
   // Ninguno de los 9 negocios de ejemplo la necesita hoy (todos tienen menú, catálogo,
   // servicios u ofertas) — queda lista para cuando un negocio real no tenga nada de eso.
   fotosGaleria: [],
+  visitas7d: VISITAS_7D_MOCK[negocio.id] ?? 0,
 }));
