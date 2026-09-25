@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -30,6 +31,13 @@ export class ServiciosAppController {
   @Get()
   listar(): Promise<ServicioApp[]> {
     return this.servicios.listar();
+  }
+
+  /** Público, sin cuenta — se llama al abrir la pantalla de un servicio, para "Explora por rubro". */
+  @Post(":slug/visitas")
+  @HttpCode(204)
+  async registrarVisita(@Param("slug") slug: string): Promise<void> {
+    await this.servicios.registrarVisita(slug);
   }
 
   @Patch(":slug")

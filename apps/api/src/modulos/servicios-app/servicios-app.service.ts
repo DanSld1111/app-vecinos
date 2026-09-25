@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ServicioApp } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
@@ -13,7 +14,20 @@ interface FilaServicioApp {
   estado: ServicioApp["estado"];
   foto_url: string | null;
   orden: number;
+  negocios: string;
+  visitas_7d: string;
 }
+
+const COLUMNAS = `
+  sa.slug, sa.nombre, sa.descripcion, sa.estado, sa.foto_url, sa.orden,
+  (SELECT COUNT(DISTINCT n.id)
+     FROM negocios n
+     JOIN negocio_categorias nc ON nc.negocio_id = n.id
+     JOIN categorias c ON c.id = nc.categoria_id
+    WHERE c.servicio_slug = sa.slug AND n.estado = 'activo' AND n.archivado_en IS NULL) AS negocios,
+  (SELECT COUNT(*) FROM servicio_visitas v
+    WHERE v.servicio_slug = sa.slug AND v.creado_en > now() - interval '7 days') AS visitas_7d
+`;
 
 function aServicioApp(fila: FilaServicioApp): ServicioApp {
   return {
@@ -23,6 +37,8 @@ function aServicioApp(fila: FilaServicioApp): ServicioApp {
     estado: fila.estado,
     fotoUrl: fila.foto_url,
     orden: fila.orden,
+    negocios: Number(fila.negocios),
+    visitas7d: Number(fila.visitas_7d),
   };
 }
 
@@ -41,14 +57,23 @@ export class ServiciosAppService {
    */
   async listar(): Promise<ServicioApp[]> {
     const { rows } = await this.bd.consultar<FilaServicioApp>(
-      `SELECT slug, nombre, descripcion, estado, foto_url, orden FROM servicios_app ORDER BY orden`,
+      `SELECT ${COLUMNAS} FROM servicios_app sa ORDER BY sa.orden`,
     );
     return rows.map(aServicioApp);
   }
 
+  /** Un renglón por apertura de la pantalla de un servicio — público, sin cuenta. Ver
+   * docs/decisiones/0074-servicios-real.md. */
+  async registrarVisita(slug: string): Promise<void> {
+    await this.bd.consultar("INSERT INTO servicio_visitas (id, servicio_slug) VALUES ($1, $2)", [
+      `visita-servicio-${randomUUID()}`,
+      slug,
+    ]);
+  }
+
   private async obtenerFilaOFallar(slug: string): Promise<FilaServicioApp> {
     const { rows } = await this.bd.consultar<FilaServicioApp>(
-      `SELECT slug, nombre, descripcion, estado, foto_url, orden FROM servicios_app WHERE slug = $1`,
+      `SELECT ${COLUMNAS} FROM servicios_app sa WHERE sa.slug = $1`,
       [slug],
     );
     if (!rows[0]) throw new NotFoundException(`No existe un servicio con slug "${slug}"`);
