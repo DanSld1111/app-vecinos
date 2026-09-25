@@ -1,7 +1,20 @@
+import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Coordenada } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
+
+const ZOOM_MAPA = 16;
+
+/** Tile de OpenStreetMap (tile.openstreetmap.org) que contiene la coordenada — servidor público
+ * oficial, sin API key. Funciona igual en web y nativo con un <Image> normal. */
+function urlTileMapa(coordenada: Coordenada) {
+  const n = 2 ** ZOOM_MAPA;
+  const latRad = (coordenada.lat * Math.PI) / 180;
+  const x = Math.floor(((coordenada.lng + 180) / 360) * n);
+  const y = Math.floor(((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n);
+  return `https://tile.openstreetmap.org/${ZOOM_MAPA}/${x}/${y}.png`;
+}
 
 export function MiniMapaNegocio({
   coordenada,
@@ -12,6 +25,7 @@ export function MiniMapaNegocio({
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  const [mapaFallo, setMapaFallo] = useState(false);
 
   function abrirGoogleMaps() {
     const url = `https://www.google.com/maps/search/?api=1&query=${coordenada.lat},${coordenada.lng}`;
@@ -21,6 +35,14 @@ export function MiniMapaNegocio({
   return (
     <Pressable style={styles.contenedor} onPress={abrirGoogleMaps}>
       <View style={styles.mapaPreview}>
+        {!mapaFallo ? (
+          <Image
+            source={{ uri: urlTileMapa(coordenada) }}
+            style={styles.mapaImagen}
+            resizeMode="cover"
+            onError={() => setMapaFallo(true)}
+          />
+        ) : null}
         <View style={styles.pin}>
           <Ionicons name="location" size={20} color="#ffffff" />
         </View>
@@ -51,6 +73,14 @@ function crearEstilos(colores: PaletaColores) {
       backgroundColor: colores.superficieHundida,
       alignItems: "center",
       justifyContent: "center",
+      overflow: "hidden",
+    },
+    mapaImagen: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
     },
     pin: {
       width: 36,
@@ -60,7 +90,7 @@ function crearEstilos(colores: PaletaColores) {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 3,
-      borderColor: colores.superficieHundida,
+      borderColor: "#ffffff",
     },
     pieMapa: {
       flexDirection: "row",
