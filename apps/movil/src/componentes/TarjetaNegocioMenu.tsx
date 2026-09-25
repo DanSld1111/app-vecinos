@@ -1,17 +1,41 @@
 import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Negocio } from "@app-vecinos/tipos";
+import { Categoria, Negocio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
-import { estaAbiertoAhora } from "../utilidades/horarios";
+import { estadoHoyTexto } from "../utilidades/horarios";
 import { urlCompleta } from "../utilidades/media";
 import { SinFoto } from "./SinFoto";
 
 /** Tarjeta grande con foto — plantilla "Menú" (Restaurantes): la comida "habla" con la foto, en
  * vez de una fila compacta. Ver docs/decisiones/0072-servicio-dueno-de-categoria.md. */
-export function TarjetaNegocioMenu({ negocio, onPress }: { negocio: Negocio; onPress: () => void }) {
+export function TarjetaNegocioMenu({
+  negocio,
+  categorias,
+  onPress,
+}: {
+  negocio: Negocio;
+  /** Para el subtítulo de la tarjeta ("Criollo · Parrillas") — se resuelven por categoriaIds. */
+  categorias?: Categoria[];
+  onPress: () => void;
+}) {
   const colores = useColores();
   const styles = crearEstilos(colores);
-  const abierto = estaAbiertoAhora(negocio.horarios);
+  const estado = estadoHoyTexto(negocio.horarios);
+  const nombresCategorias = negocio.categoriaIds
+    .map((id) => categorias?.find((c) => c.id === id)?.nombre)
+    .filter((n): n is string => Boolean(n))
+    .join(" · ");
+
+  const contenidoTextos = (colorTexto: string, colorSubtitulo: string) => (
+    <>
+      <Text style={[styles.nombre, { color: colorTexto }]} numberOfLines={1}>
+        {negocio.nombre}
+      </Text>
+      <Text style={[styles.subtitulo, { color: colorSubtitulo }]} numberOfLines={1}>
+        {nombresCategorias || negocio.direccion}
+      </Text>
+    </>
+  );
 
   return (
     <Pressable style={styles.sombra} onPress={onPress}>
@@ -22,32 +46,18 @@ export function TarjetaNegocioMenu({ negocio, onPress }: { negocio: Negocio; onP
             locations={[0, 0.5, 1]}
             style={StyleSheet.absoluteFill}
           />
-          <View style={[styles.pill, abierto ? styles.pillAbierto : styles.pillCerrado]}>
-            <Text style={styles.pillTexto}>{abierto ? "🟢 Abierto ahora" : "⚪ Cerrado"}</Text>
+          <View style={[styles.pill, estado.abierto ? styles.pillAbierto : styles.pillCerrado]}>
+            <Text style={styles.pillTexto}>{estado.abierto ? `🟢 Abierto · ${estado.detalle}` : `⚪ Cerrado · ${estado.detalle}`}</Text>
           </View>
-          <View style={styles.textos}>
-            <Text style={styles.nombre} numberOfLines={1}>
-              {negocio.nombre}
-            </Text>
-            <Text style={styles.direccion} numberOfLines={1}>
-              {negocio.direccion}
-            </Text>
-          </View>
+          <View style={styles.textos}>{contenidoTextos("#ffffff", "rgba(255,255,255,0.85)")}</View>
         </ImageBackground>
       ) : (
         <View style={styles.tarjeta}>
           <SinFoto tamanoIcono={28} style={StyleSheet.absoluteFill} />
-          <View style={[styles.pill, abierto ? styles.pillAbierto : styles.pillCerrado, styles.pillSinFoto]}>
-            <Text style={styles.pillTexto}>{abierto ? "🟢 Abierto ahora" : "⚪ Cerrado"}</Text>
+          <View style={[styles.pill, estado.abierto ? styles.pillAbierto : styles.pillCerrado, styles.pillSinFoto]}>
+            <Text style={styles.pillTexto}>{estado.abierto ? `🟢 Abierto · ${estado.detalle}` : `⚪ Cerrado · ${estado.detalle}`}</Text>
           </View>
-          <View style={styles.textosSinFoto}>
-            <Text style={[styles.nombre, { color: colores.texto }]} numberOfLines={1}>
-              {negocio.nombre}
-            </Text>
-            <Text style={[styles.direccion, { color: colores.textoSuave }]} numberOfLines={1}>
-              {negocio.direccion}
-            </Text>
-          </View>
+          <View style={styles.textosSinFoto}>{contenidoTextos(colores.texto, colores.textoSuave)}</View>
         </View>
       )}
     </Pressable>
@@ -108,7 +118,7 @@ function crearEstilos(colores: PaletaColores) {
       fontSize: 15,
       color: "#ffffff",
     },
-    direccion: {
+    subtitulo: {
       ...tipografia.pie,
       color: "rgba(255,255,255,0.85)",
     },

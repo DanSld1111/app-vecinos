@@ -36,6 +36,9 @@ export function GuiaListado({
   servicioSlugFijo,
   categoriaIdInicial,
   mostrarFiltroCategorias = false,
+  titulo,
+  subtitulo,
+  placeholderBusqueda,
 }: {
   /** Pantalla de un servicio (Restaurantes, Market Space…) — trae los negocios de TODAS sus
    * categorías, ya no una sola categoría "quemada" en el código de cada pantalla. Ver
@@ -46,6 +49,11 @@ export function GuiaListado({
    * — a diferencia de servicioSlugFijo, que es un tope fijo de la pantalla. */
   categoriaIdInicial?: string;
   mostrarFiltroCategorias?: boolean;
+  /** Encabezado propio de la pantalla del servicio (ej. "Restaurantes" / "Cartas y menús cerca de ti") —
+   * si no se pasa, no se muestra (la Guía de negocios general ya trae su propio título de pantalla). */
+  titulo?: string;
+  subtitulo?: string;
+  placeholderBusqueda?: string;
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
@@ -94,19 +102,26 @@ export function GuiaListado({
   }
 
   function renderizarTarjeta(negocio: Negocio, indice: number) {
-    if (plantilla === "menu") return <TarjetaNegocioMenu negocio={negocio} onPress={() => alTocar(negocio)} />;
+    if (plantilla === "menu") return <TarjetaNegocioMenu negocio={negocio} categorias={categorias} onPress={() => alTocar(negocio)} />;
     if (plantilla === "catalogo") return <TarjetaNegocioCatalogo negocio={negocio} onPress={() => alTocar(negocio)} />;
     return <TarjetaNegocio negocio={negocio} onPress={() => alTocar(negocio)} />;
   }
 
   return (
     <View style={styles.contenedor}>
+      {titulo ? (
+        <View style={styles.encabezadoServicio}>
+          <Text style={styles.tituloServicio}>{titulo}</Text>
+          {subtitulo ? <Text style={styles.subtituloServicio}>{subtitulo}</Text> : null}
+        </View>
+      ) : null}
+
       <View style={styles.buscador}>
         <Ionicons name="search" size={16} color={colores.textoTenue} />
         <TextInput
           value={busqueda}
           onChangeText={setBusqueda}
-          placeholder={`${textos.buscar.placeholder} ${comunidad?.nombre ?? ""}`}
+          placeholder={placeholderBusqueda ?? `${textos.buscar.placeholder} ${comunidad?.nombre ?? ""}`}
           placeholderTextColor={colores.textoTenue}
           style={styles.entradaTexto}
         />
@@ -172,6 +187,20 @@ function crearEstilos(colores: PaletaColores) {
       backgroundColor: colores.superficieHundida,
       paddingHorizontal: espaciado.lg,
       paddingTop: espaciado.lg,
+    },
+    encabezadoServicio: {
+      marginBottom: espaciado.sm,
+    },
+    tituloServicio: {
+      ...tipografia.titulo,
+      fontSize: 20,
+      color: colores.texto,
+    },
+    subtituloServicio: {
+      ...tipografia.cuerpo,
+      fontSize: 13,
+      color: colores.textoTenue,
+      marginTop: 2,
     },
     buscador: {
       flexDirection: "row",

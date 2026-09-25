@@ -2,8 +2,14 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
-import { SinFoto } from "./SinFoto";
 import { EntradaAnimada } from "./EntradaAnimada";
+
+/** Sin foto, un bloque de color en vez de un icono genérico — se alternan por posición, mismo
+ * lenguaje visual que el boceto (cada plato "respira" distinto aunque no tenga foto real). */
+function colorSwatch(colores: PaletaColores, indice: number) {
+  const paleta = [colores.acentoSuave, colores.primarioSuave, colores.superficieHundida2];
+  return paleta[indice % paleta.length];
+}
 
 function agruparPorCategoria(productos: Producto[]) {
   const grupos: { categoria: string; items: Producto[] }[] = [];
@@ -20,12 +26,16 @@ function agruparPorCategoria(productos: Producto[]) {
 
 function ItemMenu({
   producto,
+  indice,
   styles,
+  colores,
   moneda,
   retraso,
 }: {
   producto: Producto;
+  indice: number;
   styles: ReturnType<typeof crearEstilos>;
+  colores: PaletaColores;
   moneda: Moneda;
   retraso: number;
 }) {
@@ -34,7 +44,7 @@ function ItemMenu({
       {producto.fotoUrl ? (
         <Image source={{ uri: urlCompleta(producto.fotoUrl) }} style={styles.itemImagen} />
       ) : (
-        <SinFoto icono="fast-food-outline" tamanoIcono={20} style={styles.itemImagen} />
+        <View style={[styles.itemImagen, { backgroundColor: colorSwatch(colores, indice) }]} />
       )}
       <View style={styles.itemTexto}>
         {producto.destacado ? <Text style={styles.badge}>Más pedido</Text> : null}
@@ -63,9 +73,19 @@ export function MenuNegocio({ productos, moneda }: { productos: Producto[]; mone
         <View key={grupo.categoria} style={styles.grupo}>
           <Text style={styles.tituloGrupo}>{grupo.categoria}</Text>
           {grupo.items.map((producto) => {
-            const retraso = indiceGlobal * 50;
+            const indice = indiceGlobal;
             indiceGlobal += 1;
-            return <ItemMenu key={producto.id} producto={producto} styles={styles} moneda={moneda} retraso={retraso} />;
+            return (
+              <ItemMenu
+                key={producto.id}
+                producto={producto}
+                indice={indice}
+                styles={styles}
+                colores={colores}
+                moneda={moneda}
+                retraso={indice * 50}
+              />
+            );
           })}
         </View>
       ))}

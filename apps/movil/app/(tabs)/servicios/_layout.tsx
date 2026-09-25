@@ -31,9 +31,11 @@ export default function LayoutServicios() {
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="negocios" options={{ title: "Guía de negocios" }} />
-      <Stack.Screen name="productos" options={{ title: "Guía de productos" }} />
-      <Stack.Screen name="restaurantes" options={{ title: "Guía de restaurantes" }} />
-      <Stack.Screen name="supermarket" options={{ title: "Supermarket" }} />
+      {/* Título en blanco: estas pantallas traen su propio encabezado (título + bajada) dentro de
+          GuiaListado, igual que en los bocetos — un título de navegación arriba se vería duplicado. */}
+      <Stack.Screen name="productos" options={{ title: "" }} />
+      <Stack.Screen name="restaurantes" options={{ title: "" }} />
+      <Stack.Screen name="supermarket" options={{ title: "" }} />
     </Stack>
   );
 }

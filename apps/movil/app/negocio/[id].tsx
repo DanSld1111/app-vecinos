@@ -16,8 +16,7 @@ import { CategoriasRubroNegocio } from "../../src/componentes/CategoriasRubroNeg
 import { OfertasPasillosNegocio } from "../../src/componentes/OfertasPasillosNegocio";
 import { GaleriaNegocio } from "../../src/componentes/GaleriaNegocio";
 import { SinFoto } from "../../src/componentes/SinFoto";
-import { MiniMapaNegocio } from "../../src/componentes/MiniMapaNegocio";
-import { ResumenHorario } from "../../src/componentes/ResumenHorario";
+import { PanelHorarioMapa } from "../../src/componentes/PanelHorarioMapa";
 import { useProductosPorNegocio } from "../../src/datos/hooks/useProductos";
 import { resolverArquetipoFicha } from "../../src/utilidades/arquetipoFicha";
 import { urlCompleta } from "../../src/utilidades/media";
@@ -129,6 +128,8 @@ export default function FichaNegocio() {
       </View>
       <Text style={styles.descripcion}>{negocio.descripcion}</Text>
 
+      <PanelHorarioMapa horarios={negocio.horarios} coordenada={negocio.coordenada} direccion={negocio.direccion} />
+
       <View style={styles.accionRow}>
         <BotonPrimario
           texto={textos.ficha.whatsapp}
@@ -144,12 +145,6 @@ export default function FichaNegocio() {
       </View>
 
       {contenido}
-
-      <Text style={styles.encabezado}>{textos.ficha.direccion}</Text>
-      <MiniMapaNegocio coordenada={negocio.coordenada} direccion={negocio.direccion} />
-
-      <Text style={styles.encabezado}>{textos.ficha.horario}</Text>
-      <ResumenHorario horarios={negocio.horarios} />
 
       <Text style={styles.encabezado}>Reseñas</Text>
       <ResenasNegocio negocioId={negocio.id} />
