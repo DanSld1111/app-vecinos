@@ -217,12 +217,6 @@ export default function FichaNegocio() {
         </View>
 
         {contenido}
-
-        {negocio.verificadoEn ? (
-          <Text style={styles.verificado}>Datos verificados el {negocio.verificadoEn}</Text>
-        ) : (
-          <Text style={styles.sinVerificar}>Reportado por un vecino, aún sin verificar</Text>
-        )}
       </ScrollView>
 
       <MenuAccionesNegocio
@@ -305,16 +299,6 @@ function crearEstilos(colores: PaletaColores) {
     },
     accionBoton: {
       flex: 1,
-    },
-    verificado: {
-      ...tipografia.pie,
-      color: colores.primario,
-      marginTop: espaciado.lg,
-    },
-    sinVerificar: {
-      ...tipografia.pie,
-      color: colores.advertencia,
-      marginTop: espaciado.lg,
     },
   });
 }
