@@ -117,7 +117,20 @@ export default function Servicios() {
 
       {servicioGuia ? (
         <Pressable style={styles.heroSombra} onPress={() => alTocar(servicioGuia)}>
-          <LinearGradient colors={["#3a5f7d", "#213e54"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <ImageBackground
+            source={fuenteImagen(servicioGuia) ?? undefined}
+            style={styles.hero}
+            imageStyle={styles.heroImagen}
+            resizeMode="cover"
+          >
+            {/* Un poco más oscuro que el degradado de las tarjetas de rubro: acá el fondo es un
+                paisaje decorativo, no la foto de un negocio — necesita más contraste para que el
+                texto blanco se lea bien encima de cualquier cielo claro. */}
+            <LinearGradient
+              colors={["rgba(8,10,8,0.15)", "rgba(8,10,8,0.35)", "rgba(8,10,8,0.9)"]}
+              locations={[0, 0.5, 1]}
+              style={styles.degradado}
+            />
             <View style={styles.heroIcono}>
               <IconoServicio slug="negocios" size={20} color="#ffffff" />
             </View>
@@ -125,13 +138,16 @@ export default function Servicios() {
             <Text style={styles.heroNombre}>{servicioGuia.nombre}</Text>
             <View style={styles.heroFila}>
               <Text style={styles.heroDescripcion} numberOfLines={1}>
-                {negocios ? `${negocios.items.length} negocios verificados en ${comunidad?.nombre ?? "tu zona"}` : "Negocios verificados"}
+                {/* Este módulo no se queda solo en tu distrito — trae negocios de todos, y los
+                    ordena primero por cercanía real a tu ubicación (ver docs/decisiones/0073),
+                    así que "en San Borja" ya no describe bien lo que muestra. */}
+                {negocios ? `${negocios.items.length} negocios verificados` : "Negocios verificados"}
               </Text>
               <View style={styles.heroBoton}>
                 <Text style={styles.heroBotonTexto}>Explorar →</Text>
               </View>
             </View>
-          </LinearGradient>
+          </ImageBackground>
         </Pressable>
       ) : null}
 
@@ -249,8 +265,15 @@ function crearEstilos(colores: PaletaColores) {
     },
     hero: {
       borderRadius: radios.lg,
+      overflow: "hidden",
       padding: espaciado.md,
       gap: 2,
+      // Respaldo si la foto tarda en cargar o no hay una configurada — mismo tono azul que
+      // tenía el degradado sólido de antes, nunca queda en blanco.
+      backgroundColor: "#213e54",
+    },
+    heroImagen: {
+      borderRadius: radios.lg,
     },
     heroIcono: {
       width: 36,
