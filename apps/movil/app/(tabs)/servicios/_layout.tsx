@@ -31,11 +31,12 @@ export default function LayoutServicios() {
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="negocios" options={{ title: "Guía de negocios" }} />
-      {/* Título en blanco: estas pantallas traen su propio encabezado (título + bajada) dentro de
-          GuiaListado, igual que en los bocetos — un título de navegación arriba se vería duplicado. */}
-      <Stack.Screen name="productos" options={{ title: "" }} />
-      <Stack.Screen name="restaurantes" options={{ title: "" }} />
-      <Stack.Screen name="supermarket" options={{ title: "" }} />
+      {/* Sin header nativo: estas pantallas traen su propio encabezado (flecha + título + bajada)
+          dentro de GuiaListado, igual que en los bocetos — un título de navegación en blanco
+          seguía dejando la barra vacía como una franja de aire arriba de todo. */}
+      <Stack.Screen name="productos" options={{ headerShown: false }} />
+      <Stack.Screen name="restaurantes" options={{ headerShown: false }} />
+      <Stack.Screen name="supermarket" options={{ headerShown: false }} />
     </Stack>
   );
 }
