@@ -34,7 +34,7 @@ const COLOR_ROL_SUAVE: Record<RolCuenta, string> = {
 
 const COLOR_ROL_TEXTO: Record<RolCuenta, string> = {
   super_admin: "#fff",
-  dueno_negocio: "var(--verde-fuerte)",
+  dueno_negocio: "var(--verde-texto)",
   junta_vecinal: "var(--azul)",
   validador_contenido: "var(--coral-fuerte)",
   gestor_negocios: "var(--morado)",

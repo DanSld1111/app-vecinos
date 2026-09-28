@@ -46,13 +46,13 @@ export function SelectorServicioYCategoria({
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
       <div>
-        <label style={{ fontSize: 10.5, fontWeight: 700, color: "var(--texto-tenue)", textTransform: "uppercase", letterSpacing: ".03em", display: "block", marginBottom: 4 }}>
+        <label style={{ fontSize: 10.5, fontWeight: 700, color: "var(--texto-tenue)", textTransform: "none", letterSpacing: ".03em", display: "block", marginBottom: 4 }}>
           Servicio
         </label>
         <SelectorServicio servicios={serviciosConCategorias} valor={servicioSlug} onCambiar={alCambiarServicio} />
       </div>
       <div>
-        <label style={{ fontSize: 10.5, fontWeight: 700, color: "var(--texto-tenue)", textTransform: "uppercase", letterSpacing: ".03em", display: "block", marginBottom: 4 }}>
+        <label style={{ fontSize: 10.5, fontWeight: 700, color: "var(--texto-tenue)", textTransform: "none", letterSpacing: ".03em", display: "block", marginBottom: 4 }}>
           Categoría
         </label>
         <SelectorCategoria

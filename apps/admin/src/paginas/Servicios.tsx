@@ -50,34 +50,82 @@ export function Servicios() {
           Cargando…
         </div>
       ) : (
-        <div className="grid-servicios">
-          {servicios.map((servicio) => (
-            <div className="tarjeta-servicio" key={servicio.slug}>
-              <div className="foto-servicio">
-                {servicio.fotoUrl ? (
-                  <img src={urlCompleta(servicio.fotoUrl)} alt="" />
-                ) : (
-                  <span className="sin-foto-servicio"><IconoEmoji e="🖼️" /></span>
-                )}
-              </div>
-              <div className="info-servicio">
-                <div className="fila-nombre-servicio">
-                  <b>{servicio.nombre}</b>
-                  <span className={`pill ${servicio.estado === "disponible" ? "pill-verde" : "pill-gris"}`}>
-                    {servicio.estado === "disponible" ? "Disponible" : "Próximamente"}
-                  </span>
+        <>
+          {/* Como en la pestaña Servicios de la app: los disponibles son fotos grandes con el
+              nombre encima; los que vienen después, una lista simple. */}
+          <h3 className="titulo-seccion-servicios">Disponibles en la app</h3>
+          <div className="grid-servicios-foto">
+            {servicios
+              .filter((s) => s.estado === "disponible")
+              .map((servicio) => (
+                <div className="tarjeta-servicio-foto" key={servicio.slug}>
+                  <button
+                    type="button"
+                    className="portada-servicio"
+                    onClick={() => setEditandoSlug(servicio.slug)}
+                    aria-label={`Editar ${servicio.nombre}`}
+                  >
+                    {servicio.fotoUrl ? (
+                      <img src={urlCompleta(servicio.fotoUrl)} alt="" />
+                    ) : (
+                      <span className="sin-foto-servicio">
+                        <IconoEmoji e="🖼️" /> Sin foto
+                      </span>
+                    )}
+                    <span className="texto-portada-servicio">
+                      <b>{servicio.nombre}</b>
+                      <span>{servicio.descripcion || "Sin descripción"}</span>
+                    </span>
+                  </button>
+                  <div className="pie-servicio-foto">
+                    <span className="negocios-servicio">
+                      {servicio.negocios} negocio{servicio.negocios === 1 ? "" : "s"}
+                    </span>
+                    <button className="btn-accion-mini" onClick={() => setEditandoSlug(servicio.slug)}>
+                      Editar
+                    </button>
+                  </div>
+                  {!SLUGS_CON_PANTALLA.has(servicio.slug) ? (
+                    <p className="aviso-sin-pantalla">Todavía no existe la pantalla: tocar la tarjeta no navega a ningún lado.</p>
+                  ) : null}
                 </div>
-                <p className="descripcion-servicio">{servicio.descripcion || "Sin descripción"}</p>
-                {!SLUGS_CON_PANTALLA.has(servicio.slug) && servicio.estado === "disponible" ? (
-                  <p className="aviso-sin-pantalla">Todavía no existe la pantalla — tocar la tarjeta no navega a ningún lado.</p>
-                ) : null}
-              </div>
-              <button className="btn-accion-mini" onClick={() => setEditandoSlug(servicio.slug)}>
-                Editar
-              </button>
-            </div>
-          ))}
-        </div>
+              ))}
+          </div>
+
+          <h3 className="titulo-seccion-servicios">Próximamente</h3>
+          <div className="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th>Descripción</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {servicios
+                  .filter((s) => s.estado !== "disponible")
+                  .map((servicio) => (
+                    <tr key={servicio.slug}>
+                      <td>
+                        <b>{servicio.nombre}</b>
+                      </td>
+                      <td style={{ color: "var(--texto-suave)" }}>{servicio.descripcion || "Sin descripción"}</td>
+                      <td>
+                        <span className="pill pill-gris">Próximamente</span>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <button className="btn-accion-mini" style={{ marginLeft: "auto" }} onClick={() => setEditandoSlug(servicio.slug)}>
+                          Editar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {editando ? (
@@ -185,7 +233,7 @@ function ModalServicio({
               <input type="radio" checked={estado === "proximamente"} onChange={() => setEstado("proximamente")} />
               <div>
                 <b>Próximamente</b>
-                <span>Aparece abajo, como ícono en un recuadro punteado, sin foto.</span>
+                <span>Aparece abajo, en la lista de lo que viene, sin foto.</span>
               </div>
             </label>
           </div>

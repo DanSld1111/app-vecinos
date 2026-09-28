@@ -374,7 +374,7 @@ export function RegistrarNegocio() {
                                 {c.correo} · {c.negocioIds.length} negocio(s) a cargo
                               </div>
                             </div>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--verde-fuerte)" }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--verde-texto)" }}>
                               {cuentaAVincular === c.id ? "Elegido" : "Elegir"}
                             </span>
                           </div>

@@ -63,7 +63,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
           style={{
             fontSize: 10.5,
             fontWeight: 800,
-            textTransform: "uppercase",
+            textTransform: "none",
             color: "var(--texto-tenue)",
             marginBottom: 14,
           }}

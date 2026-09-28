@@ -251,7 +251,7 @@ h1, h2, h3 {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--texto-suave);
   margin-bottom: 7px;
 }
@@ -864,7 +864,7 @@ th {
   padding: 12px 18px;
   font-size: 12px;
   font-weight: 800;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.03em;
   color: var(--texto-tenue);
   border-bottom: 1px solid var(--borde);
@@ -916,7 +916,7 @@ tr:last-child td {
 .pill-oro,
 .pill-rojo,
 .pill-gris {
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.02em;
 }
 .pill-verde {
@@ -1120,7 +1120,7 @@ tr:last-child td {
   font-size: 13px;
   font-weight: 800;
   color: var(--texto-suave);
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.02em;
 }
 .campo input,
@@ -1219,7 +1219,7 @@ tr:last-child td {
 .info-distrito .nombre-fila { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5px; }
 .info-distrito b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 17px; color: var(--texto); }
 .info-distrito .ubigeo { font-size: 12px; color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; }
-.badge { font-size: 12px; font-weight: 800; padding: 2.5px 9px; border-radius: 1149px; text-transform: uppercase; letter-spacing: 0.02em; }
+.badge { font-size: 12px; font-weight: 800; padding: 2.5px 9px; border-radius: 1149px; text-transform: none; letter-spacing: 0.02em; }
 .badge-piloto { background: var(--oro-suave); color: var(--oro); }
 .badge-activo { background: var(--verde-suave); color: var(--verde-texto); }
 .badge-vacio { background: var(--coral-suave); color: var(--coral-fuerte); }
@@ -1343,7 +1343,7 @@ tr:last-child td {
   display: block;
   font-size: 12px;
   font-weight: 800;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.03em;
   color: var(--texto-suave);
   margin-bottom: 7px;
@@ -1468,7 +1468,7 @@ tr:last-child td {
   font-weight: 800;
   padding: 3.5px 10.5px;
   border-radius: 1149px;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.02em;
 }
 .badge-arq.menu { background: var(--verde-suave); color: var(--verde-texto); }
@@ -1683,7 +1683,7 @@ tr:last-child td {
 .info-negocio .direccion-neg { font-size: 13px; color: var(--texto-tenue); }
 .cats-negocio { display: flex; gap: 4.5px; flex: none; }
 .cat-tag { font-size: 12px; font-weight: 700; background: var(--superficie-hundida); color: var(--texto-suave); padding: 3.5px 9px; border-radius: 1149px; white-space: nowrap; }
-.estado-negocio-pill { font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: uppercase; letter-spacing: 0.02em; flex: none; white-space: nowrap; }
+.estado-negocio-pill { font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: none; letter-spacing: 0.02em; flex: none; white-space: nowrap; }
 .estado-negocio-pill.activo { background: var(--verde-suave); color: var(--verde-texto); }
 .estado-negocio-pill.verificar { background: var(--oro-suave); color: var(--oro); }
 .estado-negocio-pill.inactivo { background: var(--borde); color: var(--texto-tenue); }
@@ -1780,7 +1780,7 @@ tr:last-child td {
 .drawer-titulo b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 22px; color: var(--texto); }
 .drawer-desc { font-size: 14px; color: var(--texto-suave); margin: 0 0 16px; line-height: 1.5; }
 .drawer-seccion { margin-bottom: 18px; }
-.drawer-seccion .etiqueta { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 9px; }
+.drawer-seccion .etiqueta { font-size: 12px; font-weight: 800; text-transform: none; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 9px; }
 .drawer-fila-dato { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--texto); padding: 8px 0; border-bottom: 1px solid var(--borde); }
 .drawer-fila-dato:last-child { border-bottom: none; }
 .drawer-fila-dato .icono-dato { width: 25px; text-align: center; flex: none; }
@@ -1977,7 +1977,7 @@ tr:last-child td {
   border-radius: 1149px;
   white-space: nowrap;
   flex: none;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.02em;
 }
 .alcance-cuenta { display: flex; gap: 4.5px; flex-wrap: wrap; max-width: 218px; flex: none; justify-content: flex-end; }
@@ -1996,7 +1996,7 @@ tr:last-child td {
   font-weight: 800;
   padding: 4.5px 12px;
   border-radius: 1149px;
-  text-transform: uppercase;
+  text-transform: none;
   flex: none;
   white-space: nowrap;
 }
@@ -2113,7 +2113,7 @@ tr:last-child td {
 .zona-peligro .etiqueta {
   font-size: 12px;
   font-weight: 800;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.03em;
   margin-bottom: 9px;
   color: var(--rojo);
@@ -2249,7 +2249,7 @@ tr:last-child td {
   text-overflow: ellipsis;
 }
 .vigencia-an { font-size: 12px; color: var(--texto-suave); flex: none; width: 124px; text-align: right; }
-.estado-an-pill { font-size: 12px; font-weight: 800; padding: 4.5px 12px; border-radius: 1149px; text-transform: uppercase; flex: none; white-space: nowrap; }
+.estado-an-pill { font-size: 12px; font-weight: 800; padding: 4.5px 12px; border-radius: 1149px; text-transform: none; flex: none; white-space: nowrap; }
 .estado-an-pill.activo { background: var(--verde-suave); color: var(--verde-texto); }
 .estado-an-pill.programado { background: var(--oro-suave); color: var(--oro); }
 .estado-an-pill.vencido { background: var(--borde); color: var(--texto-tenue); }
@@ -2339,7 +2339,7 @@ tr:last-child td {
 .panel-referencia .sub-ref { font-size: 12px; color: var(--texto-tenue); margin: 0 0 16px; line-height: 1.5; }
 .telefono { width: 100%; background: #0d130f; border-radius: 25px; padding: 9px; margin-bottom: 12px; }
 .pantalla-tel { background: var(--fondo-app); border-radius: 17px; padding: 12px 10.5px; min-height: 35px; }
-.etiqueta-pantalla { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 7px; }
+.etiqueta-pantalla { font-size: 11px; font-weight: 800; text-transform: none; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 7px; }
 .sin-ejemplo { font-size: 12px; color: var(--texto-tenue); text-align: center; margin: 7px 0; }
 
 .mini-carrusel { background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; padding: 9px; display: flex; gap: 9px; align-items: center; margin-bottom: 6px; }
@@ -2454,7 +2454,7 @@ tr:last-child td {
   text-overflow: ellipsis;
 }
 .fecha-nov { font-size: 12px; color: var(--texto-suave); flex: none; width: 90px; text-align: right; }
-.estado-nov-pill { font-size: 12px; font-weight: 800; padding: 4.5px 12px; border-radius: 1149px; text-transform: uppercase; flex: none; white-space: nowrap; }
+.estado-nov-pill { font-size: 12px; font-weight: 800; padding: 4.5px 12px; border-radius: 1149px; text-transform: none; flex: none; white-space: nowrap; }
 .estado-nov-pill.visible { background: var(--verde-suave); color: var(--verde-texto); }
 .estado-nov-pill.oculta { background: var(--borde); color: var(--texto-tenue); }
 .fila-acciones-nov { display: flex; gap: 7px; flex: none; }
@@ -2464,7 +2464,7 @@ tr:last-child td {
 .fila-acciones-nov .btn-accion-mini.eliminar:hover { background: var(--rojo); color: #fff; }
 
 /* ---- Mini tarjeta de notificación (preview fiel de la app) ---- */
-.mini-titulo-seccion { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--texto-tenue); margin-bottom: 7px; }
+.mini-titulo-seccion { font-size: 10px; font-weight: 800; text-transform: none; letter-spacing: 0.04em; color: var(--texto-tenue); margin-bottom: 7px; }
 .mini-tarjeta-notif {
   background: var(--superficie);
   border-radius: 12px;
@@ -2534,10 +2534,10 @@ tr:last-child td {
 .cabecera-detalle { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 21px; padding-bottom: 18px; border-bottom: 1px solid var(--borde); gap: 14px; }
 .cabecera-detalle h3 { font-size: 22px; margin-bottom: 4.5px; }
 .cabecera-detalle .meta-detalle { font-size: 13px; color: var(--texto-tenue); }
-.pill-pendiente { background: var(--oro-suave); color: var(--oro); font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap; flex: none; }
+.pill-pendiente { background: var(--oro-suave); color: var(--oro); font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: none; letter-spacing: 0.02em; white-space: nowrap; flex: none; }
 
 .seccion-detalle { margin-bottom: 18px; }
-.seccion-detalle .etiqueta { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 9px; }
+.seccion-detalle .etiqueta { font-size: 12px; font-weight: 800; text-transform: none; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 9px; }
 .caja-contenido { background: var(--superficie-hundida); border-radius: 14px; padding: 16px 18px; font-size: 15px; line-height: 1.6; color: var(--texto); }
 .caja-contenido .campo-vista { display: flex; gap: 9px; padding: 4.5px 0; }
 .caja-contenido .campo-vista b { flex: none; width: 103px; color: var(--texto-suave); font-weight: 700; font-size: 13px; }
@@ -2588,7 +2588,7 @@ tr:last-child td {
 .info-historial .motivo-hist { font-size: 13px; color: var(--rojo); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .info-historial .motivo-hist-etiqueta { color: var(--texto-suave); font-weight: 700; }
 .tipo-hist-pill { font-size: 12px; font-weight: 700; background: var(--superficie-hundida); color: var(--texto-suave); padding: 3.5px 10.5px; border-radius: 1149px; white-space: nowrap; flex: none; }
-.resultado-pill { font-size: 12px; font-weight: 800; padding: 4.5px 12px; border-radius: 1149px; text-transform: uppercase; flex: none; white-space: nowrap; }
+.resultado-pill { font-size: 12px; font-weight: 800; padding: 4.5px 12px; border-radius: 1149px; text-transform: none; flex: none; white-space: nowrap; }
 .resultado-pill.aprobado { background: var(--verde-suave); color: var(--verde-texto); }
 .resultado-pill.rechazado { background: var(--rojo-suave); color: var(--rojo); }
 .fecha-hist { font-size: 12px; color: var(--texto-suave); flex: none; width: 150px; text-align: right; }
@@ -2600,7 +2600,7 @@ tr:last-child td {
 .cabecera-plantilla { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 9px; }
 .cabecera-plantilla b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; display: block; }
 .cabecera-plantilla .modo-plantilla { font-size: 12px; color: var(--texto-tenue); }
-.badge-plantilla { font-size: 10px; font-weight: 800; padding: 2.5px 8px; border-radius: 1149px; text-transform: uppercase; flex: none; white-space: nowrap; }
+.badge-plantilla { font-size: 10px; font-weight: 800; padding: 2.5px 8px; border-radius: 1149px; text-transform: none; flex: none; white-space: nowrap; }
 .badge-plantilla.sistema { background: var(--superficie-hundida); color: var(--texto-suave); }
 .badge-plantilla.nueva { background: var(--morado-suave); color: var(--morado); }
 .marco-preview { background: var(--fondo-app); border-radius: 14px; padding: 12px; margin-bottom: 12px; min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
@@ -2617,7 +2617,7 @@ tr:last-child td {
 .mr-txt span { font-size: 8.5px; color: var(--texto-tenue); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mr-precio { font-size: 10.5px; font-weight: 800; flex: none; }
 .mr-tachado { text-decoration: line-through; color: var(--texto-tenue); font-weight: 500; font-size: 8.5px; margin-right: 3.5px; }
-.mr-seccion { font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: var(--texto-tenue); margin: 7px 0 3.5px; }
+.mr-seccion { font-size: 8.5px; font-weight: 800; text-transform: none; color: var(--texto-tenue); margin: 7px 0 3.5px; }
 .mr-seccion:first-child { margin-top: 0; }
 .mr-chips { display: flex; flex-wrap: wrap; gap: 4.5px; }
 .mr-chip { background: var(--superficie); font-size: 8.5px; font-weight: 700; color: var(--texto-suave); padding: 3.5px 8px; border-radius: 1149px; display: flex; align-items: center; gap: 3.5px; }
@@ -2666,7 +2666,7 @@ tr:last-child td {
 .cabecera-arquetipo { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
 .icono-arquetipo { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex: none; }
 .cabecera-arquetipo b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; display: block; }
-.badge-origen { font-size: 10.5px; font-weight: 800; padding: 2.5px 9px; border-radius: 1149px; text-transform: uppercase; }
+.badge-origen { font-size: 10.5px; font-weight: 800; padding: 2.5px 9px; border-radius: 1149px; text-transform: none; }
 .badge-origen.sistema { background: var(--superficie-hundida); color: var(--texto-suave); }
 .badge-origen.personalizado { background: var(--morado-suave); color: var(--morado); }
 .chip-plantilla-usada { display: inline-flex; align-items: center; gap: 6px; background: var(--verde-suave); color: var(--verde-texto); font-size: 12px; font-weight: 700; padding: 4.5px 12px; border-radius: 1149px; margin-bottom: 12px; }
@@ -2684,7 +2684,7 @@ tr:last-child td {
 .mini-tarjeta-plantilla { border: 2px solid var(--borde); border-radius: 14px; padding: 12px; cursor: pointer; background: var(--superficie); text-align: left; font-family: inherit; }
 .mini-tarjeta-plantilla.activa { border-color: var(--verde); background: var(--verde-suave); }
 .mini-tarjeta-plantilla b { font-size: 13px; display: block; margin-bottom: 7px; }
-.mini-tarjeta-plantilla .badge-plantilla-mini { font-size: 8.5px; font-weight: 800; padding: 1px 7px; border-radius: 1149px; text-transform: uppercase; margin-left: 6px; }
+.mini-tarjeta-plantilla .badge-plantilla-mini { font-size: 8.5px; font-weight: 800; padding: 1px 7px; border-radius: 1149px; text-transform: none; margin-left: 6px; }
 .mini-tarjeta-plantilla .badge-plantilla-mini.sistema { background: var(--superficie); color: var(--texto-suave); }
 .mini-tarjeta-plantilla .badge-plantilla-mini.nueva { background: var(--morado-suave); color: var(--morado); }
 .mini-preview-p { background: var(--fondo-app); border-radius: 9px; padding: 7px; min-height: 53px; font-size: 9px; }
@@ -2841,7 +2841,7 @@ tr:last-child td {
 .icono-mi-negocio { width: 48px; height: 48px; border-radius: 14px; background: var(--superficie-hundida); display: flex; align-items: center; justify-content: center; font-size: 23px; flex: none; color: var(--texto-suave); }
 .cabecera-mi-negocio b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; display: block; }
 .cabecera-mi-negocio span { font-size: 13px; color: var(--texto-tenue); }
-.badge-estado-mini { display: inline-flex; align-items: center; gap: 4.5px; font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: uppercase; letter-spacing: 0.02em; width: fit-content; }
+.badge-estado-mini { display: inline-flex; align-items: center; gap: 4.5px; font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: none; letter-spacing: 0.02em; width: fit-content; }
 .badge-estado-mini.activo { background: var(--verde-suave); color: var(--verde-texto); }
 .badge-estado-mini.pendiente { background: var(--oro-suave); color: var(--oro); }
 .badge-estado-mini.rechazado { background: var(--coral-suave); color: var(--coral-fuerte); }
@@ -3167,7 +3167,7 @@ tr:last-child td {
   font-size: 10.5px;
   font-weight: 700;
   color: var(--texto-tenue);
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.06em;
 }
 .stepper-registro {
@@ -3576,3 +3576,47 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .resumen-cambios { margin: 0; font-size: 12.5px; color: var(--texto-suave); }
 .detalle-cola-aviso:has(.antes-despues) { grid-template-columns: 1fr; }
 .detalle-cola-aviso:has(.antes-despues) .telefono-cola { max-width: 260px; justify-self: center; }
+
+
+/* Acciones de cada fila: neutras con borde fino; solo las que desactivan o bloquean van en rojo.
+   (Antes cada una tenía su color de fondo — Editar, Ocultar, Pausar, Restablecer… — y las filas
+   se veían como un semáforo.) */
+.btn-accion-mini,
+.btn-accion-mini:is(.resetear, .ocultar, .pausar, .activar, .editar, .desactivar) {
+  background: transparent;
+  border: 1px solid var(--borde-fuerte);
+  color: var(--texto);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.btn-accion-mini:hover,
+.btn-accion-mini:is(.resetear, .ocultar, .pausar, .activar, .editar):hover {
+  background: var(--superficie-hover);
+  border-color: var(--texto);
+  color: var(--texto);
+}
+.btn-accion-mini.desactivar { color: var(--rojo); border-color: color-mix(in srgb, var(--rojo) 40%, transparent); }
+.btn-accion-mini.desactivar:hover { background: var(--rojo-suave); color: var(--rojo); border-color: var(--rojo); }
+
+/* Servicios: los disponibles como fotos grandes (como en la app), el resto en lista */
+.titulo-seccion-servicios { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; margin: 6px 0 12px; }
+.grid-servicios-foto { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.portada-servicio { position: relative; display: block; width: 100%; height: 150px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--superficie-hundida); font: inherit; text-align: left; }
+.portada-servicio img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease; }
+.portada-servicio:hover img { transform: scale(1.03); }
+.portada-servicio::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.72) 100%); }
+.portada-servicio .sin-foto-servicio { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--texto-tenue); font-weight: 600; }
+.texto-portada-servicio { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 1; color: #fff; display: grid; }
+.texto-portada-servicio b { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.texto-portada-servicio span { font-size: 12px; opacity: 0.9; }
+.pie-servicio-foto { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.negocios-servicio { font-size: 12.5px; color: var(--texto-suave); }
+.tarjeta-servicio-foto .aviso-sin-pantalla { margin: 6px 0 0; font-size: 12px; color: var(--coral-fuerte); }
+
+/* Categorías: la foto (o el ícono de respaldo) en círculo, igual que en Inicio de la app */
+.icono-cat-grande { width: 56px !important; height: 56px !important; border-radius: 50% !important; }
+.icono-cat-grande img { border-radius: 50%; }
+.orden-badge { font-variant-numeric: tabular-nums; color: var(--texto-tenue); font-weight: 600; }
+/* "Pausar" en Publicidad tenía una regla más específica con fondo coral: también neutro */
+.fila-acciones-an .btn-accion-mini.pausar { background: transparent; color: var(--texto); border: 1px solid var(--borde-fuerte); }
+.fila-acciones-an .btn-accion-mini.pausar:hover { background: var(--superficie-hover); color: var(--texto); border-color: var(--texto); }

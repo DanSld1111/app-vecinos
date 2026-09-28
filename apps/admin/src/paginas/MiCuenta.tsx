@@ -175,7 +175,7 @@ export function MiCuenta() {
         </div>
 
         {nombreGuardado ? (
-          <div className="panel" style={{ padding: "8px 12px", background: "var(--verde-suave)", color: "var(--verde-fuerte)", fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
+          <div className="panel" style={{ padding: "8px 12px", background: "var(--verde-suave)", color: "var(--verde-texto)", fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
             Guardado.
           </div>
         ) : null}
@@ -229,7 +229,7 @@ export function MiCuenta() {
         )}
 
         {claveCambiada ? (
-          <div className="panel" style={{ padding: "8px 12px", background: "var(--verde-suave)", color: "var(--verde-fuerte)", fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
+          <div className="panel" style={{ padding: "8px 12px", background: "var(--verde-suave)", color: "var(--verde-texto)", fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
             Contraseña actualizada.
           </div>
         ) : null}
