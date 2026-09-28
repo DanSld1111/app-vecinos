@@ -146,22 +146,22 @@ export function HistorialValidaciones() {
           Todos
         </button>
         <button className={`chip-filtro ${filtroTipo === "negocio" ? "activo" : ""}`} onClick={() => setFiltroTipo("negocio")}>
-          🏪 Negocios
+          Negocios
         </button>
         <button className={`chip-filtro ${filtroTipo === "aviso" ? "activo" : ""}`} onClick={() => setFiltroTipo("aviso")}>
-          📢 Avisos
+          Avisos
         </button>
         <button
           className={`chip-filtro ${filtroResultado === "aprobado" ? "activo" : ""}`}
           onClick={() => setFiltroResultado(filtroResultado === "aprobado" ? "todos" : "aprobado")}
         >
-          ✅ Aprobados
+          Aprobados
         </button>
         <button
           className={`chip-filtro ${filtroResultado === "rechazado" ? "activo" : ""}`}
           onClick={() => setFiltroResultado(filtroResultado === "rechazado" ? "todos" : "rechazado")}
         >
-          ✕ Rechazados
+          Rechazados
         </button>
       </div>
 
@@ -177,7 +177,7 @@ export function HistorialValidaciones() {
                 </span>
               )}
             </div>
-            <span className="tipo-hist-pill">{fila.tipo === "negocio" ? "🏪 Negocio" : "📢 Aviso"}</span>
+            <span className="tipo-hist-pill">{fila.tipo === "negocio" ? "Negocio" : "Aviso"}</span>
             <span className={`resultado-pill ${fila.aprobado ? "aprobado" : "rechazado"}`}>
               {fila.aprobado ? "Aprobado" : "Rechazado"}
             </span>

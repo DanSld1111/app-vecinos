@@ -23,7 +23,7 @@ export function MisNegocios() {
       </div>
 
       <div className="nota-info">
-        ℹ️ Cada negocio tiene su propia información, horario, fotos, ofertas y estado — nada se mezcla entre
+        Cada negocio tiene su propia información, horario, fotos, ofertas y estado — nada se mezcla entre
         ellos.
       </div>
 

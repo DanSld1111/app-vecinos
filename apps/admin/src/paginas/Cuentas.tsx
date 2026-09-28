@@ -283,7 +283,7 @@ export function Cuentas() {
             </span>
             <div className="fila-acciones-cuenta" onClick={(e) => e.stopPropagation()}>
               <button className="btn-accion-mini resetear" onClick={() => setConfirmandoResetearId(cuenta.id)}>
-                🔑 Restablecer
+                Restablecer
               </button>
               <button
                 className={`btn-accion-mini ${cuenta.activo ? "desactivar" : "activar"}`}
@@ -498,7 +498,7 @@ function ModalNuevaCuenta({
         ) : null}
 
         <div className="nota-password-info">
-          🔑 Se generará una contraseña temporal automáticamente al crear la cuenta — se la compartes tú por un
+          Se generará una contraseña temporal automáticamente al crear la cuenta — se la compartes tú por un
           canal seguro. No hace falta escribir ninguna clave aquí.
         </div>
 
@@ -681,7 +681,7 @@ function DrawerEditarCuenta({
         <div className="zona-peligro">
           <div className="etiqueta">Zona de peligro</div>
           <button className="btn-eliminar-cuenta" onClick={onPedirEliminar} type="button">
-            🗑️ Eliminar esta cuenta
+            Eliminar esta cuenta
           </button>
         </div>
 
@@ -778,7 +778,7 @@ function ModalConfirmarEliminar({
             className="sub"
             style={{ color: "var(--coral-fuerte)", background: "var(--coral-suave)", borderRadius: 10, padding: "10px 12px" }}
           >
-            ⚠️ Esta cuenta tiene negocios asignados. Al eliminarla, esos negocios quedarán <b>sin dueño</b> (podrás
+            Esta cuenta tiene negocios asignados. Al eliminarla, esos negocios quedarán <b>sin dueño</b> (podrás
             asignarles otra cuenta después).
           </p>
         ) : null}

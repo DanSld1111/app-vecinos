@@ -103,34 +103,13 @@ function PantallaLogin({ onOlvideClave }: { onOlvideClave: () => void }) {
   return (
     <div className="login-split">
       <div className="login-panel-marca">
-        <svg className="anillos" width="320" height="320" viewBox="0 0 320 320" fill="none" aria-hidden="true">
-          <circle cx="160" cy="160" r="159" stroke="#fff" strokeWidth="1" />
-          <circle cx="160" cy="160" r="110" stroke="#fff" strokeWidth="1" />
-          <circle cx="160" cy="160" r="60" stroke="#fff" strokeWidth="1" />
-        </svg>
-
         <MarcaGrande />
 
         <div className="login-mensaje">
-          <h1>
-            Todo tu barrio,
-            <br />
-            en un solo lugar.
-          </h1>
-          <p>Negocios, avisos, publicidad y comunidad de San Borja — administrados desde un mismo panel.</p>
+          <h1>Todo lo de tu comunidad, en un solo lugar.</h1>
+          <p>Negocios, avisos y publicidad de cada distrito, administrados desde un mismo panel.</p>
         </div>
 
-        <div className="login-stats">
-          <div>
-            <b>4</b>
-            <span>Distritos piloto</span>
-          </div>
-          <div className="separador" />
-          <div>
-            <b>24/7</b>
-            <span>Acceso al panel</span>
-          </div>
-        </div>
       </div>
 
       <div className="login-panel-form">
@@ -190,26 +169,6 @@ function PantallaLogin({ onOlvideClave }: { onOlvideClave: () => void }) {
             {cargando ? "Ingresando…" : "Ingresar"}
           </button>
 
-          <div className="login-separador">
-            <div />
-            <span>Cuentas de prueba</span>
-            <div />
-          </div>
-
-          <div className="credenciales-demo-caja">
-            <p>
-              <b>Super-admin</b> · admin@elisur.com / admin123
-            </p>
-            <p>
-              <b>Dueño de negocio</b> · dueno@elisur.com / negocio123
-            </p>
-            <p>
-              <b>Junta vecinal</b> · junta@elisur.com / junta123
-            </p>
-            <p>
-              <b>Validador</b> · validador@elisur.com / validar123
-            </p>
-          </div>
         </form>
       </div>
     </div>
@@ -352,7 +311,7 @@ function PantallaRestablecerClave({
               const cumple = regla.cumple(clave);
               return (
                 <span key={regla.clave} style={{ fontSize: 13, color: cumple ? "var(--verde-fuerte, #1f8a5a)" : "var(--texto-tenue, #96a091)" }}>
-                  {cumple ? "✓" : "○"} {regla.etiqueta}
+                  {cumple ? "" : "○"} {regla.etiqueta}
                 </span>
               );
             })}

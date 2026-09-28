@@ -216,7 +216,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
 
       <div style={{ borderTop: "1px solid var(--borde)", paddingTop: 12, marginTop: 4 }}>
         <button className="btn-accion-mini" onClick={() => setVerPapelera((v) => !v)}>
-          🗑️ Papelera ({papelera.length}) {verPapelera ? "▴" : "▾"}
+          Papelera ({papelera.length}) {verPapelera ? "▴" : "▾"}
         </button>
 
         {verPapelera ? (
@@ -244,7 +244,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                       className="btn-accion-mini"
                       onClick={() => accion(() => api.restaurarProducto(negocio.id, producto.id, token), "Producto restaurado con éxito")}
                     >
-                      ↩️ Restaurar
+                      Restaurar
                     </button>
                     {confirmandoBorrado === producto.id ? (
                       <ModalConfirmar

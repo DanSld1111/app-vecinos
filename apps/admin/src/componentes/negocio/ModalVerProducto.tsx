@@ -90,7 +90,7 @@ export function ModalVerProducto({
             Cerrar
           </button>
           <button className="btn-crear" onClick={onEditar}>
-            ✏️ Editar
+            Editar
           </button>
         </div>
       </div>

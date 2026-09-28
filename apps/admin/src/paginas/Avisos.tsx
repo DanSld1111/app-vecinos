@@ -162,7 +162,7 @@ export function Avisos() {
       </div>
 
       <div className="nota-info">
-        ℹ️ Aquí ves todos los avisos de la comunidad — los tuyos y los que redacta Junta Vecinal. Lo que
+        Aquí ves todos los avisos de la comunidad — los tuyos y los que redacta Junta Vecinal. Lo que
         publicas desde "+ Nuevo aviso" sale directo, sin pasar por la cola. Lo que envía Junta Vecinal sí pasa
         por ahí — revísalo en <Link to="/validacion">Validación</Link>.
       </div>
@@ -199,13 +199,13 @@ export function Avisos() {
                 <b>{aviso.titulo}</b>
                 <span className="fuente-aviso-admin">
                   {aviso.fuenteNombre}
-                  {aviso.fuenteVerificada ? <span className="tick-verificado"> ✓ Verificada</span> : null} ·{" "}
+                  {aviso.fuenteVerificada ? <span className="tick-verificado"> Verificada</span> : null} ·{" "}
                   {formatearFechaCorta(aviso.publicadoEn)}
                 </span>
                 <span className="resumen-cuerpo">{aviso.cuerpo}</span>
               </div>
               <span className={`estado-aviso-pill ${aviso.estado}`}>
-                {aviso.estado === "publicado" ? "✅ Publicado" : aviso.estado === "pendiente" ? "⏳ En revisión" : "✕ Rechazado"}
+                {aviso.estado === "publicado" ? "Publicado" : aviso.estado === "pendiente" ? "En revisión" : "Rechazado"}
               </span>
               <button className="btn-eliminar-aviso" onClick={() => setConfirmandoEliminarId(aviso.id)}>
                 🗑️

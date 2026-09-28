@@ -236,7 +236,7 @@ export function RegistrarNegocio() {
               <p className="ayuda-paso-registro">Datos básicos del negocio — la ficha completa se termina después.</p>
               <div className="tarjeta-paso-registro">
                 <div className="seccion-alta">
-                  <div className="titulo-seccion-alta">🏷️ Identidad</div>
+                  <div className="titulo-seccion-alta">Identidad</div>
                   <div className="campo-modal">
                     <label>Nombre del negocio</label>
                     <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Panadería San José" autoFocus />
@@ -250,7 +250,7 @@ export function RegistrarNegocio() {
                 </div>
 
                 <div className="seccion-alta">
-                  <div className="titulo-seccion-alta">📍 Ubicación</div>
+                  <div className="titulo-seccion-alta">Ubicación</div>
                   <div className="fila-2-campos-alta">
                     <div className="campo-modal">
                       <label>Distrito</label>
@@ -288,7 +288,7 @@ export function RegistrarNegocio() {
 
                 <div className="seccion-alta" style={{ borderBottom: "none" }}>
                   <div className="titulo-seccion-alta">
-                    📞 Contacto <span className="opcional">(opcional)</span>
+                    Contacto <span className="opcional">(opcional)</span>
                   </div>
                   <div className="fila-2-campos-alta">
                     <div className="campo-modal" style={{ marginBottom: 0 }}>
@@ -330,21 +330,21 @@ export function RegistrarNegocio() {
                   className={`tab-modo-dueno ${modoDueno === "vincular" ? "activo" : ""}`}
                   onClick={() => setModoDueno("vincular")}
                 >
-                  🔗 Vincular cuenta existente
+                  Vincular cuenta existente
                 </button>
                 <button
                   type="button"
                   className={`tab-modo-dueno ${modoDueno === "crear" ? "activo" : ""}`}
                   onClick={() => setModoDueno("crear")}
                 >
-                  ✨ Crear cuenta nueva
+                  Crear cuenta nueva
                 </button>
               </div>
 
               {modoDueno === "vincular" ? (
                 <div className="tarjeta-paso-registro">
                   <input
-                    placeholder="🔍 Buscar por nombre o correo…"
+                    placeholder="Buscar por nombre o correo…"
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     style={{ marginBottom: 10 }}
@@ -374,7 +374,7 @@ export function RegistrarNegocio() {
                               </div>
                             </div>
                             <span style={{ fontSize: 12, fontWeight: 700, color: "var(--verde-fuerte)" }}>
-                              {cuentaAVincular === c.id ? "✓ Elegido" : "Elegir"}
+                              {cuentaAVincular === c.id ? "Elegido" : "Elegir"}
                             </span>
                           </div>
                         ))}
@@ -452,21 +452,21 @@ export function RegistrarNegocio() {
               <label style={{ display: "block", margin: "20px 0 8px" }}>Seguir completando el negocio</label>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button type="button" className="pill-accion-registro" onClick={() => negocioId && navegar(`/negocios/${negocioId}`)}>
-                  ✏️ Editar información
+                  Editar información
                 </button>
                 <button
                   type="button"
                   className="pill-accion-registro"
                   onClick={() => negocioId && navegar(`/negocios/${negocioId}?tab=horario`)}
                 >
-                  🕒 Agregar horario
+                  Agregar horario
                 </button>
                 <button
                   type="button"
                   className="pill-accion-registro"
                   onClick={() => negocioId && navegar(`/negocios/${negocioId}?tab=fotos`)}
                 >
-                  📷 Agregar más fotos
+                  Agregar más fotos
                 </button>
               </div>
             </div>
@@ -579,7 +579,7 @@ function FormularioPrimerProducto({
       <div style={{ display: "grid", gridTemplateColumns: "96px 1fr", gap: 14 }}>
         <div>
           <div className="dropzone-foto-producto" onClick={() => inputFoto.current?.click()}>
-            {previsualizacion ? <img src={previsualizacion} alt="" /> : <span>📷 Subir foto</span>}
+            {previsualizacion ? <img src={previsualizacion} alt="" /> : <span>Subir foto</span>}
           </div>
           <input
             ref={inputFoto}
@@ -643,7 +643,7 @@ function FormularioPrimerProducto({
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
         <button type="button" className="btn btn-primario" disabled={!valido || guardando} onClick={guardar}>
-          {guardando ? "Guardando…" : "Publicar negocio ✓"}
+          {guardando ? "Guardando…" : "Publicar negocio"}
         </button>
       </div>
     </div>

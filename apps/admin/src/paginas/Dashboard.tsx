@@ -126,7 +126,7 @@ export function Dashboard() {
     <>
       <div className="saludo-fila">
         <div>
-          <h2>Buenas tardes, equipo 👋</h2>
+          <h2>Buenas tardes, equipo</h2>
           <p>
             Esto es lo que pasa hoy en{" "}
             {vistaTodos
@@ -143,7 +143,7 @@ export function Dashboard() {
             value={distritoSeleccionado}
             onChange={(e) => setDistritoSeleccionado(e.target.value)}
           >
-            <option value="todos">🌎 Todos los distritos</option>
+            <option value="todos">Todos los distritos</option>
             {distritos.map((d) => (
               <option key={d.ubigeo} value={d.ubigeo}>
                 📍 {d.nombre}

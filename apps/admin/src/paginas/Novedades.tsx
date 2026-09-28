@@ -140,13 +140,13 @@ export function Novedades() {
                       setModalAbierto(true);
                     }}
                   >
-                    ✏️ Editar
+                    Editar
                   </button>
                   <button
                     className="btn-accion-mini ocultar"
                     onClick={() => token && alternarActivo(novedad.id, token)}
                   >
-                    {novedad.activo ? "🙈 Ocultar" : "👁️ Mostrar"}
+                    {novedad.activo ? "Ocultar" : "Mostrar"}
                   </button>
                   <button className="btn-accion-mini eliminar" onClick={() => setConfirmandoEliminarId(novedad.id)}>
                     🗑️

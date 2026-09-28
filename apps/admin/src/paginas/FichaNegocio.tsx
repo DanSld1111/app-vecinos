@@ -251,7 +251,7 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
                 gap: 6,
               }}
             >
-              <b style={{ fontSize: 12, color: "var(--oro)" }}>📦 Archivar</b>
+              <b style={{ fontSize: 12, color: "var(--oro)" }}>Archivar</b>
               {confirmandoArchivar ? (
                 <>
                   <span style={{ fontSize: 11.5, color: "var(--texto-suave)" }}>
@@ -295,7 +295,7 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
                 gap: 6,
               }}
             >
-              <b style={{ fontSize: 12, color: "var(--rojo)" }}>🗑️ Eliminar</b>
+              <b style={{ fontSize: 12, color: "var(--rojo)" }}>Eliminar</b>
               {confirmandoEliminar ? (
                 <>
                   <span style={{ fontSize: 11.5, color: "var(--rojo)", fontWeight: 700 }}>
@@ -456,7 +456,7 @@ function PestanaDueno({ negocio }: { negocio: Negocio }) {
               onClick={() => setModo("vincular")}
               type="button"
             >
-              🔗 Vincular existente
+              Vincular existente
             </button>
           </div>
         </div>

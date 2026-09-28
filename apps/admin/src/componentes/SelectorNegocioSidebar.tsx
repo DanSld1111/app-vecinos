@@ -43,7 +43,7 @@ export function SelectorNegocioSidebar() {
         <span className="caret-negocio">{abierto ? "▴" : "▾"}</span>
       </button>
       <button type="button" className="btn-cambiar-negocio" onClick={() => setAbierto((v) => !v)}>
-        🔁 Cambiar de negocio
+        Cambiar de negocio
       </button>
 
       {abierto ? (

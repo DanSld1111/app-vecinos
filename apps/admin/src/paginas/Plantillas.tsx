@@ -3,13 +3,13 @@ import { PlantillaVisual } from "@app-vecinos/tipos";
 import { PLANTILLAS_VISUALES } from "../datos/plantillasVisuales";
 
 export const NOMBRE_TIPO_CAMPO: Record<string, string> = {
-  texto: "🔤 Texto corto",
-  texto_largo: "📝 Texto largo",
-  numero: "🔢 Número",
-  precio: "💰 Precio",
-  booleano: "✅ Sí / No",
-  opciones: "📑 Lista de opciones",
-  foto: "🖼️ Foto",
+  texto: "Texto corto",
+  texto_largo: "Texto largo",
+  numero: "Número",
+  precio: "Precio",
+  booleano: "Sí / No",
+  opciones: "Lista de opciones",
+  foto: "Foto",
 };
 
 type Filtro = "todas" | "sistema" | "nueva" | "lista" | "unico";
@@ -75,7 +75,7 @@ export function Plantillas() {
       </div>
 
       <div className="nota-info">
-        ℹ️ Cada plantilla ya trae su diseño resuelto — al crear un arquetipo solo eliges una de estas y conectas
+        Cada plantilla ya trae su diseño resuelto — al crear un arquetipo solo eliges una de estas y conectas
         tus campos a lo que la plantilla espera. No se dibuja nada a mano.
       </div>
 
@@ -84,16 +84,16 @@ export function Plantillas() {
           Todas ({resumen.total})
         </button>
         <button className={`chip-filtro ${filtro === "sistema" ? "activo" : ""}`} onClick={() => setFiltro("sistema")}>
-          ⚙️ Del sistema ({resumen.sistema})
+          Del sistema ({resumen.sistema})
         </button>
         <button className={`chip-filtro ${filtro === "nueva" ? "activo" : ""}`} onClick={() => setFiltro("nueva")}>
-          ✨ Nuevas ({resumen.nuevas})
+          Nuevas ({resumen.nuevas})
         </button>
         <button className={`chip-filtro ${filtro === "lista" ? "activo" : ""}`} onClick={() => setFiltro("lista")}>
-          📋 Modo lista
+          Modo lista
         </button>
         <button className={`chip-filtro ${filtro === "unico" ? "activo" : ""}`} onClick={() => setFiltro("unico")}>
-          🗂️ Modo único
+          Modo único
         </button>
       </div>
 
@@ -103,7 +103,7 @@ export function Plantillas() {
             <div className="cabecera-plantilla">
               <div>
                 <b>{plantilla.nombre}</b>
-                <span className="modo-plantilla">{plantilla.modo === "lista" ? "📋 Modo lista" : "🗂️ Modo único"}</span>
+                <span className="modo-plantilla">{plantilla.modo === "lista" ? "Modo lista" : "Modo único"}</span>
               </div>
               <span className={`badge-plantilla ${plantilla.origen === "sistema" ? "sistema" : "nueva"}`}>
                 {plantilla.origen === "sistema" ? "Del sistema" : "Nueva"}
@@ -218,17 +218,17 @@ export function VistaPreviaPlantilla({ id }: { id: string }) {
           <div className="mr-seccion">Entradas</div>
           <div className="mr-fila"><div className="mr-txt"><b>Anticuchos</b></div><div className="mr-precio">S/18</div></div>
           <div className="mr-seccion">Parrillas</div>
-          <div className="mr-fila"><div className="mr-txt"><b>Parrilla familiar</b><span>★ Más pedido</span></div><div className="mr-precio">S/89</div></div>
+          <div className="mr-fila"><div className="mr-txt"><b>Parrilla familiar</b><span>Más pedido</span></div><div className="mr-precio">S/89</div></div>
         </>
       );
     case "chips":
       return (
         <div className="mr-chips">
-          <span className="mr-chip">🎨 Pintura</span>
-          <span className="mr-chip">⚡ Electricidad</span>
-          <span className="mr-chip">🚿 Gasfitería</span>
-          <span className="mr-chip">🔨 Herramientas</span>
-          <span className="mr-chip">🔑 Cerrajería</span>
+          <span className="mr-chip">Pintura</span>
+          <span className="mr-chip">Electricidad</span>
+          <span className="mr-chip">Gasfitería</span>
+          <span className="mr-chip">Herramientas</span>
+          <span className="mr-chip">Cerrajería</span>
         </div>
       );
     case "carrusel-descuento":
@@ -327,8 +327,8 @@ export function VistaPreviaPlantilla({ id }: { id: string }) {
     case "info-reserva":
       return (
         <div className="mr-tarjeta-blanca">
-          <div style={{ fontSize: 8, marginBottom: 3 }}>📍 A 2 cuadras del parque</div>
-          <div style={{ fontSize: 8, marginBottom: 3 }}>🕒 Lun–Sáb, 9am–6pm</div>
+          <div style={{ fontSize: 8, marginBottom: 3 }}>A 2 cuadras del parque</div>
+          <div style={{ fontSize: 8, marginBottom: 3 }}>Lun–Sáb, 9am–6pm</div>
           <div className="mr-cta">Reservar por WhatsApp</div>
         </div>
       );

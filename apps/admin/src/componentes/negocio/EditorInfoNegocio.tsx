@@ -74,7 +74,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   return (
     <div className="layout-editor">
       <div className="tarjeta">
-        <div className="nota-info">ℹ️ Los cambios se guardan directo y se ven en la app de inmediato.</div>
+        <div className="nota-info">Los cambios se guardan directo y se ven en la app de inmediato.</div>
 
         <div className="campo-modal">
           <label>Nombre del negocio</label>
@@ -157,7 +157,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 4 }}>
           <button className="btn btn-primario" disabled={guardando} onClick={guardar}>
-            {guardando ? "Guardando…" : guardado ? "✓ Guardado" : "Guardar cambios"}
+            {guardando ? "Guardando…" : guardado ? "Guardado" : "Guardar cambios"}
           </button>
         </div>
       </div>
@@ -178,8 +178,8 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
             <div className="mini-ficha-nombre">{nombre || "Nombre del negocio"}</div>
             <div className="mini-ficha-desc">{descripcion || "Sin descripción todavía."}</div>
             <div className="mini-ficha-botones">
-              <span className="whatsapp">💬 WhatsApp</span>
-              <span className="llamar">📞 Llamar</span>
+              <span className="whatsapp">WhatsApp</span>
+              <span className="llamar">Llamar</span>
             </div>
             <div className="mini-ficha-pie">
               {negocio.verificadoEn ? `Datos verificados el ${negocio.verificadoEn}` : "Aún no verificado"}

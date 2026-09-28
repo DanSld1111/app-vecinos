@@ -49,12 +49,12 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
       <div className="tarjeta">
         {apareceEnFicha ? (
           <div className="nota-info">
-            ℹ️ La categoría principal es "{nombreCategoriaPrincipal}", así que estas ofertas{" "}
+            La categoría principal es "{nombreCategoriaPrincipal}", así que estas ofertas{" "}
             <b>sí aparecen en la ficha pública</b>.
           </div>
         ) : (
           <div className="nota-alerta">
-            ⚠️ La categoría principal es "{nombreCategoriaPrincipal}", así que esta sección todavía{" "}
+            La categoría principal es "{nombreCategoriaPrincipal}", así que esta sección todavía{" "}
             <b>no aparece en la ficha pública</b> — solo se muestra para negocios de categorías tipo
             supermercado. Se pueden dejar preparadas para cuando eso cambie, o para el carrusel de ofertas en
             Buscar, que sí las toma de aquí.

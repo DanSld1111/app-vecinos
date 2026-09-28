@@ -1,4 +1,25 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import type { IconType } from "react-icons";
+import {
+  LuBadgeCheck,
+  LuClock,
+  LuFlag,
+  LuHistory,
+  LuImage,
+  LuKeyRound,
+  LuLayers,
+  LuLayoutDashboard,
+  LuLayoutGrid,
+  LuLayoutTemplate,
+  LuLogOut,
+  LuMap,
+  LuMegaphone,
+  LuPercent,
+  LuSparkles,
+  LuStore,
+  LuTag,
+  LuUsers,
+} from "react-icons/lu";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { RolCuenta } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
@@ -12,6 +33,9 @@ import { PilaToasts } from "./PilaToasts";
 interface ItemNav {
   a: string;
   texto: string;
+  icono: IconType;
+  /** Rótulo del grupo del menú (Territorio, Catálogo…); el primer ítem de cada grupo lo muestra. */
+  grupo?: string;
   contador?: number;
 }
 
@@ -19,39 +43,39 @@ function itemsPorRol(rol: RolCuenta, pendientes: number): ItemNav[] {
   switch (rol) {
     case "super_admin":
       return [
-        { a: "/dashboard", texto: "Dashboard" },
-        { a: "/distritos", texto: "Distritos" },
-        { a: "/categorias", texto: "Categorías" },
-        { a: "/plantillas", texto: "Plantillas" },
-        { a: "/arquetipos", texto: "Arquetipos" },
-        { a: "/negocios", texto: "Negocios" },
-        { a: "/servicios", texto: "Servicios" },
-        { a: "/publicidad", texto: "Publicidad" },
-        { a: "/novedades", texto: "Novedades" },
-        { a: "/avisos", texto: "Avisos" },
-        { a: "/validacion", texto: "Validación", contador: pendientes },
-        { a: "/cuentas", texto: "Cuentas" },
-        { a: "/usuarios", texto: "Usuarios" },
+        { a: "/dashboard", texto: "Dashboard", icono: LuLayoutDashboard, grupo: "General" },
+        { a: "/distritos", texto: "Distritos", icono: LuMap, grupo: "Territorio" },
+        { a: "/categorias", texto: "Categorías", icono: LuTag, grupo: "Catálogo" },
+        { a: "/plantillas", texto: "Plantillas", icono: LuLayoutTemplate },
+        { a: "/arquetipos", texto: "Arquetipos", icono: LuLayers },
+        { a: "/servicios", texto: "Servicios", icono: LuLayoutGrid },
+        { a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" },
+        { a: "/avisos", texto: "Avisos", icono: LuMegaphone, grupo: "Comunicación" },
+        { a: "/novedades", texto: "Novedades", icono: LuSparkles },
+        { a: "/publicidad", texto: "Publicidad", icono: LuImage },
+        { a: "/validacion", texto: "Validación", icono: LuBadgeCheck, grupo: "Validación", contador: pendientes },
+        { a: "/cuentas", texto: "Cuentas", icono: LuKeyRound, grupo: "Personas" },
+        { a: "/usuarios", texto: "Usuarios", icono: LuUsers },
       ];
     case "dueno_negocio":
       return [
-        { a: "/mi-negocio", texto: "Mi negocio" },
-        { a: "/mi-negocio/horario", texto: "Horario" },
-        { a: "/mi-negocio/fotos", texto: "Fotos" },
-        { a: "/mi-negocio/ofertas", texto: "Ofertas" },
-        { a: "/mi-negocio/estado", texto: "Estado" },
+        { a: "/mi-negocio", texto: "Información", icono: LuStore, grupo: "Mi negocio" },
+        { a: "/mi-negocio/horario", texto: "Horario", icono: LuClock },
+        { a: "/mi-negocio/fotos", texto: "Fotos", icono: LuImage },
+        { a: "/mi-negocio/ofertas", texto: "Ofertas", icono: LuPercent },
+        { a: "/mi-negocio/estado", texto: "Estado", icono: LuFlag },
       ];
     case "junta_vecinal":
-      return [{ a: "/mis-avisos", texto: "Mis avisos" }];
+      return [{ a: "/mis-avisos", texto: "Mis avisos", icono: LuMegaphone, grupo: "Comunicación" }];
     case "validador_contenido":
       return [
-        { a: "/validacion", texto: "Cola de validación", contador: pendientes },
-        { a: "/validacion/historial", texto: "Historial" },
+        { a: "/validacion", texto: "Cola de validación", icono: LuBadgeCheck, grupo: "Validación", contador: pendientes },
+        { a: "/validacion/historial", texto: "Historial", icono: LuHistory },
       ];
     // Acceso total al módulo de negocios (alta, edición, publicar/despublicar) pero nada más
     // del panel — sin distritos, cuentas, categorías ni el resto de módulos de super_admin.
     case "gestor_negocios":
-      return [{ a: "/negocios", texto: "Negocios" }];
+      return [{ a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" }];
   }
 }
 
@@ -136,7 +160,7 @@ export function LayoutAdmin() {
             )}
           </svg>
         </button>
-        <span className="marca-topbar-movil">ELISUR admin</span>
+        <span className="marca-topbar-movil">ELISUR</span>
       </div>
 
       {menuAbierto ? (
@@ -145,33 +169,30 @@ export function LayoutAdmin() {
 
       <aside className={`sidebar ${menuAbierto ? "abierto" : ""}`}>
         <div className="marca">
-          <div className="punto">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10"
-                stroke="#fff"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <span>ELISUR admin</span>
+          <span>ELISUR</span>
+          <small>Panel de administración</small>
         </div>
         {cuenta.rol === "dueno_negocio" ? <SelectorNegocioSidebar /> : null}
         <nav>
           {itemsPorRol(cuenta.rol, pendientes).map((item) => (
-            <NavLink
-              key={item.a}
-              to={item.a}
-              className={({ isActive }) => (isActive ? "activo" : undefined)}
-            >
-              <span className="izq">
-                <span className="dot" />
-                {item.texto}
-              </span>
-              {item.contador ? <span className="contador">{item.contador}</span> : null}
-            </NavLink>
+            <Fragment key={item.a}>
+              {item.grupo ? <span className="grupo-nav">{item.grupo}</span> : null}
+              <NavLink
+                to={item.a}
+                end={item.a === "/mi-negocio"}
+                className={({ isActive }) => (isActive ? "activo" : undefined)}
+              >
+                <span className="izq">
+                  <item.icono className="icono-nav" aria-hidden />
+                  {item.texto}
+                </span>
+                {item.contador ? (
+                  <span className="contador" aria-label={`${item.contador} pendientes`}>
+                    {item.contador}
+                  </span>
+                ) : null}
+              </NavLink>
+            </Fragment>
           ))}
         </nav>
         <NavLink to="/mi-cuenta" className={({ isActive }) => `pie-usuario ${isActive ? "activo" : ""}`}>
@@ -186,7 +207,7 @@ export function LayoutAdmin() {
           </div>
         </NavLink>
         <button className="cerrar-sesion" onClick={cerrarSesion}>
-          Cerrar sesión
+          <LuLogOut aria-hidden /> Cerrar sesión
         </button>
       </aside>
       <div className="contenido">

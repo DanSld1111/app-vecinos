@@ -156,9 +156,9 @@ export function Categorias() {
                 <span className="slug-cat">{cat.slug}</span>
               </div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                <span className={`badge-arq ${clase}`}>{sinDefinir ? "⚠️ Sin definir" : arq!.nombre}</span>
+                <span className={`badge-arq ${clase}`}>{sinDefinir ? "Sin definir" : arq!.nombre}</span>
                 <span className={`badge-servicio ${cat.servicioSlug ? "" : "atencion"}`}>
-                  {cat.servicioSlug ? servicioPorSlug[cat.servicioSlug]?.nombre ?? cat.servicioSlug : "⚠️ Sin servicio"}
+                  {cat.servicioSlug ? servicioPorSlug[cat.servicioSlug]?.nombre ?? cat.servicioSlug : "Sin servicio"}
                 </span>
               </div>
             </div>

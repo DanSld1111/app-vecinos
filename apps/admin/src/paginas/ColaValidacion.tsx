@@ -196,10 +196,10 @@ export function ColaValidacion() {
           Todo ({totalNegocios + totalAvisos})
         </button>
         <button className={`chip-filtro ${filtroTipo === "negocio" ? "activo" : ""}`} onClick={() => setFiltroTipo("negocio")}>
-          🏪 Negocios ({totalNegocios})
+          Negocios ({totalNegocios})
         </button>
         <button className={`chip-filtro ${filtroTipo === "aviso" ? "activo" : ""}`} onClick={() => setFiltroTipo("aviso")}>
-          📢 Avisos ({totalAvisos})
+          Avisos ({totalAvisos})
         </button>
       </div>
 
@@ -209,7 +209,7 @@ export function ColaValidacion() {
             className={`chip-filtro ${filtroDistrito === "todos" ? "activo" : ""}`}
             onClick={() => setFiltroDistrito("todos")}
           >
-            🌎 Todos los distritos
+            Todos los distritos
           </button>
           {distritosDisponibles.map((d) => (
             <button
@@ -288,10 +288,10 @@ export function ColaValidacion() {
 
               <div className="fila-acciones-validacion">
                 <button className="btn-rechazar" disabled={!motivo.trim()} onClick={alRechazar}>
-                  ✕ Rechazar
+                  Rechazar
                 </button>
                 <button className="btn-aprobar" onClick={alAprobar}>
-                  ✓ Aprobar
+                  Aprobar
                 </button>
               </div>
             </div>

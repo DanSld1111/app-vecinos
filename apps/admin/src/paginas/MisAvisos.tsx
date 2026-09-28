@@ -164,7 +164,7 @@ export function MisAvisos() {
                   <span className="resumen-cuerpo">{aviso.cuerpo}</span>
                 </div>
                 <span className={`estado-aviso-pill ${aviso.estado === "publicado" ? "publicado" : aviso.estado === "pendiente" ? "pendiente" : "rechazado"}`}>
-                  {aviso.estado === "publicado" ? "✅ Publicado" : aviso.estado === "pendiente" ? "⏳ En revisión" : "✕ Rechazado"}
+                  {aviso.estado === "publicado" ? "Publicado" : aviso.estado === "pendiente" ? "En revisión" : "Rechazado"}
                 </span>
                 <button className="btn-gestionar-negocio" style={{ flex: "none" }}>
                   {aviso.estado === "rechazado" ? "Corregir →" : "Ver →"}
@@ -209,12 +209,12 @@ function DetalleAviso({ aviso, onVolver }: { aviso: Aviso; onVolver: () => void 
 
       {esPublicado ? (
         <div className="nota-info">
-          ✅ Este aviso ya está publicado y visible para los vecinos. Ya no se puede editar — si necesitas
+          Este aviso ya está publicado y visible para los vecinos. Ya no se puede editar — si necesitas
           corregir algo, crea un aviso nuevo.
         </div>
       ) : (
         <div className="nota-alerta">
-          ⏳ Este aviso está en revisión por el equipo ELISUR. Te avisaremos apenas quede aprobado o si hay
+          Este aviso está en revisión por el equipo ELISUR. Te avisaremos apenas quede aprobado o si hay
           algo que corregir — mientras tanto no puedes editarlo.
         </div>
       )}
@@ -388,7 +388,7 @@ function EditorAviso({
         </div>
       ) : (
         <div className="nota-info">
-          ℹ️ Como Junta Vecinal, tu nombre de fuente aparece sin la insignia de verificado (esa insignia es
+          Como Junta Vecinal, tu nombre de fuente aparece sin la insignia de verificado (esa insignia es
           solo para fuentes oficiales como Sedapal o la Municipalidad). Aun así, tu aviso se ve y funciona
           igual una vez aprobado.
         </div>

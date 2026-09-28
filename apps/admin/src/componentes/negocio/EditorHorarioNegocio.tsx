@@ -85,7 +85,7 @@ export function EditorHorarioNegocio({ negocio }: { negocio: Negocio }) {
 
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
           <button className="btn btn-primario" disabled={guardando} onClick={guardar}>
-            {guardando ? "Guardando…" : guardado ? "✓ Guardado" : "Guardar cambios"}
+            {guardando ? "Guardando…" : guardado ? "Guardado" : "Guardar cambios"}
           </button>
         </div>
       </div>

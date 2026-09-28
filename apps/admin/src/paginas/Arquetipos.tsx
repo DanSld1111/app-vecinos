@@ -143,7 +143,7 @@ export function Arquetipos() {
       </div>
 
       <div className="nota-info">
-        ℹ️ Ya no se arman campos desde cero: eliges una plantilla de la galería de{" "}
+        Ya no se arman campos desde cero: eliges una plantilla de la galería de{" "}
         <Link to="/plantillas">Plantillas</Link> y solo le pones tus propios nombres. Un arquetipo con negocios
         reales usándolo no permite renombrar sus campos — solo se puede archivar.
       </div>
@@ -336,7 +336,7 @@ function EditorArquetipo({
                     {p.origen === "sistema" ? "Sistema" : "Nueva"}
                   </span>
                 </b>
-                <div className="mini-preview-p">{p.modo === "lista" ? "📋 Modo lista" : "🗂️ Modo único"}</div>
+                <div className="mini-preview-p">{p.modo === "lista" ? "Modo lista" : "Modo único"}</div>
               </button>
             ))}
           </div>
@@ -405,7 +405,7 @@ function EditorArquetipo({
 
       {modo === "crear" ? (
         <div className="pasos-editor">
-          <span className="paso hecho">✓ Elegir plantilla</span>
+          <span className="paso hecho">Elegir plantilla</span>
           <span className="flecha-paso">→</span>
           <span className="paso actual">② Personalizar campos</span>
         </div>
@@ -413,7 +413,7 @@ function EditorArquetipo({
 
       {bloqueado ? (
         <div className="nota-bloqueo">
-          🔒 Este arquetipo ya tiene negocios con datos cargados. No se pueden renombrar sus campos hasta que
+          Este arquetipo ya tiene negocios con datos cargados. No se pueden renombrar sus campos hasta que
           esos negocios dejen de usarlo — puedes seguir viéndolos, pero no editarlos.
         </div>
       ) : null}

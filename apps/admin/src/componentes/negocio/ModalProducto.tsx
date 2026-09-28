@@ -252,7 +252,7 @@ export function ModalProducto({
               disabled={guardando}
               onClick={() => setConfirmandoEliminar(true)}
             >
-              🗑️ Enviar a papelera
+              Enviar a papelera
             </button>
           ) : (
             <span />

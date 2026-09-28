@@ -209,10 +209,10 @@ export function Publicidad() {
                         setModalAbierto(true);
                       }}
                     >
-                      ✏️ Editar
+                      Editar
                     </button>
                     <button className="btn-accion-mini pausar" onClick={() => alternarActivo(anuncio.id, token)}>
-                      {anuncio.activo ? "⏸ Pausar" : "▶ Reactivar"}
+                      {anuncio.activo ? "Pausar" : "▶ Reactivar"}
                     </button>
                     <button className="btn-accion-mini eliminar" onClick={() => setConfirmandoEliminarId(anuncio.id)}>
                       🗑️

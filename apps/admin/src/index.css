@@ -1,29 +1,30 @@
 :root {
-  --verde: #1f8a5a;
-  --verde-fuerte: #146641;
-  --verde-suave: #dbf1e3;
-  --coral: #ef7148;
-  --coral-fuerte: #c8532e;
-  --coral-suave: #fce2d7;
-  --oro: #b8862e;
+  /* Diseño "Vitrina" (docs/decisiones/0078-panel-vitrina.md): mismos tonos que la app de vecinos.
+     El verde de marca queda para la acción principal; los neutros son grises con un toque verde. */
+  --verde: #1a531a;
+  --verde-fuerte: #123d13;
+  --verde-suave: #e3efe6;
+  --coral: #d9623b;
+  --coral-fuerte: #b8461f;
+  --coral-suave: #fbe6dc;
+  --oro: #9a6b12;
   --oro-suave: #f6ecd6;
   --azul: #2f6690;
-  --azul-suave: #dbe9f1;
-  --azul: #2f6690;
-  --azul-suave: #dbe9f1;
-  --rojo: #c0392b;
+  --azul-suave: #e3edf4;
+  --rojo: #b3261e;
   --rojo-suave: #fbe2de;
-  --morado: #7c5cbf;
+  --morado: #6b4fae;
   --morado-suave: #ece5f9;
 
-  --texto: #1a2119;
-  --texto-suave: #5f6b5c;
-  --texto-tenue: #96a091;
+  --texto: #141a16;
+  --texto-suave: #56615a;
+  --texto-tenue: #6b746e;
   --superficie: #ffffff;
-  --superficie-hundida: #f4f4f0;
-  --fondo-app: #eef1ea;
-  --borde: #e5e3da;
-  --sombra: 0 1px 2px rgba(20, 40, 30, 0.04), 0 10px 28px -16px rgba(20, 40, 30, 0.22);
+  --superficie-hundida: #f3f5f3;
+  --fondo-app: #ffffff;
+  --borde: #e4e8e5;
+  --borde-fuerte: #c9d0cb;
+  --sombra: 0 0 0 1px var(--borde);
 }
 
 * {
@@ -34,11 +35,11 @@ body {
   margin: 0;
   background: var(--fondo-app);
   color: var(--texto);
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
 }
 
 h1, h2, h3 {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   margin: 0;
 }
@@ -75,7 +76,7 @@ h1, h2, h3 {
   flex: none;
 }
 .marca-mini span {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 18px;
 }
@@ -139,7 +140,7 @@ h1, h2, h3 {
   flex: none;
 }
 .marca-grande span {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 22px;
   color: #fff;
@@ -171,7 +172,7 @@ h1, h2, h3 {
 }
 .login-stats b {
   display: block;
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 25px;
   color: #fff;
@@ -356,7 +357,7 @@ h1, h2, h3 {
   flex: none;
 }
 .sidebar .marca span {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 17px;
   color: #fff;
@@ -620,7 +621,7 @@ h1, h2, h3 {
 .stat-tendencia.neutral { background: var(--superficie-hundida); color: var(--texto-suave); }
 .stat-tendencia.atencion { background: var(--coral-suave); color: var(--coral-fuerte); }
 .stat-valor {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 35px;
   color: var(--texto);
@@ -777,7 +778,7 @@ h1, h2, h3 {
 }
 .celda-distrito b { font-size: 14px; }
 .celda-distrito span { font-size: 12px; color: var(--texto-tenue); }
-.valor-mini { font-family: "Fraunces", serif; font-weight: 700; font-size: 17px; }
+.valor-mini { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-weight: 700; font-size: 17px; }
 
 @keyframes entrar {
   to {
@@ -1047,7 +1048,7 @@ tr:last-child td {
   flex-direction: column;
   gap: 5px;
 }
-.tarjeta-negocio .cuerpo-tarjeta b { font-family: "Fraunces", serif; font-size: 14px; line-height: 1.3; }
+.tarjeta-negocio .cuerpo-tarjeta b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 14px; line-height: 1.3; }
 .tarjeta-negocio .direccion-tarjeta { font-size: 11px; color: var(--texto-suave); }
 .tarjeta-negocio .progreso-tarjeta {
   display: flex;
@@ -1135,7 +1136,7 @@ tr:last-child td {
 }
 .mini-stat b {
   display: block;
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-size: 21px;
   color: var(--texto);
   line-height: 1.1;
@@ -1177,7 +1178,7 @@ tr:last-child td {
 .pin-distrito.vacio { background: var(--superficie-hundida); }
 .info-distrito { flex: 1; min-width: 0; }
 .info-distrito .nombre-fila { display: flex; align-items: center; gap: 9px; margin-bottom: 2.5px; }
-.info-distrito b { font-family: "Fraunces", serif; font-size: 17px; color: var(--texto); }
+.info-distrito b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 17px; color: var(--texto); }
 .info-distrito .ubigeo { font-size: 12px; color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; }
 .badge { font-size: 12px; font-weight: 800; padding: 2.5px 9px; border-radius: 1149px; text-transform: uppercase; letter-spacing: 0.02em; }
 .badge-piloto { background: var(--oro-suave); color: var(--oro); }
@@ -1420,7 +1421,7 @@ tr:last-child td {
   border-radius: 1149px;
   font-family: "IBM Plex Mono", monospace;
 }
-.nombre-cat { font-family: "Fraunces", serif; font-size: 18px; color: var(--texto); margin: 0 0 3.5px; }
+.nombre-cat { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 18px; color: var(--texto); margin: 0 0 3.5px; }
 .slug-cat { font-size: 12px; color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; display: block; }
 .badge-arq {
   align-self: flex-start;
@@ -1472,7 +1473,7 @@ tr:last-child td {
   font-size: 25px;
   flex: none;
 }
-.previsualizacion-cat b { font-family: "Fraunces", serif; font-size: 17px; color: var(--texto); display: block; }
+.previsualizacion-cat b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 17px; color: var(--texto); display: block; }
 .previsualizacion-cat span { font-size: 12px; color: var(--texto-tenue); font-family: "IBM Plex Mono", monospace; }
 
 .fila-2-campos { display: flex; gap: 12px; }
@@ -1638,7 +1639,7 @@ tr:last-child td {
 }
 .info-negocio { flex: 1; min-width: 0; }
 .info-negocio .nombre-fila-neg { display: flex; align-items: center; gap: 7px; }
-.info-negocio b { font-family: "Fraunces", serif; font-size: 16px; color: var(--texto); }
+.info-negocio b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; color: var(--texto); }
 .info-negocio .check-verificado { color: var(--verde-fuerte); font-size: 14px; }
 .info-negocio .direccion-neg { font-size: 13px; color: var(--texto-tenue); }
 .cats-negocio { display: flex; gap: 4.5px; flex: none; }
@@ -1737,7 +1738,7 @@ tr:last-child td {
   font-size: 30px;
 }
 .drawer-titulo { display: flex; align-items: center; gap: 9px; margin-bottom: 4.5px; }
-.drawer-titulo b { font-family: "Fraunces", serif; font-size: 22px; color: var(--texto); }
+.drawer-titulo b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 22px; color: var(--texto); }
 .drawer-desc { font-size: 14px; color: var(--texto-suave); margin: 0 0 16px; line-height: 1.5; }
 .drawer-seccion { margin-bottom: 18px; }
 .drawer-seccion .etiqueta { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; color: var(--texto-tenue); margin-bottom: 9px; }
@@ -1922,13 +1923,13 @@ tr:last-child td {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 16px;
   color: #fff;
 }
 .info-cuenta { flex: 1; min-width: 0; }
-.info-cuenta b { font-family: "Fraunces", serif; font-size: 16px; color: var(--texto); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.info-cuenta b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; color: var(--texto); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .info-cuenta .correo-cuenta { font-size: 13px; color: var(--texto-tenue); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rol-pill {
   font-size: 12px;
@@ -2010,7 +2011,7 @@ tr:last-child td {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 23px;
   color: #fff;
@@ -2176,7 +2177,7 @@ tr:last-child td {
 .foto-anuncio img { width: 100%; height: 100%; object-fit: cover; }
 .info-anuncio { flex: 1; min-width: 0; }
 .info-anuncio b {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-size: 16px;
   color: var(--texto);
   display: block;
@@ -2247,7 +2248,7 @@ tr:last-child td {
 .foto-servicio img { width: 100%; height: 100%; object-fit: cover; }
 .info-servicio { flex: 1; min-width: 0; }
 .fila-nombre-servicio { display: flex; align-items: center; gap: 7px; margin-bottom: 2.5px; }
-.fila-nombre-servicio b { font-family: "Fraunces", serif; font-size: 16px; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fila-nombre-servicio b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .descripcion-servicio { font-size: 13px; color: var(--texto-tenue); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .aviso-sin-pantalla { font-size: 12px; color: var(--oro); margin: 3.5px 0 0; line-height: 1.4; }
 
@@ -2397,7 +2398,7 @@ tr:last-child td {
 }
 .info-novedad { flex: 1; min-width: 0; }
 .info-novedad b {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-size: 16px;
   color: var(--texto);
   display: block;
@@ -2486,7 +2487,7 @@ tr:last-child td {
 .icono-item-cola.negocio { background: var(--verde-suave); }
 .icono-item-cola.aviso { background: var(--azul-suave); }
 .info-item-cola { flex: 1; min-width: 0; }
-.info-item-cola b { font-family: "Fraunces", serif; font-size: 14px; color: var(--texto); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info-item-cola b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 14px; color: var(--texto); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .info-item-cola span { font-size: 12px; color: var(--texto-tenue); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tiempo-cola { font-size: 12px; color: var(--texto-tenue); flex: none; white-space: nowrap; }
 
@@ -2544,7 +2545,7 @@ tr:last-child td {
 .lista-historial { display: flex; flex-direction: column; gap: 9px; }
 .fila-historial { display: flex; align-items: center; gap: 16px; background: #fff; border-radius: 16px; padding: 14px 18px; box-shadow: var(--sombra); }
 .info-historial { flex: 1; min-width: 0; }
-.info-historial b { font-family: "Fraunces", serif; font-size: 15px; color: var(--texto); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info-historial b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 15px; color: var(--texto); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .info-historial .motivo-hist { font-size: 13px; color: var(--rojo); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .info-historial .motivo-hist-etiqueta { color: var(--texto-suave); font-weight: 700; }
 .tipo-hist-pill { font-size: 12px; font-weight: 700; background: var(--superficie-hundida); color: var(--texto-suave); padding: 3.5px 10.5px; border-radius: 1149px; white-space: nowrap; flex: none; }
@@ -2558,7 +2559,7 @@ tr:last-child td {
 .tarjeta-plantilla { background: #fff; border-radius: 21px; padding: 18px; box-shadow: var(--sombra); cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease; display: flex; flex-direction: column; }
 .tarjeta-plantilla:hover { transform: translateY(-3px); box-shadow: 0 16px 34px -16px rgba(20, 40, 30, 0.32); }
 .cabecera-plantilla { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 9px; }
-.cabecera-plantilla b { font-family: "Fraunces", serif; font-size: 16px; display: block; }
+.cabecera-plantilla b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; display: block; }
 .cabecera-plantilla .modo-plantilla { font-size: 12px; color: var(--texto-tenue); }
 .badge-plantilla { font-size: 10px; font-weight: 800; padding: 2.5px 8px; border-radius: 1149px; text-transform: uppercase; flex: none; white-space: nowrap; }
 .badge-plantilla.sistema { background: var(--superficie-hundida); color: var(--texto-suave); }
@@ -2602,7 +2603,7 @@ tr:last-child td {
 .mr-franja.libre { border-color: var(--verde); color: var(--verde-fuerte); }
 .mr-mapa { width: 100%; height: 46px; border-radius: 7px; background: var(--azul-suave); margin-bottom: 6px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .mr-specs { display: flex; gap: 9px; font-size: 8px; color: var(--texto-suave); }
-.mr-precio-pizarra { font-family: "Fraunces", serif; font-size: 18px; font-weight: 700; display: block; text-align: center; }
+.mr-precio-pizarra { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 18px; font-weight: 700; display: block; text-align: center; }
 .mr-cta { background: var(--verde); color: #fff; text-align: center; font-size: 10px; font-weight: 700; padding: 7px; border-radius: 8px; margin-top: 7px; }
 
 /* ---- Drawer detalle de plantilla (reutiliza .drawer / .fondo-drawer) ---- */
@@ -2625,7 +2626,7 @@ tr:last-child td {
 .tarjeta-arquetipo:hover { transform: translateY(-3px); box-shadow: 0 16px 34px -16px rgba(20, 40, 30, 0.32); }
 .cabecera-arquetipo { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
 .icono-arquetipo { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex: none; }
-.cabecera-arquetipo b { font-family: "Fraunces", serif; font-size: 16px; display: block; }
+.cabecera-arquetipo b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; display: block; }
 .badge-origen { font-size: 10.5px; font-weight: 800; padding: 2.5px 9px; border-radius: 1149px; text-transform: uppercase; }
 .badge-origen.sistema { background: var(--superficie-hundida); color: var(--texto-suave); }
 .badge-origen.personalizado { background: var(--morado-suave); color: var(--morado); }
@@ -2682,7 +2683,7 @@ tr:last-child td {
 
 .mini-ficha-foto { width: 100%; aspect-ratio: 16/9; border-radius: 12px; background: var(--superficie-hundida); display: flex; align-items: center; justify-content: center; color: var(--texto-tenue); font-size: 23px; margin-bottom: 9px; overflow: hidden; }
 .mini-ficha-foto img { width: 100%; height: 100%; object-fit: cover; }
-.mini-ficha-nombre { font-size: 13px; font-weight: 700; font-family: "Fraunces", serif; margin-bottom: 2.5px; }
+.mini-ficha-nombre { font-size: 13px; font-weight: 700; font-family: "Schibsted Grotesk", system-ui, sans-serif; margin-bottom: 2.5px; }
 .mini-ficha-desc { font-size: 10px; color: var(--texto-tenue); line-height: 1.4; margin-bottom: 9px; }
 .mini-ficha-botones { display: flex; gap: 7px; margin-bottom: 9px; }
 .mini-ficha-botones span { flex: 1; text-align: center; font-size: 9px; font-weight: 700; padding: 7px; border-radius: 9px; }
@@ -2799,7 +2800,7 @@ tr:last-child td {
 .tarjeta-mi-negocio:hover { outline: 2px solid var(--verde); }
 .cabecera-mi-negocio { display: flex; align-items: center; gap: 12px; }
 .icono-mi-negocio { width: 48px; height: 48px; border-radius: 14px; background: var(--superficie-hundida); display: flex; align-items: center; justify-content: center; font-size: 23px; flex: none; color: var(--texto-suave); }
-.cabecera-mi-negocio b { font-family: "Fraunces", serif; font-size: 16px; display: block; }
+.cabecera-mi-negocio b { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 16px; display: block; }
 .cabecera-mi-negocio span { font-size: 13px; color: var(--texto-tenue); }
 .badge-estado-mini { display: inline-flex; align-items: center; gap: 4.5px; font-size: 12px; font-weight: 800; padding: 3.5px 10.5px; border-radius: 1149px; text-transform: uppercase; letter-spacing: 0.02em; width: fit-content; }
 .badge-estado-mini.activo { background: var(--verde-suave); color: var(--verde-fuerte); }
@@ -2844,7 +2845,7 @@ tr:last-child td {
 .mini-fecha-aviso { font-size: 9px; color: var(--texto-tenue); }
 .mini-pill-aviso { font-size: 8.5px; font-weight: 700; padding: 3.5px 8px; border-radius: 1149px; flex: none; white-space: nowrap; }
 .mini-cuerpo-aviso-cont { padding: 0 10.5px 10.5px; }
-.mini-titulo-aviso { font-family: "Fraunces", serif; font-size: 13px; font-weight: 700; display: block; margin-bottom: 1px; }
+.mini-titulo-aviso { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 13px; font-weight: 700; display: block; margin-bottom: 1px; }
 .mini-cuerpo-aviso { font-size: 10.5px; color: var(--texto-suave); line-height: 1.4; }
 .mini-pie-aviso { display: flex; align-items: center; gap: 16px; border-top: 1px solid var(--borde); padding: 8px 10.5px; }
 .mini-accion-aviso { display: flex; align-items: center; gap: 4.5px; font-size: 10.5px; font-weight: 700; color: var(--texto-suave); }
@@ -2885,7 +2886,7 @@ tr:last-child td {
   padding: 0;
 }
 .marca-topbar-movil {
-  font-family: "Fraunces", serif;
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
   font-weight: 700;
   font-size: 17px;
   color: #fff;
@@ -3355,3 +3356,99 @@ tr:last-child td {
   .stepper-registro { gap: 12px; }
   .etiqueta-stepper { display: none; }
 }
+
+
+/* =====================================================================================
+   Capa "Vitrina" — va al final a propósito: ajusta las piezas más usadas del panel al
+   diseño de la app de vecinos sin reescribir cada regla de arriba. Fuente única Schibsted
+   Grotesk, neutros grises, líneas finas en vez de tarjetas con sombra, verde solo en la
+   acción principal. Ver docs/decisiones/0078-panel-vitrina.md.
+   ===================================================================================== */
+body { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+button, input, select, textarea { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+
+/* Menú lateral claro, agrupado, con íconos de línea */
+.sidebar { background: #fbfcfb; color: var(--texto); border-right: 1px solid var(--borde); width: 244px; padding: 20px 12px; }
+.sidebar .marca { display: block; margin: 0 0 14px; padding: 2px 10px; }
+.sidebar .marca span { display: block; font-family: "Schibsted Grotesk", system-ui, sans-serif; font-weight: 800; font-size: 18px; letter-spacing: 0.02em; color: var(--texto); }
+.sidebar .marca small { display: block; font-size: 11.5px; font-weight: 600; color: var(--texto-suave); }
+.sidebar nav { gap: 1px; }
+.sidebar .grupo-nav { font-size: 11.5px; font-weight: 600; color: var(--texto-tenue); padding: 14px 10px 4px; }
+.sidebar nav a { padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--texto); }
+.sidebar nav a .izq { gap: 10px; }
+.sidebar nav a .icono-nav { width: 17px; height: 17px; color: var(--texto-suave); flex: none; }
+.sidebar nav a:hover { background: var(--superficie-hundida); color: var(--texto); }
+.sidebar nav a.activo { background: var(--superficie-hundida); color: var(--texto); font-weight: 700; }
+.sidebar nav a.activo .icono-nav { color: var(--texto); }
+.sidebar nav a .contador { background: var(--coral-fuerte); font-size: 11px; font-weight: 700; }
+.sidebar .pie-usuario { border-top: 1px solid var(--borde); color: var(--texto); }
+.sidebar .pie-usuario b { color: var(--texto); }
+.sidebar .pie-usuario span { color: var(--texto-suave); }
+.sidebar .pie-usuario.activo, .sidebar .pie-usuario:hover { background: var(--superficie-hundida); }
+.sidebar .avatar { background: var(--superficie-hundida); }
+.sidebar .cerrar-sesion { display: flex; align-items: center; gap: 8px; color: var(--texto-suave); background: transparent; border: 0; font-weight: 600; }
+.sidebar .cerrar-sesion:hover { color: var(--texto); }
+
+/* Encabezado de cada pantalla */
+.topbar { align-items: flex-end; margin-bottom: 22px; }
+.topbar h2 { font-size: 28px; line-height: 1.1; letter-spacing: -0.025em; }
+.topbar p { color: var(--texto-suave); }
+
+/* Botones: verde solo para la acción principal; el resto con borde */
+.btn { border-radius: 9px; font-weight: 600; padding: 9px 15px; transition: background-color .15s, border-color .15s, transform .1s; }
+.btn:active { transform: scale(0.98); }
+.btn-primario { background: var(--verde); }
+.btn-primario:hover { background: var(--verde-fuerte); }
+.btn-fantasma { border: 1.5px solid var(--borde-fuerte); background: #fff; }
+.btn-fantasma:hover { border-color: var(--texto); }
+
+/* Tarjetas y paneles: sin sombra flotante, borde fino */
+.panel, .tarjeta, .stat-card, .mini-stat { box-shadow: none; border: 1px solid var(--borde); border-radius: 12px; }
+.stat-card:hover, .mini-stat:hover { transform: none; box-shadow: none; border-color: var(--borde-fuerte); }
+.stat-card { gap: 6px; }
+.stat-icono, .mini-stat .icono { border-radius: 50%; }
+.panel-head h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.ver-todo { color: var(--verde); font-weight: 600; }
+
+/* Tablas: títulos de columna en minúscula inicial, filas con líneas finas */
+th { text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; color: var(--texto-suave); border-bottom: 1px solid var(--borde-fuerte); }
+td { border-bottom: 1px solid var(--borde); }
+tbody tr:hover td { background: #fafbfa; }
+.celda-item .miniatura { border-radius: 7px; width: 40px; height: 40px; object-fit: cover; }
+
+/* Etiquetas y píldoras: menos gritonas */
+.pill { font-weight: 700; padding: 2px 9px; border-radius: 5px; }
+.badge { text-transform: none; letter-spacing: 0; font-weight: 700; border-radius: 5px; }
+
+/* Buscadores, campos y filtros */
+.buscador-mini { border: 1.5px solid var(--borde-fuerte); border-radius: 9px; }
+.buscador-mini:focus-within { border-color: var(--texto); }
+input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], input[type="search"], input[type="time"], input[type="date"], input[type="url"], select, textarea {
+  border-color: var(--borde-fuerte);
+  border-radius: 9px;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--texto); outline: none; }
+.campo-modal label { font-weight: 600; color: var(--texto); text-transform: none; letter-spacing: 0; }
+
+/* Modales */
+.overlay-modal { background: rgba(10, 14, 12, 0.5); }
+.modal-card { border-radius: 14px; box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.45); }
+.modal-card h3 { font-size: 22px; }
+
+/* Movimiento: entradas cortas y respeto a "reducir movimiento" */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Login: foto de la comunidad a la izquierda, formulario limpio a la derecha */
+.login-panel-marca {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.72) 100%),
+    url("/login-comunidad.jpg") center / cover no-repeat, var(--verde-fuerte);
+}
+.login-mensaje h1 { font-size: 42px; line-height: 1.05; letter-spacing: -0.03em; max-width: 520px; }
+.login-mensaje p { color: rgba(255, 255, 255, 0.9); }
+.login-btn-ingresar { background: var(--verde); border-radius: 9px; font-weight: 600; }
+.login-btn-ingresar:hover { background: var(--verde-fuerte); }
+.login-form-ancho label { text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; color: var(--texto); }

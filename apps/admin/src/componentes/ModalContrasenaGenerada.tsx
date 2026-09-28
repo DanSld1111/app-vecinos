@@ -46,12 +46,12 @@ export function ModalContrasenaGenerada({
         <div className="caja-password">
           <span className="clave">{contrasena}</span>
           <button className="btn-copiar" onClick={copiar} type="button">
-            {copiado ? "✓ Copiado" : "📋 Copiar"}
+            {copiado ? "Copiado" : "Copiar"}
           </button>
         </div>
 
         <div className="aviso-una-vez">
-          ⚠️ Por seguridad, esta contraseña <b>no se vuelve a mostrar</b>. Si la pierdes, tendrás que
+          Por seguridad, esta contraseña <b>no se vuelve a mostrar</b>. Si la pierdes, tendrás que
           generar una nueva desde "Restablecer clave".
         </div>
 

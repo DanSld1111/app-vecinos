@@ -68,11 +68,11 @@ export function Servicios() {
                 </div>
                 <p className="descripcion-servicio">{servicio.descripcion || "Sin descripción"}</p>
                 {!SLUGS_CON_PANTALLA.has(servicio.slug) && servicio.estado === "disponible" ? (
-                  <p className="aviso-sin-pantalla">⚠️ Todavía no existe la pantalla — tocar la tarjeta no navega a ningún lado.</p>
+                  <p className="aviso-sin-pantalla">Todavía no existe la pantalla — tocar la tarjeta no navega a ningún lado.</p>
                 ) : null}
               </div>
               <button className="btn-accion-mini" onClick={() => setEditandoSlug(servicio.slug)}>
-                ✏️ Editar
+                Editar
               </button>
             </div>
           ))}
@@ -176,21 +176,21 @@ function ModalServicio({
             <label className={`opcion-ubicacion ${estado === "disponible" ? "marcada" : ""}`}>
               <input type="radio" checked={estado === "disponible"} onChange={() => setEstado("disponible")} />
               <div>
-                <b>✅ Disponible</b>
+                <b>Disponible</b>
                 <span>Aparece arriba, con foto de fondo, y se puede tocar.</span>
               </div>
             </label>
             <label className={`opcion-ubicacion ${estado === "proximamente" ? "marcada" : ""}`}>
               <input type="radio" checked={estado === "proximamente"} onChange={() => setEstado("proximamente")} />
               <div>
-                <b>⏳ Próximamente</b>
+                <b>Próximamente</b>
                 <span>Aparece abajo, como ícono en un recuadro punteado, sin foto.</span>
               </div>
             </label>
           </div>
           {estado === "disponible" && !puedeNavegar ? (
             <p className="ayuda-modal" style={{ color: "var(--rojo)" }}>
-              ⚠️ Todavía no existe la pantalla de "{servicio.nombre}" en la app — se mostrará disponible, pero
+              Todavía no existe la pantalla de "{servicio.nombre}" en la app — se mostrará disponible, pero
               tocar la tarjeta no navegará a ningún lado hasta que se construya.
             </p>
           ) : null}

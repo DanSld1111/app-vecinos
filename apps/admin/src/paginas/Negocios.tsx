@@ -143,7 +143,7 @@ export function Negocios() {
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 12.5 }}>
           <span className="pill pill-azul">📍 {comunidadFiltro.nombre}</span>
           <button className="btn btn-fantasma" style={{ padding: "4px 10px", fontSize: 11 }} onClick={() => setSearchParams({})}>
-            Quitar filtro ✕
+            Quitar filtro
           </button>
         </div>
       ) : null}
@@ -192,7 +192,7 @@ export function Negocios() {
             onClick={() => setVerArchivados((v) => !v)}
             title="Negocios archivados — no aparecen en la app ni en el listado normal"
           >
-            📦 Ver archivados
+            Ver archivados
           </button>
 
           <button
@@ -200,7 +200,7 @@ export function Negocios() {
             onClick={() => setSoloIncompletos((v) => !v)}
             title="Negocios a los que les falta foto, horario, descripción, categoría o dueño"
           >
-            ⚠️ Con algo pendiente
+            Con algo pendiente
           </button>
         </div>
       </div>

@@ -159,7 +159,7 @@ export function Usuarios() {
                     className={`btn-accion-mini ${usuario.estado === "activo" ? "desactivar" : "activar"}`}
                     onClick={() => alternarBloqueo(usuario.id, token)}
                   >
-                    {usuario.estado === "activo" ? "🚫 Bloquear" : "✅ Reactivar"}
+                    {usuario.estado === "activo" ? "Bloquear" : "Reactivar"}
                   </button>
                   <button className="btn-accion-mini desactivar" onClick={() => setConfirmandoEliminarId(usuario.id)}>
                     🗑️
