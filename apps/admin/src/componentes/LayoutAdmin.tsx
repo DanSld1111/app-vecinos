@@ -14,9 +14,11 @@ import {
   LuLogOut,
   LuMap,
   LuMegaphone,
+  LuMoon,
   LuPercent,
   LuSparkles,
   LuStore,
+  LuSun,
   LuTag,
   LuUsers,
 } from "react-icons/lu";
@@ -29,6 +31,7 @@ import { useGeografia } from "../estado/useGeografia";
 import { urlCompleta } from "../utilidades/media";
 import { SelectorNegocioSidebar } from "./SelectorNegocioSidebar";
 import { PilaToasts } from "./PilaToasts";
+import { temaEfectivo, useTemaAdmin } from "../estado/useTemaAdmin";
 
 interface ItemNav {
   a: string;
@@ -97,6 +100,9 @@ export function LayoutAdmin() {
   const cargarCategorias = useCategorias((estado) => estado.cargar);
   const cargarGeografia = useGeografia((estado) => estado.cargar);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const preferenciaTema = useTemaAdmin((estado) => estado.preferencia);
+  const alternarTema = useTemaAdmin((estado) => estado.alternar);
+  const oscuro = temaEfectivo(preferenciaTema) === "oscuro";
   const ubicacion = useLocation();
 
   // En móvil/tablet el menú es un panel deslizable — se cierra solo al navegar,
@@ -206,6 +212,15 @@ export function LayoutAdmin() {
             <span>{NOMBRE_ROL[cuenta.rol]}</span>
           </div>
         </NavLink>
+        <button
+          type="button"
+          className="boton-tema"
+          onClick={alternarTema}
+          aria-label={oscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+        >
+          {oscuro ? <LuSun className="icono-nav" aria-hidden /> : <LuMoon className="icono-nav" aria-hidden />}
+          {oscuro ? "Modo claro" : "Modo oscuro"}
+        </button>
         <button className="cerrar-sesion" onClick={cerrarSesion}>
           <LuLogOut aria-hidden /> Cerrar sesión
         </button>

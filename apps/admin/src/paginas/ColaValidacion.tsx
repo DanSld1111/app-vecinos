@@ -7,9 +7,11 @@ import { useGeografia } from "../estado/useGeografia";
 import { distritoDeComunidad } from "../utilidades/alcance";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
+import { DetalleAvisoCola, DetalleNegocioCola } from "../componentes/DetalleCola";
+import { Aviso, Negocio } from "@app-vecinos/tipos";
 type ItemCola =
-  | { tipo: "negocio"; id: string; titulo: string; subtitulo: string; distritoUbigeo: string; detalle: string; enviadoEn: string }
-  | { tipo: "aviso"; id: string; titulo: string; subtitulo: string; distritoUbigeo: string; detalle: string; enviadoEn: string };
+  | { tipo: "negocio"; id: string; titulo: string; subtitulo: string; distritoUbigeo: string; detalle: string; enviadoEn: string; negocio: Negocio }
+  | { tipo: "aviso"; id: string; titulo: string; subtitulo: string; distritoUbigeo: string; detalle: string; enviadoEn: string; aviso: Aviso };
 
 function tiempoRelativoSimple(iso: string): string {
   const minutos = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
@@ -78,6 +80,7 @@ export function ColaValidacion() {
         distritoUbigeo: n.distritoUbigeo,
         detalle: n.descripcion,
         enviadoEn: n.actualizadoEn,
+        negocio: n,
       }));
 
     // avisos ya viene filtrado por el servidor a "pendiente" + alcance de esta cuenta
@@ -93,7 +96,8 @@ export function ColaValidacion() {
           distritoUbigeo,
           detalle: a.cuerpo,
           enviadoEn: a.publicadoEn,
-        };
+          aviso: a,
+        } as ItemCola;
       });
 
     let combinados = [...pendientesNegocio, ...pendientesAviso].sort((a, b) =>
@@ -272,8 +276,11 @@ export function ColaValidacion() {
               </div>
 
               <div className="seccion-detalle">
-                <div className="etiqueta">Contenido enviado</div>
-                <div className="caja-contenido">{seleccionado.detalle}</div>
+                {seleccionado.tipo === "negocio" ? (
+                  <DetalleNegocioCola negocio={seleccionado.negocio} />
+                ) : (
+                  <DetalleAvisoCola aviso={seleccionado.aviso} />
+                )}
               </div>
 
               <div className="seccion-detalle campo-motivo">

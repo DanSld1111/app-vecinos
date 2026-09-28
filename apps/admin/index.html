@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ELISUR · Panel</title>
+    <script>
+      // Pinta el tema elegido antes de que cargue React, para no ver un destello blanco en modo oscuro.
+      (function () {
+        try {
+          var guardado = JSON.parse(localStorage.getItem("elisur-admin-tema") || "{}");
+          var pref = (guardado.state && guardado.state.preferencia) || "sistema";
+          var oscuro = pref === "oscuro" || (pref === "sistema" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.dataset.tema = oscuro ? "oscuro" : "claro";
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

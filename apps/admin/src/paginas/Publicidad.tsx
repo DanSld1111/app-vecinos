@@ -147,7 +147,7 @@ export function Publicidad() {
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "#eceae2" }}><IconoEmoji e="🗄️" /></div>
+          <div className="icono" style={{ background: "var(--borde)" }}><IconoEmoji e="🗄️" /></div>
           <div>
             <b>{resumen.vencidos}</b>
             <span>Vencidos</span>

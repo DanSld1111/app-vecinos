@@ -22,6 +22,15 @@ Bocetos de los 27 módulos: https://claude.ai/artifact/56D4NXtHLM1TyCE7GNvgVK
 - Las 12 vistas previas con celular se ven como la app nueva, solo con estilos: pantalla blanca,
   sin sombras, y en los avisos la etiqueta arriba y el autor abajo, como un aviso de Comunidad.
 
+- **Cola de validación:** el detalle ya no es un bloque de texto. Un negocio se ve con su foto,
+  categoría, dirección, teléfono, WhatsApp y horario (lo que falta se marca "Sin completar") y qué
+  le falta a la ficha; un aviso, con sus datos y la vista previa de Comunidad al lado. No hay
+  "antes y después": la API no guarda la versión anterior de una edición.
+- **Modo oscuro:** `data-tema="oscuro"` en `<html>` cambia la paleta (`:root[data-tema="oscuro"]`
+  en index.css). Botón en el pie del menú; por defecto sigue al sistema y recuerda la elección
+  (`estado/useTemaAdmin.ts`). Un script en index.html lo aplica antes de cargar React para evitar
+  el destello blanco. Los fondos `#fff` fijos pasaron a `var(--superficie)`.
+
 ## Pendiente
 
 - Las cuentas de prueba deben cambiar de contraseña o desactivarse en la base de datos.
