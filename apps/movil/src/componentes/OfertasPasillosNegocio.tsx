@@ -112,7 +112,7 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
     cinta: {
       ...tipografia.pie,
       fontSize: 10,
-      fontFamily: "PlusJakartaSans_800ExtraBold",
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
       color: "#ffffff",
       backgroundColor: colores.acentoFuerte,
       position: "absolute",
@@ -128,7 +128,7 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
     },
     nombreOferta: {
       ...tipografia.pie,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.texto,
     },
     precioAntes: {
@@ -159,7 +159,7 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
     chipPasilloTexto: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: oscuro ? "#e0b565" : "#b8862e",
     },
   });

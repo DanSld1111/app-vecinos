@@ -24,6 +24,11 @@ export interface PaletaColores {
   exito: string;
   advertencia: string;
   error: string;
+
+  /** Estrellas de calificación (antes #e0a835 repetido a mano en cada pantalla). */
+  calificacion: string;
+  /** Punto de "Abierto ahora". */
+  abierto: string;
 }
 
 export const paletaClara: PaletaColores = {
@@ -37,19 +42,25 @@ export const paletaClara: PaletaColores = {
 
   fondo: "#ffffff",
   superficie: "#ffffff",
-  superficieHundida: "#eef6f0",
-  superficieHundida2: "#e3ece4",
+  // Neutros casi grises (antes menta): con la foto como protagonista, el color lo ponen las
+  // imágenes y el verde de marca queda para la acción principal.
+  superficieHundida: "#f1f4f1",
+  superficieHundida2: "#e6ebe7",
 
-  texto: "#1a2119",
-  textoSuave: "#5f6b5c",
-  textoTenue: "#96a091",
+  texto: "#141a16",
+  textoSuave: "#56615a",
+  // Antes #96a091 (2.7:1 sobre blanco, no pasaba WCAG AA); ahora 4.8:1.
+  textoTenue: "#6b746e",
 
-  borde: "#e3ece4",
-  bordeFuerte: "#c9d6cc",
+  borde: "#e4e8e5",
+  bordeFuerte: "#c9d0cb",
 
   exito: "#1f8a5a",
   advertencia: "#ef7148",
   error: "#c0392b",
+
+  calificacion: "#c98a12",
+  abierto: "#1f8a4c",
 };
 
 // Mismo lenguaje de marca (verde San Borja + coral de acento), pero los neutros (fondo,
@@ -77,7 +88,7 @@ export const paletaOscura: PaletaColores = {
 
   texto: "#f2f3f4",
   textoSuave: "#b3b7bc",
-  textoTenue: "#797e84",
+  textoTenue: "#8d9398",
 
   borde: "#2c2f34",
   bordeFuerte: "#3c4046",
@@ -85,6 +96,9 @@ export const paletaOscura: PaletaColores = {
   exito: "#3ecf8e",
   advertencia: "#ff8f66",
   error: "#f0554a",
+
+  calificacion: "#f0b43c",
+  abierto: "#3ecf8e",
 };
 
 /** Paleta activa por defecto (usos estáticos fuera de un componente, ej. datos de ejemplo) — el modo real de cada pantalla viene de `useColores()`. */

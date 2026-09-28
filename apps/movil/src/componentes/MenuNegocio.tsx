@@ -150,7 +150,7 @@ function crearEstilos(colores: PaletaColores) {
     badge: {
       ...tipografia.pie,
       fontSize: 10,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.acentoFuerte,
       backgroundColor: colores.acentoSuave,
       alignSelf: "flex-start",

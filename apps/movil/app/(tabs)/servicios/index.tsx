@@ -317,7 +317,7 @@ function crearEstilos(colores: PaletaColores) {
     heroBotonTexto: {
       ...tipografia.pie,
       fontSize: 10.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: "#ffffff",
     },
 
@@ -407,7 +407,7 @@ function crearEstilos(colores: PaletaColores) {
     tituloGrupo: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.textoSuave,
     },
     filaProximos: {

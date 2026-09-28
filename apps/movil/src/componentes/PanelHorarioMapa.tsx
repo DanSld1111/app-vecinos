@@ -128,7 +128,7 @@ function crearEstilos(colores: PaletaColores) {
     botonTexto: {
       ...tipografia.pie,
       fontSize: 10.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       flexShrink: 1,
     },
     panel: {
@@ -159,7 +159,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     textoHoy: {
       color: colores.primarioFuerte,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     mapaPreview: {
       height: 100,
@@ -193,7 +193,7 @@ function crearEstilos(colores: PaletaColores) {
     enlaceMapa: {
       ...tipografia.pie,
       fontSize: 10.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.primarioFuerte,
     },
   });

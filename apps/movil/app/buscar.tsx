@@ -503,7 +503,7 @@ function crearEstilos(colores: PaletaColores) {
     anuncioCtaTexto: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: "#ffffff",
     },
 

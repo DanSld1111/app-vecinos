@@ -175,7 +175,7 @@ function crearEstilos(colores: PaletaColores) {
     avisoGuardadoTexto: {
       ...tipografia.pie,
       fontSize: 10.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.primarioFuerte,
       flexShrink: 1,
     },

@@ -229,7 +229,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     contador: {
       ...tipografia.pie,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.textoSuave,
     },
     contadorActivo: {

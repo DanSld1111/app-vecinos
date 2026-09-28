@@ -6,16 +6,12 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import {
   useFonts,
-  Fraunces_600SemiBold,
-  Fraunces_700Bold,
-} from "@expo-google-fonts/fraunces";
-import {
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-} from "@expo-google-fonts/plus-jakarta-sans";
+  SchibstedGrotesk_400Regular,
+  SchibstedGrotesk_500Medium,
+  SchibstedGrotesk_600SemiBold,
+  SchibstedGrotesk_700Bold,
+  SchibstedGrotesk_800ExtraBold,
+} from "@expo-google-fonts/schibsted-grotesk";
 import { queryClient } from "../src/datos/queryClient";
 import { useColores } from "../src/disenio";
 import { useTema } from "../src/estado/useTema";
@@ -29,13 +25,11 @@ export default function LayoutRaiz() {
   const colores = useColores();
   const modoOscuro = useTema((estado) => estado.modo === "oscuro");
   const [fuentesListas] = useFonts({
-    Fraunces_600SemiBold,
-    Fraunces_700Bold,
-    PlusJakartaSans_400Regular,
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_600SemiBold,
-    PlusJakartaSans_700Bold,
-    PlusJakartaSans_800ExtraBold,
+    SchibstedGrotesk_400Regular,
+    SchibstedGrotesk_500Medium,
+    SchibstedGrotesk_600SemiBold,
+    SchibstedGrotesk_700Bold,
+    SchibstedGrotesk_800ExtraBold,
   });
   const autenticado = useSesion((estado) => estado.autenticado);
   const onboardingVisto = useOnboarding((estado) => estado.visto);

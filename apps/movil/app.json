@@ -22,7 +22,8 @@
         {
           "photosPermission": "ELISUR necesita acceso a tus fotos para que puedas subir la foto de tu negocio, tu galería y tus productos."
         }
-      ]
+      ],
+      "expo-image"
     ],
     "ios": {
       "supportsTablet": true,

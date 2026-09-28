@@ -708,7 +708,7 @@ function crearEstilos(colores: PaletaColores) {
     filaTitulo: { ...tipografia.cuerpoDestacado, color: colores.texto },
     filaCuerpo: { ...tipografia.pie, color: colores.textoSuave },
     pillEstado: { paddingHorizontal: espaciado.sm, paddingVertical: 4, borderRadius: radios.completo },
-    pillEstadoTexto: { ...tipografia.pie, fontSize: 10.5, fontFamily: "PlusJakartaSans_700Bold" },
+    pillEstadoTexto: { ...tipografia.pie, fontSize: 10.5, fontFamily: "SchibstedGrotesk_700Bold" },
 
     cajaNota: { borderRadius: radios.md, padding: espaciado.md, marginBottom: espaciado.md },
     cajaNotaExito: { backgroundColor: colores.primarioSuave },
@@ -722,7 +722,7 @@ function crearEstilos(colores: PaletaColores) {
     chip: { borderWidth: 1.5, borderColor: colores.borde, borderRadius: radios.completo, paddingHorizontal: espaciado.sm + 2, paddingVertical: espaciado.xs, backgroundColor: colores.superficie },
     chipSel: { borderColor: colores.primario, backgroundColor: colores.primarioSuave },
     chipTexto: { ...tipografia.pie, fontSize: 12, color: colores.textoSuave },
-    chipTextoSel: { color: colores.primarioFuerte, fontFamily: "PlusJakartaSans_700Bold" },
+    chipTextoSel: { color: colores.primarioFuerte, fontFamily: "SchibstedGrotesk_700Bold" },
 
     filaDia: { flexDirection: "row", alignItems: "center", gap: espaciado.sm, paddingVertical: espaciado.sm + 2, borderBottomWidth: 1, borderBottomColor: colores.borde },
     diaEtiqueta: { ...tipografia.cuerpoDestacado, color: colores.texto, width: 76 },
@@ -742,13 +742,13 @@ function crearEstilos(colores: PaletaColores) {
     slotFotoVacio: { borderWidth: 1.5, borderColor: colores.borde, borderStyle: "dashed" },
     imagenPrincipal: { width: "100%", height: "100%" },
     capaSubir: { position: "absolute", left: 0, right: 0, bottom: 0, paddingVertical: espaciado.xs, backgroundColor: "rgba(0,0,0,0.55)", alignItems: "center" },
-    textoCapaSubir: { ...tipografia.pie, fontSize: 11.5, color: "#fff", fontFamily: "PlusJakartaSans_700Bold" },
+    textoCapaSubir: { ...tipografia.pie, fontSize: 11.5, color: "#fff", fontFamily: "SchibstedGrotesk_700Bold" },
     notaFoto: { ...tipografia.pie, color: colores.textoSuave, lineHeight: 17, marginTop: espaciado.sm },
 
     miniFotoProducto: { width: 36, height: 36, borderRadius: radios.sm, overflow: "hidden", alignItems: "center", justifyContent: "center", backgroundColor: colores.superficieHundida },
     imagenMiniProducto: { width: "100%", height: "100%" },
     botonMini: { paddingHorizontal: espaciado.sm, paddingVertical: 6, borderRadius: radios.sm, backgroundColor: colores.superficieHundida },
-    botonMiniTexto: { ...tipografia.pie, fontSize: 11, color: colores.textoSuave, fontFamily: "PlusJakartaSans_700Bold" },
+    botonMiniTexto: { ...tipografia.pie, fontSize: 11, color: colores.textoSuave, fontFamily: "SchibstedGrotesk_700Bold" },
 
     gridGaleria: { flexDirection: "row", flexWrap: "wrap", gap: espaciado.sm },
     slotGaleria: { width: 84, height: 84, borderRadius: radios.md, overflow: "hidden", backgroundColor: colores.superficie },

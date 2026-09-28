@@ -112,7 +112,7 @@ function crearEstilos(colores: PaletaColores) {
     pillTexto: {
       ...tipografia.pie,
       fontSize: 10.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: "#ffffff",
     },
     textos: {
@@ -142,7 +142,7 @@ function crearEstilos(colores: PaletaColores) {
     calificacionTexto: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     subtitulo: {
       ...tipografia.pie,

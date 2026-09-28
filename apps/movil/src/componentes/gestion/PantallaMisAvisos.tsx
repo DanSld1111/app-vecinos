@@ -363,7 +363,7 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
     filaTitulo: { ...tipografia.cuerpoDestacado, color: colores.texto },
     filaCuerpo: { ...tipografia.pie, color: colores.textoSuave },
     pillEstado: { paddingHorizontal: espaciado.sm, paddingVertical: 4, borderRadius: radios.completo },
-    pillEstadoTexto: { ...tipografia.pie, fontSize: 10.5, fontFamily: "PlusJakartaSans_700Bold" },
+    pillEstadoTexto: { ...tipografia.pie, fontSize: 10.5, fontFamily: "SchibstedGrotesk_700Bold" },
 
     cajaNota: { borderRadius: radios.md, padding: espaciado.md, marginBottom: espaciado.lg },
     cajaNotaExito: { backgroundColor: colores.primarioSuave },

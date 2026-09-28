@@ -173,7 +173,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     nombre: {
       ...tipografia.pie,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.texto,
     },
     precio: {
@@ -240,7 +240,7 @@ function crearEstilos(colores: PaletaColores) {
     chipAtributoTexto: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_600SemiBold",
+      fontFamily: "SchibstedGrotesk_600SemiBold",
       color: colores.textoSuave,
     },
     botonWhatsapp: {

@@ -132,7 +132,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     textoHoy: {
       color: colores.primarioFuerte,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     acerca: {
       ...tipografia.cuerpo,

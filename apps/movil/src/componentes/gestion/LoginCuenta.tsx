@@ -251,7 +251,7 @@ function PantallaRestablecerClave({ correo, onListo, onVolver }: { correo: strin
       </Pressable>
       <Text style={styles.titulo}>Ingresa el código</Text>
       <Text style={styles.desc}>
-        Enviamos un código de 6 dígitos a <Text style={{ fontFamily: "PlusJakartaSans_700Bold", color: colores.texto }}>{correo}</Text>.
+        Enviamos un código de 6 dígitos a <Text style={{ fontFamily: "SchibstedGrotesk_700Bold", color: colores.texto }}>{correo}</Text>.
       </Text>
       <CampoTexto label="Código de 6 dígitos" placeholder="123456" keyboardType="number-pad" maxLength={6} value={codigo} onChangeText={(v) => setCodigo(v.replace(/\D/g, "").slice(0, 6))} />
       <CampoClave label="Contraseña nueva" placeholder="Contraseña segura" valor={clave} onCambiar={setClave} />
@@ -299,7 +299,7 @@ function crearEstilos(colores: PaletaColores, insetTop = 0) {
     campo: { borderWidth: 1.5, borderColor: colores.borde, borderRadius: radios.md, paddingHorizontal: espaciado.md, paddingVertical: espaciado.sm + 2 },
     campoConIcono: { flexDirection: "row", alignItems: "center", gap: espaciado.sm },
     input: { ...tipografia.cuerpoDestacado, color: colores.texto },
-    enlaceFuerte: { ...tipografia.pie, color: colores.acentoFuerte, fontFamily: "PlusJakartaSans_700Bold" },
+    enlaceFuerte: { ...tipografia.pie, color: colores.acentoFuerte, fontFamily: "SchibstedGrotesk_700Bold" },
     boton: { height: 46, borderRadius: radios.md, alignItems: "center", justifyContent: "center", backgroundColor: colores.texto },
     botonTexto: { ...tipografia.cuerpoDestacado, color: "#fff" },
     cajaError: { flexDirection: "row", alignItems: "center", gap: espaciado.xs, backgroundColor: colores.acentoSuave, borderRadius: radios.md, paddingHorizontal: espaciado.md, paddingVertical: espaciado.sm, marginBottom: espaciado.md },

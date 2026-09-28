@@ -82,7 +82,7 @@ function crearEstilos(colores: PaletaColores) {
     enlaceTexto: {
       ...tipografia.pie,
       fontSize: 12,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.primarioFuerte,
     },
   });

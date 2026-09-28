@@ -1,39 +1,47 @@
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
-import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
+import { Ionicons } from "@expo/vector-icons";
+import { PaletaColores, espaciado, tipografia, useColores } from "../disenio";
 
 export function BotonPrimario({
   texto,
   onPress,
   variante = "primario",
+  icono,
+  deshabilitado = false,
   style,
 }: {
   texto: string;
   onPress: () => void;
+  /** "primario": verde de marca, una sola vez por pantalla. "fantasma": borde firme en el color del texto. */
   variante?: "primario" | "fantasma";
+  icono?: keyof typeof Ionicons.glyphMap;
+  deshabilitado?: boolean;
   style?: ViewStyle;
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
-  // Escala sutil al presionar — mismo feedback táctil que se espera de un botón nativo,
-  // sin esto un botón web se siente "plano" comparado con iOS/Android.
   const escala = useRef(new Animated.Value(1)).current;
+  const esPrimario = variante === "primario";
+  const colorTexto = esPrimario ? colores.fondo : colores.texto;
 
   function presionar(hacia: number) {
-    Animated.spring(escala, { toValue: hacia, useNativeDriver: true, speed: 40, bounciness: 6 }).start();
+    Animated.timing(escala, { toValue: hacia, duration: 100, useNativeDriver: true }).start();
   }
 
   return (
-    <Animated.View style={[{ transform: [{ scale: escala }] }, style]}>
+    <Animated.View style={[{ transform: [{ scale: escala }], opacity: deshabilitado ? 0.45 : 1 }, style]}>
       <Pressable
-        onPress={onPress}
-        onPressIn={() => presionar(0.96)}
+        onPress={deshabilitado ? undefined : onPress}
+        onPressIn={() => !deshabilitado && presionar(0.97)}
         onPressOut={() => presionar(1)}
-        style={[styles.base, variante === "primario" ? styles.primario : styles.fantasma]}
+        accessibilityRole="button"
+        accessibilityLabel={texto}
+        accessibilityState={{ disabled: deshabilitado }}
+        style={[styles.base, esPrimario ? styles.primario : styles.fantasma]}
       >
-        <Text style={variante === "primario" ? styles.textoPrimario : styles.textoFantasma}>
-          {texto}
-        </Text>
+        {icono ? <Ionicons name={icono} size={17} color={colorTexto} /> : null}
+        <Text style={[styles.texto, { color: colorTexto }]}>{texto}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -42,8 +50,10 @@ export function BotonPrimario({
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     base: {
-      height: 46,
-      borderRadius: radios.md,
+      height: 44,
+      borderRadius: 10,
+      flexDirection: "row",
+      gap: 7,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: espaciado.lg,
@@ -52,16 +62,11 @@ function crearEstilos(colores: PaletaColores) {
       backgroundColor: colores.primario,
     },
     fantasma: {
-      borderWidth: 1,
-      borderColor: colores.bordeFuerte,
+      borderWidth: 1.5,
+      borderColor: colores.texto,
     },
-    textoPrimario: {
+    texto: {
       ...tipografia.cuerpoDestacado,
-      color: colores.fondo,
-    },
-    textoFantasma: {
-      ...tipografia.cuerpoDestacado,
-      color: colores.textoSuave,
     },
   });
 }

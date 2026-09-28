@@ -166,7 +166,7 @@ function crearEstilos(colores: PaletaColores) {
       borderColor: colores.borde,
     },
     degradado: {
-      ...StyleSheet.absoluteFillObject,
+      position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
     },
     filaTexto: {
       flexDirection: "row",
@@ -196,7 +196,7 @@ function crearEstilos(colores: PaletaColores) {
     ctaTexto: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: "#ffffff",
     },
     puntos: {

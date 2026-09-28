@@ -107,7 +107,7 @@ function crearEstilos(colores: PaletaColores) {
     diaLetra: {
       ...tipografia.pie,
       fontSize: 10,
-      fontFamily: "PlusJakartaSans_800ExtraBold",
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
       color: colores.textoTenue,
     },
     diaLetraHoy: {
@@ -131,7 +131,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     botonExpandirTexto: {
       ...tipografia.pie,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.primarioFuerte,
     },
     listaCompleta: {
@@ -155,7 +155,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     nombreDiaHoy: {
       color: colores.primarioFuerte,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     valorDia: {
       ...tipografia.cuerpo,

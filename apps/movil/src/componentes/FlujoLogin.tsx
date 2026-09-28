@@ -501,7 +501,7 @@ function PantallaRestablecerClave({
 
       <Text style={styles.tituloPaso}>Ingresa el código</Text>
       <Text style={styles.descPaso}>
-        Enviamos un código de 6 dígitos a <Text style={{ fontFamily: "PlusJakartaSans_700Bold", color: colores.texto }}>{correo}</Text>.
+        Enviamos un código de 6 dígitos a <Text style={{ fontFamily: "SchibstedGrotesk_700Bold", color: colores.texto }}>{correo}</Text>.
       </Text>
 
       <CampoTexto
@@ -692,7 +692,7 @@ function crearEstilos(colores: PaletaColores) {
     divisorTexto: {
       ...tipografia.pie,
       color: colores.textoTenue,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     botonSocial: {
       flexDirection: "row",
@@ -714,7 +714,7 @@ function crearEstilos(colores: PaletaColores) {
       ...tipografia.pie,
       fontSize: 10,
       color: colores.textoTenue,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     saltar: {
       alignItems: "center",
@@ -724,7 +724,7 @@ function crearEstilos(colores: PaletaColores) {
     saltarTexto: {
       ...tipografia.pie,
       color: colores.acentoFuerte,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     pieLegal: {
       ...tipografia.pie,
@@ -735,7 +735,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     pieLegalFuerte: {
       color: colores.textoSuave,
-      fontFamily: "PlusJakartaSans_600SemiBold",
+      fontFamily: "SchibstedGrotesk_600SemiBold",
     },
 
     volver: {
@@ -777,7 +777,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     enlaceTextoFuerte: {
       color: colores.acentoFuerte,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     cajaError: {
       flexDirection: "row",
@@ -822,7 +822,7 @@ function crearEstilos(colores: PaletaColores) {
     chipComunidadTexto: {
       ...tipografia.pie,
       color: colores.acentoFuerte,
-      fontFamily: "PlusJakartaSans_600SemiBold",
+      fontFamily: "SchibstedGrotesk_600SemiBold",
     },
     chipComunidadNombre: {
       ...tipografia.display,

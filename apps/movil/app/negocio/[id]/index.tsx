@@ -349,7 +349,7 @@ function crearEstilos(colores: PaletaColores) {
     calificacionValor: {
       ...tipografia.pie,
       fontSize: 12.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.texto,
     },
     calificacionTotal: {

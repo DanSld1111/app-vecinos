@@ -32,7 +32,7 @@ export function TarjetaCategoriaDestacada({
           <LinearGradient
             colors={["rgba(8,10,8,0.05)", "rgba(8,10,8,0.15)", "rgba(8,10,8,0.75)"]}
             locations={[0, 0.5, 1]}
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
           />
           <Text style={styles.nombre} numberOfLines={1}>
             {nombre}

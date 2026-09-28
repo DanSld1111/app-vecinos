@@ -141,7 +141,7 @@ function crearEstilos(colores: PaletaColores) {
     badgePopularTexto: {
       ...tipografia.pie,
       fontSize: 9,
-      fontFamily: "PlusJakartaSans_800ExtraBold",
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
       color: colores.acentoFuerte,
     },
     filaCalificacion: {
@@ -152,7 +152,7 @@ function crearEstilos(colores: PaletaColores) {
     calificacionTexto: {
       ...tipografia.pie,
       fontSize: 10.5,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.texto,
     },
     filaTags: {
@@ -163,7 +163,7 @@ function crearEstilos(colores: PaletaColores) {
     tag: {
       ...tipografia.pie,
       fontSize: 11,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
     },
     tagAbierto: {
       color: colores.primarioFuerte,
@@ -175,7 +175,7 @@ function crearEstilos(colores: PaletaColores) {
       ...tipografia.pie,
       fontSize: 11,
       color: colores.textoTenue,
-      fontFamily: "PlusJakartaSans_600SemiBold",
+      fontFamily: "SchibstedGrotesk_600SemiBold",
     },
   });
 }

@@ -225,7 +225,7 @@ function crearEstilos(colores: PaletaColores) {
     indicadorUbicacionTexto: {
       ...tipografia.pie,
       fontSize: 10,
-      fontFamily: "PlusJakartaSans_700Bold",
+      fontFamily: "SchibstedGrotesk_700Bold",
       color: colores.primarioFuerte,
     },
     pieUbicacion: {
