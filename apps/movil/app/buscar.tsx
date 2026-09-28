@@ -10,6 +10,7 @@ import {
   Text,
   TextInput,
   View,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatearPrecio } from "@app-vecinos/tipos";
@@ -297,6 +298,7 @@ function crearEstilos(colores: PaletaColores) {
       flex: 1,
       ...tipografia.cuerpo,
       color: colores.texto,
+      ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : {}),
     },
     contenido: {
       padding: espaciado.lg,

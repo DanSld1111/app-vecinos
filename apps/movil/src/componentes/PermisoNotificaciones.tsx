@@ -1,4 +1,5 @@
-import { Image, Modal, StyleSheet, Text, View } from "react-native";
+import { Modal, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { PaletaColores, espaciado, tipografia, useColores } from "../disenio";
@@ -37,7 +38,7 @@ export function PermisoNotificaciones({
       <View style={styles.fondo}>
         <View style={styles.tarjeta} accessibilityViewIsModal>
           <View style={styles.foto}>
-            <Image source={FOTO} style={StyleSheet.absoluteFill} resizeMode="cover" />
+            <Image source={FOTO} style={styles.imagen} contentFit="cover" />
             <LinearGradient colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.6)"]} style={StyleSheet.absoluteFill} />
             <Ionicons name="notifications-outline" size={26} color="#ffffff" style={styles.campana} />
           </View>
@@ -74,7 +75,8 @@ function crearEstilos(colores: PaletaColores) {
       overflow: "hidden",
       backgroundColor: colores.fondo,
     },
-    foto: { height: 140, backgroundColor: colores.superficieHundida2 },
+    foto: { height: 140, overflow: "hidden", backgroundColor: colores.superficieHundida2 },
+    imagen: { width: "100%", height: 140 },
     campana: { position: "absolute", left: espaciado.lg, bottom: espaciado.md },
     cuerpo: { padding: espaciado.lg },
     titulo: { ...tipografia.titulo, fontSize: 21, lineHeight: 25, color: colores.texto },

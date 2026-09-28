@@ -1,5 +1,5 @@
 export const tipografia = {
-  // Schibsted Grotesk en toda la app (dirección "Vitrina", ver docs/decisiones/0060-rediseno-vitrina.md):
+  // Schibsted Grotesk en toda la app (dirección "Vitrina", ver docs/decisiones/0077-rediseno-vitrina.md):
   // una sola familia en varios pesos — 800 para nombres y títulos, 400 para leer. Reemplaza a la
   // pareja Fraunces + Plus Jakarta Sans, que es la combinación que hoy usa casi toda app hecha con IA.
   titulo: { fontFamily: "SchibstedGrotesk_800ExtraBold", fontSize: 25, lineHeight: 28, letterSpacing: -0.6 },

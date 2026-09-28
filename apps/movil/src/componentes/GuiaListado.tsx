@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from "@expo/vector-icons";
@@ -243,6 +243,7 @@ function crearEstilos(colores: PaletaColores) {
       flex: 1,
       ...tipografia.cuerpo,
       color: colores.texto,
+      ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : {}),
     },
     filaChips: {
       gap: espaciado.sm,

@@ -12,6 +12,7 @@ import { useCategorias } from "../../../src/datos/hooks/useCategorias";
 import { useFavoritosIds, useInvalidarFavoritos, alternarFavorito } from "../../../src/datos/hooks/useFavoritos";
 import { useMiCalificacion, useInvalidarCalificacion, calificar } from "../../../src/datos/hooks/useCalificacion";
 import { useSesion } from "../../../src/estado/useSesion";
+import { useComunidadActiva } from "../../../src/estado/comunidadActiva";
 import { BotonPrimario } from "../../../src/componentes/BotonPrimario";
 import { EstadoError } from "../../../src/componentes/EstadoError";
 import { EstadoVacio } from "../../../src/componentes/EstadoVacio";
@@ -36,6 +37,8 @@ import { useMovimientoReducido } from "../../../src/utilidades/useMovimientoRedu
 import { marca } from "../../../src/config/marca";
 
 const ALTO_PORTADA = 290;
+// En web, el navegador dibuja su propio contorno al enfocar un TextInput que ya tiene borde.
+const sinContornoWeb = Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : {};
 const ANIM_NATIVA = Platform.OS !== "web";
 
 function EsqueletoFicha() {
@@ -86,6 +89,7 @@ export default function FichaNegocio() {
   const { data: productos } = useProductosPorNegocio(negocio?.id);
   const { data: categorias } = useCategorias();
   const token = useSesion((estado) => estado.token);
+  const { comunidad } = useComunidadActiva();
   const { data: idsFavoritos } = useFavoritosIds();
   const invalidarFavoritos = useInvalidarFavoritos();
   const { data: miCalificacion } = useMiCalificacion(id);
@@ -154,8 +158,14 @@ export default function FichaNegocio() {
   const estadoHoy = estadoHoyTexto(negocio.horarios);
   const semana = resumenSemana(negocio.horarios);
   const rubro = categorias?.find((c) => negocio.categoriaIds.includes(c.id))?.nombre;
+  // Sin distancia real ni comunidad cargada (ej. abrir la ficha directo desde un enlace) no hay
+  // desde dónde medir: se omite en vez de mostrar minutos medidos desde el centro de Lima.
   const distancia =
-    negocio.distanciaM != null ? formatearDistancia(negocio.distanciaM) : `${minutosCaminando(negocio.coordenada)} min a pie`;
+    negocio.distanciaM != null
+      ? formatearDistancia(negocio.distanciaM)
+      : comunidad
+        ? `${minutosCaminando(negocio.coordenada)} min a pie`
+        : null;
 
   function volver() {
     if (router.canGoBack()) router.back();
@@ -338,7 +348,7 @@ export default function FichaNegocio() {
                 <Text style={styles.metaFuerte}>Califica</Text>
               )}
             </Pressable>
-            <Text style={styles.meta}> · {distancia} · </Text>
+            <Text style={styles.meta}> · {distancia ? `${distancia} · ` : ""}</Text>
             <View style={[styles.punto, { backgroundColor: estadoHoy.abierto ? colores.abierto : colores.textoTenue }]} />
             <Text style={styles.meta}>
               {estadoHoy.abierto ? "Abierto" : "Cerrado"}, {estadoHoy.detalle}
@@ -498,7 +508,7 @@ function crearEstilos(colores: PaletaColores) {
       borderWidth: 1,
       borderColor: colores.bordeFuerte,
     },
-    entradaBuscador: { flex: 1, ...tipografia.cuerpo, fontSize: 13.5, color: colores.texto, padding: 0 },
+    entradaBuscador: { flex: 1, ...tipografia.cuerpo, fontSize: 13.5, color: colores.texto, padding: 0, ...sinContornoWeb },
     seccion: { ...tipografia.subtitulo, color: colores.texto, marginTop: espaciado.xl, marginBottom: espaciado.sm },
     dias: { flexDirection: "row", gap: 4, marginTop: espaciado.sm },
     dia: {

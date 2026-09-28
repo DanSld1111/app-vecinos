@@ -739,7 +739,7 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.textoSuave,
     },
     enlaceTextoFuerte: {
-      color: colores.acentoFuerte,
+      color: colores.primario,
       fontFamily: "SchibstedGrotesk_700Bold",
     },
     cajaError: {
