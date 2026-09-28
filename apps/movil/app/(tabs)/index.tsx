@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, tipografia, useColores } from "../../src/disenio";
 import { textos } from "../../src/i18n/es";
 import { useComunidadActiva } from "../../src/estado/comunidadActiva";
@@ -9,27 +11,26 @@ import { useCategorias } from "../../src/datos/hooks/useCategorias";
 import { useNegocios } from "../../src/datos/hooks/useNegocios";
 import { useAvisos } from "../../src/datos/hooks/useAvisos";
 import { BarraBusqueda } from "../../src/componentes/BarraBusqueda";
-import { BarraSuperior } from "../../src/componentes/BarraSuperior";
-import { CarruselAvisos } from "../../src/componentes/CarruselAvisos";
-import { CarruselPublicidad } from "../../src/componentes/CarruselPublicidad";
 import { HojaInferior } from "../../src/componentes/HojaInferior";
 import { SelectorComunidad } from "../../src/componentes/SelectorComunidad";
-import { TarjetaCategoria } from "../../src/componentes/TarjetaCategoria";
-import { TarjetaCategoriaDestacada } from "../../src/componentes/TarjetaCategoriaDestacada";
-import { TarjetaNegocio } from "../../src/componentes/TarjetaNegocio";
 import { EstadoVacio } from "../../src/componentes/EstadoVacio";
 import { EstadoError } from "../../src/componentes/EstadoError";
 import { EsqueletoListaNegocios } from "../../src/componentes/EsqueletoNegocio";
 import { PermisoNotificaciones } from "../../src/componentes/PermisoNotificaciones";
+import { EntradaAnimada } from "../../src/componentes/EntradaAnimada";
+import { FotoNegocio } from "../../src/componentes/FotoNegocio";
+import { Tocable } from "../../src/componentes/Tocable";
+import { CirculoCategoria } from "../../src/componentes/vitrina/CirculoCategoria";
+import { OfertaDestacada } from "../../src/componentes/vitrina/OfertaDestacada";
+import { TarjetaVitrina } from "../../src/componentes/vitrina/TarjetaVitrina";
 import { useNotificaciones } from "../../src/estado/useNotificaciones";
-
-// Las 2 categorías más usadas se destacan arriba con tarjeta grande — el resto sigue en la fila
-// chica de siempre. Ver docs/decisiones/0030-categorias-destacadas-grandes.md.
-const SLUGS_DESTACADOS = ["restaurantes", "supermercados"];
+import { fechaCorta } from "../../src/utilidades/saludo";
+import { tiempoRelativo } from "../../src/utilidades/tiempoRelativo";
 
 export default function Inicio() {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
   const { comunidad } = useComunidadActiva();
   const [hojaComunidadVisible, setHojaComunidadVisible] = useState(false);
   const [permisoVisible, setPermisoVisible] = useState(false);
@@ -42,10 +43,8 @@ export default function Inicio() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Una sola lista — antes eran dos consultas separadas ("el más visitado" y "cerca de ti") con
-  // el mismo criterio de fondo (creado_en DESC) detrás de nombres que prometían otra cosa. Con
-  // ubicación, el backend ordena por distancia real (con tope) y desempata por popularidad; sin
-  // ella, cae a popularidad — nunca al azar. Ver docs/decisiones/0073-inicio-orden-real.md.
+  // Con ubicación, el backend ordena por distancia real y desempata por popularidad; sin ella,
+  // cae a popularidad. Ver docs/decisiones/0073-inicio-orden-real.md.
   const {
     data: negocios,
     isLoading,
@@ -58,23 +57,17 @@ export default function Inicio() {
     lng: coordenada?.lng,
   });
   const { data: avisos } = useAvisos(comunidad?.id);
+  const avisoReciente = avisos?.[0];
 
-  // El badge "🔥 Popular" es solo para quien de verdad está arriba en visitas reales — nunca el
-  // primero de la lista porque sí, y nunca si nadie tiene visitas todavía.
-  const idMasVisitado = (negocios?.items ?? []).reduce<{ id: string; visitas: number } | null>(
-    (mejor, n) => (n.visitas7d > 0 && (!mejor || n.visitas7d > mejor.visitas) ? { id: n.id, visitas: n.visitas7d } : mejor),
-    null,
-  )?.id;
-
-  const categoriasDestacadas = (categorias ?? []).filter((c) => SLUGS_DESTACADOS.includes(c.slug));
-  const categoriasResto = (categorias ?? []).filter((c) => !SLUGS_DESTACADOS.includes(c.slug));
+  // Ranking real de la semana: solo negocios con visitas, nunca "el primero de la lista porque sí".
+  const masVisitados = [...(negocios?.items ?? [])]
+    .filter((n) => n.visitas7d > 0)
+    .sort((a, b) => b.visitas7d - a.visitas7d)
+    .slice(0, 3);
 
   function alTocarCampana() {
-    if (!permisoDecidido) {
-      setPermisoVisible(true);
-    } else {
-      router.push("/notificaciones");
-    }
+    if (!permisoDecidido) setPermisoVisible(true);
+    else router.push("/notificaciones");
   }
 
   function alTocarCategoria(categoriaId: string) {
@@ -83,84 +76,144 @@ export default function Inicio() {
 
   return (
     <View style={styles.raiz}>
-      <BarraSuperior
-        nombreComunidad={comunidad?.nombre ?? "…"}
-        onAbrirComunidad={() => setHojaComunidadVisible(true)}
-        onAbrirAvisos={alTocarCampana}
-      />
+      <ScrollView contentContainerStyle={[styles.contenido, { paddingTop: insets.top + espaciado.md }]}>
+        <View style={styles.bloque}>
+          <View style={styles.filaSuperior}>
+            <Pressable
+              onPress={() => setHojaComunidadVisible(true)}
+              hitSlop={8}
+              style={styles.comunidad}
+              accessibilityRole="button"
+              accessibilityLabel={`Comunidad ${comunidad?.nombre ?? ""}. Cambiar comunidad`}
+            >
+              <Text style={styles.comunidadTexto}>
+                {comunidad?.nombre ?? "…"} · {fechaCorta()}
+              </Text>
+              <Ionicons name="chevron-down" size={13} color={colores.textoSuave} />
+            </Pressable>
+            <Pressable
+              onPress={alTocarCampana}
+              hitSlop={8}
+              style={styles.campana}
+              accessibilityRole="button"
+              accessibilityLabel="Notificaciones"
+            >
+              <Ionicons name="notifications-outline" size={21} color={colores.texto} />
+              <View style={styles.puntoCampana} />
+            </Pressable>
+          </View>
+          <Text style={styles.titulo} accessibilityRole="header">
+            ¿Qué buscas hoy?
+          </Text>
+          <BarraBusqueda placeholder="Negocio, plato o producto" onPress={() => router.push("/buscar")} />
+        </View>
 
-      <ScrollView style={styles.contenedor} contentContainerStyle={styles.contenido}>
-        <BarraBusqueda
-          placeholder="Negocios, platos y productos"
-          onPress={() => router.push("/buscar")}
-        />
-
-        <CarruselAvisos avisos={avisos ?? []} onPress={() => router.push("/comunidad")} />
-
-        {categoriasDestacadas.length > 0 ? (
-          <View style={styles.filaDestacadas}>
-            {categoriasDestacadas.map((cat) => (
-              <TarjetaCategoriaDestacada
+        {categorias && categorias.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filaCategorias}>
+            {categorias.map((cat) => (
+              <CirculoCategoria
                 key={cat.id}
                 nombre={cat.nombre}
                 fotoUrl={cat.fotoUrl}
                 onPress={() => alTocarCategoria(cat.id)}
               />
             ))}
+          </ScrollView>
+        ) : null}
+
+        <View style={styles.bloque}>
+          <OfertaDestacada />
+        </View>
+
+        {avisoReciente ? (
+          <View style={styles.bloque}>
+            <Tocable
+              style={styles.aviso}
+              onPress={() => router.push("/comunidad")}
+              accessibilityRole="button"
+              accessibilityLabel={`Aviso: ${avisoReciente.titulo}`}
+              escala={0.985}
+            >
+              <Ionicons
+                name={avisoReciente.categoria === "seguridad" ? "shield-outline" : "business-outline"}
+                size={19}
+                color={avisoReciente.categoria === "seguridad" ? colores.error : colores.primario}
+              />
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={styles.avisoTitulo} numberOfLines={1}>
+                  {avisoReciente.titulo}
+                </Text>
+                <Text style={styles.avisoMeta} numberOfLines={1}>
+                  {avisoReciente.fuenteNombre} · {tiempoRelativo(avisoReciente.publicadoEn)}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={colores.textoTenue} />
+            </Tocable>
           </View>
         ) : null}
 
-        <FlatList
-          horizontal
-          data={categoriasResto}
-          keyExtractor={(item) => item.id}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filaCategorias}
-          renderItem={({ item, index }) => (
-            <TarjetaCategoria
-              nombre={item.nombre}
-              icono={item.icono}
-              fotoUrl={item.fotoUrl}
-              indice={index}
-              onPress={() => alTocarCategoria(item.id)}
-            />
-          )}
-        />
-
-        <CarruselPublicidad />
-
-        <View style={styles.filaEncabezadoCerca}>
-          <Text style={styles.encabezado}>{textos.inicio.cercaDeTi}</Text>
-          {coordenada ? (
-            <View style={styles.indicadorUbicacion}>
-              <View style={styles.puntoVivo} />
-              <Text style={styles.indicadorUbicacionTexto}>Usando tu ubicación</Text>
-            </View>
-          ) : null}
+        <View style={[styles.bloque, styles.filaTitulo]}>
+          <Text style={styles.subtitulo} accessibilityRole="header">
+            {textos.inicio.cercaDeTi}
+          </Text>
+          <Pressable onPress={() => router.push("/servicios/negocios")} hitSlop={8} accessibilityRole="link">
+            <Text style={styles.verTodo}>Ver todo</Text>
+          </Pressable>
         </View>
+
         {isLoading ? (
-          <EsqueletoListaNegocios cantidad={3} />
+          <View style={styles.bloque}>
+            <EsqueletoListaNegocios cantidad={2} />
+          </View>
         ) : isError ? (
           <EstadoError onReintentar={() => refetch()} />
         ) : negocios && negocios.items.length > 0 ? (
-          negocios.items.map((negocio) => (
-            <TarjetaNegocio
-              key={negocio.id}
-              negocio={negocio}
-              popular={negocio.id === idMasVisitado}
-              onPress={() => router.push(`/negocio/${negocio.id}`)}
-            />
-          ))
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filaVitrina}>
+            {negocios.items.map((negocio, i) => (
+              <EntradaAnimada key={negocio.id} retraso={i * 40}>
+                <TarjetaVitrina negocio={negocio} onPress={() => router.push(`/negocio/${negocio.id}`)} />
+              </EntradaAnimada>
+            ))}
+          </ScrollView>
         ) : (
           <EstadoVacio titulo={textos.buscar.sinResultados} />
         )}
+
+        {masVisitados.length > 0 ? (
+          <View style={styles.bloque}>
+            <Text style={[styles.subtitulo, { marginBottom: espaciado.xs }]} accessibilityRole="header">
+              Lo más visitado esta semana
+            </Text>
+            {masVisitados.map((negocio, i) => (
+              <Tocable
+                key={negocio.id}
+                style={styles.filaRanking}
+                onPress={() => router.push(`/negocio/${negocio.id}`)}
+                accessibilityRole="button"
+                accessibilityLabel={`Puesto ${i + 1}: ${negocio.nombre}`}
+                escala={0.985}
+              >
+                <Text style={styles.puesto}>{i + 1}</Text>
+                <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.miniRanking} />
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={styles.nombreRanking} numberOfLines={1}>
+                    {negocio.nombre}
+                  </Text>
+                  <Text style={styles.metaRanking} numberOfLines={1}>
+                    {negocio.descripcion}
+                  </Text>
+                </View>
+              </Tocable>
+            ))}
+          </View>
+        ) : null}
       </ScrollView>
 
       {permisoUbicacion === "denegado" ? (
         <View style={styles.pieUbicacion}>
-          <Text style={styles.pieUbicacionIcono}>📍</Text>
+          <Ionicons name="location-outline" size={16} color={colores.texto} />
           <Text style={styles.pieUbicacionTexto}>
-            Si no activas tu ubicación, ordenamos igual por popularidad y usamos el centro del distrito.
+            Sin tu ubicación, ordenamos por popularidad y medimos desde el centro del distrito.
           </Text>
         </View>
       ) : null}
@@ -176,76 +229,57 @@ export default function Inicio() {
 
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
-    raiz: {
-      flex: 1,
-      backgroundColor: colores.fondo,
+    raiz: { flex: 1, backgroundColor: colores.fondo },
+    contenido: { paddingBottom: espaciado.xl, gap: espaciado.lg },
+    bloque: { paddingHorizontal: espaciado.lg },
+    filaSuperior: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    comunidad: { flexDirection: "row", alignItems: "center", gap: 3 },
+    comunidadTexto: { ...tipografia.pie, fontSize: 13, color: colores.textoSuave },
+    campana: { width: 40, height: 40, alignItems: "center", justifyContent: "center", marginRight: -10 },
+    puntoCampana: {
+      position: "absolute",
+      top: 9,
+      right: 10,
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colores.acentoFuerte,
+      borderWidth: 1.5,
+      borderColor: colores.fondo,
     },
-    contenedor: {
-      flex: 1,
-    },
-    contenido: {
-      padding: espaciado.lg,
-      paddingTop: espaciado.sm,
-      // Antes espaciado.sm (8): con "El más visitado" y "Cerca de ti" fundidos en una sola
-      // sección sobraba aire entre bloques — ver docs/decisiones/0073-inicio-orden-real.md.
-      gap: espaciado.xs,
-    },
-    // Sin marginTop: el ScrollView ya pone `gap` entre secciones — sumarle un margen acá
-    // duplicaba el espacio en blanco entre una sección y la siguiente.
-    encabezado: {
-      ...tipografia.displaySeccion,
-      color: colores.texto,
-      marginBottom: espaciado.xs,
-    },
-    filaDestacadas: {
-      flexDirection: "row",
-      gap: espaciado.sm,
-      marginBottom: espaciado.xs,
-    },
-    filaCategorias: {
-      gap: espaciado.xs,
-    },
-    filaEncabezadoCerca: {
+    titulo: { ...tipografia.titulo, fontSize: 27, lineHeight: 31, color: colores.texto, marginBottom: espaciado.md },
+    filaCategorias: { paddingHorizontal: espaciado.sm, gap: 0 },
+    aviso: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
-      marginTop: espaciado.xs,
+      gap: espaciado.md,
+      paddingHorizontal: espaciado.md,
+      paddingVertical: espaciado.sm + 2,
+      borderRadius: 10,
+      backgroundColor: colores.superficieHundida,
     },
-    indicadorUbicacion: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-    },
-    puntoVivo: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: colores.primario,
-    },
-    indicadorUbicacionTexto: {
-      ...tipografia.pie,
-      fontSize: 10,
-      fontFamily: "SchibstedGrotesk_700Bold",
-      color: colores.primarioFuerte,
-    },
+    avisoTitulo: { ...tipografia.cuerpoDestacado, fontFamily: "SchibstedGrotesk_700Bold", fontSize: 13.5, color: colores.texto },
+    avisoMeta: { ...tipografia.pie, color: colores.textoSuave },
+    filaTitulo: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: -espaciado.sm },
+    subtitulo: { ...tipografia.subtitulo, color: colores.texto },
+    verTodo: { ...tipografia.cuerpoDestacado, fontSize: 13, color: colores.primario },
+    filaVitrina: { paddingHorizontal: espaciado.lg, gap: espaciado.sm + 2 },
+    filaRanking: { flexDirection: "row", alignItems: "center", gap: espaciado.md, paddingVertical: espaciado.sm },
+    puesto: { fontFamily: "SchibstedGrotesk_800ExtraBold", fontSize: 18, width: 16, color: colores.textoTenue },
+    miniRanking: { width: 48, height: 48, borderRadius: 8 },
+    nombreRanking: { ...tipografia.cuerpoDestacado, fontFamily: "SchibstedGrotesk_700Bold", color: colores.texto },
+    metaRanking: { ...tipografia.pie, color: colores.textoSuave },
     pieUbicacion: {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.sm,
-      backgroundColor: colores.primarioFuerte,
+      backgroundColor: colores.superficieHundida,
       marginHorizontal: espaciado.lg,
       marginBottom: espaciado.sm,
-      padding: espaciado.sm + 2,
-      borderRadius: 12,
+      paddingHorizontal: espaciado.md,
+      paddingVertical: espaciado.sm + 2,
+      borderRadius: 10,
     },
-    pieUbicacionIcono: {
-      fontSize: 16,
-    },
-    pieUbicacionTexto: {
-      ...tipografia.pie,
-      fontSize: 10.5,
-      color: "#ffffff",
-      flex: 1,
-    },
+    pieUbicacionTexto: { ...tipografia.pie, color: colores.texto, flex: 1 },
   });
 }

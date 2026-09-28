@@ -36,11 +36,10 @@ export function CategoriasRubroNegocio({ rubros }: { rubros: string[] }) {
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     tituloSeccion: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-      marginTop: espaciado.md,
-      marginBottom: espaciado.sm,
+      ...tipografia.subtitulo,
+      color: colores.texto,
+      marginTop: espaciado.lg,
+      marginBottom: espaciado.xs,
     },
     grid: {
       flexDirection: "row",

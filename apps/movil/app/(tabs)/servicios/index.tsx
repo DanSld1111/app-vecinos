@@ -131,9 +131,6 @@ export default function Servicios() {
               locations={[0, 0.5, 1]}
               style={styles.degradado}
             />
-            <View style={styles.heroIcono}>
-              <IconoServicio slug="negocios" size={20} color="#ffffff" />
-            </View>
             <Text style={styles.heroEtiqueta}>Busca en todo tu distrito</Text>
             <Text style={styles.heroNombre}>{servicioGuia.nombre}</Text>
             <View style={styles.heroFila}>
@@ -171,9 +168,6 @@ export default function Servicios() {
                     locations={[0, 0.5, 1]}
                     style={styles.degradado}
                   />
-                  <View style={styles.icono}>
-                    <IconoServicio slug={servicio.slug as SlugIconoServicio} size={19} color={colorIcono} />
-                  </View>
                   <View style={styles.tarjetaTextos}>
                     <Text style={styles.tarjetaNombre}>{servicio.nombre}</Text>
                     <View style={styles.filaDescripcion}>
@@ -215,10 +209,8 @@ export default function Servicios() {
             <Text style={styles.tituloGrupo}>{grupo.titulo}</Text>
             <View style={styles.filaProximos}>
               {grupo.items.map((servicio) => (
-                <View key={servicio.slug} style={styles.tarjetaProxima}>
-                  <View style={styles.iconoProximo}>
-                    <IconoServicio slug={servicio.slug as SlugIconoServicio} size={15} color={colores.textoSuave} />
-                  </View>
+                <View key={servicio.slug} style={styles.tarjetaProxima} accessibilityLabel={`${servicio.nombre}, próximamente`}>
+                  <IconoServicio slug={servicio.slug as SlugIconoServicio} size={16} color={colores.textoSuave} />
                   <Text style={styles.textoProximo}>{servicio.nombre}</Text>
                 </View>
               ))}
@@ -233,14 +225,16 @@ function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     contenedor: {
       flex: 1,
-      backgroundColor: colores.superficieHundida,
+      backgroundColor: colores.fondo,
     },
     contenido: {
       padding: espaciado.lg,
-      gap: espaciado.sm,
+      gap: espaciado.sm + 2,
     },
     titulo: {
-      ...tipografia.displayGrande,
+      ...tipografia.titulo,
+      fontSize: 27,
+      lineHeight: 31,
       color: colores.texto,
     },
     subtitulo: {
@@ -249,23 +243,19 @@ function crearEstilos(colores: PaletaColores) {
       marginTop: -espaciado.sm,
     },
     etiquetaSeccion: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-      marginTop: espaciado.xs,
+      ...tipografia.subtitulo,
+      color: colores.texto,
+      marginTop: espaciado.md,
     },
 
     heroSombra: {
-      borderRadius: radios.lg,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 12,
-      elevation: 2,
+      borderRadius: 10,
     },
     hero: {
-      borderRadius: radios.lg,
+      borderRadius: 10,
       overflow: "hidden",
+      minHeight: 168,
+      justifyContent: "flex-end",
       padding: espaciado.md,
       gap: 2,
       // Respaldo si la foto tarda en cargar o no hay una configurada — mismo tono azul que
@@ -273,7 +263,7 @@ function crearEstilos(colores: PaletaColores) {
       backgroundColor: "#213e54",
     },
     heroImagen: {
-      borderRadius: radios.lg,
+      borderRadius: 10,
     },
     heroIcono: {
       width: 36,
@@ -291,8 +281,9 @@ function crearEstilos(colores: PaletaColores) {
       textTransform: "uppercase",
     },
     heroNombre: {
-      ...tipografia.displaySeccion,
-      fontSize: 17,
+      ...tipografia.titulo,
+      fontSize: 22,
+      lineHeight: 25,
       color: "#ffffff",
     },
     heroFila: {
@@ -329,26 +320,21 @@ function crearEstilos(colores: PaletaColores) {
     tarjetaSombra: {
       flexBasis: "48%",
       flexGrow: 1,
-      borderRadius: radios.lg,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 12,
-      elevation: 2,
+      borderRadius: 10,
     },
     tarjeta: {
       flex: 1,
-      borderRadius: radios.lg,
+      borderRadius: 10,
       overflow: "hidden",
       padding: espaciado.md,
-      minHeight: 128,
+      minHeight: 150,
       backgroundColor: colores.superficie,
       // Ícono arriba, nombre/descripción abajo — el degradado oscurece de arriba hacia abajo
       // para que el texto blanco se lea bien sobre cualquier foto de fondo.
-      justifyContent: "space-between",
+      justifyContent: "flex-end",
     },
     tarjetaImagen: {
-      borderRadius: radios.lg,
+      borderRadius: 10,
       width: "100%",
       height: "100%",
     },
@@ -375,8 +361,9 @@ function crearEstilos(colores: PaletaColores) {
       gap: 2,
     },
     tarjetaNombre: {
-      ...tipografia.displaySeccion,
-      fontSize: 15,
+      ...tipografia.titulo,
+      fontSize: 17,
+      lineHeight: 20,
       color: "#ffffff",
     },
     tarjetaNombreSinFoto: {
@@ -413,35 +400,22 @@ function crearEstilos(colores: PaletaColores) {
     filaProximos: {
       flexDirection: "row",
       flexWrap: "wrap",
-      gap: espaciado.sm,
+      columnGap: espaciado.lg,
     },
     tarjetaProxima: {
-      width: "31%",
-      backgroundColor: colores.superficie,
-      borderWidth: 1.5,
-      borderStyle: "dashed",
-      borderColor: colores.borde,
-      borderRadius: radios.md,
-      paddingVertical: espaciado.sm,
-      paddingHorizontal: 6,
+      width: "46%",
+      flexDirection: "row",
       alignItems: "center",
-      gap: 5,
-      opacity: 0.8,
-    },
-    iconoProximo: {
-      width: 32,
-      height: 32,
-      borderRadius: radios.sm,
-      backgroundColor: colores.superficieHundida,
-      alignItems: "center",
-      justifyContent: "center",
+      gap: espaciado.sm,
+      paddingVertical: espaciado.sm + 2,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colores.bordeFuerte,
     },
     textoProximo: {
       ...tipografia.pie,
-      fontSize: 11,
-      fontWeight: "700",
+      fontSize: 13,
       color: colores.textoSuave,
-      textAlign: "center",
+      flexShrink: 1,
     },
   });
 }

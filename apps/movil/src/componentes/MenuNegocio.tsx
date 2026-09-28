@@ -1,15 +1,9 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
-import { urlCompleta } from "../utilidades/media";
+import { FotoNegocio } from "./FotoNegocio";
 import { EntradaAnimada } from "./EntradaAnimada";
 
-/** Sin foto, un bloque de color en vez de un icono genérico — se alternan por posición, mismo
- * lenguaje visual que el boceto (cada plato "respira" distinto aunque no tenga foto real). */
-function colorSwatch(colores: PaletaColores, indice: number) {
-  const paleta = [colores.acentoSuave, colores.primarioSuave, colores.superficieHundida2];
-  return paleta[indice % paleta.length];
-}
 
 function agruparPorCategoria(productos: Producto[]) {
   const grupos: { categoria: string; items: Producto[] }[] = [];
@@ -41,11 +35,7 @@ function ItemMenu({
 }) {
   return (
     <EntradaAnimada retraso={retraso} style={styles.item}>
-      {producto.fotoUrl ? (
-        <Image source={{ uri: urlCompleta(producto.fotoUrl) }} style={styles.itemImagen} />
-      ) : (
-        <View style={[styles.itemImagen, { backgroundColor: colorSwatch(colores, indice) }]} />
-      )}
+      <FotoNegocio nombre={producto.nombre} url={producto.fotoUrl} style={styles.itemImagen} tamanoIniciales={18} />
       <View style={styles.itemTexto}>
         {producto.destacado ? <Text style={styles.badge}>Más pedido</Text> : null}
         <Text style={styles.itemNombre}>{producto.nombre}</Text>
@@ -116,11 +106,10 @@ export function MenuNegocio({
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     tituloSeccion: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-      marginTop: espaciado.md,
-      marginBottom: espaciado.sm,
+      ...tipografia.subtitulo,
+      color: colores.texto,
+      marginTop: espaciado.lg,
+      marginBottom: espaciado.xs,
     },
     grupo: {
       marginBottom: espaciado.md,

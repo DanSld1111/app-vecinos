@@ -130,7 +130,7 @@ export function GuiaListado({
       ) : null}
 
       <View style={styles.buscador}>
-        <Ionicons name="search" size={16} color={colores.textoTenue} />
+        <Ionicons name="search" size={16} color={colores.textoSuave} />
         <TextInput
           value={busqueda}
           onChangeText={setBusqueda}
@@ -177,11 +177,11 @@ export function GuiaListado({
           keyExtractor={(item) => item.id}
           numColumns={esCatalogo ? 2 : 1}
           contentContainerStyle={{ paddingBottom: espaciado.xl }}
-          ItemSeparatorComponent={esCatalogo ? undefined : () => <View style={{ height: espaciado.sm }} />}
+          ItemSeparatorComponent={undefined}
           ListEmptyComponent={<EstadoVacio titulo={textos.buscar.sinResultados} />}
           renderItem={({ item, index }) => (
             <EntradaAnimada
-              retraso={Math.min(index, 8) * 50}
+              retraso={Math.min(index, 8) * 40}
               style={esCatalogo ? styles.celdaGrid : undefined}
             >
               {renderizarTarjeta(item, index)}
@@ -197,7 +197,7 @@ function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     contenedor: {
       flex: 1,
-      backgroundColor: colores.superficieHundida,
+      backgroundColor: colores.fondo,
       paddingHorizontal: espaciado.lg,
       paddingTop: espaciado.lg,
     },
@@ -218,29 +218,26 @@ function crearEstilos(colores: PaletaColores) {
     },
     tituloServicio: {
       ...tipografia.titulo,
-      fontSize: 20,
+      fontSize: 22,
       color: colores.texto,
     },
     subtituloServicio: {
       ...tipografia.cuerpo,
       fontSize: 13,
-      color: colores.textoTenue,
+      color: colores.textoSuave,
       marginTop: 2,
     },
     buscador: {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.sm,
-      backgroundColor: colores.superficie,
-      borderRadius: radios.completo,
+      backgroundColor: colores.fondo,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      borderColor: colores.texto,
       paddingHorizontal: espaciado.md,
-      height: 46,
-      marginBottom: espaciado.sm,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      elevation: 2,
+      height: 44,
+      marginBottom: espaciado.md,
     },
     entradaTexto: {
       flex: 1,
@@ -252,9 +249,8 @@ function crearEstilos(colores: PaletaColores) {
       paddingBottom: espaciado.sm,
     },
     contador: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
+      ...tipografia.pie,
+      color: colores.textoSuave,
       marginBottom: espaciado.xs,
     },
     celdaGrid: {

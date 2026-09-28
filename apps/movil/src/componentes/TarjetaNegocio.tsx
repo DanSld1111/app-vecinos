@@ -1,181 +1,103 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Negocio } from "@app-vecinos/tipos";
-import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
+import { PaletaColores, espaciado, tipografia, useColores } from "../disenio";
 import { estaAbiertoAhora } from "../utilidades/horarios";
 import { formatearDistancia, minutosCaminando } from "../utilidades/distancia";
-import { urlCompleta } from "../utilidades/media";
-import { AvatarNegocio } from "./AvatarNegocio";
+import { FotoNegocio } from "./FotoNegocio";
+import { Tocable } from "./Tocable";
 
+/**
+ * Fila de un negocio en listas (Guía de negocios, resultados de búsqueda): miniatura, nombre,
+ * dirección y estado, separada por una línea fina en vez de una tarjeta con sombra.
+ */
 export function TarjetaNegocio({
   negocio,
   popular = false,
   onPress,
 }: {
   negocio: Negocio;
-  /** Insignia "🔥 Popular" — la decide quien arma la lista (ej. Inicio, solo para el más
-   * visitado real), no este componente. */
+  /** "Popular esta semana" — la decide quien arma la lista, no este componente. */
   popular?: boolean;
   onPress: () => void;
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
   const abierto = estaAbiertoAhora(negocio.horarios);
-  // Con distancia real del backend (Negocio.distanciaM, viene cuando Inicio pidió con GPS):
-  // se muestra ella y los minutos que salen de ahí — no la aproximación desde el centro del
-  // distrito que usa minutosCaminando() sin ubicación real. Ver docs/decisiones/0073.
+  // Con distancia real del backend (viene cuando se pidió con GPS) se muestra ella; si no, los
+  // minutos aproximados desde el centro del distrito. Ver docs/decisiones/0073.
   const tieneDistanciaReal = negocio.distanciaM != null;
   const minutos = tieneDistanciaReal
     ? Math.max(1, Math.round((negocio.distanciaM as number) / 80))
     : minutosCaminando(negocio.coordenada);
+  const distancia = tieneDistanciaReal
+    ? `${formatearDistancia(negocio.distanciaM as number)} · ${minutos} min`
+    : `${minutos} min a pie`;
 
   return (
-    <View style={styles.sombra}>
-      <Pressable style={styles.contenedor} onPress={onPress}>
-        {negocio.fotoPrincipalUrl ? (
-          <Image source={{ uri: urlCompleta(negocio.fotoPrincipalUrl) }} style={styles.miniatura} />
-        ) : (
-          <AvatarNegocio nombre={negocio.nombre} size={54} radio={radios.md} />
-        )}
-        <View style={styles.texto}>
-          <View style={styles.filaNombre}>
-            <Text style={styles.nombre} numberOfLines={1}>
-              {negocio.nombre}
-            </Text>
-            {negocio.verificadoEn ? (
-              <View style={styles.tick}>
-                <Ionicons name="checkmark" size={9} color="#fff" />
-              </View>
-            ) : null}
-            {popular ? (
-              <View style={styles.badgePopular}>
-                <Text style={styles.badgePopularTexto}>🔥 Popular</Text>
-              </View>
-            ) : null}
-            {negocio.calificacionTotal > 0 ? (
-              <View style={styles.filaCalificacion}>
-                <Ionicons name="star" size={10} color="#e0a835" />
-                <Text style={styles.calificacionTexto}>{negocio.calificacionPromedio}</Text>
-              </View>
-            ) : null}
-          </View>
-          <Text style={styles.direccion} numberOfLines={1}>
-            {negocio.direccion}
+    <Tocable
+      style={styles.contenedor}
+      onPress={onPress}
+      escala={0.985}
+      accessibilityRole="button"
+      accessibilityLabel={`${negocio.nombre}, ${abierto ? "abierto" : "cerrado"}, ${distancia}`}
+    >
+      <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.miniatura} tamanoIniciales={19} />
+      <View style={styles.texto}>
+        <View style={styles.filaNombre}>
+          <Text style={styles.nombre} numberOfLines={1}>
+            {negocio.nombre}
           </Text>
-          <View style={styles.filaTags}>
-            <Text style={[styles.tag, abierto ? styles.tagAbierto : styles.tagCerrado]}>
-              ● {abierto ? "Abierto" : "Cerrado"}
-            </Text>
-            {tieneDistanciaReal ? (
-              <Text style={styles.tagDistancia}>
-                📍 {formatearDistancia(negocio.distanciaM as number)} · {minutos} min
-              </Text>
-            ) : (
-              <Text style={styles.tagDistancia}>🚶 {minutos} min</Text>
-            )}
-          </View>
+          {negocio.verificadoEn ? <Ionicons name="checkmark-circle" size={14} color={colores.primario} /> : null}
         </View>
-        <Ionicons name="chevron-forward" size={16} color={colores.textoTenue} />
-      </Pressable>
-    </View>
+        <Text style={styles.direccion} numberOfLines={1}>
+          {negocio.direccion}
+        </Text>
+        <View style={styles.filaTags}>
+          <View style={[styles.punto, { backgroundColor: abierto ? colores.abierto : colores.textoTenue }]} />
+          <Text style={styles.meta}>
+            {abierto ? "Abierto" : "Cerrado"} · {distancia}
+          </Text>
+          {negocio.calificacionTotal > 0 ? (
+            <>
+              <Text style={styles.meta}> · </Text>
+              <Ionicons name="star" size={11} color={colores.calificacion} />
+              <Text style={styles.metaFuerte}> {negocio.calificacionPromedio}</Text>
+            </>
+          ) : null}
+        </View>
+        {popular ? <Text style={styles.popular}>Popular esta semana</Text> : null}
+      </View>
+    </Tocable>
   );
 }
 
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
-    sombra: {
-      borderRadius: radios.lg,
-      backgroundColor: colores.superficie,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      elevation: 2,
-    },
     contenedor: {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.md,
-      borderRadius: radios.lg,
-      overflow: "hidden",
-      padding: espaciado.sm + 2,
+      paddingVertical: espaciado.md - 1,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colores.bordeFuerte,
+      backgroundColor: colores.fondo,
     },
-    miniatura: {
-      width: 54,
-      height: 54,
-      borderRadius: radios.md,
-    },
-    texto: {
-      flex: 1,
-      gap: 3,
-    },
-    filaNombre: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-    },
+    miniatura: { width: 64, height: 64, borderRadius: 8 },
+    texto: { flex: 1, minWidth: 0, gap: 1 },
+    filaNombre: { flexDirection: "row", alignItems: "center", gap: 5 },
     nombre: {
-      ...tipografia.displaySeccion,
+      ...tipografia.cuerpoDestacado,
+      fontFamily: "SchibstedGrotesk_700Bold",
       fontSize: 14.5,
       color: colores.texto,
       flexShrink: 1,
     },
-    tick: {
-      width: 13,
-      height: 13,
-      borderRadius: 7,
-      backgroundColor: colores.primario,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    direccion: {
-      ...tipografia.pie,
-      color: colores.textoSuave,
-    },
-    badgePopular: {
-      backgroundColor: colores.acentoSuave,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: radios.completo,
-    },
-    badgePopularTexto: {
-      ...tipografia.pie,
-      fontSize: 9,
-      fontFamily: "SchibstedGrotesk_800ExtraBold",
-      color: colores.acentoFuerte,
-    },
-    filaCalificacion: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 2,
-    },
-    calificacionTexto: {
-      ...tipografia.pie,
-      fontSize: 10.5,
-      fontFamily: "SchibstedGrotesk_700Bold",
-      color: colores.texto,
-    },
-    filaTags: {
-      flexDirection: "row",
-      gap: espaciado.sm,
-      marginTop: 1,
-    },
-    tag: {
-      ...tipografia.pie,
-      fontSize: 11,
-      fontFamily: "SchibstedGrotesk_700Bold",
-    },
-    tagAbierto: {
-      color: colores.primarioFuerte,
-    },
-    tagCerrado: {
-      color: colores.textoTenue,
-    },
-    tagDistancia: {
-      ...tipografia.pie,
-      fontSize: 11,
-      color: colores.textoTenue,
-      fontFamily: "SchibstedGrotesk_600SemiBold",
-    },
+    direccion: { ...tipografia.pie, fontSize: 12.5, color: colores.textoSuave },
+    filaTags: { flexDirection: "row", alignItems: "center", marginTop: 2 },
+    punto: { width: 6, height: 6, borderRadius: 3, marginRight: 5 },
+    meta: { ...tipografia.pie, color: colores.textoSuave },
+    metaFuerte: { ...tipografia.pie, fontFamily: "SchibstedGrotesk_700Bold", color: colores.texto },
+    popular: { ...tipografia.pie, fontSize: 11.5, fontFamily: "SchibstedGrotesk_600SemiBold", color: colores.acentoFuerte, marginTop: 2 },
   });
 }

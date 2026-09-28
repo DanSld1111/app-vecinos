@@ -4,26 +4,58 @@
     {
       "name": "api",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--workspace=apps/api"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--workspace=apps/api"
+      ],
       "port": 3000
     },
     {
       "name": "movil",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "web", "--workspace=apps/movil"],
+      "runtimeArgs": [
+        "run",
+        "web",
+        "--workspace=apps/movil"
+      ],
       "port": 8081,
       "autoPort": true
     },
     {
+      "name": "movil-mock",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "web",
+        "--workspace=apps/movil",
+        "--",
+        "--port",
+        "8082",
+        "--clear"
+      ],
+      "port": 8082,
+      "env": {
+        "EXPO_PUBLIC_DATA_SOURCE": "mock"
+      }
+    },
+    {
       "name": "admin",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--workspace=apps/admin"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--workspace=apps/admin"
+      ],
       "port": 5183
     },
     {
       "name": "meilisearch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "meilisearch"],
+      "runtimeArgs": [
+        "run",
+        "meilisearch"
+      ],
       "port": 7700
     }
   ]

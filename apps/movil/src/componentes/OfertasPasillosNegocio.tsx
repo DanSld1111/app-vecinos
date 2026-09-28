@@ -82,11 +82,10 @@ export function OfertasPasillosNegocio({
 function crearEstilos(colores: PaletaColores, oscuro: boolean) {
   return StyleSheet.create({
     tituloSeccion: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-      marginTop: espaciado.md,
-      marginBottom: espaciado.sm,
+      ...tipografia.subtitulo,
+      color: colores.texto,
+      marginTop: espaciado.lg,
+      marginBottom: espaciado.xs,
     },
     sinResultados: {
       ...tipografia.cuerpo,

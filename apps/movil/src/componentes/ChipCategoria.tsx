@@ -20,6 +20,9 @@ export function ChipCategoria({
     <Pressable
       onPress={onPress}
       style={[styles.chip, activo && styles.chipActivo]}
+      accessibilityRole="button"
+      accessibilityState={{ selected: activo }}
+      accessibilityLabel={etiqueta}
     >
       {colorPunto ? (
         <View style={[styles.punto, { backgroundColor: activo ? colores.fondo : colorPunto }]} />
@@ -35,12 +38,12 @@ function crearEstilos(colores: PaletaColores) {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      paddingVertical: espaciado.xs,
+      paddingVertical: 6,
       paddingHorizontal: espaciado.md,
       borderRadius: radios.completo,
-      backgroundColor: colores.superficie,
+      backgroundColor: colores.fondo,
       borderWidth: 1.5,
-      borderColor: colores.borde,
+      borderColor: colores.bordeFuerte,
     },
     punto: {
       width: 6,
@@ -53,8 +56,9 @@ function crearEstilos(colores: PaletaColores) {
     },
     texto: {
       ...tipografia.pie,
-      fontFamily: "SchibstedGrotesk_700Bold",
-      color: colores.textoSuave,
+      fontFamily: "SchibstedGrotesk_600SemiBold",
+      fontSize: 12.5,
+      color: colores.texto,
     },
     textoActivo: {
       color: colores.fondo,
