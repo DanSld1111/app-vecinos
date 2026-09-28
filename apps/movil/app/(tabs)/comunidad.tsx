@@ -2,6 +2,13 @@ import { useState, useRef, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Animated, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import Reanimated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
+
+// Al cambiar de filtro, los avisos que se quedan se deslizan a su nuevo lugar y los que entran o
+// salen lo hacen con un fundido (Reanimated respeta solo "reducir movimiento" del teléfono).
+const TRANSICION_LISTA = LinearTransition.duration(260);
+const ENTRADA = FadeIn.duration(220);
+const SALIDA = FadeOut.duration(140);
 import { useBarraPestanas } from "../../src/estado/useBarraPestanas";
 import { useAlturaBarra, useDesplazamiento } from "../../src/utilidades/useDesplazamiento";
 import { BarraTituloFija } from "../../src/componentes/BarraTituloFija";
@@ -113,18 +120,22 @@ export default function Comunidad() {
                   <Text style={styles.tituloFijado}>Alertas activas</Text>
                 </View>
                 {fijadas.map((aviso) => (
-                  <TarjetaAviso key={aviso.id} aviso={aviso} />
+                  <Reanimated.View key={aviso.id} layout={TRANSICION_LISTA} entering={ENTRADA} exiting={SALIDA}>
+                    <TarjetaAviso aviso={aviso} />
+                  </Reanimated.View>
                 ))}
               </View>
             ) : null}
 
             {grupos.map((grupo) => (
-              <View key={grupo.etiqueta} style={styles.grupo}>
+              <Reanimated.View key={grupo.etiqueta} style={styles.grupo} layout={TRANSICION_LISTA} entering={ENTRADA} exiting={SALIDA}>
                 <Text style={styles.tituloGrupo}>{grupo.etiqueta}</Text>
                 {grupo.avisos.map((aviso) => (
-                  <TarjetaAviso key={aviso.id} aviso={aviso} />
+                  <Reanimated.View key={aviso.id} layout={TRANSICION_LISTA} entering={ENTRADA} exiting={SALIDA}>
+                    <TarjetaAviso aviso={aviso} />
+                  </Reanimated.View>
                 ))}
-              </View>
+              </Reanimated.View>
             ))}
           </>
         ) : (

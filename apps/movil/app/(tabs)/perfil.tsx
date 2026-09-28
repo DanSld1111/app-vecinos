@@ -99,7 +99,7 @@ function FilaInterruptor({
         {texto}
         {proximamente ? <Text style={styles.etiquetaProximamente}>  Próximamente</Text> : null}
       </Text>
-      <Interruptor activo={activo} onCambiar={onCambiar} deshabilitado={proximamente} />
+      <Interruptor activo={activo} onCambiar={onCambiar} deshabilitado={proximamente} etiqueta={texto} />
     </View>
   );
 }

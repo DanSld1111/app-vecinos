@@ -23,16 +23,15 @@ export function useDesplazamiento() {
   const onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
     useNativeDriver: false,
     listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-      const y = contentOffset.y;
-      const cercaDelFinal = y + layoutMeasurement.height >= contentSize.height - 24;
+      const y = e.nativeEvent.contentOffset.y;
       const delta = y - ultimoY.current;
       if (y < 48) {
         setOculta(false);
         ultimoY.current = y;
       } else if (Math.abs(delta) > UMBRAL) {
-        // Al llegar al final se muestra: no hay más contenido que la barra pueda estar tapando.
-        setOculta(delta > 0 && !cercaDelFinal);
+        // No se fuerza a mostrarla al llegar al final: en listas cortas eso la hacía aparecer y
+        // desaparecer. Las listas ya dejan el alto de la barra libre abajo, así que no tapa nada.
+        setOculta(delta > 0);
         ultimoY.current = y;
       }
     },

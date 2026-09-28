@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, PanResponder, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,6 +31,30 @@ export function OfertaDestacada() {
   const restanteRef = useRef(DURACION_MS);
 
   const total = anuncios.length;
+  // Arrastre con el dedo: el contenido sigue un poco al dedo y, pasado el umbral, cambia de anuncio.
+  const arrastre = useRef(new Animated.Value(0)).current;
+  const estadoRef = useRef({ indice, total });
+  estadoRef.current = { indice, total };
+  const accionesRef = useRef({ pausar: () => {}, reanudar: () => {}, avanzar: (_a: number) => {} });
+
+  const gestos = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) => estadoRef.current.total > 1 && Math.abs(g.dx) > 12 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderGrant: () => accionesRef.current.pausar(),
+      onPanResponderMove: (_e, g) => arrastre.setValue(g.dx * 0.35),
+      onPanResponderRelease: (_e, g) => {
+        const { indice: i, total: n } = estadoRef.current;
+        Animated.spring(arrastre, { toValue: 0, friction: 7, useNativeDriver: Platform.OS !== "web" }).start();
+        if (g.dx < -40 || g.vx < -0.5) accionesRef.current.avanzar((i + 1) % n);
+        else if (g.dx > 40 || g.vx > 0.5) accionesRef.current.avanzar((i - 1 + n) % n);
+        else accionesRef.current.reanudar();
+      },
+      onPanResponderTerminate: () => {
+        Animated.spring(arrastre, { toValue: 0, useNativeDriver: Platform.OS !== "web" }).start();
+        accionesRef.current.reanudar();
+      },
+    }),
+  ).current;
 
   function avanzar(a: number) {
     Animated.timing(fundido, { toValue: 0.2, duration: reducido ? 0 : 150, useNativeDriver: true }).start(() => {
@@ -73,6 +97,8 @@ export function OfertaDestacada() {
     progreso.stopAnimation((v) => correr(v, Math.max(200, restanteRef.current)));
   }
 
+  accionesRef.current = { pausar, reanudar, avanzar };
+
   if (total === 0) return null;
   const anuncio: Anuncio = anuncios[Math.min(indice, total - 1)];
   const uri = urlCompleta(anuncio.imagenUrl);
@@ -86,7 +112,7 @@ export function OfertaDestacada() {
       accessibilityLabel={`${anuncio.nombre}. ${anuncio.detalle}`}
       style={styles.contenedor}
     >
-      <Animated.View style={[StyleSheet.absoluteFill, { opacity: fundido }]}>
+      <Animated.View {...gestos.panHandlers} style={[StyleSheet.absoluteFill, { opacity: fundido, transform: [{ translateX: arrastre }] }]}>
         {uri ? (
           <>
             <Image source={{ uri }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} />

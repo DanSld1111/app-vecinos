@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Negocio } from "@app-vecinos/tipos";
 import { abrirNegocio } from "../../src/componentes/transicion/abrirNegocio";
+import { TEXTO_BUSCADOR } from "../../src/componentes/transicion/BuscadorEnVuelo";
+import { useTransicionBuscador } from "../../src/estado/useTransicionBuscador";
 import { router } from "expo-router";
 import { Animated, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,7 +23,7 @@ import { HojaInferior } from "../../src/componentes/HojaInferior";
 import { SelectorComunidad } from "../../src/componentes/SelectorComunidad";
 import { EstadoVacio } from "../../src/componentes/EstadoVacio";
 import { EstadoError } from "../../src/componentes/EstadoError";
-import { EsqueletoListaNegocios } from "../../src/componentes/EsqueletoNegocio";
+import { EsqueletoFilaVitrina } from "../../src/componentes/EsqueletoNegocio";
 import { PermisoNotificaciones } from "../../src/componentes/PermisoNotificaciones";
 import { EntradaAnimada } from "../../src/componentes/EntradaAnimada";
 import { FotoNegocio } from "../../src/componentes/FotoNegocio";
@@ -76,6 +78,7 @@ export default function Inicio() {
   const desplazamiento = useDesplazamiento();
   const alturaBarra = useAlturaBarra();
   const queryClient = useQueryClient();
+  const refBuscador = useRef<View>(null);
   const [actualizando, setActualizando] = useState(false);
   const { comunidad } = useComunidadActiva();
   const [hojaComunidadVisible, setHojaComunidadVisible] = useState(false);
@@ -119,6 +122,33 @@ export default function Inicio() {
     } finally {
       setActualizando(false);
     }
+  }
+
+  // Mide el buscador para que la pantalla Buscar lo haga "subir" desde aquí (ver BuscadorEnVuelo).
+  function abrirBuscar() {
+    const vista = refBuscador.current;
+    if (!vista) {
+      router.push("/buscar");
+      return;
+    }
+    let listo = false;
+    const respaldo = setTimeout(() => {
+      if (!listo) {
+        listo = true;
+        router.push("/buscar");
+      }
+    }, 150);
+    vista.measureInWindow((x, y, ancho, alto) => {
+      if (listo) return;
+      listo = true;
+      clearTimeout(respaldo);
+      if (!ancho || !alto) {
+        router.push("/buscar");
+        return;
+      }
+      useTransicionBuscador.getState().preparar({ x, y, ancho, alto });
+      router.push({ pathname: "/buscar", params: { transicion: "buscador" } });
+    });
   }
 
   function alTocarCampana() {
@@ -175,7 +205,9 @@ export default function Inicio() {
           <Text style={styles.titulo} accessibilityRole="header">
             ¿Qué buscas hoy?
           </Text>
-          <BarraBusqueda placeholder="Negocio, plato o producto" onPress={() => router.push("/buscar")} />
+          <View ref={refBuscador} collapsable={false}>
+            <BarraBusqueda placeholder={TEXTO_BUSCADOR} onPress={abrirBuscar} />
+          </View>
         </View>
 
         {categorias && categorias.length > 0 ? (
@@ -232,9 +264,7 @@ export default function Inicio() {
         </View>
 
         {isLoading ? (
-          <View style={styles.bloque}>
-            <EsqueletoListaNegocios cantidad={2} />
-          </View>
+          <EsqueletoFilaVitrina />
         ) : isError ? (
           <EstadoError onReintentar={() => refetch()} />
         ) : negocios && negocios.items.length > 0 ? (

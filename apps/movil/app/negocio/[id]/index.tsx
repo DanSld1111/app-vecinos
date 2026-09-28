@@ -16,7 +16,7 @@ import { useComunidadActiva } from "../../../src/estado/comunidadActiva";
 import { BotonPrimario } from "../../../src/componentes/BotonPrimario";
 import { EstadoError } from "../../../src/componentes/EstadoError";
 import { EstadoVacio } from "../../../src/componentes/EstadoVacio";
-import { usePulso } from "../../../src/componentes/EsqueletoNegocio";
+import { Hueso } from "../../../src/componentes/EsqueletoNegocio";
 import { MenuNegocio } from "../../../src/componentes/MenuNegocio";
 import { CatalogoNegocio } from "../../../src/componentes/CatalogoNegocio";
 import { ServiciosNegocio } from "../../../src/componentes/ServiciosNegocio";
@@ -44,17 +44,16 @@ const sinContornoWeb = Platform.OS === "web" ? ({ outlineStyle: "none" } as obje
 const ANIM_NATIVA = Platform.OS !== "web";
 
 function EsqueletoFicha() {
-  const colores = useColores();
-  const opacidad = usePulso();
   return (
-    <Animated.View style={{ opacity: opacidad }}>
-      <View style={{ height: ALTO_PORTADA, backgroundColor: colores.superficieHundida2 }} />
+    <View accessibilityLabel="Cargando negocio" accessibilityRole="progressbar">
+      <Hueso style={{ height: ALTO_PORTADA }} />
       <View style={{ padding: espaciado.lg, gap: espaciado.sm }}>
-        <View style={{ height: 12, width: "35%", borderRadius: 6, backgroundColor: colores.superficieHundida2 }} />
-        <View style={{ height: 26, width: "75%", borderRadius: 8, backgroundColor: colores.superficieHundida2 }} />
-        <View style={{ height: 12, width: "60%", borderRadius: 6, backgroundColor: colores.superficieHundida2 }} />
+        <Hueso style={{ height: 12, width: "35%", borderRadius: 6 }} />
+        <Hueso style={{ height: 26, width: "75%", borderRadius: 8 }} />
+        <Hueso style={{ height: 12, width: "60%", borderRadius: 6 }} />
+        <Hueso style={{ height: 44, width: "100%", borderRadius: 10, marginTop: espaciado.md }} />
       </View>
-    </Animated.View>
+    </View>
   );
 }
 

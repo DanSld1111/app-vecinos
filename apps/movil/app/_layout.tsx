@@ -17,6 +17,7 @@ import { useColores } from "../src/disenio";
 import { useTema } from "../src/estado/useTema";
 import { BannerSinConexion } from "../src/componentes/BannerSinConexion";
 import { FlujoLogin } from "../src/componentes/FlujoLogin";
+import { FundidoTema } from "../src/componentes/transicion/FundidoTema";
 import { Onboarding } from "../src/componentes/Onboarding";
 import { useSesion } from "../src/estado/useSesion";
 import { useOnboarding } from "../src/estado/useOnboarding";
@@ -95,11 +96,21 @@ export default function LayoutRaiz() {
                 }}
               />
               <Stack.Screen name="favoritos" options={{ presentation: "fullScreenModal" }} />
-              <Stack.Screen name="buscar" options={{ presentation: "fullScreenModal" }} />
+              {/* Desde el buscador de Inicio la pantalla entra con un fundido mientras el buscador
+                  "sube" a su lugar (ver BuscadorEnVuelo); desde otros lados, como modal. */}
+              <Stack.Screen
+                name="buscar"
+                options={({ route }) =>
+                  (route.params as { transicion?: string } | undefined)?.transicion === "buscador"
+                    ? { presentation: "fullScreenModal", animation: "fade" }
+                    : { presentation: "fullScreenModal" }
+                }
+              />
               <Stack.Screen name="notificaciones" />
               <Stack.Screen name="cuenta/index" options={{ presentation: "fullScreenModal" }} />
             </Stack>
           )}
+          <FundidoTema />
         </View>
       </QueryClientProvider>
     </SafeAreaProvider>

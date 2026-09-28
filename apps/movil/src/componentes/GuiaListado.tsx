@@ -176,7 +176,8 @@ export function GuiaListado({
         <EstadoError onReintentar={() => refetch()} />
       ) : (
         <FlashList
-          key={esCatalogo ? "grid" : "lista"}
+          // Cambiar de filtro vuelve a montar la lista: las filas nuevas entran escalonadas.
+          key={`${esCatalogo ? "grid" : "lista"}-${categoriaId ?? "todas"}`}
           data={negocios?.items ?? []}
           keyExtractor={(item) => item.id}
           numColumns={esCatalogo ? 2 : 1}

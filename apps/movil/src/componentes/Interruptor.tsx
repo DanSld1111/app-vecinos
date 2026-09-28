@@ -1,4 +1,4 @@
-import { Animated, Pressable, StyleSheet } from "react-native";
+import { Animated, Easing, Pressable, StyleSheet } from "react-native";
 import { useEffect, useRef } from "react";
 import { PaletaColores, useColores } from "../disenio";
 
@@ -6,10 +6,13 @@ export function Interruptor({
   activo,
   onCambiar,
   deshabilitado = false,
+  etiqueta,
 }: {
   activo: boolean;
   onCambiar: (valor: boolean) => void;
   deshabilitado?: boolean;
+  /** Lo que lee el lector de pantalla ("Modo oscuro"); si falta, lee solo "activado/desactivado". */
+  etiqueta?: string;
 }) {
   const colores = useColores();
   const styles = crearEstilos(colores);
@@ -18,7 +21,8 @@ export function Interruptor({
   useEffect(() => {
     Animated.timing(posicion, {
       toValue: activo ? 1 : 0,
-      duration: 150,
+      duration: 180,
+      easing: Easing.bezier(0.3, 1.4, 0.5, 1),
       useNativeDriver: true,
     }).start();
   }, [activo, posicion]);
@@ -29,6 +33,9 @@ export function Interruptor({
     <Pressable
       disabled={deshabilitado}
       onPress={() => onCambiar(!activo)}
+      accessibilityRole="switch"
+      accessibilityLabel={etiqueta}
+      accessibilityState={{ checked: activo, disabled: deshabilitado }}
       style={[
         styles.pista,
         { backgroundColor: activo ? colores.primario : colores.bordeFuerte },

@@ -47,6 +47,7 @@ export default function AjustesNotificaciones() {
                     <Interruptor
                       activo={preferencias[categoria.id] ?? false}
                       onCambiar={() => alternarCategoria(categoria.id)}
+                      etiqueta={categoria.nombre}
                     />
                   </View>
                 ))}

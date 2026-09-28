@@ -31,6 +31,15 @@ https://claude.ai/artifact/GfJgQmqeWjsb7h2pdUpMmx
   crecer una copia desde ahí hasta la portada en 400 ms (`FotoEnVuelo`), mientras la pantalla entra
   con un fundido. No se usó `sharedTransitionTag` de Reanimated: en la 4.5 está detrás de un flag
   que exige compilar la app nativa, y no funciona en web (donde corre producción).
+- **Barra de pestañas:** flota sobre el contenido con desenfoque (casi opaca en Android), se
+  esconde al bajar y vuelve al subir (`useDesplazamiento`), el ícono elegido rebota con una
+  vibración corta, tocar la pestaña actual sube al tope (`useScrollToTop`) y Comunidad muestra un
+  punto rojo si hay una alerta de seguridad que el vecino no vio.
+- **Otros efectos:** el buscador de Inicio "sube" hasta su lugar en Buscar (`BuscadorEnVuelo`);
+  el cambio claro/oscuro se hace con un fundido (`FundidoTema`); esqueletos de carga con la forma
+  nueva y un brillo que los recorre (`Hueso`); los avisos de Comunidad se reacomodan con
+  animación al filtrar; la oferta de Inicio se puede deslizar con el dedo; Servicios, Comunidad y
+  Perfil muestran una barra con el título en chico al bajar; Inicio se actualiza arrastrando.
 - **Textos:** "comunidad" en vez de "barrio"; "Entrar en modo invitado" en vez de "modo prueba".
   El login sigue siendo con correo y contraseña.
 

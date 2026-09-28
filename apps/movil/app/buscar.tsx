@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { router } from "expo-router";
+import { useMemo, useRef, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import {
   FlatList,
@@ -22,6 +22,9 @@ import { useBusquedasRecientes } from "../src/estado/useBusquedasRecientes";
 import { TarjetaNegocio } from "../src/componentes/TarjetaNegocio";
 import { EstadoVacio } from "../src/componentes/EstadoVacio";
 import { FotoNegocio } from "../src/componentes/FotoNegocio";
+import { BuscadorEnVuelo, TEXTO_BUSCADOR } from "../src/componentes/transicion/BuscadorEnVuelo";
+import { RectanguloVentana, useTransicionBuscador } from "../src/estado/useTransicionBuscador";
+import { useMovimientoReducido } from "../src/utilidades/useMovimientoReducido";
 import { SinFoto } from "../src/componentes/SinFoto";
 import { useAnuncios } from "../src/datos/hooks/useAnuncios";
 import { recolectarOfertas } from "../src/utilidades/ofertas";
@@ -41,6 +44,32 @@ export default function BuscarPantallaCompleta() {
   const { comunidad } = useComunidadActiva();
   const [texto, setTexto] = useState("");
   const [tendenciasExpandidas, setTendenciasExpandidas] = useState(false);
+  const { transicion } = useLocalSearchParams<{ transicion?: string }>();
+  const reducido = useMovimientoReducido();
+  const refCampo = useRef<View>(null);
+  // Si se llegó tocando el buscador de Inicio, una copia suya sube hasta este campo; mientras
+  // tanto el campo real queda invisible (ver BuscadorEnVuelo).
+  const [origenBuscador, setOrigenBuscador] = useState<RectanguloVentana | null>(() =>
+    transicion === "buscador" ? useTransicionBuscador.getState().origen : null,
+  );
+  const [destinoBuscador, setDestinoBuscador] = useState<RectanguloVentana | null>(null);
+
+  function llegoElBuscador() {
+    setOrigenBuscador(null);
+    useTransicionBuscador.getState().limpiar();
+  }
+
+  function medirCampo() {
+    if (!origenBuscador || destinoBuscador) return;
+    if (reducido) {
+      llegoElBuscador();
+      return;
+    }
+    refCampo.current?.measureInWindow((x, y, ancho, alto) => {
+      if (ancho && alto) setDestinoBuscador({ x, y, ancho, alto });
+      else llegoElBuscador();
+    });
+  }
   const { recientes, agregar, quitar, limpiar } = useBusquedasRecientes();
   const { data: categorias } = useCategorias();
 
@@ -95,14 +124,19 @@ export default function BuscarPantallaCompleta() {
         >
           <Ionicons name="chevron-back" size={24} color={colores.texto} />
         </Pressable>
-        <View style={styles.inputFila}>
+        <View
+          ref={refCampo}
+          collapsable={false}
+          onLayout={medirCampo}
+          style={[styles.inputFila, origenBuscador ? { opacity: 0 } : null]}
+        >
           <Ionicons name="search" size={16} color={colores.textoSuave} />
           <TextInput
             autoFocus
             value={texto}
             onChangeText={setTexto}
             onSubmitEditing={alEnviar}
-            placeholder="Negocios, platos y productos"
+            placeholder={TEXTO_BUSCADOR}
             placeholderTextColor={colores.textoTenue}
             style={styles.input}
             returnKeyType="search"
@@ -258,6 +292,9 @@ export default function BuscarPantallaCompleta() {
           </View>
         </ScrollView>
       )}
+      {origenBuscador && destinoBuscador ? (
+        <BuscadorEnVuelo origen={origenBuscador} destino={destinoBuscador} onLlegar={llegoElBuscador} />
+      ) : null}
     </View>
   );
 }

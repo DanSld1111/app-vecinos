@@ -1,75 +1,37 @@
-import { Animated, StyleSheet, View } from "react-native";
-import { PaletaColores, espaciado, radios, useColores } from "../disenio";
-import { usePulso } from "./EsqueletoNegocio";
+import { StyleSheet, View } from "react-native";
+import { espaciado, useColores } from "../disenio";
+import { Hueso } from "./EsqueletoNegocio";
 
+/** Carga de un aviso de Comunidad con la misma forma que TarjetaAviso: etiqueta, título, texto y autor. */
 export function EsqueletoAviso() {
-  const opacidad = usePulso();
   const colores = useColores();
-  const styles = crearEstilos(colores);
-
   return (
-    <Animated.View style={[styles.tarjeta, { opacity: opacidad }]}>
-      <View style={styles.encabezado}>
-        <View style={styles.avatar} />
-        <View style={styles.encabezadoTexto}>
-          <View style={[styles.linea, { width: "55%" }]} />
-          <View style={[styles.linea, { width: "30%", height: 6 }]} />
-        </View>
+    <View
+      style={{
+        paddingVertical: espaciado.lg,
+        gap: 8,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: colores.borde,
+      }}
+    >
+      <Hueso style={{ width: 88, height: 16, borderRadius: 4 }} />
+      <Hueso style={{ width: "75%", height: 14, borderRadius: 6 }} />
+      <Hueso style={{ width: "95%", height: 10, borderRadius: 5 }} />
+      <Hueso style={{ width: "60%", height: 10, borderRadius: 5 }} />
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 }}>
+        <Hueso style={{ width: 24, height: 24, borderRadius: 12 }} />
+        <Hueso style={{ width: 140, height: 9, borderRadius: 5 }} />
       </View>
-      <View style={styles.cuerpo}>
-        <View style={[styles.linea, { width: "80%", height: 10 }]} />
-        <View style={[styles.linea, { width: "95%" }]} />
-        <View style={[styles.linea, { width: "60%" }]} />
-      </View>
-    </Animated.View>
+    </View>
   );
 }
 
 export function EsqueletoListaAvisos({ cantidad = 3 }: { cantidad?: number }) {
   return (
-    <View style={{ gap: espaciado.md }}>
+    <View accessibilityLabel="Cargando avisos" accessibilityRole="progressbar">
       {Array.from({ length: cantidad }).map((_, i) => (
         <EsqueletoAviso key={i} />
       ))}
     </View>
   );
-}
-
-function crearEstilos(colores: PaletaColores) {
-  return StyleSheet.create({
-    tarjeta: {
-      backgroundColor: colores.superficie,
-      borderRadius: radios.lg,
-      padding: espaciado.md,
-      gap: espaciado.md,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.06,
-      shadowRadius: 16,
-      elevation: 2,
-    },
-    encabezado: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: espaciado.sm,
-    },
-    avatar: {
-      width: 38,
-      height: 38,
-      borderRadius: radios.md,
-      backgroundColor: colores.superficieHundida2,
-    },
-    encabezadoTexto: {
-      flex: 1,
-      gap: 6,
-    },
-    cuerpo: {
-      gap: 6,
-    },
-    linea: {
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colores.superficieHundida2,
-    },
-  });
 }
