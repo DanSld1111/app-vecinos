@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import { Negocio } from "@app-vecinos/tipos";
@@ -19,8 +20,10 @@ export function TarjetaNegocio({
   negocio: Negocio;
   /** "Popular esta semana" — la decide quien arma la lista, no este componente. */
   popular?: boolean;
-  onPress: () => void;
+  /** Recibe la vista de la miniatura, para que la foto pueda "volar" hasta la ficha. */
+  onPress: (vistaFoto: View | null) => void;
 }) {
+  const refFoto = useRef<View>(null);
   const colores = useColores();
   const styles = crearEstilos(colores);
   const abierto = estaAbiertoAhora(negocio.horarios);
@@ -37,12 +40,14 @@ export function TarjetaNegocio({
   return (
     <Tocable
       style={styles.contenedor}
-      onPress={onPress}
+      onPress={() => onPress(refFoto.current)}
       escala={0.985}
       accessibilityRole="button"
       accessibilityLabel={`${negocio.nombre}, ${abierto ? "abierto" : "cerrado"}, ${distancia}`}
     >
-      <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.miniatura} tamanoIniciales={19} />
+      <View ref={refFoto} collapsable={false}>
+        <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.miniatura} tamanoIniciales={19} />
+      </View>
       <View style={styles.texto}>
         <View style={styles.filaNombre}>
           <Text style={styles.nombre} numberOfLines={1}>

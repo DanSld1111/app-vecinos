@@ -1,4 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useRef } from "react";
+import { abrirNegocio } from "../transicion/abrirNegocio";
 import { Negocio } from "@app-vecinos/tipos";
 import { PaletaColores, tipografia, useColores } from "../../disenio";
 import { estaAbiertoAhora } from "../../utilidades/horarios";
@@ -15,7 +17,8 @@ export function textoCercania(negocio: Negocio): { texto: string; abierto: boole
 }
 
 /** Foto vertical de un negocio, como una vitrina de tienda: la fila "Cerca de ti" de Inicio. */
-export function TarjetaVitrina({ negocio, onPress }: { negocio: Negocio; onPress: () => void }) {
+export function TarjetaVitrina({ negocio }: { negocio: Negocio }) {
+  const refFoto = useRef<View>(null);
   const colores = useColores();
   const styles = crearEstilos(colores);
   const { texto, abierto } = textoCercania(negocio);
@@ -23,11 +26,13 @@ export function TarjetaVitrina({ negocio, onPress }: { negocio: Negocio; onPress
   return (
     <Tocable
       style={styles.contenedor}
-      onPress={onPress}
+      onPress={() => abrirNegocio(negocio.id, { vista: refFoto.current, url: negocio.fotoPrincipalUrl, radio: 8 })}
       accessibilityRole="button"
       accessibilityLabel={`${negocio.nombre}, ${texto}`}
     >
-      <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.foto} tamanoIniciales={34} />
+      <View ref={refFoto} collapsable={false}>
+        <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.foto} tamanoIniciales={34} />
+      </View>
       <Text style={styles.nombre} numberOfLines={2}>
         {negocio.nombre}
       </Text>

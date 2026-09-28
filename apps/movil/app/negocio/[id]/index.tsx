@@ -28,6 +28,8 @@ import { HojaCalificar } from "../../../src/componentes/HojaCalificar";
 import { MiniMapaNegocio } from "../../../src/componentes/MiniMapaNegocio";
 import { FotoNegocio } from "../../../src/componentes/FotoNegocio";
 import { Aviso } from "../../../src/componentes/Aviso";
+import { FotoEnVuelo } from "../../../src/componentes/transicion/FotoEnVuelo";
+import { OrigenFoto, useTransicionFoto } from "../../../src/estado/useTransicionFoto";
 import { useProductosPorNegocio } from "../../../src/datos/hooks/useProductos";
 import { resolverArquetipoFicha } from "../../../src/utilidades/arquetipoFicha";
 import { estadoHoyTexto, resumenSemana } from "../../../src/utilidades/horarios";
@@ -79,7 +81,39 @@ function BotonSobreFoto({
   );
 }
 
+/**
+ * Envoltorio: la foto que llega "volando" desde la tarjeta vive aquí, fuera de los estados de
+ * carga/error/lista de la ficha, para que el vuelo no se reinicie cuando termina de cargar.
+ */
 export default function FichaNegocio() {
+  const { id, transicion } = useLocalSearchParams<{ id: string; transicion?: string }>();
+  const reducido = useMovimientoReducido();
+  const [fotoEnVuelo, setFotoEnVuelo] = useState<OrigenFoto | null>(() => {
+    const origen = useTransicionFoto.getState().origen;
+    return transicion === "foto" && origen?.negocioId === id ? origen : null;
+  });
+
+  function llegoLaFoto() {
+    setFotoEnVuelo(null);
+    useTransicionFoto.getState().limpiar();
+  }
+
+  useEffect(() => {
+    if (reducido && fotoEnVuelo) llegoLaFoto();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reducido]);
+
+  return (
+    <View style={{ flex: 1 }}>
+      <FichaContenido fotoEnVuelo={fotoEnVuelo} />
+      {fotoEnVuelo ? <FotoEnVuelo origen={fotoEnVuelo} altoDestino={ALTO_PORTADA} onLlegar={llegoLaFoto} /> : null}
+    </View>
+  );
+}
+
+function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
+  // Se fija al montar: si la portada llegó volando, no hace su propio fundido al aparecer.
+  const [llegoVolando] = useState(fotoEnVuelo !== null);
   const colores = useColores();
   const styles = crearEstilos(colores);
   const insets = useSafeAreaInsets();
@@ -279,7 +313,8 @@ export default function FichaNegocio() {
   const portadaEscalaScroll = reducido
     ? 1
     : scrollY.interpolate({ inputRange: [-200, 0], outputRange: [1.6, 1], extrapolateRight: "clamp" });
-  const portadaEscalaEntrada = entrada.interpolate({ inputRange: [0, 1], outputRange: [1.06, 1] });
+  // Si la foto llega volando, la portada no hace además su propio acercamiento.
+  const portadaEscalaEntrada = fotoEnVuelo ? 1 : entrada.interpolate({ inputRange: [0, 1], outputRange: [1.06, 1] });
   const cuerpoOpacidad = entrada.interpolate({ inputRange: [0, 0.4, 1], outputRange: [0, 0.4, 1] });
   const cuerpoY = entrada.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
   const barraOpacidad = scrollY.interpolate({
@@ -301,6 +336,7 @@ export default function FichaNegocio() {
         <View style={styles.portadaMarco}>
           <Animated.View
             style={{
+              opacity: fotoEnVuelo ? 0 : 1,
               transform: [{ translateY: portadaY }, { scale: portadaEscalaScroll }, { scale: portadaEscalaEntrada }],
             }}
           >
@@ -310,6 +346,7 @@ export default function FichaNegocio() {
               style={{ height: ALTO_PORTADA, width: "100%" }}
               tamanoIniciales={72}
               avisoSinFoto
+              fundido={!llegoVolando}
             />
           </Animated.View>
         </View>

@@ -11,6 +11,7 @@ import { useComunidadActiva } from "../estado/comunidadActiva";
 import { useCategorias } from "../datos/hooks/useCategorias";
 import { useNegocios } from "../datos/hooks/useNegocios";
 import { ChipCategoria } from "./ChipCategoria";
+import { abrirNegocio } from "./transicion/abrirNegocio";
 import { TarjetaNegocio } from "./TarjetaNegocio";
 import { TarjetaNegocioMenu } from "./TarjetaNegocioMenu";
 import { TarjetaNegocioCatalogo } from "./TarjetaNegocioCatalogo";
@@ -99,14 +100,14 @@ export function GuiaListado({
   const plantilla = servicioSlugFijo ? PLANTILLA_POR_SERVICIO[servicioSlugFijo] : undefined;
   const esCatalogo = plantilla === "catalogo";
 
-  function alTocar(negocio: Negocio) {
-    router.push(`/negocio/${negocio.id}`);
+  function alTocar(negocio: Negocio, vistaFoto?: View | null, radio = 8) {
+    abrirNegocio(negocio.id, { vista: vistaFoto ?? null, url: negocio.fotoPrincipalUrl, radio });
   }
 
   function renderizarTarjeta(negocio: Negocio, indice: number) {
-    if (plantilla === "menu") return <TarjetaNegocioMenu negocio={negocio} categorias={categorias} onPress={() => alTocar(negocio)} />;
+    if (plantilla === "menu") return <TarjetaNegocioMenu negocio={negocio} categorias={categorias} onPress={(vista) => alTocar(negocio, vista, 10)} />;
     if (plantilla === "catalogo") return <TarjetaNegocioCatalogo negocio={negocio} onPress={() => alTocar(negocio)} />;
-    return <TarjetaNegocio negocio={negocio} onPress={() => alTocar(negocio)} />;
+    return <TarjetaNegocio negocio={negocio} onPress={(vista) => alTocar(negocio, vista)} />;
   }
 
   return (

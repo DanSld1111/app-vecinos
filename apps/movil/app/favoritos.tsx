@@ -1,4 +1,7 @@
+import { useRef } from "react";
 import { router } from "expo-router";
+import { Negocio } from "@app-vecinos/tipos";
+import { abrirNegocio } from "../src/componentes/transicion/abrirNegocio";
 import { Ionicons } from "@expo/vector-icons";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -57,38 +60,43 @@ export default function Favoritos() {
               <EstadoVacio titulo="Todavía no tienes favoritos. Toca el corazón en la ficha de un negocio para guardarlo aquí." />
             </View>
           }
-          renderItem={({ item, index }) => {
-            const { texto, abierto } = textoCercania(item);
-            return (
-              <EntradaAnimada retraso={Math.min(index, 8) * 40} style={{ flex: 1, maxWidth: "50%" }}>
-                <Tocable
-                  onPress={() => router.push(`/negocio/${item.id}`)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${item.nombre}, ${texto}`}
-                  style={{ marginBottom: espaciado.lg }}
-                >
-                  <View>
-                    <FotoNegocio nombre={item.nombre} url={item.fotoPrincipalUrl} style={styles.foto} tamanoIniciales={30} />
-                    <View style={styles.corazon}>
-                      <Ionicons name="heart" size={14} color="#c8322e" />
-                    </View>
-                  </View>
-                  <Text style={styles.nombre} numberOfLines={2}>
-                    {item.nombre}
-                  </Text>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                    {abierto ? <View style={styles.punto} /> : null}
-                    <Text style={styles.meta} numberOfLines={1}>
-                      {texto}
-                    </Text>
-                  </View>
-                </Tocable>
-              </EntradaAnimada>
-            );
-          }}
+          renderItem={({ item, index }) => (
+            <EntradaAnimada retraso={Math.min(index, 8) * 40} style={{ flex: 1, maxWidth: "50%" }}>
+              <CeldaFavorito negocio={item} styles={styles} />
+            </EntradaAnimada>
+          )}
         />
       )}
     </View>
+  );
+}
+
+function CeldaFavorito({ negocio: item, styles }: { negocio: Negocio; styles: ReturnType<typeof crearEstilos> }) {
+  const refFoto = useRef<View>(null);
+  const { texto, abierto } = textoCercania(item);
+  return (
+    <Tocable
+      onPress={() => abrirNegocio(item.id, { vista: refFoto.current, url: item.fotoPrincipalUrl, radio: 10 })}
+      accessibilityRole="button"
+      accessibilityLabel={`${item.nombre}, ${texto}`}
+      style={{ marginBottom: espaciado.lg }}
+    >
+      <View ref={refFoto} collapsable={false}>
+        <FotoNegocio nombre={item.nombre} url={item.fotoPrincipalUrl} style={styles.foto} tamanoIniciales={30} />
+        <View style={styles.corazon}>
+          <Ionicons name="heart" size={14} color="#c8322e" />
+        </View>
+      </View>
+      <Text style={styles.nombre} numberOfLines={2}>
+        {item.nombre}
+      </Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        {abierto ? <View style={styles.punto} /> : null}
+        <Text style={styles.meta} numberOfLines={1}>
+          {texto}
+        </Text>
+      </View>
+    </Tocable>
   );
 }
 

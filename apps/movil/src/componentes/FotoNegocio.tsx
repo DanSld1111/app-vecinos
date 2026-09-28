@@ -21,6 +21,7 @@ export function FotoNegocio({
   tamanoIniciales,
   avisoSinFoto = false,
   posicion,
+  fundido = true,
 }: {
   nombre: string;
   url: string | null | undefined;
@@ -30,6 +31,8 @@ export function FotoNegocio({
   avisoSinFoto?: boolean;
   /** Encuadre de la foto (ej. "top" para fachadas). */
   posicion?: "center" | "top" | "bottom";
+  /** false cuando la foto ya viene "volando" a su lugar (ver FotoEnVuelo): aparecer con otro fundido la haría parpadear. */
+  fundido?: boolean;
 }) {
   const colores = useColores();
   const uri = urlCompleta(url);
@@ -41,7 +44,7 @@ export function FotoNegocio({
         style={[styles.base, { backgroundColor: colores.superficieHundida2 }, style as StyleProp<ImageStyle>]}
         contentFit="cover"
         contentPosition={posicion ?? "center"}
-        transition={250}
+        transition={fundido ? 250 : 0}
         accessibilityLabel={`Foto de ${nombre}`}
       />
     );

@@ -65,7 +65,16 @@ export default function LayoutRaiz() {
               <Stack.Screen name="(tabs)" />
               {/* Sin header nativo: trae su propio encabezado (flecha + buscador + favorito + ⋮)
                   dentro del componente — mismo criterio que servicios/_layout.tsx. */}
-              <Stack.Screen name="negocio/[id]/index" options={{ headerShown: false }} />
+              {/* Si se abrió tocando una foto (ver abrirNegocio), la pantalla entra con un fundido
+                  mientras esa foto crece hasta la portada; si no, el deslizamiento de siempre. */}
+              <Stack.Screen
+                name="negocio/[id]/index"
+                options={({ route }) => ({
+                  headerShown: false,
+                  animation:
+                    (route.params as { transicion?: string } | undefined)?.transicion === "foto" ? "fade" : "slide_from_right",
+                })}
+              />
               <Stack.Screen
                 name="negocio/[id]/informacion"
                 options={{

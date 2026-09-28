@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,8 +18,10 @@ export function TarjetaNegocioMenu({
   negocio: Negocio;
   /** Para el subtítulo de la tarjeta ("Criollo · Parrillas") — se resuelven por categoriaIds. */
   categorias?: Categoria[];
-  onPress: () => void;
+  /** Recibe la vista de la tarjeta, para que la foto pueda "volar" hasta la ficha. */
+  onPress: (vistaFoto: View | null) => void;
 }) {
+  const refTarjeta = useRef<View>(null);
   const colores = useColores();
   const styles = crearEstilos(colores);
   const estado = estadoHoyTexto(negocio.horarios);
@@ -35,7 +38,7 @@ export function TarjetaNegocioMenu({
         </Text>
         {negocio.calificacionTotal > 0 ? (
           <View style={styles.filaCalificacion}>
-            <Ionicons name="star" size={11} color="#e0a835" />
+            <Ionicons name="star" size={11} color={colores.calificacion} />
             <Text style={[styles.calificacionTexto, { color: colorTexto }]}>{negocio.calificacionPromedio}</Text>
           </View>
         ) : null}
@@ -47,7 +50,8 @@ export function TarjetaNegocioMenu({
   );
 
   return (
-    <Pressable style={styles.sombra} onPress={onPress}>
+    <Pressable style={styles.sombra} onPress={() => onPress(refTarjeta.current)} accessibilityRole="button" accessibilityLabel={negocio.nombre}>
+      <View ref={refTarjeta} collapsable={false}>
       {negocio.fotoPrincipalUrl ? (
         <ImageBackground source={{ uri: urlCompleta(negocio.fotoPrincipalUrl) }} style={styles.tarjeta} imageStyle={styles.imagen}>
           <LinearGradient
@@ -69,6 +73,7 @@ export function TarjetaNegocioMenu({
           <View style={styles.textosSinFoto}>{contenidoTextos(colores.texto, colores.textoSuave)}</View>
         </View>
       )}
+      </View>
     </Pressable>
   );
 }
@@ -76,23 +81,20 @@ export function TarjetaNegocioMenu({
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     sombra: {
-      borderRadius: radios.lg,
+      borderRadius: 10,
       backgroundColor: colores.superficie,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.1,
-      shadowRadius: 14,
+
       elevation: 3,
     },
     tarjeta: {
       height: 150,
-      borderRadius: radios.lg,
+      borderRadius: 10,
       overflow: "hidden",
       justifyContent: "space-between",
       padding: espaciado.md,
     },
     imagen: {
-      borderRadius: radios.lg,
+      borderRadius: 10,
     },
     pill: {
       alignSelf: "flex-start",

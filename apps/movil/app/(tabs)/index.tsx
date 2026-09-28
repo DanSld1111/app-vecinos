@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Negocio } from "@app-vecinos/tipos";
+import { abrirNegocio } from "../../src/componentes/transicion/abrirNegocio";
 import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,6 +28,40 @@ import { TarjetaVitrina } from "../../src/componentes/vitrina/TarjetaVitrina";
 import { useNotificaciones } from "../../src/estado/useNotificaciones";
 import { fechaCorta } from "../../src/utilidades/saludo";
 import { tiempoRelativo } from "../../src/utilidades/tiempoRelativo";
+
+function FilaRanking({
+  negocio,
+  puesto,
+  styles,
+}: {
+  negocio: Negocio;
+  puesto: number;
+  styles: ReturnType<typeof crearEstilos>;
+}) {
+  const refFoto = useRef<View>(null);
+  return (
+    <Tocable
+      style={styles.filaRanking}
+      onPress={() => abrirNegocio(negocio.id, { vista: refFoto.current, url: negocio.fotoPrincipalUrl, radio: 8 })}
+      accessibilityRole="button"
+      accessibilityLabel={`Puesto ${puesto}: ${negocio.nombre}`}
+      escala={0.985}
+    >
+      <Text style={styles.puesto}>{puesto}</Text>
+      <View ref={refFoto} collapsable={false}>
+        <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.miniRanking} />
+      </View>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={styles.nombreRanking} numberOfLines={1}>
+          {negocio.nombre}
+        </Text>
+        <Text style={styles.metaRanking} numberOfLines={1}>
+          {negocio.descripcion}
+        </Text>
+      </View>
+    </Tocable>
+  );
+}
 
 export default function Inicio() {
   const colores = useColores();
@@ -171,7 +207,7 @@ export default function Inicio() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filaVitrina}>
             {negocios.items.map((negocio, i) => (
               <EntradaAnimada key={negocio.id} retraso={i * 40}>
-                <TarjetaVitrina negocio={negocio} onPress={() => router.push(`/negocio/${negocio.id}`)} />
+                <TarjetaVitrina negocio={negocio} />
               </EntradaAnimada>
             ))}
           </ScrollView>
@@ -185,25 +221,7 @@ export default function Inicio() {
               Lo más visitado esta semana
             </Text>
             {masVisitados.map((negocio, i) => (
-              <Tocable
-                key={negocio.id}
-                style={styles.filaRanking}
-                onPress={() => router.push(`/negocio/${negocio.id}`)}
-                accessibilityRole="button"
-                accessibilityLabel={`Puesto ${i + 1}: ${negocio.nombre}`}
-                escala={0.985}
-              >
-                <Text style={styles.puesto}>{i + 1}</Text>
-                <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.miniRanking} />
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={styles.nombreRanking} numberOfLines={1}>
-                    {negocio.nombre}
-                  </Text>
-                  <Text style={styles.metaRanking} numberOfLines={1}>
-                    {negocio.descripcion}
-                  </Text>
-                </View>
-              </Tocable>
+              <FilaRanking key={negocio.id} negocio={negocio} puesto={i + 1} styles={styles} />
             ))}
           </View>
         ) : null}

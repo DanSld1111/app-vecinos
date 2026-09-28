@@ -26,12 +26,15 @@ https://claude.ai/artifact/GfJgQmqeWjsb7h2pdUpMmx
   bajar, corazón que late con vibración (`expo-haptics`), oferta de Inicio que pasa sola con barra
   de progreso, hojas inferiores que se cierran arrastrando, barra de pestañas con rayita que se
   desliza y fundido entre pestañas. Todo respeta "reducir movimiento" (`useMovimientoReducido`).
+- **Foto que vuela a la ficha** (`react-native-reanimated`): al tocar la foto de un negocio en
+  Inicio, la Guía, Restaurantes o Favoritos, se mide dónde está (`abrirNegocio`) y la ficha hace
+  crecer una copia desde ahí hasta la portada en 400 ms (`FotoEnVuelo`), mientras la pantalla entra
+  con un fundido. No se usó `sharedTransitionTag` de Reanimated: en la 4.5 está detrás de un flag
+  que exige compilar la app nativa, y no funciona en web (donde corre producción).
 - **Textos:** "comunidad" en vez de "barrio"; "Entrar en modo invitado" en vez de "modo prueba".
   El login sigue siendo con correo y contraseña.
 
 ## Pendiente
 
-- Transición de "foto compartida" real entre la tarjeta y la ficha: hoy es una aproximación
-  (la portada entra acercándose). La real necesita `react-native-reanimated`.
 - Fotos de categoría para las que aún no tienen (se ven con iniciales).
 - Pantallas de "modo gestión" (dueño de negocio / junta) solo heredan fuente y colores.
