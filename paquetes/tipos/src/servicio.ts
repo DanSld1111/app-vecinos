@@ -1,3 +1,5 @@
+import type { TipoFicha } from "./ficha";
+
 export type EstadoServicioApp = "disponible" | "proximamente";
 
 /**
@@ -19,4 +21,7 @@ export interface ServicioApp {
   /** Aperturas de este servicio en los últimos 7 días — sube con POST /servicios-app/:slug/visitas.
    * Se usa para ordenar "Explora por rubro" por uso real. */
   visitas7d: number;
+  /** Ficha por defecto de los negocios de este servicio; sus categorías la heredan salvo que
+   * elijan otra. null = no es un directorio de negocios (Taxi, Bolsa de empleo…). */
+  ficha?: TipoFicha | null;
 }

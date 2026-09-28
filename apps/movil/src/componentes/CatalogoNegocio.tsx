@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { Image, Linking, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
+import { atributosVisibles } from "../utilidades/fichaNegocio";
 import { ChipCategoria } from "./ChipCategoria";
 import { SinFoto } from "./SinFoto";
 import { EntradaAnimada } from "./EntradaAnimada";
@@ -13,7 +14,13 @@ export function CatalogoNegocio({
   moneda,
   whatsapp,
   busqueda = "",
+  titulo = "Catálogo",
+  campos = [],
 }: {
+  /** Título de la sección: el que configuró la categoría en el panel, o el de la ficha. */
+  titulo?: string;
+  /** Campos extra de la categoría (Talla, Color…), para mostrar cada valor con su etiqueta. */
+  campos?: AtributoProductoDef[];
   productos: Producto[];
   moneda: Moneda;
   /** Para el botón "Consultar por WhatsApp" en el detalle del producto — null si el negocio no puso uno. */
@@ -46,7 +53,7 @@ export function CatalogoNegocio({
 
   return (
     <View>
-      <Text style={styles.tituloSeccion}>Catálogo</Text>
+      <Text style={styles.tituloSeccion}>{titulo}</Text>
 
       {subcategorias.length > 1 ? (
         <View style={styles.filaChips}>
@@ -104,11 +111,11 @@ export function CatalogoNegocio({
                 <Text style={styles.nombreHoja}>{abierto.nombre}</Text>
                 <Text style={styles.precioHoja}>{formatearPrecio(abierto.precio, moneda)}</Text>
                 {abierto.descripcion ? <Text style={styles.descripcionHoja}>{abierto.descripcion}</Text> : null}
-                {Object.keys(abierto.atributos ?? {}).length > 0 ? (
+                {atributosVisibles(abierto.atributos, campos).length > 0 ? (
                   <View style={styles.filaAtributos}>
-                    {Object.entries(abierto.atributos).map(([clave, valor]) => (
-                      <View key={clave} style={styles.chipAtributo}>
-                        <Text style={styles.chipAtributoTexto}>{valor}</Text>
+                    {atributosVisibles(abierto.atributos, campos).map((a) => (
+                      <View key={a.clave} style={styles.chipAtributo}>
+                        <Text style={styles.chipAtributoTexto}>{a.texto}</Text>
                       </View>
                     ))}
                   </View>

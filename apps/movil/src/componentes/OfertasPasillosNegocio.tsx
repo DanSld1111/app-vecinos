@@ -12,7 +12,10 @@ export function OfertasPasillosNegocio({
   negocioFotoUrl,
   moneda,
   busqueda = "",
+  titulo = "Ofertas de la semana",
 }: {
+  /** Título de la sección: el que configuró la categoría en el panel, o el de la ficha. */
+  titulo?: string;
   ofertas: OfertaNegocio[];
   pasillos: string[];
   /** No hay foto propia por oferta en el modelo — se reusa la foto principal del negocio. */
@@ -34,7 +37,7 @@ export function OfertasPasillosNegocio({
     <View>
       {ofertas.length > 0 ? (
         <>
-          <Text style={styles.tituloSeccion}>Ofertas de la semana</Text>
+          <Text style={styles.tituloSeccion}>{titulo}</Text>
           {ofertasFiltradas.length === 0 ? (
             <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
           ) : (

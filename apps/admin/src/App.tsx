@@ -11,8 +11,7 @@ import { ColaValidacion } from "./paginas/ColaValidacion";
 import { HistorialValidaciones } from "./paginas/HistorialValidaciones";
 import { Distritos } from "./paginas/Distritos";
 import { Categorias } from "./paginas/Categorias";
-import { Plantillas } from "./paginas/Plantillas";
-import { Arquetipos } from "./paginas/Arquetipos";
+import { Fichas } from "./paginas/Fichas";
 import { Publicidad } from "./paginas/Publicidad";
 import { Novedades } from "./paginas/Novedades";
 import { Avisos } from "./paginas/Avisos";
@@ -70,8 +69,10 @@ export function App() {
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/distritos" element={<Distritos />} />
         <Route path="/categorias" element={<Categorias />} />
-        <Route path="/plantillas" element={<Plantillas />} />
-        <Route path="/arquetipos" element={<Arquetipos />} />
+        <Route path="/fichas" element={<Fichas />} />
+        {/* Plantillas y Arquetipos se juntaron en Fichas (decisión 0080): los enlaces viejos llevan ahí. */}
+        <Route path="/plantillas" element={<Navigate to="/fichas" replace />} />
+        <Route path="/arquetipos" element={<Navigate to="/fichas" replace />} />
         <Route path="/publicidad" element={<Publicidad />} />
         <Route path="/novedades" element={<Novedades />} />
         <Route path="/avisos" element={<Avisos />} />

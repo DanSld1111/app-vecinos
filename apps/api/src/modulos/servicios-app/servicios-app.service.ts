@@ -14,12 +14,13 @@ interface FilaServicioApp {
   estado: ServicioApp["estado"];
   foto_url: string | null;
   orden: number;
+  ficha: ServicioApp["ficha"];
   negocios: string;
   visitas_7d: string;
 }
 
 const COLUMNAS = `
-  sa.slug, sa.nombre, sa.descripcion, sa.estado, sa.foto_url, sa.orden,
+  sa.slug, sa.nombre, sa.descripcion, sa.estado, sa.foto_url, sa.orden, sa.ficha,
   (SELECT COUNT(DISTINCT n.id)
      FROM negocios n
      JOIN negocio_categorias nc ON nc.negocio_id = n.id
@@ -37,6 +38,7 @@ function aServicioApp(fila: FilaServicioApp): ServicioApp {
     estado: fila.estado,
     fotoUrl: fila.foto_url,
     orden: fila.orden,
+    ficha: fila.ficha,
     negocios: Number(fila.negocios),
     visitas7d: Number(fila.visitas_7d),
   };
@@ -86,9 +88,10 @@ export class ServiciosAppService {
       `UPDATE servicios_app
        SET nombre = COALESCE($2, nombre),
            descripcion = COALESCE($3, descripcion),
-           estado = COALESCE($4, estado)
+           estado = COALESCE($4, estado),
+           ficha = CASE WHEN $5 THEN $6 ELSE ficha END
        WHERE slug = $1`,
-      [slug, dto.nombre ?? null, dto.descripcion ?? null, dto.estado ?? null],
+      [slug, dto.nombre ?? null, dto.descripcion ?? null, dto.estado ?? null, "ficha" in dto, dto.ficha ?? null],
     );
     await this.auditoria.registrar("actualizar", "servicio_app", slug, cuentaQueActua, dto as Record<string, unknown>);
     return aServicioApp(await this.obtenerFilaOFallar(slug));

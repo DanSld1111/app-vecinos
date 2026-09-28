@@ -95,8 +95,8 @@ export function RegistrarNegocio() {
   }
 
   const categoriaActual = categorias.find((c) => c.id === categoriaId) ?? null;
-  const atributosDef = categoriaActual?.atributosProducto ?? [];
-  const mostrarSeccion = categoriaActual?.arquetipoFicha === "menu";
+  const atributosDef = (categoriaActual?.atributosProducto ?? []).filter((c) => !c.oculto);
+  const mostrarSeccion = categoriaActual?.fichaEfectiva === "menu";
 
   // Dueño (paso 2)
   const cuentas = useCuentas((estado) => estado.cuentas);

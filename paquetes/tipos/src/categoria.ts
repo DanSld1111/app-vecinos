@@ -1,5 +1,8 @@
+import type { TipoFicha } from "./ficha";
+
 /**
- * Qué bloque de contenido muestra la ficha de un negocio de esta categoría:
+ * @deprecated Reemplazado por TipoFicha (ficha.ts). La API lo sigue enviando, calculado a partir
+ * de la ficha efectiva, solo para versiones viejas de la app. Qué bloque de contenido muestra la ficha de un negocio de esta categoría:
  * menu = platos con precio (restaurantes, comida)
  * catalogo = grilla de productos con foto y precio (moda, artesanía)
  * servicios = lista de servicios con tarifa (salud, mascotas, servicios)
@@ -22,6 +25,9 @@ export interface AtributoProductoDef {
   tipo: "opciones" | "texto" | "color";
   /** Solo si tipo = "opciones". */
   opciones?: string[];
+  /** Oculto = no se pide al cargar productos ni se muestra en la app, pero los valores ya
+   * guardados se conservan (se puede volver a mostrar). */
+  oculto?: boolean;
 }
 
 export interface Categoria {
@@ -33,11 +39,16 @@ export interface Categoria {
   /** Foto que representa la categoría en la tarjeta de Inicio (reemplaza al ícono ahí). Ver docs/decisiones/0029-categorias-con-foto.md. */
   fotoUrl: string | null;
   orden: number;
-  /** @deprecated Se mantiene solo para que la app móvil siga renderizando las 5 fichas fijas. El panel admin ya gestiona esto vía `arquetipoId`. */
+  /** @deprecated Usar `fichaEfectiva`. Se mantiene para versiones viejas de la app. */
   arquetipoFicha?: ArquetipoFicha;
-  /** Referencia a un `Arquetipo` real (paquetes/tipos/src/arquetipo.ts), gestionado desde el módulo Arquetipos del admin. */
-  arquetipoId?: string;
-  /** Vacío o ausente = los productos de esta categoría no tienen atributos especiales. */
+  /** Ficha elegida para esta categoría. null = hereda la de su servicio. Ver ficha.ts. */
+  ficha?: TipoFicha | null;
+  /** La ficha que se muestra de verdad: la propia, o la del servicio, o la galería si ninguno
+   * define una. La calcula la API. */
+  fichaEfectiva?: TipoFicha;
+  /** Título propio de la sección de la ficha (ej. "Nuestras prendas"). null = el de la ficha. */
+  tituloSeccion?: string | null;
+  /** Campos extra de los productos. Vacío o ausente = los productos no tienen campos especiales. */
   atributosProducto?: AtributoProductoDef[];
   /** A qué servicio pertenece (ServicioApp.slug) — filtra qué categorías se ofrecen al elegir
    * el servicio en el alta de negocio, y qué negocios entran en la pantalla de ese servicio en

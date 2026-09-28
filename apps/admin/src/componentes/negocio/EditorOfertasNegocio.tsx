@@ -5,8 +5,6 @@ import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 
 import { IconoEmoji } from "../IconoEmoji";
-/** Arquetipos cuya plantilla muestra el carrusel de ofertas directo en la ficha pública. */
-const ARQUETIPOS_CON_CARRUSEL_EN_FICHA = new Set(["arq-ofertas"]);
 
 /** Compartido entre "Mi negocio" (dueño) y la ficha del panel (admin). */
 export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
@@ -25,9 +23,8 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
   const categoriasDelNegocio = negocio.categoriaIds
     .map((id) => categorias.find((c) => c.id === id))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
-  const apareceEnFicha = categoriasDelNegocio.some(
-    (c) => c.arquetipoId && ARQUETIPOS_CON_CARRUSEL_EN_FICHA.has(c.arquetipoId),
-  );
+  // Solo la ficha "Ofertas y pasillos" muestra el carrusel de ofertas en la app.
+  const apareceEnFicha = categoriasDelNegocio.some((c) => c.fichaEfectiva === "ofertas");
   const nombreCategoriaPrincipal = categoriasDelNegocio[0]?.nombre ?? "Sin categoría";
 
   function agregar() {

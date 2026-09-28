@@ -11,7 +11,14 @@ const ICONO_POR_RUBRO: Record<string, keyof typeof Ionicons.glyphMap> = {
   Jardinería: "leaf-outline",
 };
 
-export function CategoriasRubroNegocio({ rubros }: { rubros: string[] }) {
+export function CategoriasRubroNegocio({
+  rubros,
+  titulo = "Qué encuentras aquí",
+}: {
+  rubros: string[];
+  /** Título de la sección: el que configuró la categoría en el panel, o el de la ficha. */
+  titulo?: string;
+}) {
   const colores = useColores();
   const styles = crearEstilos(colores);
 
@@ -19,7 +26,7 @@ export function CategoriasRubroNegocio({ rubros }: { rubros: string[] }) {
 
   return (
     <View>
-      <Text style={styles.tituloSeccion}>Qué encuentras aquí</Text>
+      <Text style={styles.tituloSeccion}>{titulo}</Text>
       <View style={styles.grid}>
         {rubros.map((rubro) => (
           <View key={rubro} style={styles.tarjeta}>

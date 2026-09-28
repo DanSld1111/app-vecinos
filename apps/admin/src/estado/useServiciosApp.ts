@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { EstadoServicioApp, ServicioApp } from "@app-vecinos/tipos";
+import { EstadoServicioApp, ServicioApp, TipoFicha } from "@app-vecinos/tipos";
 import { apiFetch, apiSubirArchivo, ErrorApi } from "../datos/clienteApi";
 
 interface EstadoServiciosApp {
@@ -9,7 +9,7 @@ interface EstadoServiciosApp {
   cargar: () => Promise<void>;
   actualizar: (
     slug: string,
-    datos: { nombre?: string; descripcion?: string; estado?: EstadoServicioApp },
+    datos: { nombre?: string; descripcion?: string; estado?: EstadoServicioApp; ficha?: TipoFicha | null },
     token: string,
   ) => Promise<boolean>;
   subirFoto: (slug: string, archivo: File, token: string) => Promise<boolean>;

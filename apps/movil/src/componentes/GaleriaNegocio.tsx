@@ -12,13 +12,20 @@ const TARJETAS_GALERIA: { icono: keyof typeof Ionicons.glyphMap; texto: string }
 
 /** `fotos`: hasta 6 URLs subidas desde el panel (Mi negocio > Fotos). Los recuadros sin foto
  * propia siguen mostrando el ícono genérico — nunca se inventa una foto que el negocio no subió. */
-export function GaleriaNegocio({ fotos = [] }: { fotos?: string[] }) {
+export function GaleriaNegocio({
+  fotos = [],
+  titulo = "Fotos del negocio",
+}: {
+  fotos?: string[];
+  /** Título de la sección: el que configuró la categoría en el panel, o el de la ficha. */
+  titulo?: string;
+}) {
   const colores = useColores();
   const styles = crearEstilos(colores);
 
   return (
     <View>
-      <Text style={styles.tituloSeccion}>Fotos del negocio</Text>
+      <Text style={styles.tituloSeccion}>{titulo}</Text>
       <View style={styles.grilla}>
         {TARJETAS_GALERIA.map((tarjeta, indice) => {
           const foto = fotos[indice];

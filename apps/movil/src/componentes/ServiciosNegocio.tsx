@@ -20,7 +20,10 @@ export function ServiciosNegocio({
   servicios,
   moneda,
   busqueda = "",
+  titulo = "Servicios y tarifas",
 }: {
+  /** Título de la sección: el que configuró la categoría en el panel, o el de la ficha. */
+  titulo?: string;
   servicios: ServicioOfrecido[];
   moneda: Moneda;
   /** Viene del buscador del header de la ficha — ver app/negocio/[id]/index.tsx. */
@@ -37,7 +40,7 @@ export function ServiciosNegocio({
   if (filtrados.length === 0) {
     return (
       <View>
-        <Text style={styles.tituloSeccion}>Servicios y tarifas</Text>
+        <Text style={styles.tituloSeccion}>{titulo}</Text>
         <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
       </View>
     );
@@ -45,7 +48,7 @@ export function ServiciosNegocio({
 
   return (
     <View>
-      <Text style={styles.tituloSeccion}>Servicios y tarifas</Text>
+      <Text style={styles.tituloSeccion}>{titulo}</Text>
       {filtrados.map((servicio, indice) => (
         <EntradaAnimada key={servicio.nombre} retraso={indice * 60} style={styles.fila}>
           {servicio.fotoUrl ? (

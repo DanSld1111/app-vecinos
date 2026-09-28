@@ -1,4 +1,6 @@
-import { IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { Type } from "class-transformer";
+import { ArrayMaxSize, IsArray, IsIn, IsOptional, IsString, MaxLength, MinLength, ValidateNested } from "class-validator";
+import { CampoProductoDto, TIPOS_FICHA } from "./campo-producto.dto";
 
 export class CrearCategoriaDto {
   @IsString()
@@ -12,9 +14,23 @@ export class CrearCategoriaDto {
 
   @IsOptional()
   @IsString()
-  arquetipoId?: string | null;
+  servicioSlug?: string | null;
 
+  /** null = hereda la ficha del servicio. */
+  @IsOptional()
+  @IsIn(TIPOS_FICHA)
+  ficha?: (typeof TIPOS_FICHA)[number] | null;
+
+  /** Vacío o null = usa el título de la ficha. */
   @IsOptional()
   @IsString()
-  servicioSlug?: string | null;
+  @MaxLength(40)
+  tituloSeccion?: string | null;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(12)
+  @ValidateNested({ each: true })
+  @Type(() => CampoProductoDto)
+  atributosProducto?: CampoProductoDto[];
 }

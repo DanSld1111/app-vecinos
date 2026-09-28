@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { EstadoServicioApp, ServicioApp } from "@app-vecinos/tipos";
+import { EstadoServicioApp, FICHAS, ServicioApp, TIPOS_FICHA, TipoFicha, tituloSeccionFicha } from "@app-vecinos/tipos";
 import { useServiciosApp } from "../estado/useServiciosApp";
+import { useCategorias } from "../estado/useCategorias";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
+import { useToasts } from "../estado/useToasts";
 import { urlCompleta } from "../utilidades/media";
+import { TarjetaFicha } from "../componentes/fichas/TarjetaFicha";
+import { TelefonoFicha } from "../componentes/fichas/TelefonoFicha";
+import { useNegocioEjemplo } from "../componentes/fichas/useNegocioEjemplo";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
 // A qué pantalla real navega cada servicio sigue fijo en el código de apps/movil — activar acá
@@ -16,13 +21,15 @@ export function Servicios() {
   const cargando = useServiciosApp((estado) => estado.cargando);
   const error = useServiciosApp((estado) => estado.error);
   const cargar = useServiciosApp((estado) => estado.cargar);
+  const cargarCategorias = useCategorias((estado) => estado.cargar);
   const token = useSesionAdmin((estado) => estado.token)!;
 
   const [editandoSlug, setEditandoSlug] = useState<string | null>(null);
 
   useEffect(() => {
     cargar();
-  }, [cargar]);
+    cargarCategorias();
+  }, [cargar, cargarCategorias]);
 
   const editando = servicios.find((s) => s.slug === editandoSlug) ?? null;
   const disponibles = servicios.filter((s) => s.estado === "disponible").length;
@@ -80,6 +87,7 @@ export function Servicios() {
                   <div className="pie-servicio-foto">
                     <span className="negocios-servicio">
                       {servicio.negocios} negocio{servicio.negocios === 1 ? "" : "s"}
+                      {servicio.ficha ? ` · Ficha ${FICHAS[servicio.ficha].nombre}` : ""}
                     </span>
                     <button className="btn-accion-mini" onClick={() => setEditandoSlug(servicio.slug)}>
                       Editar
@@ -111,7 +119,10 @@ export function Servicios() {
                       <td>
                         <b>{servicio.nombre}</b>
                       </td>
-                      <td style={{ color: "var(--texto-suave)" }}>{servicio.descripcion || "Sin descripción"}</td>
+                      <td style={{ color: "var(--texto-suave)" }}>
+                        {servicio.descripcion || "Sin descripción"}
+                        {servicio.ficha ? ` · Ficha ${FICHAS[servicio.ficha].nombre}` : ""}
+                      </td>
                       <td>
                         <span className="pill pill-gris">Próximamente</span>
                       </td>
@@ -153,21 +164,54 @@ function ModalServicio({
 }) {
   const actualizar = useServiciosApp((estado) => estado.actualizar);
   const subirFoto = useServiciosApp((estado) => estado.subirFoto);
+  const categorias = useCategorias((estado) => estado.categorias);
+  const cargarCategorias = useCategorias((estado) => estado.cargar);
+  const actualizarCategoria = useCategorias((estado) => estado.actualizar);
+  const avisos = useToasts((estado) => estado.mostrar);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [nombre, setNombre] = useState(servicio.nombre);
   const [descripcion, setDescripcion] = useState(servicio.descripcion);
   const [estado, setEstado] = useState<EstadoServicioApp>(servicio.estado);
+  const [ficha, setFicha] = useState<TipoFicha | null>(servicio.ficha ?? null);
   const [guardando, setGuardando] = useState(false);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
 
-  const huboCambio = nombre !== servicio.nombre || descripcion !== servicio.descripcion || estado !== servicio.estado;
+  const huboCambio =
+    nombre !== servicio.nombre ||
+    descripcion !== servicio.descripcion ||
+    estado !== servicio.estado ||
+    ficha !== (servicio.ficha ?? null);
+
+  // Las categorías de este servicio, con la ficha que tendrían con lo que se está eligiendo.
+  const suyas = categorias.filter((c) => c.servicioSlug === servicio.slug);
+  const fichaDe = (c: (typeof suyas)[number]): TipoFicha => c.ficha ?? ficha ?? "galeria";
+  const [vistaId, setVistaId] = useState<string | null>(null);
+  const enVista = suyas.find((c) => c.id === vistaId) ?? suyas.find((c) => !c.ficha) ?? suyas[0] ?? null;
+  const fichaVista: TipoFicha = enVista ? fichaDe(enVista) : ficha ?? "galeria";
+  const ejemplo = useNegocioEjemplo(enVista ? [enVista.id] : [], fichaVista, token);
 
   async function guardar() {
     setGuardando(true);
-    const ok = await actualizar(servicio.slug, { nombre: nombre.trim(), descripcion: descripcion.trim(), estado }, token);
+    const ok = await actualizar(
+      servicio.slug,
+      { nombre: nombre.trim(), descripcion: descripcion.trim(), estado, ficha },
+      token,
+    );
     setGuardando(false);
-    if (ok) onCerrar();
+    if (ok) {
+      // La ficha efectiva de las categorías que heredan cambió: se vuelve a pedir.
+      if (ficha !== (servicio.ficha ?? null)) await cargarCategorias();
+      onCerrar();
+    }
+  }
+
+  async function heredar(categoriaId: string, nombreCategoria: string) {
+    const ok = await actualizarCategoria(categoriaId, { ficha: null }, token);
+    if (ok) {
+      setVistaId(categoriaId);
+      avisos(`${nombreCategoria} ahora usa la ficha del servicio`);
+    }
   }
 
   async function alElegirFoto(archivo: File) {
@@ -178,7 +222,8 @@ function ModalServicio({
 
   return (
     <div className="overlay-modal" onClick={onCerrar}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-card modal-con-telefono" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-con-telefono-form">
         <h3>Editar "{servicio.nombre}"</h3>
         <p className="sub">
           Slug fijo: <code>{servicio.slug}</code> — no editable, está enlazado al código de la app.
@@ -245,6 +290,70 @@ function ModalServicio({
           ) : null}
         </div>
 
+        <div className="campo-modal">
+          <label>Ficha por defecto</label>
+          <p className="ayuda-modal" style={{ marginTop: 0 }}>
+            La heredan todas sus categorías, salvo las que eligieron otra en Categorías.
+          </p>
+          <div className="grid-fichas compacta">
+            {TIPOS_FICHA.map((f) => (
+              <TarjetaFicha key={f} ficha={f} compacta seleccionada={f === ficha} onElegir={() => setFicha(f)} />
+            ))}
+          </div>
+          <label className="check-sin-ficha">
+            <input type="checkbox" checked={ficha === null} onChange={(e) => setFicha(e.target.checked ? null : "servicios")} />
+            No es un directorio de negocios (Taxi, Bolsa de empleo…)
+          </label>
+        </div>
+
+        {suyas.length ? (
+          <div className="campo-modal">
+            <label>Sus categorías</label>
+            <table className="tabla-fichas-categorias">
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Ficha que usa</th>
+                  <th>Origen</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {suyas.map((c) => (
+                  <tr
+                    key={c.id}
+                    className={enVista?.id === c.id ? "en-vista" : undefined}
+                    onClick={() => setVistaId(c.id)}
+                    title="Ver en el celular"
+                  >
+                    <td>
+                      <b>{c.nombre}</b>
+                    </td>
+                    <td>{FICHAS[fichaDe(c)].nombre}</td>
+                    <td>
+                      <span className={`pill ${c.ficha ? "pill-oro" : "pill-verde"}`}>{c.ficha ? "Propia" : "Heredada"}</span>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      {c.ficha ? (
+                        <button
+                          type="button"
+                          className="btn-accion-mini"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            heredar(c.id, c.nombre);
+                          }}
+                        >
+                          Usar la del servicio
+                        </button>
+                      ) : null}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+
         <div className="modal-footer">
           <button className="btn-cancelar" onClick={onCerrar}>
             Cerrar
@@ -253,6 +362,36 @@ function ModalServicio({
             {guardando ? "Guardando…" : "Guardar cambios"}
           </button>
         </div>
+        </div>
+
+        <aside className="columna-telefono">
+          {enVista ? (
+            <>
+              <p className="rotulo-telefono">
+                <b>{enVista.nombre}</b> en {nombre.trim() || servicio.nombre}
+              </p>
+              <TelefonoFicha
+                ficha={fichaVista}
+                titulo={tituloSeccionFicha(fichaVista, enVista.tituloSeccion)}
+                campos={FICHAS[fichaVista].usaProductos ? enVista.atributosProducto ?? [] : []}
+                rotulo={enVista.nombre}
+                negocio={ejemplo.negocio}
+                productos={ejemplo.productos}
+                cargando={ejemplo.cargando}
+              />
+              <p className="leyenda-telefono">
+                Usa <span className="pill pill-verde">{FICHAS[fichaVista].nombre}</span>{" "}
+                {enVista.ficha ? "(propia)" : "heredada del servicio"}. Toca otra categoría para verla.
+              </p>
+            </>
+          ) : (
+            <p className="leyenda-telefono">
+              {ficha
+                ? "Este servicio todavía no tiene categorías. Las que le agregues en Categorías usarán esta ficha."
+                : "Este servicio no muestra negocios, así que no tiene ficha."}
+            </p>
+          )}
+        </aside>
       </div>
     </div>
   );

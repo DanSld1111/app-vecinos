@@ -31,7 +31,7 @@ import { Aviso } from "../../../src/componentes/Aviso";
 import { FotoEnVuelo } from "../../../src/componentes/transicion/FotoEnVuelo";
 import { OrigenFoto, useTransicionFoto } from "../../../src/estado/useTransicionFoto";
 import { useProductosPorNegocio } from "../../../src/datos/hooks/useProductos";
-import { resolverArquetipoFicha } from "../../../src/utilidades/arquetipoFicha";
+import { resolverFicha } from "../../../src/utilidades/fichaNegocio";
 import { estadoHoyTexto, resumenSemana } from "../../../src/utilidades/horarios";
 import { formatearDistancia, minutosCaminando } from "../../../src/utilidades/distancia";
 import { vibrarLigero } from "../../../src/utilidades/haptico";
@@ -271,20 +271,34 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
     }
   }
 
-  const arquetipo = resolverArquetipoFicha(negocio, categorias);
+  // La ficha (y su título y campos extra) se configura por servicio y categoría en el panel — ver
+  // docs/decisiones/0080-fichas.md. Si el negocio no cargó el contenido de su ficha, se cae a lo
+  // que sí tenga (productos o fotos), con el título propio de ese bloque.
+  const fichaNegocio = resolverFicha(negocio, categorias);
+  const arquetipo = fichaNegocio?.ficha ?? null;
+  const tituloDe = (ficha: string) => (arquetipo === ficha ? fichaNegocio?.titulo : undefined);
+  const camposExtra = fichaNegocio?.campos ?? [];
   const tieneBuscador =
     (arquetipo === "servicios" && !!negocio.serviciosOfrecidos?.length) ||
     (arquetipo === "ofertas" && !!(negocio.ofertas?.length || negocio.pasillos?.length)) ||
-    (!!productos && productos.length > 0 && arquetipo !== "categorias");
+    (!!productos && productos.length > 0 && arquetipo !== "rubros");
 
   let contenido;
   if (arquetipo === "servicios" && negocio.serviciosOfrecidos?.length) {
-    contenido = <ServiciosNegocio servicios={negocio.serviciosOfrecidos} moneda={negocio.moneda} busqueda={busqueda} />;
-  } else if (arquetipo === "categorias" && negocio.rubrosDisponibles?.length) {
-    contenido = <CategoriasRubroNegocio rubros={negocio.rubrosDisponibles} />;
+    contenido = (
+      <ServiciosNegocio
+        servicios={negocio.serviciosOfrecidos}
+        moneda={negocio.moneda}
+        busqueda={busqueda}
+        titulo={tituloDe("servicios")}
+      />
+    );
+  } else if (arquetipo === "rubros" && negocio.rubrosDisponibles?.length) {
+    contenido = <CategoriasRubroNegocio rubros={negocio.rubrosDisponibles} titulo={tituloDe("rubros")} />;
   } else if (arquetipo === "ofertas" && (negocio.ofertas?.length || negocio.pasillos?.length)) {
     contenido = (
       <OfertasPasillosNegocio
+        titulo={tituloDe("ofertas")}
         ofertas={negocio.ofertas ?? []}
         pasillos={negocio.pasillos ?? []}
         negocioFotoUrl={negocio.fotoPrincipalUrl}
@@ -293,11 +307,28 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
       />
     );
   } else if (arquetipo === "catalogo" && productos && productos.length > 0) {
-    contenido = <CatalogoNegocio productos={productos} moneda={negocio.moneda} whatsapp={negocio.whatsapp} busqueda={busqueda} />;
+    contenido = (
+      <CatalogoNegocio
+        productos={productos}
+        moneda={negocio.moneda}
+        whatsapp={negocio.whatsapp}
+        busqueda={busqueda}
+        titulo={tituloDe("catalogo")}
+        campos={camposExtra}
+      />
+    );
   } else if (productos && productos.length > 0) {
-    contenido = <MenuNegocio productos={productos} moneda={negocio.moneda} busqueda={busqueda} />;
+    contenido = (
+      <MenuNegocio
+        productos={productos}
+        moneda={negocio.moneda}
+        busqueda={busqueda}
+        titulo={tituloDe("menu")}
+        campos={arquetipo === "menu" ? camposExtra : []}
+      />
+    );
   } else {
-    contenido = <GaleriaNegocio fotos={negocio.fotosGaleria} />;
+    contenido = <GaleriaNegocio fotos={negocio.fotosGaleria} titulo={tituloDe("galeria")} />;
   }
 
   // Parallax: la portada baja a 0.45× mientras se desplaza (parece moverse más lento que el

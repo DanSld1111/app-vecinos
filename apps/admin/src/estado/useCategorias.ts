@@ -1,9 +1,17 @@
 import { create } from "zustand";
-import { Categoria } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Categoria, TipoFicha } from "@app-vecinos/tipos";
 import { apiFetch, apiSubirArchivo, ErrorApi } from "../datos/clienteApi";
 
-type CategoriaNueva = { nombre: string; icono: string; arquetipoId?: string; servicioSlug?: string | null };
-type CategoriaEditable = { nombre?: string; icono?: string; arquetipoId?: string | null; servicioSlug?: string | null };
+/** Lo que define la ficha de la categoría — ver docs/decisiones/0080-fichas.md. */
+type ConfigFicha = {
+  /** null = hereda la ficha del servicio. */
+  ficha?: TipoFicha | null;
+  tituloSeccion?: string | null;
+  /** Campos nuevos van con clave vacía: la API la genera. */
+  atributosProducto?: AtributoProductoDef[];
+};
+type CategoriaNueva = { nombre: string; icono: string; servicioSlug?: string | null } & ConfigFicha;
+type CategoriaEditable = { nombre?: string; icono?: string; servicioSlug?: string | null } & ConfigFicha;
 
 interface EstadoCategorias {
   categorias: Categoria[];

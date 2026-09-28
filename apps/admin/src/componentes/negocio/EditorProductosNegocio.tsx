@@ -70,10 +70,11 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
     () => categorias.find((c) => c.id === negocio.categoriaIds[0]),
     [categorias, negocio.categoriaIds],
   );
-  const atributosDef = categoriaPrincipal?.atributosProducto ?? [];
+  // Los campos ocultos desde el panel (Categorías) no se piden, pero sus valores guardados se conservan.
+  const atributosDef = (categoriaPrincipal?.atributosProducto ?? []).filter((c) => !c.oculto);
   // "Sección del menú" solo tiene sentido para categorías tipo carta (restaurantes) — para
   // catálogo, servicios, rubros u ofertas es un campo sin relación con lo que se está cargando.
-  const mostrarSeccion = categoriaPrincipal?.arquetipoFicha === "menu";
+  const mostrarSeccion = categoriaPrincipal?.fichaEfectiva === "menu";
 
   async function guardar(datos: DatosProducto, fotoNueva: File | null) {
     // Al crear, la foto va en un segundo paso: hasta que el producto no existe no hay id al que

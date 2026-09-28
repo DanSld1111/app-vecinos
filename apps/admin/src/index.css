@@ -3620,3 +3620,157 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 /* "Pausar" en Publicidad tenía una regla más específica con fondo coral: también neutro */
 .fila-acciones-an .btn-accion-mini.pausar { background: transparent; color: var(--texto); border: 1px solid var(--borde-fuerte); }
 .fila-acciones-an .btn-accion-mini.pausar:hover { background: var(--superficie-hover); color: var(--texto); border-color: var(--texto); }
+
+/* ---- Fichas (decisión 0080): catálogo, selector y el celular de vista previa ---- */
+.con-telefono { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 28px; align-items: start; }
+.con-telefono-principal { min-width: 0; }
+.columna-telefono { position: sticky; top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.rotulo-telefono { margin: 0; font-size: 13px; color: var(--texto-suave); text-align: center; }
+.rotulo-telefono b { color: var(--texto); }
+.leyenda-telefono { margin: 0; font-size: 12.5px; color: var(--texto-suave); text-align: center; line-height: 1.6; max-width: 34ch; }
+
+.grid-fichas { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.grid-fichas.compacta { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 10px; }
+.tarjeta-ficha {
+  position: relative; display: flex; flex-direction: column; gap: 8px; text-align: left;
+  font: inherit; color: var(--texto); background: var(--superficie); border: 1.5px solid var(--borde);
+  border-radius: 14px; padding: 12px; cursor: pointer;
+}
+.tarjeta-ficha:hover { border-color: var(--borde-fuerte); }
+.tarjeta-ficha[aria-pressed="true"] { border-color: var(--verde-texto); box-shadow: 0 0 0 1px var(--verde-texto); }
+.tarjeta-ficha:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
+.tarjeta-ficha b { font-size: 14px; }
+.tarjeta-ficha.compacta { padding: 9px; gap: 6px; }
+.tarjeta-ficha.compacta b { font-size: 12.5px; }
+.desc-ficha { font-size: 12.5px; color: var(--texto-suave); line-height: 1.45; }
+.uso-ficha { font-size: 12px; font-weight: 700; color: var(--verde-texto); }
+.marca-ficha {
+  position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 12px;
+}
+.miniatura-ficha { display: grid; gap: 4px; align-content: start; height: 74px; padding: 8px; border-radius: 9px; background: var(--superficie-hundida); overflow: hidden; }
+.tarjeta-ficha.compacta .miniatura-ficha { height: 52px; padding: 6px; }
+.mf-fila { display: flex; align-items: center; gap: 4px; }
+.mf-cuad { width: 13px; height: 13px; border-radius: 3px; background: var(--borde-fuerte); flex: none; }
+.mf-lin { height: 5px; flex: 1; border-radius: 3px; background: var(--borde-fuerte); }
+.mf-lin.precio { flex: none; width: 16px; background: var(--verde-texto); opacity: .55; }
+.mf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; height: 58px; }
+.tarjeta-ficha.compacta .mf-grid { height: 40px; }
+.mf-grid.tres { grid-template-columns: 1fr 1fr 1fr; }
+.mf-grid.bajo, .tarjeta-ficha.compacta .mf-grid.bajo { height: 26px; }
+.mf-caja { border-radius: 4px; background: var(--borde-fuerte); }
+.mf-chips { display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; }
+.mf-chip { height: 11px; border-radius: 6px; background: var(--borde-fuerte); }
+.ficha-nueva {
+  display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 12px;
+  border: 1.5px dashed var(--borde-fuerte); border-radius: 14px; font-size: 13px; color: var(--texto-suave); line-height: 1.45;
+}
+.ficha-nueva b { color: var(--texto); font-size: 14px; }
+.detalle-ficha { margin-top: 16px; padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.detalle-ficha h4 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--texto-suave); }
+.detalle-ficha ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.7; }
+.pills-uso { display: flex; flex-wrap: wrap; gap: 6px; }
+.badge-ficha {
+  align-self: flex-start; font-size: 12px; font-weight: 700; padding: 3.5px 10.5px; border-radius: 999px;
+  background: var(--verde-suave); color: var(--verde-texto);
+}
+.badge-ficha.propia { background: var(--oro-suave); color: var(--oro); }
+
+/* Las opciones con radio dentro de un modal heredaban el estilo de ".campo-modal label" e
+   ".campo-modal input" (bloque y ancho completo): el radio quedaba suelto encima del texto. */
+.campo-modal label.opcion-ubicacion { display: flex; align-items: center; gap: 12px; margin-bottom: 0; font-size: 14px; font-weight: 400; color: var(--texto); }
+.campo-modal .opcion-ubicacion input { width: auto; padding: 0; }
+.campo-modal .opcion-ubicacion span { display: block; font-size: 12.5px; color: var(--texto-suave); }
+
+/* Modal ancho con el celular a la derecha (Categorías y Servicios). */
+.modal-card.modal-con-telefono { width: min(1060px, 95vw); display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+.modal-con-telefono .columna-telefono { top: 0; }
+.modal-con-telefono-form { min-width: 0; }
+.campos-extra { display: flex; flex-direction: column; gap: 6px; }
+.campo-extra { display: grid; grid-template-columns: minmax(0, 1fr) 124px minmax(0, 1.3fr) 64px; gap: 6px; align-items: center; }
+.campo-extra.cabecera { font-size: 12px; color: var(--texto-tenue); }
+.campo-modal .campo-extra input, .campo-modal .campo-extra select { padding: 7px 9px; font-size: 13px; }
+.campo-extra.oculto input, .campo-extra.oculto select { opacity: .5; }
+.acciones-campo { display: flex; gap: 2px; justify-content: flex-end; }
+.icono-campo { border: 0; background: none; color: var(--texto-suave); padding: 6px; border-radius: 8px; cursor: pointer; display: grid; place-items: center; font-size: 16px; }
+.icono-campo:hover { background: var(--superficie-hundida); color: var(--texto); }
+.campo-modal label.check-sin-ficha { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--texto-suave); }
+.campo-modal .check-sin-ficha input { width: auto; }
+.tabla-fichas-categorias { width: 100%; border-collapse: collapse; font-size: 13.5px; border: 1px solid var(--borde); border-radius: 12px; overflow: hidden; }
+.tabla-fichas-categorias th { text-align: left; font-size: 12px; font-weight: 600; color: var(--texto-tenue); padding: 8px 10px; border-bottom: 1px solid var(--borde); }
+.tabla-fichas-categorias td { padding: 8px 10px; border-bottom: 1px solid var(--borde); }
+.tabla-fichas-categorias tr:last-child td { border-bottom: 0; }
+.tabla-fichas-categorias tbody tr { cursor: pointer; }
+.tabla-fichas-categorias tbody tr:hover { background: var(--superficie-hover); }
+.tabla-fichas-categorias tr.en-vista { background: var(--verde-suave); }
+
+/* El celular: la pantalla usa siempre la paleta clara de la app, como un teléfono de verdad. */
+.tf-telefono { width: 300px; max-width: 100%; height: 600px; padding: 10px; border-radius: 40px; background: #0f1110; box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .45); }
+.tf-pantalla {
+  --tf-texto: #141a16; --tf-suave: #5f6862; --tf-linea: #e3e7e4; --tf-verde: #1a531a; --tf-chip: #f1f3f1;
+  height: 100%; overflow: hidden auto; scrollbar-width: none; border-radius: 31px; background: #fff; color: var(--tf-texto);
+  font-size: 12.5px; line-height: 1.4; transition: opacity .2s;
+}
+.tf-pantalla::-webkit-scrollbar { display: none; }
+.tf-pantalla.cargando { opacity: .55; }
+.tf-portada { position: relative; height: 150px; background: #eef1ee center / cover; }
+.tf-ini { position: absolute; inset: 0; display: grid; place-items: center; font-size: 40px; font-weight: 800; color: var(--tf-verde); }
+.tf-bot { position: absolute; top: 10px; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: #141a16; display: grid; place-items: center; font-size: 15px; }
+.tf-bot.izq { left: 10px; }
+.tf-bot.der { right: 10px; }
+.tf-cuerpo { padding: 12px 14px 24px; }
+.tf-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tf-suave); }
+.tf-nombre { margin: 2px 0 4px; font-size: 19px; font-weight: 800; line-height: 1.15; letter-spacing: -.015em; }
+.tf-desc { margin: 0 0 10px; color: var(--tf-suave); }
+.tf-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.tf-btn { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 0; border: 1.5px solid var(--tf-texto); border-radius: 9px; font-weight: 700; }
+.tf-btn.verde { background: var(--tf-verde); border-color: var(--tf-verde); color: #fff; }
+.tf-busca { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; padding: 6px 9px; border: 1.5px solid var(--tf-linea); border-radius: 9px; color: var(--tf-suave); }
+.tf-tit { margin: 4px 0 8px; font-size: 15px; font-weight: 800; }
+.tf-sub { margin: 12px 0 6px; font-size: 12.5px; font-weight: 700; }
+.tf-item { display: flex; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--tf-linea); }
+.tf-item:last-child { border-bottom: 0; }
+.tf-ft { width: 46px; height: 46px; flex: none; border-radius: 8px; background: #eef3ee center / cover; color: var(--tf-verde); display: grid; place-items: center; font-size: 18px; }
+.tf-ft.chico { width: 36px; height: 36px; font-size: 15px; }
+.tf-inf { flex: 1; min-width: 0; }
+.tf-inf b { display: block; font-size: 12.5px; }
+.tf-inf span { display: block; font-size: 11.5px; color: var(--tf-suave); }
+.tf-precio { color: var(--tf-verde); font-weight: 700; white-space: nowrap; }
+.tf-inf .tf-precio { color: var(--tf-verde); }
+.tf-attrs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.tf-inf .tf-attr, .tf-attr { display: inline-block; font-size: 10.5px; padding: 1px 7px; border-radius: 999px; background: var(--tf-chip); color: var(--tf-texto); }
+.tf-attr i { font-style: normal; color: var(--tf-suave); }
+.tf-fila-serv { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--tf-linea); }
+.tf-fila-serv .tf-precio { margin-left: auto; }
+.tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tf-card { overflow: hidden; border: 1px solid var(--tf-linea); border-radius: 10px; }
+.tf-card-img { aspect-ratio: 1; background: #eef1ee center / cover; display: grid; place-items: center; color: var(--tf-suave); font-weight: 700; font-size: 20px; }
+.tf-card-txt { padding: 6px 8px; }
+.tf-card-txt b { display: block; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tf-card-txt s { display: block; font-size: 10px; color: var(--tf-suave); }
+.tf-hoja { margin-top: 10px; padding: 10px; border: 1px solid var(--tf-linea); border-radius: 12px; background: #fafbfa; }
+.tf-hoja-rotulo { display: block; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--tf-suave); margin-bottom: 2px; }
+.tf-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tf-rubro { padding: 8px 10px; border: 1.5px solid var(--tf-linea); border-radius: 10px; font-size: 12px; font-weight: 600; }
+.tf-carrusel { display: flex; gap: 8px; overflow: hidden; }
+.tf-oferta { flex: 0 0 118px; overflow: hidden; border: 1px solid var(--tf-linea); border-radius: 10px; }
+.tf-oferta-img { position: relative; height: 62px; background: #eef1ee center / cover; }
+.tf-oferta-img em { position: absolute; top: 5px; left: 5px; padding: 1px 6px; border-radius: 999px; background: #c8532a; color: #fff; font-size: 9.5px; font-weight: 700; font-style: normal; }
+.tf-pasillo { padding: 4px 10px; border-radius: 999px; background: #f6ead4; color: #9a6a20; font-size: 11.5px; font-weight: 600; }
+.tf-gal { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tf-gal div { aspect-ratio: 1; border-radius: 10px; background: #eef1ee center / cover; }
+.tf-gal div.vacia { display: grid; place-items: center; color: var(--tf-suave); font-size: 11px; }
+.tf-nota { margin: 8px 0 0; font-size: 10.5px; font-style: italic; color: var(--tf-suave); }
+.destello { animation: destello-ficha .9s ease; }
+@keyframes destello-ficha { from { background: #fff3c4; } to { background: transparent; } }
+
+@media (max-width: 1100px) {
+  .con-telefono, .modal-card.modal-con-telefono { grid-template-columns: minmax(0, 1fr); }
+  .columna-telefono { position: static; }
+}
+@media (max-width: 640px) {
+  .detalle-ficha { grid-template-columns: 1fr; }
+  .campo-extra { grid-template-columns: minmax(0, 1fr) 110px 56px; }
+  .campo-extra > :nth-child(3) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .destello { animation: none; } }

@@ -16,12 +16,11 @@ import { ProfesionalesModule } from "./modulos/profesionales/profesionales.modul
 import { ServiciosAppModule } from "./modulos/servicios-app/servicios-app.module";
 import { PublicidadModule } from "./modulos/publicidad/publicidad.module";
 import { NovedadesModule } from "./modulos/novedades/novedades.module";
-import { ArquetiposModule } from "./modulos/arquetipos/arquetipos.module";
 import { ResenasModule } from "./modulos/resenas/resenas.module";
 import { FavoritosModule } from "./modulos/favoritos/favoritos.module";
 
 // Etapa 2 cerrada: los 7 módulos que definía docs/tecnica/10-fases-pendientes.pdf ya existen.
-// NovedadesModule y ArquetiposModule se sumaron después (ver docs/decisiones/0034-conexion-real-paneles.md)
+// NovedadesModule se sumó después (ver docs/decisiones/0034-conexion-real-paneles.md)
 // para terminar de conectar secciones del panel que hasta entonces solo vivían en memoria del navegador.
 // El único que queda deliberadamente fuera del panel admin es `pagos` — su esquema vive en
 // infraestructura/migraciones/0009_pagos_preparado.sql pero se activa recién cuando el modelo
@@ -47,7 +46,6 @@ import { FavoritosModule } from "./modulos/favoritos/favoritos.module";
     ServiciosAppModule,
     PublicidadModule,
     NovedadesModule,
-    ArquetiposModule,
     ResenasModule,
     FavoritosModule,
   ],

@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { FotoNegocio } from "./FotoNegocio";
 import { EntradaAnimada } from "./EntradaAnimada";
+import { atributosVisibles } from "../utilidades/fichaNegocio";
 
 
 function agruparPorCategoria(productos: Producto[]) {
@@ -25,7 +26,9 @@ function ItemMenu({
   colores,
   moneda,
   retraso,
+  campos,
 }: {
+  campos: AtributoProductoDef[];
   producto: Producto;
   indice: number;
   styles: ReturnType<typeof crearEstilos>;
@@ -43,6 +46,15 @@ function ItemMenu({
           {producto.descripcion}
         </Text>
         <Text style={styles.itemPrecio}>{formatearPrecio(producto.precio, moneda)}</Text>
+        {campos.length > 0 && atributosVisibles(producto.atributos, campos).length > 0 ? (
+          <View style={styles.filaAtributos}>
+            {atributosVisibles(producto.atributos, campos).map((a) => (
+              <Text key={a.clave} style={styles.chipAtributo}>
+                {a.texto}
+              </Text>
+            ))}
+          </View>
+        ) : null}
       </View>
     </EntradaAnimada>
   );
@@ -52,7 +64,13 @@ export function MenuNegocio({
   productos,
   moneda,
   busqueda = "",
+  titulo = "Menú",
+  campos = [],
 }: {
+  /** Título de la sección: el que configuró la categoría en el panel, o el de la ficha. */
+  titulo?: string;
+  /** Campos extra de la categoría (Talla, Color…), para mostrar cada valor con su etiqueta. */
+  campos?: AtributoProductoDef[];
   productos: Producto[];
   moneda: Moneda;
   /** Viene del buscador del header de la ficha, no de uno propio — ver app/negocio/[id]/index.tsx. */
@@ -70,7 +88,7 @@ export function MenuNegocio({
   if (filtrados.length === 0) {
     return (
       <View>
-        <Text style={styles.tituloSeccion}>Menú</Text>
+        <Text style={styles.tituloSeccion}>{titulo}</Text>
         <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
       </View>
     );
@@ -78,7 +96,7 @@ export function MenuNegocio({
 
   return (
     <View>
-      <Text style={styles.tituloSeccion}>Menú</Text>
+      <Text style={styles.tituloSeccion}>{titulo}</Text>
       {grupos.map((grupo) => (
         <View key={grupo.categoria} style={styles.grupo}>
           <Text style={styles.tituloGrupo}>{grupo.categoria}</Text>
@@ -94,6 +112,7 @@ export function MenuNegocio({
                 colores={colores}
                 moneda={moneda}
                 retraso={indice * 50}
+                campos={campos}
               />
             );
           })}
@@ -161,6 +180,22 @@ function crearEstilos(colores: PaletaColores) {
       ...tipografia.cuerpoDestacado,
       color: colores.primarioFuerte,
       marginTop: 2,
+    },
+    filaAtributos: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 4,
+      marginTop: 4,
+    },
+    chipAtributo: {
+      ...tipografia.pie,
+      fontSize: 11,
+      color: colores.textoSuave,
+      backgroundColor: colores.superficieHundida,
+      borderRadius: radios.sm,
+      paddingHorizontal: 6,
+      paddingVertical: 1,
+      overflow: "hidden",
     },
     sinResultados: {
       ...tipografia.cuerpo,
