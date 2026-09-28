@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { useTema } from "../../src/estado/useTema";
@@ -37,7 +38,7 @@ export default function AjustesNotificaciones() {
                     style={[styles.fila, i > 0 && styles.filaConBorde]}
                   >
                     <View style={[styles.icono, { backgroundColor: categoria.colorFondo }]}>
-                      <Text style={styles.emoji}>{categoria.emoji}</Text>
+                      <Ionicons name={categoria.icono} size={16} color={categoria.colorTexto} />
                     </View>
                     <View style={styles.info}>
                       <Text style={styles.nombre}>{categoria.nombre}</Text>
@@ -57,7 +58,7 @@ export default function AjustesNotificaciones() {
 
       <View style={styles.avisoProximamente}>
         <Text style={styles.avisoProximamenteTexto}>
-          ✉️ Los avisos por correo llegarán cuando la app tenga cuentas de usuario (próxima etapa) —
+          Los avisos por correo llegarán cuando la app tenga cuentas de usuario (próxima etapa) —
           por ahora todo se recibe por notificación dentro de la app.
         </Text>
       </View>
@@ -89,37 +90,26 @@ function crearEstilos(colores: PaletaColores) {
       gap: espaciado.sm,
     },
     tituloGrupo: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
+      ...tipografia.subtitulo,
+      fontSize: 15,
+      color: colores.texto,
     },
-    sombra: {
-      borderRadius: radios.lg,
-      backgroundColor: colores.superficie,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      elevation: 2,
-    },
-    tarjeta: {
-      borderRadius: radios.lg,
-      overflow: "hidden",
-    },
+    sombra: {},
+    tarjeta: {},
     fila: {
       flexDirection: "row",
       alignItems: "center",
-      gap: espaciado.sm,
-      padding: espaciado.md,
+      gap: espaciado.md,
+      paddingVertical: espaciado.md,
     },
     filaConBorde: {
-      borderTopWidth: 1,
-      borderTopColor: colores.borde,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colores.bordeFuerte,
     },
     icono: {
-      width: 36,
-      height: 36,
-      borderRadius: radios.md,
+      width: 34,
+      height: 34,
+      borderRadius: 17,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -138,14 +128,14 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.textoSuave,
     },
     avisoProximamente: {
-      backgroundColor: colores.primarioSuave,
-      borderRadius: radios.md,
+      backgroundColor: colores.superficieHundida,
+      borderRadius: 10,
       padding: espaciado.md,
       marginTop: espaciado.xs,
     },
     avisoProximamenteTexto: {
       ...tipografia.pie,
-      color: colores.primarioFuerte,
+      color: colores.textoSuave,
       lineHeight: 17,
     },
   });

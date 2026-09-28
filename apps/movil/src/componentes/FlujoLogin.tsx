@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { marca } from "../config/marca";
 import { useComunidadActiva } from "../estado/comunidadActiva";
 import { useSesion } from "../estado/useSesion";
 import { BotonPrimario } from "./BotonPrimario";
+
+const FOTO_INGRESO = require("../../assets/servicios/guia-negocios.jpg");
 
 type Paso = "ingreso" | "registro" | "olvide-correo" | "olvide-codigo";
 
@@ -59,21 +61,6 @@ export function FlujoLogin() {
       onOlvideClave={() => setPaso("olvide-correo")}
       onSaltar={continuarComoInvitado}
     />
-  );
-}
-
-function IsotipoBlanco({ size = 26 }: { size?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      <Path
-        d="M13 11 H23 M13 11 V29 M13 20 H20 M13 29 H21"
-        stroke="#fff"
-        strokeWidth={3.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <Path d="M21 21 C21 15 26 11.5 31 10.5 C29.5 16 26 20 21 21 Z" fill="#fff" />
-    </Svg>
   );
 }
 
@@ -179,23 +166,25 @@ function PantallaIngreso({
 
   return (
     <View style={styles.pantallaIngreso}>
-      <View style={styles.circuloA} />
-      <View style={styles.circuloB} />
-
       <ScrollView
-        contentContainerStyle={[styles.scrollIngreso, { paddingTop: espaciado.xxl + insets.top }]}
+        contentContainerStyle={styles.scrollIngreso}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-      <View style={styles.insignia}>
-        <IsotipoBlanco size={26} />
-      </View>
-      <Text style={styles.insigniaTexto}>{marca.nombreApp}</Text>
-      <Text style={styles.tituloIngreso}>
-        Uniendo a cada vecino para hacer crecer la comunidad de nuestro distrito
-      </Text>
+      <ImageBackground source={FOTO_INGRESO} style={[styles.portadaIngreso, { paddingTop: insets.top + espaciado.lg }]} resizeMode="cover">
+        <LinearGradient
+          colors={["rgba(0,0,0,0.25)", "rgba(0,0,0,0)", "rgba(0,0,0,0.75)"]}
+          locations={[0, 0.35, 1]}
+          style={StyleSheet.absoluteFill}
+        />
+        <Text style={styles.marcaIngreso}>{marca.nombreApp}</Text>
+        <Text style={styles.tituloIngreso} accessibilityRole="header">
+          Encuentra todo lo de tu comunidad
+        </Text>
+      </ImageBackground>
 
       <View style={styles.tarjetaIngreso}>
-        <Text style={styles.tarjetaTitulo}>Ingresar</Text>
+        <Text style={styles.tarjetaTitulo}>Ingresa con tu correo para entrar a tu cuenta.</Text>
 
         <CampoTexto
           label="Correo"
@@ -246,8 +235,8 @@ function PantallaIngreso({
 
         <BotonGoogle />
 
-        <Pressable style={styles.saltar} onPress={onSaltar}>
-          <Text style={styles.saltarTexto}>Continuar sin iniciar sesión (modo prueba)</Text>
+        <Pressable style={styles.saltar} onPress={onSaltar} accessibilityRole="button">
+          <Text style={styles.saltarTexto}>Entrar en modo invitado</Text>
         </Pressable>
 
         <Text style={styles.pieLegal}>
@@ -564,68 +553,41 @@ function crearEstilos(colores: PaletaColores) {
 
     pantallaIngreso: {
       flex: 1,
-      backgroundColor: colores.primario,
-      overflow: "hidden",
+      backgroundColor: colores.fondo,
     },
     scrollIngreso: {
-      paddingHorizontal: espaciado.xl,
-      paddingTop: espaciado.xxl,
-      paddingBottom: espaciado.xl,
       flexGrow: 1,
+      paddingBottom: espaciado.xl,
     },
-    circuloA: {
-      position: "absolute",
-      top: -60,
-      right: -60,
-      width: 180,
-      height: 180,
-      borderRadius: 90,
-      backgroundColor: colores.primarioFuerte,
-      opacity: 0.35,
+    portadaIngreso: {
+      height: 300,
+      justifyContent: "space-between",
+      paddingHorizontal: espaciado.xl,
+      paddingBottom: espaciado.lg,
+      overflow: "hidden",
     },
-    circuloB: {
-      position: "absolute",
-      bottom: -90,
-      left: -70,
-      width: 220,
-      height: 220,
-      borderRadius: 110,
-      backgroundColor: "#000",
-      opacity: 0.12,
-    },
-    insignia: {
-      width: 44,
-      height: 44,
-      borderRadius: 13,
-      backgroundColor: "rgba(255,255,255,0.16)",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: espaciado.sm,
-    },
-    insigniaTexto: {
-      ...tipografia.etiqueta,
-      color: "rgba(255,255,255,0.75)",
-      letterSpacing: 1,
-      marginBottom: 6,
+    marcaIngreso: {
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
+      fontSize: 18,
+      letterSpacing: 0.5,
+      color: "#ffffff",
     },
     tituloIngreso: {
-      ...tipografia.displayGrande,
-      fontSize: 21,
-      lineHeight: 28,
-      color: "#fff",
-      maxWidth: 260,
-      marginBottom: espaciado.xl,
+      ...tipografia.titulo,
+      fontSize: 30,
+      lineHeight: 33,
+      color: "#ffffff",
+      maxWidth: 300,
     },
     tarjetaIngreso: {
       backgroundColor: colores.fondo,
-      borderRadius: radios.lg + 6,
-      padding: espaciado.lg,
+      paddingHorizontal: espaciado.xl,
+      paddingTop: espaciado.lg,
     },
     tarjetaTitulo: {
-      ...tipografia.display,
-      fontSize: 15,
-      color: colores.primario,
-      marginBottom: espaciado.md,
+      ...tipografia.cuerpo,
+      color: colores.textoSuave,
+      marginBottom: espaciado.lg,
     },
     tituloPaso: {
       ...tipografia.displayGrande,
@@ -638,8 +600,9 @@ function crearEstilos(colores: PaletaColores) {
       marginBottom: espaciado.xl,
     },
     campoLabel: {
-      ...tipografia.etiqueta,
-      color: colores.textoSuave,
+      ...tipografia.cuerpoDestacado,
+      fontSize: 13,
+      color: colores.texto,
       marginBottom: espaciado.xs,
     },
     filaDosCampos: {
@@ -722,9 +685,9 @@ function crearEstilos(colores: PaletaColores) {
       marginBottom: espaciado.md,
     },
     saltarTexto: {
-      ...tipografia.pie,
-      color: colores.acentoFuerte,
-      fontFamily: "SchibstedGrotesk_700Bold",
+      ...tipografia.cuerpoDestacado,
+      fontSize: 13.5,
+      color: colores.primario,
     },
     pieLegal: {
       ...tipografia.pie,
@@ -753,8 +716,8 @@ function crearEstilos(colores: PaletaColores) {
 
     campoGenerico: {
       borderWidth: 1.5,
-      borderColor: colores.borde,
-      borderRadius: radios.md,
+      borderColor: colores.bordeFuerte,
+      borderRadius: 10,
       paddingHorizontal: espaciado.md,
       paddingVertical: espaciado.sm + 2,
     },

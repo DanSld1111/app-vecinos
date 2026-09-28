@@ -1,24 +1,34 @@
 import { useRef, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
-import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
+import {
+  Image,
+  ImageSourcePropType,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PaletaColores, espaciado, tipografia, useColores } from "../disenio";
 import { marca } from "../config/marca";
 import { BotonPrimario } from "./BotonPrimario";
 import { useOnboarding } from "../estado/useOnboarding";
 
-const PASOS: { icono: keyof typeof Ionicons.glyphMap; titulo: string; texto: string }[] = [
+const PASOS: { foto: ImageSourcePropType; titulo: string; texto: string }[] = [
   {
-    icono: "search",
-    titulo: "Encuentra lo de tu barrio",
+    foto: require("../../assets/servicios/restaurantes.jpg"),
+    titulo: "Encuentra lo de tu comunidad",
     texto: "Negocios, restaurantes y servicios de tu comunidad, todo en un solo lugar.",
   },
   {
-    icono: "megaphone-outline",
+    foto: require("../../assets/servicios/guia-negocios.jpg"),
     titulo: "Entérate primero",
     texto: "Avisos de la junta vecinal y de la municipalidad, verificados antes de llegarte.",
   },
   {
-    icono: "storefront-outline",
+    foto: require("../../assets/servicios/market-space.jpg"),
     titulo: "¿Tienes un negocio?",
     texto: "Entra en \"Modo gestión\" desde tu perfil para publicar tu ficha, fotos y ofertas.",
   },
@@ -28,6 +38,7 @@ const PASOS: { icono: keyof typeof Ionicons.glyphMap; titulo: string; texto: str
 export function Onboarding() {
   const colores = useColores();
   const styles = crearEstilos(colores);
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const marcarVisto = useOnboarding((estado) => estado.marcarVisto);
   const [paso, setPaso] = useState(0);
@@ -52,7 +63,7 @@ export function Onboarding() {
   }
 
   return (
-    <View style={styles.contenedor}>
+    <View style={[styles.contenedor, { paddingTop: insets.top }]}>
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -63,9 +74,7 @@ export function Onboarding() {
       >
         {PASOS.map((p, i) => (
           <View key={i} style={[styles.pagina, { width }]}>
-            <View style={styles.circuloIcono}>
-              <Ionicons name={p.icono} size={40} color={colores.primario} />
-            </View>
+            <Image source={p.foto} style={styles.foto} resizeMode="cover" accessibilityIgnoresInvertColors />
             <Text style={styles.titulo}>{p.titulo}</Text>
             <Text style={styles.texto}>{p.texto}</Text>
           </View>
@@ -95,22 +104,14 @@ export function Onboarding() {
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     contenedor: { flex: 1, backgroundColor: colores.fondo },
-    pagina: { flex: 1, alignItems: "center", justifyContent: "center", padding: espaciado.xl },
-    circuloIcono: {
-      width: 88,
-      height: 88,
-      borderRadius: radios.completo,
-      backgroundColor: colores.primarioSuave,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: espaciado.lg,
-    },
-    titulo: { ...tipografia.titulo, color: colores.texto, textAlign: "center", marginBottom: espaciado.sm },
-    texto: { ...tipografia.cuerpo, color: colores.textoSuave, textAlign: "center" },
-    pie: { padding: espaciado.lg, gap: espaciado.md, alignItems: "center" },
-    puntos: { flexDirection: "row", gap: espaciado.xs },
-    punto: { width: 8, height: 8, borderRadius: 4, backgroundColor: colores.superficieHundida2 },
-    puntoActivo: { backgroundColor: colores.primario, width: 20 },
-    omitir: { ...tipografia.cuerpoDestacado, fontSize: 13, color: colores.textoTenue },
+    pagina: { flex: 1, justifyContent: "flex-end", padding: espaciado.lg, paddingBottom: espaciado.md },
+    foto: { flex: 1, width: "100%", borderRadius: 12, marginBottom: espaciado.xl, backgroundColor: colores.superficieHundida },
+    titulo: { ...tipografia.titulo, fontSize: 28, lineHeight: 31, color: colores.texto, marginBottom: espaciado.sm },
+    texto: { ...tipografia.cuerpo, fontSize: 15, lineHeight: 21, color: colores.textoSuave },
+    pie: { padding: espaciado.lg, gap: espaciado.md, alignItems: "stretch" },
+    puntos: { flexDirection: "row", gap: 4 },
+    punto: { flex: 1, height: 3, borderRadius: 2, backgroundColor: colores.superficieHundida2 },
+    puntoActivo: { backgroundColor: colores.texto },
+    omitir: { ...tipografia.cuerpoDestacado, fontSize: 13.5, color: colores.textoSuave, textAlign: "center" },
   });
 }

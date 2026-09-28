@@ -1,13 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 
-const EMOJI_POR_RUBRO: Record<string, string> = {
-  Pintura: "🎨",
-  Electricidad: "💡",
-  Gasfitería: "🚰",
-  Herramientas: "🔧",
-  Cerrajería: "🔒",
-  Jardinería: "🌱",
+const ICONO_POR_RUBRO: Record<string, keyof typeof Ionicons.glyphMap> = {
+  Pintura: "color-palette-outline",
+  Electricidad: "flash-outline",
+  Gasfitería: "water-outline",
+  Herramientas: "hammer-outline",
+  Cerrajería: "key-outline",
+  Jardinería: "leaf-outline",
 };
 
 export function CategoriasRubroNegocio({ rubros }: { rubros: string[] }) {
@@ -23,7 +24,7 @@ export function CategoriasRubroNegocio({ rubros }: { rubros: string[] }) {
         {rubros.map((rubro) => (
           <View key={rubro} style={styles.tarjeta}>
             <View style={styles.icono}>
-              <Text style={styles.emoji}>{EMOJI_POR_RUBRO[rubro] ?? "🏷️"}</Text>
+              <Ionicons name={ICONO_POR_RUBRO[rubro] ?? "pricetag-outline"} size={16} color={colores.primario} />
             </View>
             <Text style={styles.nombre}>{rubro}</Text>
           </View>

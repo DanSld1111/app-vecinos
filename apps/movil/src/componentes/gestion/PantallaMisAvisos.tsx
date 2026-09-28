@@ -111,7 +111,7 @@ export function PantallaMisAvisos({ cuenta, token }: { cuenta: Cuenta; token: st
 
       {error ? (
         <View style={styles.cajaAlerta}>
-          <Text style={styles.textoAlerta}>⚠️ {error}</Text>
+          <Text style={styles.textoAlerta}>{error}</Text>
         </View>
       ) : null}
 
@@ -190,7 +190,7 @@ function DetalleAviso({ aviso, onVolver }: { aviso: Aviso; onVolver: () => void 
       <View style={[styles.cajaNota, esPublicado ? styles.cajaNotaExito : styles.cajaNotaEspera]}>
         <Text style={[styles.textoNota, { color: esPublicado ? colores.primarioFuerte : (oscuro ? "#e0b565" : "#b8862e") }]}>
           {esPublicado
-            ? "✅ Este aviso ya está publicado y visible para los vecinos."
+            ? "Este aviso ya está publicado y visible para los vecinos."
             : "⏳ En revisión por el equipo ELISUR. Te avisaremos apenas quede aprobado o si hay algo que corregir."}
         </Text>
       </View>
@@ -264,7 +264,7 @@ function EditorAviso({
 
       {modo === "corregir" && aviso ? (
         <View style={[styles.cajaNota, styles.cajaNotaError]}>
-          <Text style={[styles.textoNota, { color: colores.error }]}>✕ Motivo del rechazo: "{aviso.motivoRechazo}"</Text>
+          <Text style={[styles.textoNota, { color: colores.error }]}>Motivo del rechazo: "{aviso.motivoRechazo}"</Text>
         </View>
       ) : (
         <View style={[styles.cajaNota, styles.cajaNotaEspera]}>
@@ -315,7 +315,7 @@ function EditorAviso({
 
       {error ? (
         <View style={styles.cajaAlerta}>
-          <Text style={styles.textoAlerta}>⚠️ {error}</Text>
+          <Text style={styles.textoAlerta}>{error}</Text>
         </View>
       ) : null}
 

@@ -177,7 +177,7 @@ export function GuiaListado({
           keyExtractor={(item) => item.id}
           numColumns={esCatalogo ? 2 : 1}
           contentContainerStyle={{ paddingBottom: espaciado.xl }}
-          ItemSeparatorComponent={undefined}
+          ItemSeparatorComponent={plantilla === "menu" ? () => <View style={{ height: espaciado.md }} /> : undefined}
           ListEmptyComponent={<EstadoVacio titulo={textos.buscar.sinResultados} />}
           renderItem={({ item, index }) => (
             <EntradaAnimada

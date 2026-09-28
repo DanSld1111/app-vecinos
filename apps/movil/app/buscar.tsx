@@ -20,7 +20,7 @@ import { useCategorias } from "../src/datos/hooks/useCategorias";
 import { useBusquedasRecientes } from "../src/estado/useBusquedasRecientes";
 import { TarjetaNegocio } from "../src/componentes/TarjetaNegocio";
 import { EstadoVacio } from "../src/componentes/EstadoVacio";
-import { AvatarNegocio } from "../src/componentes/AvatarNegocio";
+import { FotoNegocio } from "../src/componentes/FotoNegocio";
 import { SinFoto } from "../src/componentes/SinFoto";
 import { useAnuncios } from "../src/datos/hooks/useAnuncios";
 import { recolectarOfertas } from "../src/utilidades/ofertas";
@@ -92,10 +92,10 @@ export default function BuscarPantallaCompleta() {
           style={styles.backBtn}
           onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
         >
-          <Ionicons name="arrow-back" size={18} color={colores.texto} />
+          <Ionicons name="chevron-back" size={24} color={colores.texto} />
         </Pressable>
         <View style={styles.inputFila}>
-          <Ionicons name="search" size={16} color={colores.textoTenue} />
+          <Ionicons name="search" size={16} color={colores.textoSuave} />
           <TextInput
             autoFocus
             value={texto}
@@ -161,7 +161,6 @@ export default function BuscarPantallaCompleta() {
 
           {ofertas.length > 0 ? (
             <View style={styles.bannerOfertas}>
-              <Text style={styles.ofertasEyebrow}>Solo para ti</Text>
               <Text style={styles.ofertasTitulo}>Ofertas de tus negocios de siempre</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filaOfertas}>
                 {ofertas.map(({ negocioId, negocioNombre, negocioFotoUrl, oferta, moneda }) => (
@@ -170,11 +169,7 @@ export default function BuscarPantallaCompleta() {
                     style={styles.tarjetaOferta}
                     onPress={() => router.push(`/negocio/${negocioId}`)}
                   >
-                    {negocioFotoUrl ? (
-                      <Image source={{ uri: urlCompleta(negocioFotoUrl) }} style={styles.fotoOferta} />
-                    ) : (
-                      <SinFoto icono="pricetag-outline" tamanoIcono={20} style={styles.fotoOferta} />
-                    )}
+                    <FotoNegocio nombre={negocioNombre} url={negocioFotoUrl} style={styles.fotoOferta} tamanoIniciales={24} />
                     <Text style={styles.cintaOferta}>{oferta.etiqueta}</Text>
                     <View style={styles.infoOferta}>
                       <Text style={styles.negocioOferta} numberOfLines={1}>
@@ -204,11 +199,7 @@ export default function BuscarPantallaCompleta() {
                     style={styles.visitado}
                     onPress={() => router.push(`/negocio/${negocio.id}`)}
                   >
-                    {negocio.fotoPrincipalUrl ? (
-                      <Image source={{ uri: urlCompleta(negocio.fotoPrincipalUrl) }} style={styles.fotoVisitado} />
-                    ) : (
-                      <AvatarNegocio nombre={negocio.nombre} size={56} />
-                    )}
+                    <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.fotoVisitado} tamanoIniciales={18} />
                     <Text style={styles.nombreVisitado} numberOfLines={2}>
                       {negocio.nombre}
                     </Text>
@@ -239,11 +230,7 @@ export default function BuscarPantallaCompleta() {
                   {anuncio.detalle}
                 </Text>
               </View>
-              {anuncio.negocioId ? (
-                <View style={styles.anuncioCta}>
-                  <Text style={styles.anuncioCtaTexto}>Ver</Text>
-                </View>
-              ) : null}
+              {anuncio.negocioId ? <Ionicons name="chevron-forward" size={16} color={colores.textoTenue} /> : null}
             </Pressable>
           ) : null}
 
@@ -289,10 +276,8 @@ function crearEstilos(colores: PaletaColores) {
       paddingBottom: espaciado.sm,
     },
     backBtn: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: colores.superficieHundida,
+      width: 36,
+      height: 40,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -301,15 +286,12 @@ function crearEstilos(colores: PaletaColores) {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.sm,
-      backgroundColor: colores.superficie,
-      borderRadius: radios.completo,
+      backgroundColor: colores.fondo,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      borderColor: colores.texto,
       paddingHorizontal: espaciado.md,
       height: 44,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      elevation: 2,
     },
     input: {
       flex: 1,
@@ -331,8 +313,7 @@ function crearEstilos(colores: PaletaColores) {
       marginBottom: espaciado.xs,
     },
     tituloSeccion: {
-      ...tipografia.displaySeccion,
-      fontSize: 15,
+      ...tipografia.subtitulo,
       color: colores.texto,
     },
     limpiar: {
@@ -369,11 +350,7 @@ function crearEstilos(colores: PaletaColores) {
       fontWeight: "600",
     },
 
-    bannerOfertas: {
-      backgroundColor: colores.primario,
-      borderRadius: radios.lg,
-      padding: espaciado.md,
-    },
+    bannerOfertas: {},
     ofertasEyebrow: {
       ...tipografia.etiqueta,
       fontSize: 10.5,
@@ -381,26 +358,26 @@ function crearEstilos(colores: PaletaColores) {
       textTransform: "uppercase",
     },
     ofertasTitulo: {
-      ...tipografia.displaySeccion,
-      fontSize: 17,
-      color: "#ffffff",
-      marginTop: 2,
-      marginBottom: espaciado.md,
+      ...tipografia.subtitulo,
+      color: colores.texto,
+      marginBottom: espaciado.sm,
     },
     filaOfertas: {
-      marginHorizontal: -espaciado.md,
-      paddingHorizontal: espaciado.md,
+      marginHorizontal: -espaciado.lg,
+      paddingHorizontal: espaciado.lg,
     },
     tarjetaOferta: {
-      width: 122,
-      marginRight: espaciado.sm,
-      backgroundColor: colores.superficie,
-      borderRadius: radios.md,
+      width: 150,
+      marginRight: espaciado.sm + 2,
+      backgroundColor: colores.fondo,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colores.borde,
       overflow: "hidden",
     },
     fotoOferta: {
       width: "100%",
-      height: 78,
+      height: 96,
     },
     cintaOferta: {
       ...tipografia.pie,
@@ -413,7 +390,8 @@ function crearEstilos(colores: PaletaColores) {
       left: 6,
       paddingHorizontal: 7,
       paddingVertical: 3,
-      borderRadius: radios.sm,
+      borderRadius: 4,
+      overflow: "hidden",
     },
     infoOferta: {
       padding: espaciado.sm,
@@ -421,10 +399,8 @@ function crearEstilos(colores: PaletaColores) {
     },
     negocioOferta: {
       ...tipografia.pie,
-      fontSize: 9.5,
-      fontWeight: "800",
-      color: colores.primarioFuerte,
-      textTransform: "uppercase",
+      fontSize: 11,
+      color: colores.textoSuave,
     },
     nombreOferta: {
       ...tipografia.pie,
@@ -440,8 +416,9 @@ function crearEstilos(colores: PaletaColores) {
     },
     precioOferta: {
       ...tipografia.cuerpoDestacado,
-      fontSize: 13,
-      color: colores.primarioFuerte,
+      fontFamily: "SchibstedGrotesk_700Bold",
+      fontSize: 13.5,
+      color: colores.texto,
     },
 
     visitado: {
@@ -457,9 +434,9 @@ function crearEstilos(colores: PaletaColores) {
     },
     nombreVisitado: {
       ...tipografia.pie,
-      fontSize: 10.5,
-      fontWeight: "700",
-      color: colores.textoSuave,
+      fontSize: 11.5,
+      fontFamily: "SchibstedGrotesk_600SemiBold",
+      color: colores.texto,
       textAlign: "center",
     },
 
@@ -467,8 +444,8 @@ function crearEstilos(colores: PaletaColores) {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.md,
-      backgroundColor: colores.primarioSuave,
-      borderRadius: radios.lg,
+      backgroundColor: colores.superficieHundida,
+      borderRadius: 10,
       padding: espaciado.sm + 2,
     },
     anuncioIcono: {
@@ -482,7 +459,7 @@ function crearEstilos(colores: PaletaColores) {
     anuncioFoto: {
       width: 52,
       height: 52,
-      borderRadius: radios.md,
+      borderRadius: 8,
     },
     anuncioNombre: {
       ...tipografia.displaySeccion,
@@ -511,20 +488,17 @@ function crearEstilos(colores: PaletaColores) {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.md,
-      paddingVertical: espaciado.xs + 2,
+      paddingVertical: espaciado.sm + 2,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colores.bordeFuerte,
     },
     numeroTendencia: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      backgroundColor: colores.texto,
-      alignItems: "center",
-      justifyContent: "center",
+      width: 18,
     },
     numeroTendenciaTexto: {
-      ...tipografia.pie,
-      fontWeight: "800",
-      color: "#ffffff",
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
+      fontSize: 16,
+      color: colores.textoTenue,
     },
     nombreTendencia: {
       ...tipografia.cuerpoDestacado,
@@ -532,11 +506,10 @@ function crearEstilos(colores: PaletaColores) {
       textTransform: "capitalize",
     },
     mostrarMas: {
-      ...tipografia.pie,
-      fontWeight: "800",
-      color: colores.primarioFuerte,
-      textAlign: "center",
-      marginTop: espaciado.xs,
+      ...tipografia.cuerpoDestacado,
+      fontSize: 13,
+      color: colores.primario,
+      marginTop: espaciado.sm,
     },
   });
 }

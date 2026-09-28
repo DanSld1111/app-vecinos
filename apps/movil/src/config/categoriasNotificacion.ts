@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { PaletaColores } from "../disenio";
 
 export type GrupoNotificacion = "comunidad" | "negocios" | "app";
@@ -8,6 +9,8 @@ export interface CategoriaNotificacion {
   nombre: string;
   descripcion: string;
   emoji: string;
+  /** Ícono de línea que reemplaza al emoji en pantalla (el emoji queda para el texto de la push). */
+  icono: keyof typeof Ionicons.glyphMap;
   colorFondo: string;
   colorTexto: string;
   /** Si empieza activada por defecto la primera vez que el usuario abre los ajustes. */
@@ -22,6 +25,7 @@ export const GRUPOS_NOTIFICACION: { id: GrupoNotificacion; nombre: string }[] = 
 
 interface BaseCategoria {
   id: string;
+  icono: keyof typeof Ionicons.glyphMap;
   grupo: GrupoNotificacion;
   nombre: string;
   descripcion: string;
@@ -43,6 +47,7 @@ const CATEGORIAS_BASE: BaseCategoria[] = [
     nombre: "Alertas de seguridad",
     descripcion: "Serenazgo y emergencias del vecindario.",
     emoji: "🚨",
+    icono: "shield-outline",
     color: "acento",
     porDefecto: true,
   },
@@ -52,6 +57,7 @@ const CATEGORIAS_BASE: BaseCategoria[] = [
     nombre: "Avisos municipales y junta vecinal",
     descripcion: "Cortes de servicio, reuniones, campañas.",
     emoji: "🏛️",
+    icono: "business-outline",
     color: "mostaza",
     porDefecto: true,
   },
@@ -61,6 +67,7 @@ const CATEGORIAS_BASE: BaseCategoria[] = [
     nombre: "Ofertas y promociones",
     descripcion: "Descuentos de negocios cerca de ti.",
     emoji: "🎉",
+    icono: "pricetag-outline",
     color: "primario",
     porDefecto: true,
   },
@@ -70,6 +77,7 @@ const CATEGORIAS_BASE: BaseCategoria[] = [
     nombre: "Nuevos negocios en tu zona",
     descripcion: "Cuando se suma un negocio verificado.",
     emoji: "🏪",
+    icono: "storefront-outline",
     color: "primario",
     porDefecto: false,
   },
@@ -79,6 +87,7 @@ const CATEGORIAS_BASE: BaseCategoria[] = [
     nombre: "Novedades de la app",
     descripcion: "Funciones nuevas y mejoras.",
     emoji: "✨",
+    icono: "sparkles-outline",
     color: "neutro",
     porDefecto: true,
   },

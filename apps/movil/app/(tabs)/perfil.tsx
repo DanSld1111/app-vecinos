@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { ImageBackground, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { iniciales } from "../../src/componentes/FotoNegocio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { marca } from "../../src/config/marca";
@@ -15,6 +17,8 @@ import { HojaInferior } from "../../src/componentes/HojaInferior";
 import { SelectorComunidad } from "../../src/componentes/SelectorComunidad";
 import { SobreComunidad } from "../../src/componentes/SobreComunidad";
 import { Interruptor } from "../../src/componentes/Interruptor";
+
+const FOTO_INVITAR = require("../../assets/servicios/guia-negocios.jpg");
 
 function Grupo({ children }: { children: React.ReactNode }) {
   const colores = useColores();
@@ -46,9 +50,14 @@ function FilaPerfil({
   const colores = useColores();
   const styles = crearEstilos(colores);
   return (
-    <Pressable style={[styles.fila, primero && styles.filaSinBorde]} onPress={onPress}>
+    <Pressable
+      style={[styles.fila, primero && styles.filaSinBorde]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={texto}
+    >
       <View style={[styles.filaIcono, peligro && styles.filaIconoPeligro]}>
-        <Ionicons name={icono} size={17} color={peligro ? colores.acentoFuerte : colores.primarioFuerte} />
+        <Ionicons name={icono} size={19} color={peligro ? colores.acentoFuerte : colores.texto} />
       </View>
       <Text style={[styles.filaTexto, peligro && styles.filaTextoPeligro]}>
         {texto}
@@ -81,7 +90,7 @@ function FilaInterruptor({
   return (
     <View style={[styles.fila, primero && styles.filaSinBorde]}>
       <View style={styles.filaIcono}>
-        <Ionicons name={icono} size={17} color={colores.primarioFuerte} />
+        <Ionicons name={icono} size={19} color={colores.texto} />
       </View>
       <Text style={styles.filaTexto}>
         {texto}
@@ -117,38 +126,40 @@ export default function Perfil() {
   return (
     <ScrollView style={styles.contenedor} contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}>
       <View style={styles.header}>
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={26} color={colores.primarioFuerte} />
-          </View>
-          <View style={styles.avatarEditar}>
-            <Ionicons name="pencil" size={10} color="#ffffff" />
-          </View>
+        <View style={styles.avatar}>
+          {usuario ? (
+            <Text style={styles.avatarIniciales}>{iniciales(nombreMostrado)}</Text>
+          ) : (
+            <Ionicons name="person-outline" size={24} color={colores.primario} />
+          )}
         </View>
         <View style={styles.headerTexto}>
-          <Text style={styles.titulo}>{nombreMostrado}</Text>
-          <View style={styles.filaZona}>
-            <Text style={styles.vecinoDe}>Vecino de</Text>
-            <View style={styles.pillZona}>
-              <Text style={styles.pillZonaTexto}>{comunidad?.nombre ?? "…"}</Text>
-            </View>
-          </View>
+          <Text style={styles.titulo} numberOfLines={1}>
+            {nombreMostrado}
+          </Text>
+          <Text style={styles.vecinoDe}>
+            {usuario ? "Vecino de " : "Modo invitado · "}
+            {comunidad?.nombre ?? "…"}
+          </Text>
         </View>
       </View>
 
-      <Pressable style={styles.statSombra} onPress={() => router.push("/favoritos")}>
-        <View style={styles.statCardAncha}>
-          <View style={[styles.statIcono, { backgroundColor: colores.primarioSuave }]}>
-            <Ionicons name="heart" size={16} color={colores.primarioFuerte} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.statEtiquetaAncha}>Favoritos</Text>
-            <Text style={styles.statSubtextoAncha}>
-              {idsFavoritos ? `${idsFavoritos.length} negocio${idsFavoritos.length === 1 ? "" : "s"} guardado${idsFavoritos.length === 1 ? "" : "s"}` : "Negocios que guardaste"}
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colores.textoTenue} />
+      <Pressable
+        style={styles.statCardAncha}
+        onPress={() => router.push("/favoritos")}
+        accessibilityRole="button"
+        accessibilityLabel="Favoritos"
+      >
+        <Ionicons name="heart-outline" size={20} color={colores.texto} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.statEtiquetaAncha}>Favoritos</Text>
+          <Text style={styles.statSubtextoAncha}>
+            {idsFavoritos
+              ? `${idsFavoritos.length} negocio${idsFavoritos.length === 1 ? "" : "s"} guardado${idsFavoritos.length === 1 ? "" : "s"}`
+              : "Negocios que guardaste"}
+          </Text>
         </View>
+        <Ionicons name="chevron-forward" size={18} color={colores.textoTenue} />
       </Pressable>
 
       <Text style={styles.etiquetaSeccion}>Preferencias</Text>
@@ -194,17 +205,16 @@ export default function Perfil() {
         />
       </Grupo>
 
-      <Pressable style={styles.ctaSombra} onPress={compartirApp}>
-        <View style={styles.ctaInvitar}>
-          <View style={styles.ctaIcono}>
-            <Ionicons name="people" size={20} color="#ffffff" />
-          </View>
-          <View style={styles.ctaTexto}>
-            <Text style={styles.ctaTitulo}>Invitar a vecinos</Text>
-            <Text style={styles.ctaSubtitulo}>Comparte {marca.nombreApp} con tu cuadra</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={16} color="#ffffff" />
-        </View>
+      <Pressable onPress={compartirApp} accessibilityRole="button" accessibilityLabel="Invitar a vecinos">
+        <ImageBackground source={FOTO_INVITAR} style={styles.ctaInvitar} imageStyle={{ borderRadius: 10 }} resizeMode="cover">
+          <LinearGradient
+            colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.72)"]}
+            locations={[0.2, 1]}
+            style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}
+          />
+          <Text style={styles.ctaTitulo}>Invita a tus vecinos</Text>
+          <Text style={styles.ctaSubtitulo}>Comparte {marca.nombreApp} con tu comunidad</Text>
+        </ImageBackground>
       </Pressable>
 
       <Grupo>
@@ -238,209 +248,52 @@ export default function Perfil() {
 
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
-    contenedor: {
-      flex: 1,
-      backgroundColor: colores.superficieHundida,
-    },
-    contenido: {
-      padding: espaciado.lg,
-      gap: espaciado.md,
-    },
-
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: espaciado.md,
-      backgroundColor: colores.primarioSuave,
-      borderRadius: radios.lg,
-      padding: espaciado.lg,
-    },
-    avatarWrap: {
-      position: "relative",
-    },
+    contenedor: { flex: 1, backgroundColor: colores.fondo },
+    contenido: { padding: espaciado.lg, gap: espaciado.sm, paddingBottom: espaciado.xxl },
+    header: { flexDirection: "row", alignItems: "center", gap: espaciado.md, marginBottom: espaciado.sm },
     avatar: {
-      width: 56,
-      height: 56,
-      borderRadius: radios.lg,
-      backgroundColor: colores.fondo,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: colores.superficieHundida,
       alignItems: "center",
       justifyContent: "center",
     },
-    avatarEditar: {
-      position: "absolute",
-      bottom: -3,
-      right: -3,
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      backgroundColor: colores.primario,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 2,
-      borderColor: colores.primarioSuave,
-    },
-    headerTexto: {
-      flex: 1,
-      gap: 4,
-    },
-    titulo: {
-      ...tipografia.display,
-      color: colores.texto,
-    },
-    filaZona: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-    },
-    vecinoDe: {
-      ...tipografia.pie,
-      color: colores.textoSuave,
-      fontWeight: "600",
-    },
-    pillZona: {
-      backgroundColor: colores.fondo,
-      paddingHorizontal: espaciado.sm,
-      paddingVertical: 2,
-      borderRadius: radios.completo,
-    },
-    pillZonaTexto: {
-      ...tipografia.etiqueta,
-      color: colores.primarioFuerte,
-    },
-
-    statSombra: {
-      borderRadius: radios.lg,
-      backgroundColor: colores.superficie,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      elevation: 2,
-    },
+    avatarIniciales: { fontFamily: "SchibstedGrotesk_800ExtraBold", fontSize: 21, color: colores.primario, letterSpacing: -0.5 },
+    headerTexto: { flex: 1, minWidth: 0 },
+    titulo: { ...tipografia.titulo, fontSize: 24, lineHeight: 28, color: colores.texto },
+    vecinoDe: { ...tipografia.cuerpo, fontSize: 13, color: colores.textoSuave },
     statCardAncha: {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.md,
-      borderRadius: radios.lg,
+      borderWidth: 1.5,
+      borderColor: colores.borde,
+      borderRadius: 10,
       padding: espaciado.md,
     },
-    statIcono: {
-      width: 34,
-      height: 34,
-      borderRadius: radios.md,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    statEtiquetaAncha: {
-      ...tipografia.cuerpoDestacado,
-      color: colores.texto,
-    },
-    statSubtextoAncha: {
-      ...tipografia.pie,
-      color: colores.textoSuave,
-      marginTop: 1,
-    },
-
-    etiquetaSeccion: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-      marginTop: espaciado.xs,
-    },
-    grupoSombra: {
-      borderRadius: radios.lg,
-      backgroundColor: colores.superficie,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      elevation: 2,
-    },
-    grupoCard: {
-      borderRadius: radios.lg,
-      overflow: "hidden",
-    },
+    statEtiquetaAncha: { ...tipografia.cuerpoDestacado, fontFamily: "SchibstedGrotesk_700Bold", color: colores.texto },
+    statSubtextoAncha: { ...tipografia.pie, color: colores.textoSuave },
+    etiquetaSeccion: { ...tipografia.subtitulo, fontSize: 14, color: colores.texto, marginTop: espaciado.md },
+    grupoSombra: {},
+    grupoCard: {},
     fila: {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.md,
-      paddingVertical: espaciado.sm + 2,
-      paddingHorizontal: espaciado.md,
-      borderTopWidth: 1,
-      borderTopColor: colores.borde,
+      paddingVertical: espaciado.md,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colores.bordeFuerte,
     },
-    filaSinBorde: {
-      borderTopWidth: 0,
-    },
-    filaIcono: {
-      width: 34,
-      height: 34,
-      borderRadius: radios.sm,
-      backgroundColor: colores.superficieHundida,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    filaIconoPeligro: {
-      backgroundColor: colores.acentoSuave,
-    },
-    filaTexto: {
-      ...tipografia.cuerpoDestacado,
-      color: colores.texto,
-      flex: 1,
-    },
-    filaTextoPeligro: {
-      color: colores.acentoFuerte,
-    },
-    etiquetaProximamente: {
-      ...tipografia.pie,
-      fontSize: 10,
-      color: colores.textoTenue,
-      fontWeight: "700",
-    },
-
-    ctaSombra: {
-      borderRadius: radios.lg,
-      shadowColor: colores.acentoFuerte,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.22,
-      shadowRadius: 16,
-      elevation: 4,
-    },
-    ctaInvitar: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: espaciado.md,
-      backgroundColor: colores.acentoFuerte,
-      borderRadius: radios.lg,
-      padding: espaciado.md,
-    },
-    ctaIcono: {
-      width: 40,
-      height: 40,
-      borderRadius: radios.md,
-      backgroundColor: "rgba(255,255,255,0.2)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    ctaTexto: {
-      flex: 1,
-      gap: 1,
-    },
-    ctaTitulo: {
-      ...tipografia.displaySeccion,
-      fontSize: 15,
-      color: "#ffffff",
-    },
-    ctaSubtitulo: {
-      ...tipografia.pie,
-      color: "rgba(255,255,255,0.85)",
-    },
-
-    footerMarca: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textAlign: "center",
-      marginTop: espaciado.xs,
-    },
+    filaSinBorde: { borderTopWidth: 0 },
+    filaIcono: { width: 22, alignItems: "center" },
+    filaIconoPeligro: {},
+    filaTexto: { ...tipografia.cuerpo, fontSize: 14.5, color: colores.texto, flex: 1 },
+    filaTextoPeligro: { color: colores.acentoFuerte, fontFamily: "SchibstedGrotesk_600SemiBold" },
+    etiquetaProximamente: { ...tipografia.pie, fontSize: 11.5, color: colores.textoTenue },
+    ctaInvitar: { height: 128, borderRadius: 10, justifyContent: "flex-end", padding: espaciado.md, marginTop: espaciado.md, overflow: "hidden" },
+    ctaTitulo: { ...tipografia.titulo, fontSize: 19, lineHeight: 22, color: "#ffffff" },
+    ctaSubtitulo: { ...tipografia.pie, fontSize: 12.5, color: "rgba(255,255,255,0.92)" },
+    footerMarca: { ...tipografia.pie, color: colores.textoTenue, textAlign: "center", marginTop: espaciado.md },
   });
 }

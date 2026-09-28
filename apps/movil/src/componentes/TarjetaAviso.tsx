@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Animated, Platform, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { useRef } from "react";
+import { vibrarLigero } from "../utilidades/haptico";
 import { Aviso, CategoriaAviso } from "@app-vecinos/tipos";
-import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
+import { PaletaColores, espaciado, tipografia, useColores } from "../disenio";
 import { useTema } from "../estado/useTema";
 import { marca } from "../config/marca";
 import { tiempoRelativo } from "../utilidades/tiempoRelativo";
@@ -62,178 +65,99 @@ export function TarjetaAviso({ aviso }: { aviso: Aviso }) {
   }
 
   const esUrgente = aviso.categoria === "seguridad";
+  const latido = useRef(new Animated.Value(1)).current;
+
+  function tocarMeInteresa() {
+    const activar = !marcado;
+    alternar(aviso.id);
+    if (activar) {
+      vibrarLigero();
+      latido.setValue(1);
+      Animated.sequence([
+        Animated.timing(latido, { toValue: 1.25, duration: 110, useNativeDriver: Platform.OS !== "web" }),
+        Animated.spring(latido, { toValue: 1, friction: 4, tension: 180, useNativeDriver: Platform.OS !== "web" }),
+      ]).start();
+    }
+  }
 
   return (
-    <View style={esUrgente ? styles.sombraUrgente : styles.sombra}>
-    <View style={styles.tarjeta}>
-      <View style={styles.encabezado}>
-        <View style={[styles.avatar, { backgroundColor: estilo.fondo }]}>
-          <Ionicons name={estilo.icono} size={19} color={estilo.texto} />
-        </View>
-        <View style={styles.encabezadoTexto}>
-          <View style={styles.filaFuente}>
-            <Text style={styles.fuente} numberOfLines={1}>
-              {aviso.fuenteNombre}
-            </Text>
-            {aviso.fuenteVerificada ? (
-              <View style={styles.tick}>
-                <Ionicons name="checkmark" size={9} color="#fff" />
-              </View>
-            ) : null}
-          </View>
-          <Text style={styles.fecha}>{tiempoRelativo(aviso.publicadoEn)}</Text>
-        </View>
-        <View style={[styles.pill, { backgroundColor: estilo.fondo }]}>
-          <Text style={[styles.pillTexto, { color: estilo.texto }]}>{estilo.etiqueta}</Text>
-        </View>
+    <View style={styles.post}>
+      <View style={[styles.etiqueta, { backgroundColor: estilo.fondo }]}>
+        <Text style={[styles.etiquetaTexto, { color: estilo.texto }]}>
+          {esUrgente ? "Alerta de seguridad" : estilo.etiqueta}
+        </Text>
       </View>
 
-      <View style={styles.cuerpoContenedor}>
-        <Text style={styles.titulo}>{aviso.titulo}</Text>
-        <Text style={styles.cuerpo}>{aviso.cuerpo}</Text>
-      </View>
+      <Text style={styles.titulo} accessibilityRole="header">
+        {aviso.titulo}
+      </Text>
+      <Text style={styles.cuerpo}>{aviso.cuerpo}</Text>
 
       {aviso.imagenUrl ? (
-        <Pressable onPress={() => setVisorAbierto(true)}>
-          <Image source={{ uri: aviso.imagenUrl }} style={styles.imagen} resizeMode="cover" />
+        <Pressable onPress={() => setVisorAbierto(true)} accessibilityRole="imagebutton" accessibilityLabel="Ver foto del aviso">
+          <Image source={{ uri: aviso.imagenUrl }} style={styles.imagen} contentFit="cover" transition={250} />
         </Pressable>
       ) : null}
 
+      <View style={styles.autor}>
+        <View style={[styles.avatar, { backgroundColor: estilo.fondo }]}>
+          <Ionicons name={estilo.icono} size={13} color={estilo.texto} />
+        </View>
+        <Text style={styles.fuente} numberOfLines={1}>
+          {aviso.fuenteNombre}
+        </Text>
+        {aviso.fuenteVerificada ? (
+          <Ionicons name="checkmark-circle" size={13} color={colores.primario} accessibilityLabel="Fuente verificada" />
+        ) : null}
+        <Text style={styles.fecha}> · {tiempoRelativo(aviso.publicadoEn)}</Text>
+      </View>
+
       <View style={styles.pie}>
-        <Pressable style={styles.accion} onPress={() => alternar(aviso.id)} hitSlop={8}>
-          <Ionicons
-            name={marcado ? "heart" : "heart-outline"}
-            size={20}
-            color={marcado ? colores.acentoFuerte : colores.textoSuave}
-          />
-          <Text style={[styles.contador, marcado && styles.contadorActivo]}>{meGusta}</Text>
+        <Pressable
+          style={styles.accion}
+          onPress={tocarMeInteresa}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityState={{ selected: marcado }}
+          accessibilityLabel={`Me interesa, ${meGusta}`}
+        >
+          <Animated.View style={{ transform: [{ scale: latido }] }}>
+            <Ionicons name={marcado ? "heart" : "heart-outline"} size={18} color={marcado ? "#c8322e" : colores.textoSuave} />
+          </Animated.View>
+          <Text style={[styles.contador, marcado && { color: "#c8322e" }]}>{meGusta}</Text>
         </Pressable>
-        <Pressable style={styles.accion} onPress={compartir} hitSlop={8}>
-          <Ionicons name="paper-plane-outline" size={19} color={colores.textoSuave} />
+        <Pressable style={styles.accion} onPress={compartir} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Compartir, ${compartidos}`}>
+          <Ionicons name="paper-plane-outline" size={17} color={colores.textoSuave} />
           <Text style={styles.contador}>{compartidos}</Text>
         </Pressable>
       </View>
 
-      <VisorImagen uri={aviso.imagenUrl} visible={visorAbierto} onCerrar={() => setVisorAbierto(false)} />
-    </View>
+      {aviso.imagenUrl ? (
+        <VisorImagen visible={visorAbierto} uri={aviso.imagenUrl} onCerrar={() => setVisorAbierto(false)} />
+      ) : null}
     </View>
   );
 }
 
 function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
-    sombra: {
-      borderRadius: radios.lg,
-      backgroundColor: colores.superficie,
-      shadowColor: "#0f1f16",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.08,
-      shadowRadius: 16,
-      elevation: 3,
+    post: {
+      paddingVertical: espaciado.lg,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colores.bordeFuerte,
+      gap: espaciado.xs + 2,
     },
-    sombraUrgente: {
-      borderRadius: radios.lg,
-      backgroundColor: colores.superficie,
-      shadowColor: colores.error,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.14,
-      shadowRadius: 16,
-      elevation: 3,
-    },
-    tarjeta: {
-      borderRadius: radios.lg,
-      overflow: "hidden",
-    },
-    encabezado: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: espaciado.sm,
-      padding: espaciado.md,
-      paddingBottom: espaciado.sm,
-    },
-    avatar: {
-      width: 38,
-      height: 38,
-      borderRadius: radios.md,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    encabezadoTexto: {
-      flex: 1,
-      gap: 1,
-    },
-    filaFuente: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-    },
-    fuente: {
-      ...tipografia.cuerpoDestacado,
-      color: colores.texto,
-      flexShrink: 1,
-    },
-    tick: {
-      width: 13,
-      height: 13,
-      borderRadius: 7,
-      backgroundColor: colores.primario,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    fecha: {
-      ...tipografia.pie,
-      fontSize: 11,
-      color: colores.textoTenue,
-    },
-    pill: {
-      paddingHorizontal: espaciado.sm,
-      paddingVertical: 4,
-      borderRadius: radios.completo,
-    },
-    pillTexto: {
-      ...tipografia.etiqueta,
-      fontSize: 10,
-    },
-    cuerpoContenedor: {
-      paddingHorizontal: espaciado.md,
-      paddingBottom: espaciado.md,
-      gap: 2,
-    },
-    titulo: {
-      ...tipografia.displaySeccion,
-      fontSize: 16,
-      color: colores.texto,
-    },
-    cuerpo: {
-      ...tipografia.cuerpo,
-      color: colores.textoSuave,
-    },
-    imagen: {
-      width: "100%",
-      aspectRatio: 16 / 10,
-      backgroundColor: colores.superficieHundida,
-    },
-    pie: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: espaciado.lg,
-      borderTopWidth: 1,
-      borderTopColor: colores.borde,
-      paddingHorizontal: espaciado.md,
-      paddingVertical: espaciado.sm,
-    },
-    accion: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-    },
-    contador: {
-      ...tipografia.pie,
-      fontFamily: "SchibstedGrotesk_700Bold",
-      color: colores.textoSuave,
-    },
-    contadorActivo: {
-      color: colores.acentoFuerte,
-    },
+    etiqueta: { alignSelf: "flex-start", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 },
+    etiquetaTexto: { fontFamily: "SchibstedGrotesk_700Bold", fontSize: 11.5 },
+    titulo: { ...tipografia.subtitulo, fontSize: 17, lineHeight: 22, color: colores.texto, marginTop: 2 },
+    cuerpo: { ...tipografia.cuerpo, color: colores.textoSuave },
+    imagen: { width: "100%", height: 180, borderRadius: 10, marginTop: espaciado.xs, backgroundColor: colores.superficieHundida2 },
+    autor: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: espaciado.xs },
+    avatar: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+    fuente: { ...tipografia.pie, fontFamily: "SchibstedGrotesk_600SemiBold", color: colores.texto, flexShrink: 1 },
+    fecha: { ...tipografia.pie, color: colores.textoSuave },
+    pie: { flexDirection: "row", gap: espaciado.lg, marginTop: espaciado.xs },
+    accion: { flexDirection: "row", alignItems: "center", gap: 5 },
+    contador: { ...tipografia.pie, fontFamily: "SchibstedGrotesk_600SemiBold", fontSize: 12.5, color: colores.textoSuave },
   });
 }

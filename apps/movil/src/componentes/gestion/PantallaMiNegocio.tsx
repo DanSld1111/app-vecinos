@@ -70,7 +70,7 @@ export function PantallaMiNegocio({ cuenta, token }: { cuenta: Cuenta; token: st
   if (error && negocios.length === 0) {
     return (
       <View style={styles.centro}>
-        <Text style={styles.textoError}>⚠️ {error}</Text>
+        <Text style={styles.textoError}>{error}</Text>
       </View>
     );
   }
@@ -238,12 +238,12 @@ function TabInformacion({ negocio, token }: { negocio: Negocio; token: string })
 
       {error ? (
         <View style={styles.cajaAlerta}>
-          <Text style={styles.textoAlerta}>⚠️ {error}</Text>
+          <Text style={styles.textoAlerta}>{error}</Text>
         </View>
       ) : null}
       {guardado ? (
         <View style={[styles.cajaNota, styles.cajaNotaExito, { marginTop: espaciado.md }]}>
-          <Text style={[styles.textoNota, { color: colores.primarioFuerte }]}>✓ Guardado.</Text>
+          <Text style={[styles.textoNota, { color: colores.primarioFuerte }]}>Guardado.</Text>
         </View>
       ) : null}
 
@@ -314,12 +314,12 @@ function TabHorario({ negocio, token }: { negocio: Negocio; token: string }) {
 
       {error ? (
         <View style={styles.cajaAlerta}>
-          <Text style={styles.textoAlerta}>⚠️ {error}</Text>
+          <Text style={styles.textoAlerta}>{error}</Text>
         </View>
       ) : null}
       {guardado ? (
         <View style={[styles.cajaNota, styles.cajaNotaExito, { marginTop: espaciado.md }]}>
-          <Text style={[styles.textoNota, { color: colores.primarioFuerte }]}>✓ Horario guardado.</Text>
+          <Text style={[styles.textoNota, { color: colores.primarioFuerte }]}>Horario guardado.</Text>
         </View>
       ) : null}
 
@@ -415,7 +415,7 @@ function TabOfertas({ negocio, token }: { negocio: Negocio; token: string }) {
 
       {error ? (
         <View style={styles.cajaAlerta}>
-          <Text style={styles.textoAlerta}>⚠️ {error}</Text>
+          <Text style={styles.textoAlerta}>{error}</Text>
         </View>
       ) : null}
 
@@ -566,7 +566,7 @@ function TabFotos({ negocio, token }: { negocio: Negocio; token: string }) {
 
       {error ? (
         <View style={styles.cajaAlerta}>
-          <Text style={styles.textoAlerta}>⚠️ {error}</Text>
+          <Text style={styles.textoAlerta}>{error}</Text>
         </View>
       ) : null}
     </ScrollView>

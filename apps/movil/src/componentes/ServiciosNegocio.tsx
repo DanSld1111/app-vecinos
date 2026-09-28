@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { Moneda, ServicioOfrecido, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
@@ -5,13 +6,14 @@ import { useTema } from "../estado/useTema";
 import { urlCompleta } from "../utilidades/media";
 import { EntradaAnimada } from "./EntradaAnimada";
 
-const EMOJI_POR_SERVICIO: Record<string, string> = {
-  "Lavado y secado": "🧺",
-  "Planchado": "👔",
-  "Edredón / cobertor": "🛏️",
-  "Consulta general": "🩺",
-  "Vacunación": "💉",
-  "Baño y corte": "✂️",
+// Ícono de línea por servicio conocido; el resto usa una etiqueta genérica (antes eran emojis).
+const ICONO_POR_SERVICIO: Record<string, keyof typeof Ionicons.glyphMap> = {
+  "Lavado y secado": "water-outline",
+  "Planchado": "shirt-outline",
+  "Edredón / cobertor": "bed-outline",
+  "Consulta general": "medkit-outline",
+  "Vacunación": "bandage-outline",
+  "Baño y corte": "cut-outline",
 };
 
 export function ServiciosNegocio({
@@ -50,7 +52,7 @@ export function ServiciosNegocio({
             <Image source={{ uri: urlCompleta(servicio.fotoUrl) }} style={styles.foto} />
           ) : (
             <View style={styles.icono}>
-              <Text style={styles.emoji}>{EMOJI_POR_SERVICIO[servicio.nombre] ?? "🏷️"}</Text>
+              <Ionicons name={ICONO_POR_SERVICIO[servicio.nombre] ?? "pricetag-outline"} size={18} color={colores.primario} />
             </View>
           )}
           <View style={styles.info}>
@@ -60,7 +62,7 @@ export function ServiciosNegocio({
           <Text style={styles.precio}>{formatearPrecio(servicio.precio, moneda)}</Text>
         </EntradaAnimada>
       ))}
-      <Text style={styles.nota}>Tarifas referenciales — confirma el precio final con el negocio.</Text>
+      <Text style={styles.nota}>Tarifas referenciales. Confirma el precio final con el negocio.</Text>
     </View>
   );
 }
@@ -86,7 +88,7 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       height: 34,
       borderRadius: radios.sm,
       // Azul de servicio — decorativo, distinto de marca a propósito (ver OfertasPasillosNegocio.tsx).
-      backgroundColor: oscuro ? "#1c2c38" : "#dbe9f1",
+      backgroundColor: colores.superficieHundida,
       alignItems: "center",
       justifyContent: "center",
     },

@@ -65,7 +65,6 @@ export default function Comunidad() {
           <Text style={styles.insigniaZonaTexto}>{comunidad?.nombre ?? "..."}</Text>
         </View>
       </View>
-      <Text style={styles.subtitulo}>Lo que está pasando cerca de ti, en tiempo real.</Text>
 
       <View style={styles.filaChips}>
         {filtros(colores).map((item) => (
@@ -119,11 +118,11 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
   return StyleSheet.create({
     contenedor: {
       flex: 1,
-      backgroundColor: colores.superficieHundida,
+      backgroundColor: colores.fondo,
     },
     contenido: {
       padding: espaciado.lg,
-      gap: espaciado.md,
+      gap: espaciado.sm,
     },
     filaTitulo: {
       flexDirection: "row",
@@ -132,18 +131,22 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       gap: espaciado.sm,
     },
     titulo: {
-      ...tipografia.displayGrande,
+      ...tipografia.titulo,
+      fontSize: 27,
+      lineHeight: 31,
       color: colores.texto,
     },
     insigniaZona: {
-      backgroundColor: colores.primarioSuave,
-      paddingHorizontal: espaciado.sm,
+      borderWidth: 1.5,
+      borderColor: colores.bordeFuerte,
+      paddingHorizontal: espaciado.md,
       paddingVertical: 5,
       borderRadius: radios.completo,
     },
     insigniaZonaTexto: {
-      ...tipografia.etiqueta,
-      color: colores.primarioFuerte,
+      fontFamily: "SchibstedGrotesk_600SemiBold",
+      fontSize: 12.5,
+      color: colores.texto,
     },
     subtitulo: {
       ...tipografia.cuerpo,
@@ -155,12 +158,11 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       gap: espaciado.sm,
     },
     grupo: {
-      gap: espaciado.sm,
+      marginTop: espaciado.md,
     },
     tituloGrupo: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
+      ...tipografia.subtitulo,
+      color: colores.texto,
     },
     encabezadoFijado: {
       flexDirection: "row",

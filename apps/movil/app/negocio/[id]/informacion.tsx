@@ -4,7 +4,7 @@ import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../
 import { useNegocio } from "../../../src/datos/hooks/useNegocios";
 import { EstadoError } from "../../../src/componentes/EstadoError";
 import { EstadoVacio } from "../../../src/componentes/EstadoVacio";
-import { SinFoto } from "../../../src/componentes/SinFoto";
+import { FotoNegocio } from "../../../src/componentes/FotoNegocio";
 import { MiniMapaNegocio } from "../../../src/componentes/MiniMapaNegocio";
 import { listaSemanaCompleta } from "../../../src/utilidades/horarios";
 import { urlCompleta } from "../../../src/utilidades/media";
@@ -37,9 +37,9 @@ export default function InformacionNegocio() {
     <View style={styles.contenedor}>
       <View style={styles.filaLogo}>
         {negocio.fotoPrincipalUrl ? (
-          <Image source={{ uri: urlCompleta(negocio.fotoPrincipalUrl) }} style={styles.logo} />
+          <FotoNegocio nombre={negocio.nombre} url={negocio.fotoPrincipalUrl} style={styles.logo} />
         ) : (
-          <SinFoto tamanoIcono={24} style={styles.logo} />
+          <FotoNegocio nombre={negocio.nombre} url={null} style={styles.logo} />
         )}
         <View style={{ flex: 1 }}>
           <Text style={styles.nombre}>{negocio.nombre}</Text>
@@ -101,27 +101,20 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.textoSuave,
     },
     encabezado: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
-      marginTop: espaciado.md,
-      marginBottom: espaciado.xs,
+      ...tipografia.subtitulo,
+      color: colores.texto,
+      marginTop: espaciado.lg,
+      marginBottom: espaciado.sm,
     },
-    tarjetaHorario: {
-      backgroundColor: colores.superficieHundida,
-      borderRadius: radios.md,
-      padding: espaciado.sm,
-    },
+    tarjetaHorario: {},
     filaDia: {
       flexDirection: "row",
       justifyContent: "space-between",
-      paddingVertical: espaciado.xs,
-      paddingHorizontal: espaciado.sm,
-      borderRadius: radios.sm,
+      paddingVertical: espaciado.sm + 1,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colores.bordeFuerte,
     },
-    filaDiaHoy: {
-      backgroundColor: colores.primarioSuave,
-    },
+    filaDiaHoy: {},
     nombreDia: {
       ...tipografia.cuerpo,
       color: colores.textoSuave,
@@ -131,7 +124,7 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.texto,
     },
     textoHoy: {
-      color: colores.primarioFuerte,
+      color: colores.texto,
       fontFamily: "SchibstedGrotesk_700Bold",
     },
     acerca: {

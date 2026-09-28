@@ -134,19 +134,20 @@ function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     contenedor: {
       flex: 1,
-      backgroundColor: colores.superficieHundida,
+      backgroundColor: colores.fondo,
     },
     contenido: {
       padding: espaciado.lg,
+      paddingTop: espaciado.sm,
       gap: espaciado.lg,
     },
     seccion: {
-      gap: espaciado.sm,
+      gap: 0,
     },
     tituloSeccion: {
-      ...tipografia.etiqueta,
-      color: colores.textoTenue,
-      textTransform: "uppercase",
+      ...tipografia.subtitulo,
+      fontSize: 15,
+      color: colores.texto,
     },
   });
 }

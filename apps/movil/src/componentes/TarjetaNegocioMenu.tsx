@@ -56,7 +56,7 @@ export function TarjetaNegocioMenu({
             style={StyleSheet.absoluteFill}
           />
           <View style={[styles.pill, estado.abierto ? styles.pillAbierto : styles.pillCerrado]}>
-            <Text style={styles.pillTexto}>{estado.abierto ? `🟢 Abierto · ${estado.detalle}` : `⚪ Cerrado · ${estado.detalle}`}</Text>
+            <Text style={styles.pillTexto}>{estado.abierto ? `● Abierto · ${estado.detalle}` : `○ Cerrado · ${estado.detalle}`}</Text>
           </View>
           <View style={styles.textos}>{contenidoTextos("#ffffff", "rgba(255,255,255,0.85)")}</View>
         </ImageBackground>
@@ -64,7 +64,7 @@ export function TarjetaNegocioMenu({
         <View style={styles.tarjeta}>
           <SinFoto tamanoIcono={28} style={StyleSheet.absoluteFill} />
           <View style={[styles.pill, estado.abierto ? styles.pillAbierto : styles.pillCerrado, styles.pillSinFoto]}>
-            <Text style={styles.pillTexto}>{estado.abierto ? `🟢 Abierto · ${estado.detalle}` : `⚪ Cerrado · ${estado.detalle}`}</Text>
+            <Text style={styles.pillTexto}>{estado.abierto ? `● Abierto · ${estado.detalle}` : `○ Cerrado · ${estado.detalle}`}</Text>
           </View>
           <View style={styles.textosSinFoto}>{contenidoTextos(colores.texto, colores.textoSuave)}</View>
         </View>

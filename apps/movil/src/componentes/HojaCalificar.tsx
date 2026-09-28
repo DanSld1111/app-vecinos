@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Calificacion } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { HojaInferior } from "./HojaInferior";
+import { vibrarExito } from "../utilidades/haptico";
 
 const VALORES: Calificacion[] = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
@@ -41,7 +42,13 @@ function EstrellaSeleccionable({
   }
 
   return (
-    <Pressable onPress={alTocar} hitSlop={4} style={{ padding: 2 }}>
+    <Pressable
+      onPress={alTocar}
+      hitSlop={4}
+      style={{ padding: 2 }}
+      accessibilityRole="button"
+      accessibilityLabel={`${indice + 1} estrella${indice === 0 ? "" : "s"}`}
+    >
       <Ionicons name={nombre} size={tamano} color={relleno > 0 ? colorLleno : colorVacio} />
     </Pressable>
   );
@@ -81,6 +88,7 @@ export function HojaCalificar({
     try {
       await onCalificar(nuevo);
       setGuardado(nuevo);
+      vibrarExito();
     } finally {
       setGuardando(false);
     }
@@ -99,14 +107,14 @@ export function HojaCalificar({
               indice={indice}
               valor={valor}
               tamano={TAMANO_ESTRELLA}
-              colorLleno="#e0a835"
-              colorVacio={colores.borde}
+              colorLleno={colores.calificacion}
+              colorVacio={colores.textoTenue}
               onTocar={alTocarEstrella}
             />
           ))}
         </View>
         {valor > 0 ? <Text style={styles.valorNumero}>{valor}</Text> : null}
-        <Text style={styles.ayuda}>Toca la mitad izquierda o derecha de una estrella — medias estrellas incluidas.</Text>
+        <Text style={styles.ayuda}>Toca el lado izquierdo de una estrella para media estrella.</Text>
 
         {guardando ? (
           <View style={styles.avisoGuardando}>
@@ -114,9 +122,9 @@ export function HojaCalificar({
           </View>
         ) : guardado ? (
           <View style={styles.avisoGuardado}>
-            <Ionicons name="checkmark-circle" size={14} color={colores.primarioFuerte} />
+            <Ionicons name="checkmark-circle" size={16} color={colores.primario} />
             <Text style={styles.avisoGuardadoTexto}>
-              Guardaste {guardado} ✓ — puedes cambiarla cuando quieras
+              Guardaste {String(guardado).replace(".", ",")}. Puedes cambiarla cuando quieras.
             </Text>
           </View>
         ) : null}
@@ -132,8 +140,8 @@ function crearEstilos(colores: PaletaColores) {
       paddingBottom: espaciado.sm,
     },
     titulo: {
-      ...tipografia.displaySeccion,
-      fontSize: 15,
+      ...tipografia.subtitulo,
+      fontSize: 17,
       color: colores.texto,
       textAlign: "center",
     },
@@ -150,7 +158,7 @@ function crearEstilos(colores: PaletaColores) {
     },
     ayuda: {
       ...tipografia.pie,
-      fontSize: 10.5,
+      fontSize: 12,
       color: colores.textoTenue,
       textAlign: "center",
       marginTop: espaciado.sm,
@@ -167,16 +175,16 @@ function crearEstilos(colores: PaletaColores) {
       flexDirection: "row",
       alignItems: "center",
       gap: espaciado.xs,
-      backgroundColor: colores.primarioSuave,
-      borderRadius: radios.md,
+      backgroundColor: colores.superficieHundida,
+      borderRadius: 10,
       paddingVertical: espaciado.sm,
       paddingHorizontal: espaciado.md,
     },
     avisoGuardadoTexto: {
       ...tipografia.pie,
-      fontSize: 10.5,
-      fontFamily: "SchibstedGrotesk_700Bold",
-      color: colores.primarioFuerte,
+      fontSize: 12.5,
+      fontFamily: "SchibstedGrotesk_600SemiBold",
+      color: colores.texto,
       flexShrink: 1,
     },
   });
