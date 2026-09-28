@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ServicioApp } from "@app-vecinos/tipos";
 
+import { IconoEmoji } from "../IconoEmoji";
 /** Mismo criterio que IconoServicio en la app móvil (emoji fijo por slug) — acá basta un emoji,
  * no hace falta el SVG propio del móvil. */
 const EMOJI_POR_SLUG: Record<string, string> = {
@@ -48,7 +49,7 @@ export function SelectorServicio({
     <div ref={contenedorRef} style={{ position: "relative" }}>
       <button type="button" className="selector-categoria-boton" onClick={() => setAbierto((v) => !v)}>
         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {actual ? <span>{EMOJI_POR_SLUG[actual.slug] ?? "🏷️"}</span> : null}
+          {actual ? <span><IconoEmoji e={EMOJI_POR_SLUG[actual.slug] ?? "🏷️"} /></span> : null}
           {actual ? actual.nombre : placeholder}
         </span>
         <span style={{ color: "var(--texto-tenue)", fontSize: 11 }}>{abierto ? "▲" : "▼"}</span>
@@ -65,7 +66,7 @@ export function SelectorServicio({
                 setAbierto(false);
               }}
             >
-              <span>{EMOJI_POR_SLUG[s.slug] ?? "🏷️"}</span>
+              <span><IconoEmoji e={EMOJI_POR_SLUG[s.slug] ?? "🏷️"} /></span>
               <span>{s.nombre}</span>
             </div>
           ))}

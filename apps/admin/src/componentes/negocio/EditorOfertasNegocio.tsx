@@ -4,6 +4,7 @@ import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 
+import { IconoEmoji } from "../IconoEmoji";
 /** Arquetipos cuya plantilla muestra el carrusel de ofertas directo en la ficha pública. */
 const ARQUETIPOS_CON_CARRUSEL_EN_FICHA = new Set(["arq-ofertas"]);
 
@@ -74,7 +75,7 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
                   {precioDe(o.precio)}
                 </span>
                 <button type="button" onClick={() => eliminarOferta(negocio.id, i, token)}>
-                  🗑️
+                  <IconoEmoji e="🗑️" />
                 </button>
               </div>
             ))}

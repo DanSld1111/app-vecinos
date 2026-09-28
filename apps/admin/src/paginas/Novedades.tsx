@@ -3,6 +3,7 @@ import { Novedad } from "@app-vecinos/tipos";
 import { useNovedades } from "../estado/useNovedades";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const LIMITE_TEXTO = 140;
 
 function formatearFechaCorta(iso: string): string {
@@ -91,21 +92,21 @@ export function Novedades() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✨</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✨" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Total novedades</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>👁️</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="👁️" /></div>
           <div>
             <b>{resumen.visibles}</b>
             <span>Visibles ahora</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "#eceae2" }}>🙈</div>
+          <div className="icono" style={{ background: "#eceae2" }}><IconoEmoji e="🙈" /></div>
           <div>
             <b>{resumen.ocultas}</b>
             <span>Ocultas</span>
@@ -116,14 +117,14 @@ export function Novedades() {
       <div className="layout-novedades">
         <div>
           <div className="buscador-mini">
-            🔍
+            <IconoEmoji e="🔍" />
             <input placeholder="Buscar novedad…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
           </div>
 
           <div className="lista-novedades">
             {novedadesFiltradas.map((novedad) => (
               <div className={`fila-novedad ${novedad.activo ? "" : "oculta"}`} key={novedad.id}>
-                <div className="icono-novedad">✨</div>
+                <div className="icono-novedad"><IconoEmoji e="✨" /></div>
                 <div className="info-novedad">
                   <b>{novedad.titulo}</b>
                   <span className="texto-nov">{novedad.texto}</span>
@@ -149,7 +150,7 @@ export function Novedades() {
                     {novedad.activo ? "Ocultar" : "Mostrar"}
                   </button>
                   <button className="btn-accion-mini eliminar" onClick={() => setConfirmandoEliminarId(novedad.id)}>
-                    🗑️
+                    <IconoEmoji e="🗑️" />
                   </button>
                 </div>
               </div>
@@ -178,7 +179,7 @@ export function Novedades() {
               ) : (
                 ejemploVisible.map((novedad, i) => (
                   <div className="mini-tarjeta-notif" key={novedad.id}>
-                    <div className="mini-icono-notif">✨</div>
+                    <div className="mini-icono-notif"><IconoEmoji e="✨" /></div>
                     <div className="mini-cuerpo">
                       <b>{novedad.titulo}</b>
                       <span className="mini-texto-notif">{novedad.texto}</span>
@@ -269,7 +270,7 @@ function ModalNovedad({
           <div className="vista-previa-tarjeta">
             <div className="etiqueta-pantalla">Así se verá</div>
             <div className="mini-tarjeta-notif previa">
-              <div className="mini-icono-notif">✨</div>
+              <div className="mini-icono-notif"><IconoEmoji e="✨" /></div>
               <div className="mini-cuerpo">
                 <b>{titulo.trim() || "Título de la novedad"}</b>
                 <span className="mini-texto-notif">{texto.trim() || "Texto breve de la novedad."}</span>
@@ -304,12 +305,12 @@ function ModalConfirmarEliminarNovedad({
   return (
     <div className="overlay-modal" onClick={onCancelar}>
       <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-        <div className="icono-alerta">⚠️</div>
+        <div className="icono-alerta"><IconoEmoji e="⚠️" /></div>
         <h3>¿Eliminar esta novedad?</h3>
         <p className="sub">Esta acción no se puede deshacer. Dejará de mostrarse de inmediato en la app.</p>
 
         <div className="fila-novedad" style={{ textAlign: "left", boxShadow: "none", background: "var(--superficie-hundida)" }}>
-          <div className="icono-novedad">✨</div>
+          <div className="icono-novedad"><IconoEmoji e="✨" /></div>
           <div className="info-novedad">
             <b>{novedad.titulo}</b>
             <span className="texto-nov">Publicada el {formatearFechaCorta(novedad.publicadoEn)}</span>

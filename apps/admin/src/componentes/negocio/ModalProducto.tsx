@@ -5,6 +5,7 @@ import { urlCompleta } from "../../utilidades/media";
 import { SelectorColorAtributo } from "./SelectorColorAtributo";
 import { ModalConfirmar } from "../ModalConfirmar";
 
+import { IconoEmoji } from "../IconoEmoji";
 const TIPOS_ACEPTADOS = "image/jpeg,image/png,image/webp";
 
 /**
@@ -113,7 +114,7 @@ export function ModalProducto({
                   style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               ) : (
-                "🖼️"
+                <IconoEmoji e="🖼️" />
               )}
             </div>
 

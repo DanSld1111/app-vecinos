@@ -9,6 +9,7 @@ import { IconoCategoria } from "../componentes/IconoCategoria";
 import { SelectorIcono } from "../componentes/SelectorIcono";
 import { urlCompleta } from "../utilidades/media";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const CLASE_BADGE_POR_ARQUETIPO: Record<string, string> = {
   "arq-menu": "menu",
   "arq-catalogo": "catalogo",
@@ -77,28 +78,28 @@ export function Categorias() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🗂️</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🗂️" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Categorías</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.conArquetipo}</b>
             <span>Con arquetipo</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--rojo-suave)" }}>⚠️</div>
+          <div className="icono" style={{ background: "var(--rojo-suave)" }}><IconoEmoji e="⚠️" /></div>
           <div>
             <b>{resumen.sinDefinir}</b>
             <span>Sin definir</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>🏪</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="🏪" /></div>
           <div>
             <b>{resumen.negociosCategorizados}</b>
             <span>Negocios categorizados</span>
@@ -107,7 +108,7 @@ export function Categorias() {
       </div>
 
       <div className="buscador-mini" style={{ marginBottom: 18, boxShadow: "var(--sombra)" }}>
-        🔍
+        <IconoEmoji e="🔍" />
         <input
           placeholder="Buscar categoría por nombre…"
           value={busqueda}
@@ -331,7 +332,7 @@ function ModalCategoria({
               className={`opcion-arq ${arquetipoId === "" ? "selec" : ""}`}
               onClick={() => setArquetipoId("")}
             >
-              <span className="emoji-arq">➖</span>
+              <span className="emoji-arq"><IconoEmoji e="➖" /></span>
               Sin definir
             </button>
             {arquetipos.map((a) => (

@@ -14,6 +14,7 @@ import { EditorOfertasNegocio } from "../componentes/negocio/EditorOfertasNegoci
 import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio";
 import { urlCompleta } from "../utilidades/media";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 type Pestana = "info" | "horario" | "fotos" | "productos" | "ofertas" | "dueno" | "estado";
 
 const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
@@ -91,7 +92,7 @@ export function FichaNegocio() {
                 style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
               />
             ) : (
-              "🖼️"
+              <IconoEmoji e="🖼️" />
             )}
           </div>
           <div>
@@ -111,7 +112,7 @@ export function FichaNegocio() {
             className={`tab-negocio ${pestana === p.id ? "activo" : ""}`}
             onClick={() => setSearchParams(p.id === "info" ? {} : { tab: p.id })}
           >
-            {p.icono} {p.texto}
+            <IconoEmoji e={p.icono} /> {p.texto}
           </button>
         ))}
       </div>
@@ -144,7 +145,7 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
   if (negocio.archivadoEn) {
     return (
       <div className="tarjeta-estado-grande pendiente">
-        <div className="icono-estado-grande">📦</div>
+        <div className="icono-estado-grande"><IconoEmoji e="📦" /></div>
         <div style={{ flex: 1 }}>
           <h3>Este negocio está archivado</h3>
           <p>No aparece en el listado ni en la app. Se puede restaurar en cualquier momento.</p>
@@ -382,7 +383,7 @@ function PestanaDueno({ negocio }: { negocio: Negocio }) {
 
       {dueno ? (
         <div className="drawer-dueno-card">
-          <div className="avatar-dueno">👤</div>
+          <div className="avatar-dueno"><IconoEmoji e="👤" /></div>
           <div>
             <b>{dueno.nombre}</b>
             <span>{dueno.correo}</span>

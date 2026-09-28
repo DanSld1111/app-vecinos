@@ -1,5 +1,6 @@
 import { useToasts } from "../estado/useToasts";
 
+import { IconoEmoji } from "./IconoEmoji";
 /** Se monta una sola vez (LayoutAdmin) — flota sobre todo lo demás. */
 export function PilaToasts() {
   const toasts = useToasts((estado) => estado.toasts);
@@ -15,7 +16,7 @@ export function PilaToasts() {
           className={`aviso-flotante ${toast.tipo === "error" ? "aviso-flotante--error" : ""}`}
           onClick={() => cerrar(toast.id)}
         >
-          <span>{toast.tipo === "error" ? "⚠️" : "✅"}</span>
+          <span><IconoEmoji e={toast.tipo === "error" ? "⚠️" : "✅"} /></span>
           {toast.mensaje}
         </div>
       ))}

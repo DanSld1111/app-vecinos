@@ -5,6 +5,7 @@ import { useAvisos } from "../estado/useAvisos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { useGeografia } from "../estado/useGeografia";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 interface EstiloCategoria {
   icono: string;
   fondoVar: string;
@@ -117,7 +118,7 @@ export function Avisos() {
 
       {errorAvisos ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {errorAvisos}</span>
+          <span><IconoEmoji e="⚠️" /> {errorAvisos}</span>
           <button className="btn-accion-mini" onClick={() => cargarTodos(token)}>
             Reintentar
           </button>
@@ -132,28 +133,28 @@ export function Avisos() {
       <>
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>📢</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="📢" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Avisos en total</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.publicados}</b>
             <span>Publicados</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>⏳</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="⏳" /></div>
           <div>
             <b>{resumen.pendientes}</b>
             <span>En revisión (Junta vecinal)</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--rojo-suave)" }}>✕</div>
+          <div className="icono" style={{ background: "var(--rojo-suave)" }}><IconoEmoji e="✕" /></div>
           <div>
             <b>{resumen.rechazados}</b>
             <span>Rechazados</span>
@@ -168,7 +169,7 @@ export function Avisos() {
       </div>
 
       <div className="buscador-mini" style={{ marginBottom: 16, boxShadow: "var(--sombra)" }}>
-        🔍
+        <IconoEmoji e="🔍" />
         <input placeholder="Buscar por título o fuente…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
       </div>
 
@@ -182,7 +183,7 @@ export function Avisos() {
             className={`chip-filtro ${filtroCategoria === cat ? "activo" : ""}`}
             onClick={() => setFiltroCategoria(cat)}
           >
-            {ESTILO_CATEGORIA[cat].icono} {ESTILO_CATEGORIA[cat].etiqueta} ({avisos.filter((a) => a.categoria === cat).length})
+            <IconoEmoji e={ESTILO_CATEGORIA[cat].icono} /> {ESTILO_CATEGORIA[cat].etiqueta} ({avisos.filter((a) => a.categoria === cat).length})
           </button>
         ))}
       </div>
@@ -193,7 +194,7 @@ export function Avisos() {
           return (
             <div className="fila-aviso-admin" key={aviso.id}>
               <div className="icono-cat-aviso" style={{ background: estilo.fondoVar, color: estilo.textoVar }}>
-                {estilo.icono}
+                <IconoEmoji e={estilo.icono} />
               </div>
               <div className="info-aviso-admin">
                 <b>{aviso.titulo}</b>
@@ -208,7 +209,7 @@ export function Avisos() {
                 {aviso.estado === "publicado" ? "Publicado" : aviso.estado === "pendiente" ? "En revisión" : "Rechazado"}
               </span>
               <button className="btn-eliminar-aviso" onClick={() => setConfirmandoEliminarId(aviso.id)}>
-                🗑️
+                <IconoEmoji e="🗑️" />
               </button>
             </div>
           );
@@ -306,7 +307,7 @@ function ModalNuevoAviso({
                     onClick={() => setCategoria(cat)}
                   >
                     <span className="icono-op-cat" style={{ background: ESTILO_CATEGORIA[cat].fondoVar, color: ESTILO_CATEGORIA[cat].textoVar }}>
-                      {ESTILO_CATEGORIA[cat].icono}
+                      <IconoEmoji e={ESTILO_CATEGORIA[cat].icono} />
                     </span>
                     <div>
                       <b>{ESTILO_CATEGORIA[cat].etiqueta}</b>
@@ -373,12 +374,12 @@ function ModalNuevoAviso({
                 <div className="mini-tarjeta-aviso">
                   <div className="mini-cab-aviso">
                     <div className="mini-avatar-aviso" style={{ background: estilo.fondoVar, color: estilo.textoVar }}>
-                      {estilo.icono}
+                      <IconoEmoji e={estilo.icono} />
                     </div>
                     <div className="mini-info-fuente">
                       <div className="mini-fila-fuente">
                         <span className="mini-fuente-aviso">{fuenteNombre || "Nombre de la fuente"}</span>
-                        {fuenteVerificada ? <span className="mini-tick-aviso">✓</span> : null}
+                        {fuenteVerificada ? <span className="mini-tick-aviso"><IconoEmoji e="✓" /></span> : null}
                       </div>
                       <span className="mini-fecha-aviso">Ahora mismo</span>
                     </div>
@@ -391,8 +392,8 @@ function ModalNuevoAviso({
                     <span className="mini-cuerpo-aviso">{cuerpo || "Cuerpo del aviso…"}</span>
                   </div>
                   <div className="mini-pie-aviso">
-                    <span className="mini-accion-aviso">🤍 0</span>
-                    <span className="mini-accion-aviso">📤 0</span>
+                    <span className="mini-accion-aviso"><IconoEmoji e="🤍" /> 0</span>
+                    <span className="mini-accion-aviso"><IconoEmoji e="📤" /> 0</span>
                   </div>
                 </div>
               </div>

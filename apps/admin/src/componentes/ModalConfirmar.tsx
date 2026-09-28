@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { IconoEmoji } from "./IconoEmoji";
 /** Confirmación genérica antes de una acción que no se deshace fácil (eliminar, enviar a
  * papelera, etc.) — mismo look que ModalConfirmarEliminar de Cuentas.tsx, reutilizable. */
 export function ModalConfirmar({
@@ -28,7 +29,7 @@ export function ModalConfirmar({
   return (
     <div className="overlay-modal" onClick={onCancelar}>
       <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-        <div className="icono-alerta">⚠️</div>
+        <div className="icono-alerta"><IconoEmoji e="⚠️" /></div>
         <h3>{titulo}</h3>
         <p className="sub">{mensaje}</p>
         <div className="modal-footer">

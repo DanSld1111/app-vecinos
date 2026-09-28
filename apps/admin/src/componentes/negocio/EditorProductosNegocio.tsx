@@ -10,6 +10,7 @@ import { ModalConfirmar } from "../ModalConfirmar";
 import { useToasts } from "../../estado/useToasts";
 import { urlCompleta } from "../../utilidades/media";
 
+import { IconoEmoji } from "../IconoEmoji";
 /**
  * La carta del negocio: productos agrupados por sección, con foto, precio en la moneda del
  * negocio, arrastrar para ordenar dentro de cada sección, y papelera recuperable.
@@ -148,7 +149,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
         </button>
       </div>
 
-      {error ? <div className="nota-alerta">⚠️ {error}</div> : null}
+      {error ? <div className="nota-alerta"><IconoEmoji e="⚠️" /> {error}</div> : null}
 
       {secciones.length === 0 ? (
         <div className="panel" style={{ padding: 28, textAlign: "center", color: "var(--texto-tenue)" }}>
@@ -181,7 +182,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
               >
                 <span style={{ color: "var(--texto-tenue)", fontSize: 13 }}>⠿</span>
                 <div className="foto-servicio">
-                  {producto.fotoUrl ? <img src={urlCompleta(producto.fotoUrl)} alt="" /> : "🖼️"}
+                  {producto.fotoUrl ? <img src={urlCompleta(producto.fotoUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
                 </div>
                 <span className="nombre-producto-foto" style={{ flex: 1 }}>
                   {producto.nombre}
@@ -195,17 +196,17 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                 <b style={{ fontSize: 12.5, whiteSpace: "nowrap" }}>{precioDe(producto.precio)}</b>
                 <div style={{ display: "flex", gap: 4 }}>
                   <button className="btn-icono-crud" title="Ver" onClick={() => setViendo(producto)}>
-                    👁️
+                    <IconoEmoji e="👁️" />
                   </button>
                   <button className="btn-icono-crud" title="Editar" onClick={() => setEditando(producto)}>
-                    ✏️
+                    <IconoEmoji e="✏️" />
                   </button>
                   <button
                     className="btn-icono-crud btn-icono-crud--rojo"
                     title="Enviar a papelera"
                     onClick={() => setEnviandoAPapelera(producto)}
                   >
-                    🗑️
+                    <IconoEmoji e="🗑️" />
                   </button>
                 </div>
               </div>
@@ -232,7 +233,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                 {papelera.map((producto) => (
                   <div className="fila-producto-foto" key={producto.id}>
                     <div className="foto-servicio">
-                      {producto.fotoUrl ? <img src={urlCompleta(producto.fotoUrl)} alt="" /> : "🖼️"}
+                      {producto.fotoUrl ? <img src={urlCompleta(producto.fotoUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
                     </div>
                     <span className="nombre-producto-foto" style={{ flex: 1 }}>
                       {producto.nombre}

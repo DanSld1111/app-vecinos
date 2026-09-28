@@ -19,6 +19,7 @@ import { SelectorColorAtributo } from "../componentes/negocio/SelectorColorAtrib
 import * as productosApi from "../datos/productosApi";
 import { DatosProducto } from "../datos/productosApi";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 type Paso = 1 | 2 | 3 | 4;
 const ETIQUETAS_PASO: Record<Paso, string> = {
   1: "Datos básicos",
@@ -314,7 +315,7 @@ export function RegistrarNegocio() {
                   </div>
                 </div>
               </div>
-              {errorPaso1 ? <div className="nota-alerta" style={{ marginTop: 12 }}>⚠️ {errorPaso1}</div> : null}
+              {errorPaso1 ? <div className="nota-alerta" style={{ marginTop: 12 }}><IconoEmoji e="⚠️" /> {errorPaso1}</div> : null}
               <p className="ayuda-paso-registro" style={{ marginTop: 12 }}>
                 El dueño no se pide acá — tiene su propio paso, con espacio para buscarlo o crearlo bien.
               </p>
@@ -418,7 +419,7 @@ export function RegistrarNegocio() {
           {paso === 4 ? (
             <div>
               <div style={{ textAlign: "center", padding: "10px 0 18px" }}>
-                <span style={{ fontSize: 34 }}>🎉</span>
+                <span style={{ fontSize: 34 }}><IconoEmoji e="🎉" /></span>
                 <h2 style={{ fontSize: 19, marginTop: 6 }}>¡Negocio registrado!</h2>
                 <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--texto-suave)" }}>
                   {nombre} ya está en el listado. Puedes seguir completando la ficha cuando quieras.
@@ -430,7 +431,7 @@ export function RegistrarNegocio() {
                   <label style={{ display: "block", marginBottom: 8 }}>Producto agregado</label>
                   <div className="tarjeta-resumen-producto">
                     <div className="foto-servicio" style={{ width: 52, height: 52, borderRadius: 10, flex: "none" }}>
-                      {productoCreado.fotoUrl ? <img src={urlCompleta(productoCreado.fotoUrl)} alt="" /> : "🖼️"}
+                      {productoCreado.fotoUrl ? <img src={urlCompleta(productoCreado.fotoUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
                     </div>
                     <div style={{ flex: 1 }}>
                       <b style={{ fontSize: 13 }}>{productoCreado.nombre}</b>

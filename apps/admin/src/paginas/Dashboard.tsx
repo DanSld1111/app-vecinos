@@ -6,6 +6,7 @@ import { useGeografia } from "../estado/useGeografia";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { distritoDeComunidad } from "../utilidades/alcance";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const HOY_CRUDO = new Date().toLocaleDateString("es-PE", {
   weekday: "long",
   day: "numeric",
@@ -146,7 +147,7 @@ export function Dashboard() {
             <option value="todos">Todos los distritos</option>
             {distritos.map((d) => (
               <option key={d.ubigeo} value={d.ubigeo}>
-                📍 {d.nombre}
+                <IconoEmoji e="📍" /> {d.nombre}
               </option>
             ))}
           </select>
@@ -157,7 +158,7 @@ export function Dashboard() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="top-row">
-            <div className="stat-icono verde">🏪</div>
+            <div className="stat-icono verde"><IconoEmoji e="🏪" /></div>
             <div className="stat-tendencia positiva">Activos</div>
           </div>
           <div className="stat-valor">{negociosActivos}</div>
@@ -165,7 +166,7 @@ export function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="top-row">
-            <div className="stat-icono oro">⏳</div>
+            <div className="stat-icono oro"><IconoEmoji e="⏳" /></div>
             <div className="stat-tendencia atencion">{negociosPendientes > 0 ? "Revisar" : "Al día"}</div>
           </div>
           <div className="stat-valor">{negociosPendientes}</div>
@@ -173,7 +174,7 @@ export function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="top-row">
-            <div className="stat-icono coral">📢</div>
+            <div className="stat-icono coral"><IconoEmoji e="📢" /></div>
             <div className="stat-tendencia atencion">{avisosPendientes > 0 ? "Revisar" : "Al día"}</div>
           </div>
           <div className="stat-valor">{avisosPendientes}</div>
@@ -181,7 +182,7 @@ export function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="top-row">
-            <div className="stat-icono azul">{vistaTodos ? "🗺️" : "👥"}</div>
+            <div className="stat-icono azul"><IconoEmoji e={vistaTodos ? "🗺️" : "👥"} /></div>
             <div className="stat-tendencia neutral">{vistaTodos ? "En expansión" : "Piloto"}</div>
           </div>
           <div className="stat-valor">{vistaTodos ? distritos.length : 1}</div>
@@ -191,14 +192,14 @@ export function Dashboard() {
 
       <div className="acciones-rapidas">
         <Link to="/negocios" className="accion-rapida">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>➕</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="➕" /></div>
           <div>
             <b>Nuevo negocio</b>
             <span>Alta manual</span>
           </div>
         </Link>
         <Link to="/novedades" className="accion-rapida">
-          <div className="icono" style={{ background: "var(--coral-suave)" }}>📣</div>
+          <div className="icono" style={{ background: "var(--coral-suave)" }}><IconoEmoji e="📣" /></div>
           <div>
             <b>Nueva novedad</b>
             <span>Avisar a los vecinos</span>
@@ -206,7 +207,7 @@ export function Dashboard() {
         </Link>
         {vistaTodos ? (
           <Link to="/distritos" className="accion-rapida">
-            <div className="icono" style={{ background: "var(--azul-suave)" }}>🗺️</div>
+            <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="🗺️" /></div>
             <div>
               <b>Nuevo distrito</b>
               <span>Expandir cobertura</span>
@@ -214,7 +215,7 @@ export function Dashboard() {
           </Link>
         ) : (
           <Link to="/publicidad" className="accion-rapida">
-            <div className="icono" style={{ background: "var(--azul-suave)" }}>🖼️</div>
+            <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="🖼️" /></div>
             <div>
               <b>Nuevo anuncio</b>
               <span>Publicidad de la app</span>
@@ -245,7 +246,7 @@ export function Dashboard() {
                 <tr key={distrito.ubigeo}>
                   <td>
                     <div className="celda-distrito">
-                      <div className="bandera">📍</div>
+                      <div className="bandera"><IconoEmoji e="📍" /></div>
                       <div>
                         <b>{distrito.nombre}</b>
                         <br />
@@ -291,7 +292,7 @@ export function Dashboard() {
                         : "var(--verde-suave)",
                   }}
                 >
-                  {item.tipo === "negocio" ? "🏪" : "📢"}
+                  <IconoEmoji e={item.tipo === "negocio" ? "🏪" : "📢"} />
                 </div>
                 <div className="info">
                   <b>{item.titulo}</b>

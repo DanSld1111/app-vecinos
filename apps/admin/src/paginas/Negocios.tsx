@@ -9,6 +9,7 @@ import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { fichaCompleta, partesDeFicha, resumenDeLoQueFalta } from "../utilidades/completitudNegocio";
 import { urlCompleta } from "../utilidades/media";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 type FiltroEstado = "todos" | "activo" | "por_verificar" | "inactivo";
 
 function pillEstado(estado: EstadoNegocio) {
@@ -95,7 +96,7 @@ export function Negocios() {
 
       {errorNegocios ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {errorNegocios}</span>
+          <span><IconoEmoji e="⚠️" /> {errorNegocios}</span>
           <button className="btn-accion-mini" onClick={() => cargarNegocios(token)}>
             Reintentar
           </button>
@@ -110,28 +111,28 @@ export function Negocios() {
       <>
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🏪</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🏪" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Total negocios</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.activos}</b>
             <span>Activos</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>⏳</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="⏳" /></div>
           <div>
             <b>{resumen.porVerificar}</b>
             <span>Por verificar</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>📝</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="📝" /></div>
           <div>
             <b>{resumen.incompletas}</b>
             <span>Fichas incompletas</span>
@@ -141,7 +142,7 @@ export function Negocios() {
 
       {comunidadFiltro ? (
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontSize: 12.5 }}>
-          <span className="pill pill-azul">📍 {comunidadFiltro.nombre}</span>
+          <span className="pill pill-azul"><IconoEmoji e="📍" /> {comunidadFiltro.nombre}</span>
           <button className="btn btn-fantasma" style={{ padding: "4px 10px", fontSize: 11 }} onClick={() => setSearchParams({})}>
             Quitar filtro
           </button>
@@ -150,7 +151,7 @@ export function Negocios() {
 
       <div className="barra-filtros">
         <div className="buscador-mini">
-          🔍
+          <IconoEmoji e="🔍" />
           <input placeholder="Buscar negocio…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
         </div>
         <div className="fila-filtro">
@@ -213,12 +214,12 @@ export function Negocios() {
           return (
             <div className="tarjeta-negocio" key={negocio.id} onClick={() => navegar(`/negocios/${negocio.id}`)}>
               <div className="foto-tarjeta">
-                {negocio.fotoPrincipalUrl ? <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" /> : "🖼️"}
+                {negocio.fotoPrincipalUrl ? <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
                 <span className="estado-flotante">{pillEstado(negocio.estado)}</span>
               </div>
               <div className="cuerpo-tarjeta">
                 <b>
-                  {negocio.nombre} {negocio.verificadoEn ? <span className="check-verificado">✓</span> : null}
+                  {negocio.nombre} {negocio.verificadoEn ? <span className="check-verificado"><IconoEmoji e="✓" /></span> : null}
                 </b>
                 <span className="direccion-tarjeta">{negocio.direccion}</span>
                 <div className="cats-negocio">

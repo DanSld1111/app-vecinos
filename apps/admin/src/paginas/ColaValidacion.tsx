@@ -6,6 +6,7 @@ import { useAvisos } from "../estado/useAvisos";
 import { useGeografia } from "../estado/useGeografia";
 import { distritoDeComunidad } from "../utilidades/alcance";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 type ItemCola =
   | { tipo: "negocio"; id: string; titulo: string; subtitulo: string; distritoUbigeo: string; detalle: string; enviadoEn: string }
   | { tipo: "aviso"; id: string; titulo: string; subtitulo: string; distritoUbigeo: string; detalle: string; enviadoEn: string };
@@ -147,7 +148,7 @@ export function ColaValidacion() {
 
       {errorNegocios || errorAvisos ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {errorNegocios ?? errorAvisos}</span>
+          <span><IconoEmoji e="⚠️" /> {errorNegocios ?? errorAvisos}</span>
           <button
             className="btn-accion-mini"
             onClick={() => {
@@ -162,28 +163,28 @@ export function ColaValidacion() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>⏳</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="⏳" /></div>
           <div>
             <b>{items.length}</b>
             <span>Total pendientes</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🏪</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🏪" /></div>
           <div>
             <b>{totalNegocios}</b>
             <span>Negocios</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>📢</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="📢" /></div>
           <div>
             <b>{totalAvisos}</b>
             <span>Avisos</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--coral-suave)" }}>⏱️</div>
+          <div className="icono" style={{ background: "var(--coral-suave)" }}><IconoEmoji e="⏱️" /></div>
           <div>
             <b>{masAntiguo ?? "—"}</b>
             <span>Más antiguo</span>
@@ -217,7 +218,7 @@ export function ColaValidacion() {
               className={`chip-filtro ${filtroDistrito === d.ubigeo ? "activo" : ""}`}
               onClick={() => setFiltroDistrito(d.ubigeo)}
             >
-              📍 {d.nombre}
+              <IconoEmoji e="📍" /> {d.nombre}
             </button>
           ))}
         </div>
@@ -229,7 +230,7 @@ export function ColaValidacion() {
         </div>
       ) : items.length === 0 ? (
         <div className="estado-vacio-cola">
-          <div className="emoji-vacio">🎉</div>
+          <div className="emoji-vacio"><IconoEmoji e="🎉" /></div>
           <p>
             <b style={{ color: "var(--texto)" }}>Todo al día.</b>
             <br />
@@ -248,7 +249,7 @@ export function ColaValidacion() {
                 }}
                 className={`item-cola ${seleccionado?.id === item.id ? "seleccionado" : ""}`}
               >
-                <div className={`icono-item-cola ${item.tipo}`}>{item.tipo === "negocio" ? "🏪" : "📢"}</div>
+                <div className={`icono-item-cola ${item.tipo}`}><IconoEmoji e={item.tipo === "negocio" ? "🏪" : "📢"} /></div>
                 <div className="info-item-cola">
                   <b>{item.titulo}</b>
                   <span>{item.subtitulo}</span>

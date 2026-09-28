@@ -5,6 +5,7 @@ import { useNegocios } from "../estado/useNegocios";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { urlCompleta } from "../utilidades/media";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const NOMBRE_UBICACION: Record<UbicacionAnuncio, string> = {
   carrusel_inicio: "Carrusel Inicio",
   banner_buscar: "Banner Buscar",
@@ -125,28 +126,28 @@ export function Publicidad() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>📣</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="📣" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Total anuncios</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.activos}</b>
             <span>Activos ahora</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>⏳</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="⏳" /></div>
           <div>
             <b>{resumen.programados}</b>
             <span>Programados</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "#eceae2" }}>🗄️</div>
+          <div className="icono" style={{ background: "#eceae2" }}><IconoEmoji e="🗄️" /></div>
           <div>
             <b>{resumen.vencidos}</b>
             <span>Vencidos</span>
@@ -158,7 +159,7 @@ export function Publicidad() {
         <div>
           <div className="barra-filtros">
             <div className="buscador-mini">
-              🔍
+              <IconoEmoji e="🔍" />
               <input placeholder="Buscar anuncio…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
             </div>
             <div className="fila-filtro">
@@ -171,7 +172,7 @@ export function Publicidad() {
                   className={`chip-filtro ${filtroUbicacion === u ? "activo" : ""}`}
                   onClick={() => setFiltroUbicacion(u)}
                 >
-                  {ICONO_UBICACION[u]} {NOMBRE_UBICACION[u]}
+                  <IconoEmoji e={ICONO_UBICACION[u]} /> {NOMBRE_UBICACION[u]}
                 </button>
               ))}
             </div>
@@ -183,7 +184,7 @@ export function Publicidad() {
               return (
                 <div className="fila-anuncio" key={anuncio.id}>
                   <div className="foto-anuncio">
-                    {anuncio.imagenUrl ? <img src={urlCompleta(anuncio.imagenUrl)} alt="" /> : "🖼️"}
+                    {anuncio.imagenUrl ? <img src={urlCompleta(anuncio.imagenUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
                   </div>
                   <div className="info-anuncio">
                     <b>{anuncio.nombre}</b>
@@ -192,7 +193,7 @@ export function Publicidad() {
                   <div className="ubicaciones-an">
                     {anuncio.ubicaciones.map((u) => (
                       <span className={`chip-ubicacion ${u === "carrusel_inicio" ? "inicio" : "buscar"}`} key={u}>
-                        {ICONO_UBICACION[u]} {u === "carrusel_inicio" ? "Inicio" : "Buscar"}
+                        <IconoEmoji e={ICONO_UBICACION[u]} /> {u === "carrusel_inicio" ? "Inicio" : "Buscar"}
                       </span>
                     ))}
                   </div>
@@ -215,7 +216,7 @@ export function Publicidad() {
                       {anuncio.activo ? "Pausar" : "▶ Reactivar"}
                     </button>
                     <button className="btn-accion-mini eliminar" onClick={() => setConfirmandoEliminarId(anuncio.id)}>
-                      🗑️
+                      <IconoEmoji e="🗑️" />
                     </button>
                   </div>
                 </div>
@@ -276,7 +277,7 @@ export function Publicidad() {
                   {ejemploBanner.imagenUrl ? (
                     <img className="mini-icono" src={urlCompleta(ejemploBanner.imagenUrl)} alt="" />
                   ) : (
-                    <div className="mini-icono">★</div>
+                    <div className="mini-icono"><IconoEmoji e="★" /></div>
                   )}
                   <div>
                     <b>{ejemploBanner.nombre}</b>
@@ -390,7 +391,7 @@ function ModalAnuncio({
           <label>Imagen</label>
           <div className="selector-imagen">
             <div className="slot-imagen">
-              {anuncio?.imagenUrl ? <img src={urlCompleta(anuncio.imagenUrl)} alt="" /> : "🖼️"}
+              {anuncio?.imagenUrl ? <img src={urlCompleta(anuncio.imagenUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
             </div>
             <div>
               <p>
@@ -427,7 +428,7 @@ function ModalAnuncio({
                 <input type="checkbox" checked={ubicaciones.includes(u)} onChange={() => alternarUbicacion(u)} />
                 <div>
                   <b>
-                    {ICONO_UBICACION[u]} {NOMBRE_UBICACION[u]}
+                    <IconoEmoji e={ICONO_UBICACION[u]} /> {NOMBRE_UBICACION[u]}
                   </b>
                   <span>{DESCRIPCION_UBICACION[u]}</span>
                 </div>
@@ -484,12 +485,12 @@ function ModalConfirmarEliminarAnuncio({
   return (
     <div className="overlay-modal" onClick={onCancelar}>
       <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-        <div className="icono-alerta">⚠️</div>
+        <div className="icono-alerta"><IconoEmoji e="⚠️" /></div>
         <h3>¿Eliminar este anuncio?</h3>
         <p className="sub">Esta acción no se puede deshacer. El anuncio dejará de mostrarse de inmediato en la app.</p>
 
         <div className="fila-anuncio" style={{ textAlign: "left", boxShadow: "none", background: "var(--superficie-hundida)" }}>
-          <div className="foto-anuncio">🖼️</div>
+          <div className="foto-anuncio"><IconoEmoji e="🖼️" /></div>
           <div className="info-anuncio">
             <b>{anuncio.nombre}</b>
             <span className="detalle-an">

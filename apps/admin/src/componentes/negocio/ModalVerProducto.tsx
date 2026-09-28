@@ -2,6 +2,7 @@ import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-veci
 import { urlCompleta } from "../../utilidades/media";
 import { PALETA_COLORES } from "./SelectorColorAtributo";
 
+import { IconoEmoji } from "../IconoEmoji";
 function etiquetaAtributo(def: AtributoProductoDef, valor: string): string {
   if (def.tipo === "color") return PALETA_COLORES.find((c) => c.clave === valor)?.nombre ?? valor;
   return valor;
@@ -52,7 +53,7 @@ export function ModalVerProducto({
               style={{ width: "100%", maxHeight: 320, objectFit: "contain", display: "block" }}
             />
           ) : (
-            <div style={{ aspectRatio: "1.6", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>🖼️</div>
+            <div style={{ aspectRatio: "1.6", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconoEmoji e="🖼️" /></div>
           )}
         </div>
 

@@ -7,6 +7,7 @@ import { useNegocios } from "../estado/useNegocios";
 import { useAvisos } from "../estado/useAvisos";
 import { distritoDeComunidad } from "../utilidades/alcance";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 export function Distritos() {
   const distritos = useGeografia((estado) => estado.distritos);
   const comunidades = useGeografia((estado) => estado.comunidades);
@@ -178,28 +179,28 @@ export function Distritos() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>🗺️</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="🗺️" /></div>
           <div>
             <b>{resumen.distritosActivos}</b>
             <span>Distritos activos</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>📍</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="📍" /></div>
           <div>
             <b>{resumen.comunidades}</b>
             <span>Comunidades</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🏪</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🏪" /></div>
           <div>
             <b>{resumen.negociosTotales}</b>
             <span>Negocios totales</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>⏳</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="⏳" /></div>
           <div>
             <b>{resumen.porVerificar}</b>
             <span>Por verificar</span>
@@ -225,7 +226,7 @@ export function Distritos() {
       </div>
 
       <div className="buscador-mini" style={{ marginBottom: 16, boxShadow: "var(--sombra)" }}>
-        🔍
+        <IconoEmoji e="🔍" />
         <input
           placeholder="Buscar distrito por nombre o ubigeo…"
           value={busqueda}
@@ -243,7 +244,7 @@ export function Distritos() {
           return (
             <div className="tarjeta-distrito" key={distrito.ubigeo}>
               <button className="cabecera-distrito" onClick={() => alternarAbierto(distrito.ubigeo)}>
-                <div className={`pin-distrito ${sinComunidades ? "vacio" : ""}`}>📍</div>
+                <div className={`pin-distrito ${sinComunidades ? "vacio" : ""}`}><IconoEmoji e="📍" /></div>
                 <div className="info-distrito">
                   <div className="nombre-fila">
                     <b>{distrito.nombre}</b>
@@ -282,7 +283,7 @@ export function Distritos() {
                 <div className="cuerpo-distrito">
                   {comunidadesDelDistrito.map((comunidad) => (
                     <div className="fila-comunidad" key={comunidad.id}>
-                      <div className="icono-com">📍</div>
+                      <div className="icono-com"><IconoEmoji e="📍" /></div>
                       <div>
                         <b>{comunidad.nombre}</b>
                         <br />
@@ -317,7 +318,7 @@ export function Distritos() {
                         title="Eliminar comunidad"
                         onClick={() => setConfirmandoEliminarComunidad(comunidad)}
                       >
-                        🗑️
+                        <IconoEmoji e="🗑️" />
                       </button>
                     </div>
                   ))}
@@ -492,7 +493,7 @@ export function Distritos() {
       {confirmandoEliminarComunidad ? (
         <div className="overlay-modal" onClick={() => setConfirmandoEliminarComunidad(null)}>
           <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-            <div className="icono-alerta">⚠️</div>
+            <div className="icono-alerta"><IconoEmoji e="⚠️" /></div>
             <h3>¿Eliminar "{confirmandoEliminarComunidad.nombre}"?</h3>
             <p className="sub">
               Esta acción no se puede deshacer. Si todavía tiene negocios, avisos o vecinos registrados, no se

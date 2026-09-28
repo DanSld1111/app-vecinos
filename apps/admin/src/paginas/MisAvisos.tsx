@@ -5,6 +5,7 @@ import { useAvisos } from "../estado/useAvisos";
 import { useGeografia } from "../estado/useGeografia";
 import { ESTILO_CATEGORIA } from "./Avisos";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const CATEGORIAS_JUNTA: CategoriaAviso[] = ["junta_vecinal", "municipal", "otro"];
 
 function formatearFecha(iso: string): string {
@@ -102,7 +103,7 @@ export function MisAvisos() {
 
       {errorAvisos ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {errorAvisos}</span>
+          <span><IconoEmoji e="⚠️" /> {errorAvisos}</span>
           <button className="btn-accion-mini" onClick={() => cargarPropios(token)}>
             Reintentar
           </button>
@@ -117,28 +118,28 @@ export function MisAvisos() {
       <>
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>📣</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="📣" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Avisos en total</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.publicados}</b>
             <span>Publicados</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--oro-suave)" }}>⏳</div>
+          <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="⏳" /></div>
           <div>
             <b>{resumen.pendientes}</b>
             <span>En revisión</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--rojo-suave)" }}>✕</div>
+          <div className="icono" style={{ background: "var(--rojo-suave)" }}><IconoEmoji e="✕" /></div>
           <div>
             <b>{resumen.rechazados}</b>
             <span>Rechazados — necesitan corrección</span>
@@ -157,7 +158,7 @@ export function MisAvisos() {
             return (
               <div className="fila-aviso-admin" key={aviso.id} style={{ cursor: "pointer" }} onClick={() => setVista({ tipo: "detalle", id: aviso.id })}>
                 <div className="icono-cat-aviso" style={{ background: estilo.fondoVar, color: estilo.textoVar }}>
-                  {estilo.icono}
+                  <IconoEmoji e={estilo.icono} />
                 </div>
                 <div className="info-aviso-admin">
                   <b>{aviso.titulo}</b>
@@ -224,14 +225,14 @@ function DetalleAviso({ aviso, onVolver }: { aviso: Aviso; onVolver: () => void 
           {esPublicado ? (
             <div className="resumen-mini" style={{ gridTemplateColumns: "repeat(2, 1fr)", marginBottom: 0 }}>
               <div className="mini-stat">
-                <div className="icono" style={{ background: "var(--coral-suave)" }}>🤍</div>
+                <div className="icono" style={{ background: "var(--coral-suave)" }}><IconoEmoji e="🤍" /></div>
                 <div>
                   <b>{aviso.meGusta}</b>
                   <span>Vecinos interesados</span>
                 </div>
               </div>
               <div className="mini-stat">
-                <div className="icono" style={{ background: "var(--azul-suave)" }}>📤</div>
+                <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="📤" /></div>
                 <div>
                   <b>{aviso.compartidos}</b>
                   <span>Veces compartido</span>
@@ -245,7 +246,7 @@ function DetalleAviso({ aviso, onVolver }: { aviso: Aviso; onVolver: () => void 
                 <div className="categoria-select-tipo">
                   <div className="opcion-categoria selec" style={{ pointerEvents: "none" }}>
                     <span className="icono-op-cat" style={{ background: estilo.fondoVar, color: estilo.textoVar }}>
-                      {estilo.icono}
+                      <IconoEmoji e={estilo.icono} />
                     </span>
                     <div>
                       <b>{estilo.etiqueta}</b>
@@ -277,12 +278,12 @@ function DetalleAviso({ aviso, onVolver }: { aviso: Aviso; onVolver: () => void 
               <div className="mini-tarjeta-aviso">
                 <div className="mini-cab-aviso">
                   <div className="mini-avatar-aviso" style={{ background: estilo.fondoVar, color: estilo.textoVar }}>
-                    {estilo.icono}
+                    <IconoEmoji e={estilo.icono} />
                   </div>
                   <div className="mini-info-fuente">
                     <div className="mini-fila-fuente">
                       <span className="mini-fuente-aviso">{aviso.fuenteNombre}</span>
-                      {aviso.fuenteVerificada ? <span className="mini-tick-aviso">✓</span> : null}
+                      {aviso.fuenteVerificada ? <span className="mini-tick-aviso"><IconoEmoji e="✓" /></span> : null}
                     </div>
                     <span className="mini-fecha-aviso">{formatearFecha(aviso.publicadoEn)}</span>
                   </div>
@@ -295,8 +296,8 @@ function DetalleAviso({ aviso, onVolver }: { aviso: Aviso; onVolver: () => void 
                   <span className="mini-cuerpo-aviso">{aviso.cuerpo}</span>
                 </div>
                 <div className="mini-pie-aviso">
-                  <span className="mini-accion-aviso">{esPublicado ? "❤️" : "🤍"} {aviso.meGusta}</span>
-                  <span className="mini-accion-aviso">📤 {aviso.compartidos}</span>
+                  <span className="mini-accion-aviso"><IconoEmoji e="🤍" /> {aviso.meGusta}</span>
+                  <span className="mini-accion-aviso"><IconoEmoji e="📤" /> {aviso.compartidos}</span>
                 </div>
               </div>
             </div>
@@ -384,7 +385,7 @@ function EditorAviso({
 
       {modo === "corregir" && aviso ? (
         <div className="caja-motivo-rechazo">
-          ✕ <b>Motivo del rechazo:</b> "{aviso.motivoRechazo}"
+          <IconoEmoji e="✕" /> <b>Motivo del rechazo:</b> "{aviso.motivoRechazo}"
         </div>
       ) : (
         <div className="nota-info">
@@ -407,7 +408,7 @@ function EditorAviso({
                   onClick={() => setCategoria(cat)}
                 >
                   <span className="icono-op-cat" style={{ background: ESTILO_CATEGORIA[cat].fondoVar, color: ESTILO_CATEGORIA[cat].textoVar }}>
-                    {ESTILO_CATEGORIA[cat].icono}
+                    <IconoEmoji e={ESTILO_CATEGORIA[cat].icono} />
                   </span>
                   <div>
                     <b>{ESTILO_CATEGORIA[cat].etiqueta}</b>
@@ -448,7 +449,7 @@ function EditorAviso({
               <div className="mini-tarjeta-aviso">
                 <div className="mini-cab-aviso">
                   <div className="mini-avatar-aviso" style={{ background: estilo.fondoVar, color: estilo.textoVar }}>
-                    {estilo.icono}
+                    <IconoEmoji e={estilo.icono} />
                   </div>
                   <div className="mini-info-fuente">
                     <div className="mini-fila-fuente">
@@ -465,8 +466,8 @@ function EditorAviso({
                   <span className="mini-cuerpo-aviso">{cuerpo || "Cuerpo del aviso…"}</span>
                 </div>
                 <div className="mini-pie-aviso">
-                  <span className="mini-accion-aviso">🤍 0</span>
-                  <span className="mini-accion-aviso">📤 0</span>
+                  <span className="mini-accion-aviso"><IconoEmoji e="🤍" /> 0</span>
+                  <span className="mini-accion-aviso"><IconoEmoji e="📤" /> 0</span>
                 </div>
               </div>
             </div>

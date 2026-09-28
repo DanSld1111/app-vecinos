@@ -4,6 +4,7 @@ import { useCategorias } from "../estado/useCategorias";
 import { IconoCategoria } from "../componentes/IconoCategoria";
 import { estadoVisualDe, ETIQUETA_ESTADO_VISUAL, ICONO_ESTADO_VISUAL } from "../utilidades/estadoNegocio";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 export function MisNegocios() {
   const { misNegocios, elegir } = useNegociosDelDueno();
   const categorias = useCategorias((estado) => estado.categorias);
@@ -51,7 +52,7 @@ export function MisNegocios() {
                 </div>
               </div>
               <span className={`badge-estado-mini ${estadoVisual}`}>
-                {ICONO_ESTADO_VISUAL[estadoVisual]} {ETIQUETA_ESTADO_VISUAL[estadoVisual]}
+                <IconoEmoji e={ICONO_ESTADO_VISUAL[estadoVisual]} /> {ETIQUETA_ESTADO_VISUAL[estadoVisual]}
               </span>
               <p className="meta-mi-negocio">
                 {estadoVisual === "rechazado"
@@ -66,7 +67,7 @@ export function MisNegocios() {
         })}
 
         <div className="tarjeta-mi-negocio tarjeta-agregar-negocio">
-          <span style={{ fontSize: 24 }}>➕</span>
+          <span style={{ fontSize: 24 }}><IconoEmoji e="➕" /></span>
           <p style={{ margin: 0, fontSize: 12, fontWeight: 700 }}>Agregar otro negocio</p>
           <p style={{ margin: 0, fontSize: 10.5, fontWeight: 500 }}>Escríbenos para sumarlo a tu cuenta</p>
         </div>

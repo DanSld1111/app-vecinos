@@ -4,6 +4,7 @@ import { useNegocios } from "../estado/useNegocios";
 import { useAvisos } from "../estado/useAvisos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 interface FilaHistorial {
   id: string;
   tipo: "negocio" | "aviso";
@@ -91,7 +92,7 @@ export function HistorialValidaciones() {
 
       {errorNegocios || errorAvisos ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {errorNegocios ?? errorAvisos}</span>
+          <span><IconoEmoji e="⚠️" /> {errorNegocios ?? errorAvisos}</span>
           <button
             className="btn-accion-mini"
             onClick={() => {
@@ -112,28 +113,28 @@ export function HistorialValidaciones() {
       <>
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>📋</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="📋" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Total revisadas</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.aprobadas}</b>
             <span>Aprobadas</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--rojo-suave)" }}>✕</div>
+          <div className="icono" style={{ background: "var(--rojo-suave)" }}><IconoEmoji e="✕" /></div>
           <div>
             <b>{resumen.rechazadas}</b>
             <span>Rechazadas</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>📊</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="📊" /></div>
           <div>
             <b>{tasaAprobacion}%</b>
             <span>Tasa de aprobación</span>
@@ -168,7 +169,7 @@ export function HistorialValidaciones() {
       <div className="lista-historial">
         {filasFiltradas.map((fila) => (
           <div className="fila-historial" key={`${fila.tipo}-${fila.id}`}>
-            <div className={`icono-item-cola ${fila.tipo}`}>{fila.tipo === "negocio" ? "🏪" : "📢"}</div>
+            <div className={`icono-item-cola ${fila.tipo}`}><IconoEmoji e={fila.tipo === "negocio" ? "🏪" : "📢"} /></div>
             <div className="info-historial">
               <b>{fila.titulo}</b>
               {fila.aprobado ? null : (

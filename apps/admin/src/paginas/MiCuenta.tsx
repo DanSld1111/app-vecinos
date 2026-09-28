@@ -3,6 +3,7 @@ import { RolCuenta } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { urlCompleta } from "../utilidades/media";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const NOMBRE_ROL: Record<RolCuenta, string> = {
   super_admin: "Super-admin",
   dueno_negocio: "Dueño de negocio",
@@ -113,7 +114,7 @@ export function MiCuenta() {
         >
           <span>{error}</span>
           <button className="btn-accion-mini" onClick={limpiarError}>
-            ✕
+            <IconoEmoji e="✕" />
           </button>
         </div>
       ) : null}

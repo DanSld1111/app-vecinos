@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 
+import { IconoEmoji } from "./IconoEmoji";
 const TABS = [
   { a: "/mi-negocio", fin: true, icono: "📋", texto: "Información" },
   { a: "/mi-negocio/horario", fin: false, icono: "🕒", texto: "Horario" },
@@ -19,7 +20,7 @@ export function TabsMiNegocio() {
           end={tab.fin}
           className={({ isActive }) => `tab-negocio ${isActive ? "activo" : ""}`}
         >
-          {tab.icono} {tab.texto}
+          <IconoEmoji e={tab.icono} /> {tab.texto}
         </NavLink>
       ))}
     </div>

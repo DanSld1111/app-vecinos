@@ -4,6 +4,7 @@ import { useServiciosApp } from "../estado/useServiciosApp";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { urlCompleta } from "../utilidades/media";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 // A qué pantalla real navega cada servicio sigue fijo en el código de apps/movil — activar acá
 // uno de los que todavía no tiene pantalla propia (Taxi, Turismo, etc.) cambia cómo se ve la
 // tarjeta, pero tocarla en la app no lleva a ningún lado hasta que esa pantalla se construya.
@@ -40,7 +41,7 @@ export function Servicios() {
 
       {error ? (
         <div className="panel" style={{ padding: 16, marginBottom: 16, background: "var(--rojo-suave)", color: "var(--rojo)" }}>
-          ⚠️ {error}
+          <IconoEmoji e="⚠️" /> {error}
         </div>
       ) : null}
 
@@ -56,7 +57,7 @@ export function Servicios() {
                 {servicio.fotoUrl ? (
                   <img src={urlCompleta(servicio.fotoUrl)} alt="" />
                 ) : (
-                  <span className="sin-foto-servicio">🖼️</span>
+                  <span className="sin-foto-servicio"><IconoEmoji e="🖼️" /></span>
                 )}
               </div>
               <div className="info-servicio">
@@ -150,7 +151,7 @@ function ModalServicio({
           <label>Foto de fondo de la tarjeta</label>
           <div className="selector-imagen">
             <div className="slot-imagen">
-              {servicio.fotoUrl ? <img src={urlCompleta(servicio.fotoUrl)} alt="" /> : "🖼️"}
+              {servicio.fotoUrl ? <img src={urlCompleta(servicio.fotoUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
             </div>
             <div>
               <p>Solo se usa mientras el servicio está "Disponible" — en "Próximamente" no se muestra.</p>

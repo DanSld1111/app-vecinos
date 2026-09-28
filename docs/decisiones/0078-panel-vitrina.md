@@ -17,10 +17,11 @@ Bocetos de los 27 módulos: https://claude.ai/artifact/56D4NXtHLM1TyCE7GNvgVK
   correos y contraseñas de prueba. "Todo tu barrio" pasa a "Todo lo de tu comunidad".
 - Se quitaron los emojis que decoraban textos ("📦 Archivar", "✓ Aprobar"…).
 
+- Los emojis que hacían de ícono pasan por `IconoEmoji`, que los dibuja como íconos de línea
+  (Lucide). Los datos siguen guardando el emoji; solo cambia cómo se dibuja.
+- Las 12 vistas previas con celular se ven como la app nueva, solo con estilos: pantalla blanca,
+  sin sombras, y en los avisos la etiqueta arriba y el autor abajo, como un aviso de Comunidad.
+
 ## Pendiente
 
-- Los emojis que hacen de ícono dentro de un círculo (alertas, pasos de estado, íconos de
-  servicios) siguen; hay que reemplazarlos uno a uno por íconos de línea.
-- Las vistas previas con el celular de la app nueva (avisos, novedades, anuncios, ficha) de los
-  bocetos todavía no están en código.
 - Las cuentas de prueba deben cambiar de contraseña o desactivarse en la base de datos.

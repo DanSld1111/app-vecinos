@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { IconoEmoji } from "./IconoEmoji";
 export function ModalContrasenaGenerada({
   titulo,
   nombre,
@@ -28,7 +29,7 @@ export function ModalContrasenaGenerada({
   return (
     <div className="overlay-modal" onClick={onCerrar}>
       <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-        <div className="icono-exito">🔑</div>
+        <div className="icono-exito"><IconoEmoji e="🔑" /></div>
         <h3>{titulo}</h3>
         <p className="sub">
           Copia esta contraseña temporal y compártesela a la persona por un canal seguro (WhatsApp, en
@@ -36,7 +37,7 @@ export function ModalContrasenaGenerada({
         </p>
 
         <div className="fila-cuenta-generada">
-          <div className="avatar-mini">👤</div>
+          <div className="avatar-mini"><IconoEmoji e="👤" /></div>
           <div>
             <b>{nombre}</b>
             <span>{correo}</span>

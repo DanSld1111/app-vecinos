@@ -10,6 +10,7 @@ import { NOMBRE_TIPO_CAMPO, VistaPreviaPlantilla } from "./Plantillas";
 import { IconoCategoria } from "../componentes/IconoCategoria";
 import { SelectorIcono } from "../componentes/SelectorIcono";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 export function Arquetipos() {
   const arquetipos = useArquetipos((e) => e.arquetipos);
   const cargandoArquetipos = useArquetipos((e) => e.cargando);
@@ -113,28 +114,28 @@ export function Arquetipos() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🧩</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🧩" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Arquetipos</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--superficie-hundida)" }}>⚙️</div>
+          <div className="icono" style={{ background: "var(--superficie-hundida)" }}><IconoEmoji e="⚙️" /></div>
           <div>
             <b>{resumen.sistema}</b>
             <span>Del sistema</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--morado-suave)" }}>✨</div>
+          <div className="icono" style={{ background: "var(--morado-suave)" }}><IconoEmoji e="✨" /></div>
           <div>
             <b>{resumen.personalizados}</b>
             <span>Personalizados</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>🗂️</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="🗂️" /></div>
           <div>
             <b>{resumen.categoriasConArquetipo}</b>
             <span>Categorías asignadas</span>
@@ -172,12 +173,12 @@ export function Arquetipos() {
                 </div>
               </div>
 
-              <div className="chip-plantilla-usada">🎨 {plantilla?.nombre ?? "Plantilla eliminada"}</div>
+              <div className="chip-plantilla-usada"><IconoEmoji e="🎨" /> {plantilla?.nombre ?? "Plantilla eliminada"}</div>
 
               <div className="meta-arquetipo">
-                🏷️ {uso.categorias.length} categoría{uso.categorias.length === 1 ? "" : "s"} la
+                <IconoEmoji e="🏷️" /> {uso.categorias.length} categoría{uso.categorias.length === 1 ? "" : "s"} la
                 {uso.categorias.length === 1 ? "" : "s"} usa{uso.categorias.length === 1 ? "" : "n"}
-                {uso.negocios.length > 0 ? ` · 🔒 ${uso.negocios.length} negocio${uso.negocios.length === 1 ? "" : "s"} con datos` : ""}
+                {uso.negocios.length > 0 ? ` · ${uso.negocios.length} negocio${uso.negocios.length === 1 ? "" : "s"} con datos` : ""}
               </div>
 
               <div style={{ display: "flex", gap: 6 }}>
@@ -199,7 +200,7 @@ export function Arquetipos() {
                       setConfirmandoEliminarId(a.id);
                     }}
                   >
-                    🗑️
+                    <IconoEmoji e="🗑️" />
                   </button>
                 ) : null}
               </div>
@@ -208,7 +209,7 @@ export function Arquetipos() {
         })}
 
         <div className="tarjeta-nuevo-arquetipo" onClick={() => setCreando(true)}>
-          <span className="icono-mas">➕</span>
+          <span className="icono-mas"><IconoEmoji e="➕" /></span>
           <p style={{ margin: 0, fontSize: 11.5, textAlign: "center" }}>
             Diseñar un
             <br />
@@ -422,7 +423,7 @@ function EditorArquetipo({
         <div className="tarjeta">
           <div className="plantilla-elegida-resumen">
             <div>
-              <b>🎨 {plantillaElegida?.nombre}</b>
+              <b><IconoEmoji e="🎨" /> {plantillaElegida?.nombre}</b>
               <span>
                 {campos.length} campo{campos.length === 1 ? "" : "s"} fijos — solo puedes renombrarlos y decidir
                 cuáles son obligatorios
@@ -444,7 +445,7 @@ function EditorArquetipo({
                   <span className="tipo-campo-pill-fijo">{NOMBRE_TIPO_CAMPO[definicion?.tipo ?? "texto"]}</span>
                   {bloqueado ? (
                     <span className="icono-candado" title="Este campo tiene negocios con datos reales">
-                      🔒
+                      <IconoEmoji e="🔒" />
                     </span>
                   ) : (
                     <div

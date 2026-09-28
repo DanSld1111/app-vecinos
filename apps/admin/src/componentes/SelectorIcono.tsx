@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GRUPOS_ICONO, buscarIconos } from "../datos/iconosCategorias";
 import { IconoCategoria } from "./IconoCategoria";
 
+import { IconoEmoji } from "./IconoEmoji";
 export function SelectorIcono({ value, onChange }: { value: string; onChange: (nombre: string) => void }) {
   const [abierto, setAbierto] = useState(false);
   const [tab, setTab] = useState(GRUPOS_ICONO[0].id);
@@ -24,7 +25,7 @@ export function SelectorIcono({ value, onChange }: { value: string; onChange: (n
       {abierto ? (
         <div className="panel-emojis">
           <div className="buscador-emoji">
-            🔍
+            <IconoEmoji e="🔍" />
             <input
               placeholder='Buscar (ej. "auto", "casa", "tienda")…'
               value={busqueda}

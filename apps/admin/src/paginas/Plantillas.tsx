@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { PlantillaVisual } from "@app-vecinos/tipos";
 import { PLANTILLAS_VISUALES } from "../datos/plantillasVisuales";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 export const NOMBRE_TIPO_CAMPO: Record<string, string> = {
   texto: "Texto corto",
   texto_largo: "Texto largo",
@@ -45,28 +46,28 @@ export function Plantillas() {
 
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🎨</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🎨" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Plantillas disponibles</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--superficie-hundida)" }}>⚙️</div>
+          <div className="icono" style={{ background: "var(--superficie-hundida)" }}><IconoEmoji e="⚙️" /></div>
           <div>
             <b>{resumen.sistema}</b>
             <span>Del sistema (migradas)</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--morado-suave)" }}>✨</div>
+          <div className="icono" style={{ background: "var(--morado-suave)" }}><IconoEmoji e="✨" /></div>
           <div>
             <b>{resumen.nuevas}</b>
             <span>Nuevas</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>🗂️</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="🗂️" /></div>
           <div>
             <b>{resumen.modoUnico}</b>
             <span>Modo único</span>
@@ -139,7 +140,7 @@ function DrawerPlantilla({ plantilla, onCerrar }: { plantilla: PlantillaVisual; 
       <div className="fondo-drawer" onClick={onCerrar} />
       <div className="drawer">
         <div className="drawer-cierre">
-          <button onClick={onCerrar} type="button">✕</button>
+          <button onClick={onCerrar} type="button"><IconoEmoji e="✕" /></button>
         </div>
 
         <div className="drawer-titulo">
@@ -181,17 +182,17 @@ export function VistaPreviaPlantilla({ id }: { id: string }) {
       return (
         <>
           <div className="mr-fila">
-            <div className="mr-icono">🧺</div>
+            <div className="mr-icono"><IconoEmoji e="🧺" /></div>
             <div className="mr-txt"><b>Lavado y secado</b><span>Por kilo</span></div>
             <div className="mr-precio">S/8</div>
           </div>
           <div className="mr-fila">
-            <div className="mr-icono">👔</div>
+            <div className="mr-icono"><IconoEmoji e="👔" /></div>
             <div className="mr-txt"><b>Planchado</b><span>Por prenda</span></div>
             <div className="mr-precio">S/2</div>
           </div>
           <div className="mr-fila">
-            <div className="mr-icono">🛏️</div>
+            <div className="mr-icono"><IconoEmoji e="🛏️" /></div>
             <div className="mr-txt"><b>Edredón</b><span>Lavado especial</span></div>
             <div className="mr-precio">S/25</div>
           </div>
@@ -201,7 +202,7 @@ export function VistaPreviaPlantilla({ id }: { id: string }) {
       return (
         <div className="mr-grid2">
           <div>
-            <div className="mr-img" style={{ height: 44 }}><span className="mr-cinta">★</span></div>
+            <div className="mr-img" style={{ height: 44 }}><span className="mr-cinta"><IconoEmoji e="★" /></span></div>
             <b style={{ fontSize: 8 }}>Chompa alpaca</b>
             <div className="mr-precio" style={{ fontSize: 8 }}>S/120</div>
           </div>
@@ -287,9 +288,9 @@ export function VistaPreviaPlantilla({ id }: { id: string }) {
     case "ficha-mapa":
       return (
         <div className="mr-tarjeta-blanca">
-          <div className="mr-mapa">📍</div>
+          <div className="mr-mapa"><IconoEmoji e="📍" /></div>
           <b style={{ fontSize: 8.5 }}>Casa 3 dorm. — Los Rosales</b>
-          <div className="mr-specs" style={{ marginTop: 2 }}>🛏️ 3 · 🚿 2 · 📐 120m²</div>
+          <div className="mr-specs" style={{ marginTop: 2 }}><IconoEmoji e="🛏️" /> 3 · <IconoEmoji e="🚿" /> 2 · <IconoEmoji e="📐" /> 120m²</div>
           <div className="mr-precio" style={{ marginTop: 2 }}>S/320,000</div>
         </div>
       );
@@ -315,11 +316,11 @@ export function VistaPreviaPlantilla({ id }: { id: string }) {
       return (
         <div className="mr-grid2">
           <div className="mr-tarjeta-blanca" style={{ textAlign: "center", padding: "8px 4px" }}>
-            <div style={{ fontSize: 14 }}>🎨</div>
+            <div style={{ fontSize: 14 }}><IconoEmoji e="🎨" /></div>
             <b style={{ fontSize: 7.5 }}>Arte</b>
           </div>
           <div className="mr-tarjeta-blanca" style={{ textAlign: "center", padding: "8px 4px" }}>
-            <div style={{ fontSize: 14 }}>📚</div>
+            <div style={{ fontSize: 14 }}><IconoEmoji e="📚" /></div>
             <b style={{ fontSize: 7.5 }}>Libros</b>
           </div>
         </div>

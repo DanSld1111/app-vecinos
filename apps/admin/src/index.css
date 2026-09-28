@@ -3452,3 +3452,51 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .login-btn-ingresar { background: var(--verde); border-radius: 9px; font-weight: 600; }
 .login-btn-ingresar:hover { background: var(--verde-fuerte); }
 .login-form-ancho label { text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; color: var(--texto); }
+
+/* Íconos de línea que reemplazan a los emojis (ver componentes/IconoEmoji.tsx): heredan tamaño y color */
+.icono-emoji { width: 1em; height: 1em; vertical-align: -0.14em; flex: none; stroke-width: 1.9; }
+.icono-alerta .icono-emoji, .icono-exito .icono-emoji, .icono-estado-grande .icono-emoji { width: 0.9em; height: 0.9em; }
+
+/* =====================================================================================
+   Vistas previas con el celular: se ven como la app de vecinos nueva (pantalla blanca,
+   Schibsted, sin sombras, íconos en círculo). En los avisos, la etiqueta va arriba, luego
+   título y texto, y el autor abajo — igual que un aviso en Comunidad.
+   ===================================================================================== */
+.telefono { background: #0c0e0d; border-radius: 30px; padding: 7px; box-shadow: 0 18px 36px -22px rgba(0, 0, 0, 0.5); }
+.pantalla-tel { background: #ffffff; border-radius: 24px; padding: 14px 12px; font-family: "Schibsted Grotesk", system-ui, sans-serif; color: #141a16; }
+.etiqueta-pantalla, .mini-titulo-seccion { text-transform: none; letter-spacing: -0.01em; font-size: 12.5px; font-weight: 700; color: #141a16; }
+
+.mini-tarjeta-aviso { position: relative; display: flex; flex-direction: column; box-shadow: none; border-radius: 0; border-bottom: 1px solid var(--borde); padding: 30px 2px 10px; background: transparent; }
+.mini-tarjeta-aviso .mini-pill-aviso { position: absolute; top: 8px; left: 2px; border-radius: 4px; font-size: 9px; padding: 2px 7px; }
+.mini-tarjeta-aviso .mini-cuerpo-aviso-cont { order: 1; padding: 0; }
+.mini-tarjeta-aviso .mini-cab-aviso { order: 2; padding: 8px 0 0; align-items: center; }
+.mini-tarjeta-aviso .mini-pie-aviso { order: 3; padding: 7px 0 0; border-top: 0; }
+.mini-avatar-aviso { width: 20px; height: 20px; border-radius: 50%; font-size: 10px; }
+.mini-info-fuente { display: flex; align-items: center; gap: 4px; }
+.mini-titulo-aviso { font-size: 12.5px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; }
+.mini-cuerpo-aviso { font-size: 10px; color: var(--texto-suave); }
+.mini-tick-aviso { color: var(--verde); }
+
+.mini-tarjeta-notif { box-shadow: none; border-radius: 0; border-bottom: 1px solid var(--borde); background: transparent; padding: 8px 0; }
+.mini-tarjeta-notif .mini-icono-notif { border-radius: 50%; }
+.mini-tarjeta-notif.previa { box-shadow: none; border: 1px solid var(--borde); border-radius: 10px; }
+.mini-pill-notif { background: transparent !important; padding: 0 !important; color: var(--texto-tenue) !important; text-transform: none; letter-spacing: 0; font-weight: 500; }
+
+.mr-tarjeta-blanca { border: 1px solid var(--borde); border-radius: 8px; }
+.mr-chip { border-radius: 99px; border: 1px solid var(--borde-fuerte); background: #fff; }
+.mr-img { border-radius: 6px; background: var(--superficie-hundida); }
+.mr-precio { font-weight: 700; }
+.mini-ficha-nombre { font-family: "Schibsted Grotesk", system-ui, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+
+/* Anuncio del carrusel: foto a lo ancho con el texto encima (como la oferta de Inicio) */
+.mini-carrusel { position: relative; height: 104px; padding: 0 10px 9px; border: 0; border-radius: 8px; overflow: hidden; align-items: flex-end; background: var(--verde-fuerte); }
+.mini-carrusel .mini-thumb { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; }
+.mini-carrusel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.72) 100%); }
+.mini-carrusel .mini-texto, .mini-carrusel .mini-cta { position: relative; z-index: 1; }
+.mini-carrusel .mini-texto b { color: #fff; font-size: 12.5px; font-weight: 800; letter-spacing: -0.01em; }
+.mini-carrusel .mini-texto span, .mini-carrusel .mini-cta { color: rgba(255, 255, 255, 0.9); }
+/* Banner de Buscar: fila gris clara con miniatura, como en la app */
+.mini-banner-buscar { background: var(--superficie-hundida); border-radius: 8px; }
+.mini-banner-buscar .mini-icono { background: #fff; color: var(--texto); border-radius: 6px; }
+.mini-banner-buscar div b { color: var(--texto); }
+.mini-banner-buscar div span { color: var(--texto-suave); }

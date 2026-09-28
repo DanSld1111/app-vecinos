@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Negocio } from "@app-vecinos/tipos";
 import { estadoVisualDe } from "../../utilidades/estadoNegocio";
 
+import { IconoEmoji } from "../IconoEmoji";
 function formatearFecha(fecha: string | null): string {
   if (!fecha) return "—";
   return new Date(fecha).toLocaleDateString("es-PE", { day: "2-digit", month: "short", year: "numeric" });
@@ -21,7 +22,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
     <>
       {estadoVisual === "rechazado" ? (
         <div className="tarjeta-estado-grande rechazado">
-          <div className="icono-estado-grande">✕</div>
+          <div className="icono-estado-grande"><IconoEmoji e="✕" /></div>
           <div>
             <h3>El último envío fue rechazado</h3>
             <p>Corrige lo que se indica abajo y vuelve a enviarlo desde "Información".</p>
@@ -29,7 +30,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
         </div>
       ) : estadoVisual === "activo" ? (
         <div className="tarjeta-estado-grande activo">
-          <div className="icono-estado-grande">✅</div>
+          <div className="icono-estado-grande"><IconoEmoji e="✅" /></div>
           <div>
             <h3>Publicado y visible en la app</h3>
             <p>
@@ -40,7 +41,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
         </div>
       ) : (
         <div className="tarjeta-estado-grande pendiente">
-          <div className="icono-estado-grande">⏳</div>
+          <div className="icono-estado-grande"><IconoEmoji e="⏳" /></div>
           <div>
             <h3>Todavía sin publicar</h3>
             <p>
@@ -71,7 +72,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
         </div>
         <div className="linea-tiempo-estado">
           <div className="paso-tiempo">
-            <div className="punto-tiempo hecho">✓</div>
+            <div className="punto-tiempo hecho"><IconoEmoji e="✓" /></div>
             <div className="cuerpo-paso">
               <b>Ficha creada</b>
               <span>{formatearFecha(negocio.creadoEn)}</span>
@@ -80,7 +81,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
 
           {estadoVisual === "rechazado" ? (
             <div className="paso-tiempo">
-              <div className="punto-tiempo malo">✕</div>
+              <div className="punto-tiempo malo"><IconoEmoji e="✕" /></div>
               <div className="cuerpo-paso">
                 <b>Rechazado por el equipo ELISUR</b>
                 <span>{formatearFecha(negocio.actualizadoEn)}</span>
@@ -90,14 +91,14 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
           ) : estadoVisual === "activo" ? (
             <>
               <div className="paso-tiempo">
-                <div className="punto-tiempo hecho">✓</div>
+                <div className="punto-tiempo hecho"><IconoEmoji e="✓" /></div>
                 <div className="cuerpo-paso">
                   <b>Publicado</b>
                   <span>{formatearFecha(negocio.verificadoEn)}</span>
                 </div>
               </div>
               <div className="paso-tiempo">
-                <div className="punto-tiempo hecho">👁️</div>
+                <div className="punto-tiempo hecho"><IconoEmoji e="👁️" /></div>
                 <div className="cuerpo-paso">
                   <b>Visible para los vecinos</b>
                   <span>Desde entonces</span>
@@ -106,7 +107,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
             </>
           ) : (
             <div className="paso-tiempo">
-              <div className="punto-tiempo actual">⏳</div>
+              <div className="punto-tiempo actual"><IconoEmoji e="⏳" /></div>
               <div className="cuerpo-paso">
                 <b>Sin publicar</b>
                 <span>Se publica desde esta pantalla</span>

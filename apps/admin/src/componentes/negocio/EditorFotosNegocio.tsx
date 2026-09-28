@@ -4,6 +4,7 @@ import { useNegocios } from "../../estado/useNegocios";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { urlCompleta } from "../../utilidades/media";
 
+import { IconoEmoji } from "../IconoEmoji";
 const TIPOS_ACEPTADOS = "image/jpeg,image/png,image/webp";
 const MAX_FOTOS_GALERIA = 6;
 
@@ -51,7 +52,7 @@ export function EditorFotosNegocio({ negocio }: { negocio: Negocio }) {
               </div>
             ) : (
               <div className="slot-foto-principal">
-                <span className="icono-slot">🖼️</span>
+                <span className="icono-slot"><IconoEmoji e="🖼️" /></span>
                 <button type="button" disabled={subiendo} onClick={() => inputRef.current?.click()}>
                   {subiendo ? "Subiendo…" : "Subir foto principal"}
                 </button>
@@ -93,7 +94,7 @@ export function EditorFotosNegocio({ negocio }: { negocio: Negocio }) {
               {negocio.fotoPrincipalUrl ? (
                 <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
               ) : (
-                "🖼️"
+                <IconoEmoji e="🖼️" />
               )}
             </div>
             <div className="mini-ficha-nombre">{negocio.nombre}</div>
@@ -160,7 +161,7 @@ function EditorGaleria({ negocioId, token, fotos }: { negocioId: string; token: 
               onClick={() => alBorrar(url)}
               title="Borrar esta foto"
             >
-              🗑️
+              <IconoEmoji e="🗑️" />
             </button>
           </div>
         ))}

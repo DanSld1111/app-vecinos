@@ -7,6 +7,7 @@ import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { generarContrasenaTemporal } from "../utilidades/contrasena";
 import { ModalContrasenaGenerada } from "../componentes/ModalContrasenaGenerada";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 const NOMBRE_ROL: Record<RolCuenta, string> = {
   super_admin: "Super-admin",
   dueno_negocio: "Dueño de negocio",
@@ -174,7 +175,7 @@ export function Cuentas() {
 
       {errorCuentas ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {errorCuentas}</span>
+          <span><IconoEmoji e="⚠️" /> {errorCuentas}</span>
           <button className="btn-accion-mini" onClick={() => cargar(token)}>
             Reintentar
           </button>
@@ -189,42 +190,42 @@ export function Cuentas() {
       <>
       <div className="resumen-mini">
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>👥</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="👥" /></div>
           <div>
             <b>{resumen.total}</b>
             <span>Total cuentas</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
           <div>
             <b>{resumen.activas}</b>
             <span>Activas</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--verde-suave)" }}>🏪</div>
+          <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="🏪" /></div>
           <div>
             <b>{resumen.duenos}</b>
             <span>Dueños de negocio</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--azul-suave)" }}>🏛️</div>
+          <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="🏛️" /></div>
           <div>
             <b>{resumen.juntas}</b>
             <span>Junta vecinal</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--coral-suave)" }}>🔍</div>
+          <div className="icono" style={{ background: "var(--coral-suave)" }}><IconoEmoji e="🔍" /></div>
           <div>
             <b>{resumen.validadores}</b>
             <span>Validadores</span>
           </div>
         </div>
         <div className="mini-stat">
-          <div className="icono" style={{ background: "var(--morado-suave)" }}>🏪</div>
+          <div className="icono" style={{ background: "var(--morado-suave)" }}><IconoEmoji e="🏪" /></div>
           <div>
             <b>{resumen.gestores}</b>
             <span>Gestores de negocios</span>
@@ -234,7 +235,7 @@ export function Cuentas() {
 
       <div className="barra-filtros">
         <div className="buscador-mini">
-          🔍
+          <IconoEmoji e="🔍" />
           <input placeholder="Buscar por nombre o correo…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
         </div>
         <div className="fila-filtro">
@@ -583,7 +584,7 @@ function DrawerEditarCuenta({
       <div className="fondo-drawer" onClick={onCerrar} />
       <div className="drawer">
         <div className="drawer-cierre">
-          <button onClick={onCerrar} type="button">✕</button>
+          <button onClick={onCerrar} type="button"><IconoEmoji e="✕" /></button>
         </div>
 
         <div className="drawer-avatar-grande" style={{ background: COLOR_ROL[cuenta.rol] }}>
@@ -628,10 +629,10 @@ function DrawerEditarCuenta({
               <div className="lista-negocios-asignados">
                 {cuenta.negocioIds.map((id) => (
                   <div className="fila-negocio-asignado" key={id}>
-                    <div className="icono-neg">🏪</div>
+                    <div className="icono-neg"><IconoEmoji e="🏪" /></div>
                     <b>{negocioPorId[id]?.nombre ?? id}</b>
                     <button type="button" title="Quitar" onClick={() => onQuitarNegocio(id)}>
-                      ✕
+                      <IconoEmoji e="✕" />
                     </button>
                   </div>
                 ))}
@@ -712,7 +713,7 @@ function ModalConfirmarResetear({
   return (
     <div className="overlay-modal" onClick={onCancelar}>
       <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-        <div className="icono-alerta">🔑</div>
+        <div className="icono-alerta"><IconoEmoji e="🔑" /></div>
         <h3>¿Restablecer la contraseña de "{cuenta.nombre}"?</h3>
         <p className="sub">
           Se genera una contraseña temporal nueva y la anterior deja de funcionar de inmediato — {cuenta.nombre}{" "}
@@ -754,7 +755,7 @@ function ModalConfirmarEliminar({
   return (
     <div className="overlay-modal" onClick={onCancelar}>
       <div className="modal-card" style={{ textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
-        <div className="icono-alerta">⚠️</div>
+        <div className="icono-alerta"><IconoEmoji e="⚠️" /></div>
         <h3>¿Eliminar esta cuenta?</h3>
         <p className="sub">Esta acción no se puede deshacer. La persona ya no podrá entrar al panel con este correo.</p>
 

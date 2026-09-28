@@ -3,6 +3,7 @@ import { useUsuarios } from "../estado/useUsuarios";
 import { useGeografia } from "../estado/useGeografia";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 
+import { IconoEmoji } from "../componentes/IconoEmoji";
 function iniciales(nombre: string, apellido: string): string {
   return ((nombre[0] ?? "") + (apellido[0] ?? "")).toUpperCase();
 }
@@ -65,7 +66,7 @@ export function Usuarios() {
 
       {error ? (
         <div className="nota-alerta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>⚠️ {error}</span>
+          <span><IconoEmoji e="⚠️" /> {error}</span>
           <button className="btn-accion-mini" onClick={() => cargar(token)}>
             Reintentar
           </button>
@@ -80,28 +81,28 @@ export function Usuarios() {
         <>
           <div className="resumen-mini">
             <div className="mini-stat">
-              <div className="icono" style={{ background: "var(--azul-suave)" }}>👤</div>
+              <div className="icono" style={{ background: "var(--azul-suave)" }}><IconoEmoji e="👤" /></div>
               <div>
                 <b>{resumen.total}</b>
                 <span>Usuarios registrados</span>
               </div>
             </div>
             <div className="mini-stat">
-              <div className="icono" style={{ background: "var(--verde-suave)" }}>✅</div>
+              <div className="icono" style={{ background: "var(--verde-suave)" }}><IconoEmoji e="✅" /></div>
               <div>
                 <b>{resumen.activos}</b>
                 <span>Activos</span>
               </div>
             </div>
             <div className="mini-stat">
-              <div className="icono" style={{ background: "var(--rojo-suave)" }}>🚫</div>
+              <div className="icono" style={{ background: "var(--rojo-suave)" }}><IconoEmoji e="🚫" /></div>
               <div>
                 <b>{resumen.bloqueados}</b>
                 <span>Bloqueados</span>
               </div>
             </div>
             <div className="mini-stat">
-              <div className="icono" style={{ background: "var(--oro-suave)" }}>📍</div>
+              <div className="icono" style={{ background: "var(--oro-suave)" }}><IconoEmoji e="📍" /></div>
               <div>
                 <b>{resumen.comunidades}</b>
                 <span>Comunidades con usuarios</span>
@@ -111,7 +112,7 @@ export function Usuarios() {
 
           <div className="barra-filtros">
             <div className="buscador-mini">
-              🔍
+              <IconoEmoji e="🔍" />
               <input placeholder="Buscar por nombre, correo o teléfono…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
             </div>
             <div className="fila-filtro">
@@ -124,7 +125,7 @@ export function Usuarios() {
                   className={`chip-filtro ${filtroComunidad === c.id ? "activo" : ""}`}
                   onClick={() => setFiltroComunidad(c.id)}
                 >
-                  📍 {c.nombre}
+                  <IconoEmoji e="📍" /> {c.nombre}
                 </button>
               ))}
             </div>
@@ -144,7 +145,7 @@ export function Usuarios() {
                   <span className="correo-cuenta" style={{ opacity: 0.7 }}>{usuario.telefono}</span>
                 </div>
                 <span className="rol-pill" style={{ background: "var(--azul-suave)", color: "var(--azul)" }}>
-                  📍 {comunidadPorId[usuario.comunidadId]?.nombre ?? "Sin comunidad"}
+                  <IconoEmoji e="📍" /> {comunidadPorId[usuario.comunidadId]?.nombre ?? "Sin comunidad"}
                 </span>
                 <span style={{ fontSize: 10.5, color: "var(--texto-tenue)", flex: "none", width: 160 }}>
                   Registrado {formatearFecha(usuario.registradoEn)}
@@ -162,7 +163,7 @@ export function Usuarios() {
                     {usuario.estado === "activo" ? "Bloquear" : "Reactivar"}
                   </button>
                   <button className="btn-accion-mini desactivar" onClick={() => setConfirmandoEliminarId(usuario.id)}>
-                    🗑️
+                    <IconoEmoji e="🗑️" />
                   </button>
                 </div>
               </div>
