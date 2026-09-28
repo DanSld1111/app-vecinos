@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Negocio } from "@app-vecinos/tipos";
 import { abrirNegocio } from "../../src/componentes/transicion/abrirNegocio";
 import { router } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
+import { useScrollToTop } from "@react-navigation/native";
+import { useAlturaBarra, useDesplazamiento } from "../../src/utilidades/useDesplazamiento";
+
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, tipografia, useColores } from "../../src/disenio";
@@ -67,6 +71,12 @@ export default function Inicio() {
   const colores = useColores();
   const styles = crearEstilos(colores);
   const insets = useSafeAreaInsets();
+  const refScroll = useRef<ScrollView>(null);
+  useScrollToTop(refScroll);
+  const desplazamiento = useDesplazamiento();
+  const alturaBarra = useAlturaBarra();
+  const queryClient = useQueryClient();
+  const [actualizando, setActualizando] = useState(false);
   const { comunidad } = useComunidadActiva();
   const [hojaComunidadVisible, setHojaComunidadVisible] = useState(false);
   const [permisoVisible, setPermisoVisible] = useState(false);
@@ -101,6 +111,16 @@ export default function Inicio() {
     .sort((a, b) => b.visitas7d - a.visitas7d)
     .slice(0, 3);
 
+  // Arrastrar hacia abajo: vuelve a pedir todo lo que muestra Inicio (negocios, avisos, anuncios, categorías).
+  async function actualizar() {
+    setActualizando(true);
+    try {
+      await queryClient.invalidateQueries();
+    } finally {
+      setActualizando(false);
+    }
+  }
+
   function alTocarCampana() {
     if (!permisoDecidido) setPermisoVisible(true);
     else router.push("/notificaciones");
@@ -112,7 +132,21 @@ export default function Inicio() {
 
   return (
     <View style={styles.raiz}>
-      <ScrollView contentContainerStyle={[styles.contenido, { paddingTop: insets.top + espaciado.md }]}>
+      <Animated.ScrollView
+        ref={refScroll}
+        onScroll={desplazamiento.onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={[styles.contenido, { paddingTop: insets.top + espaciado.md, paddingBottom: alturaBarra + espaciado.xl }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={actualizando}
+            onRefresh={actualizar}
+            tintColor={colores.primario}
+            colors={[colores.primario]}
+            progressBackgroundColor={colores.fondo}
+          />
+        }
+      >
         <View style={styles.bloque}>
           <View style={styles.filaSuperior}>
             <Pressable
@@ -225,10 +259,10 @@ export default function Inicio() {
             ))}
           </View>
         ) : null}
-      </ScrollView>
+      </Animated.ScrollView>
 
       {permisoUbicacion === "denegado" ? (
-        <View style={styles.pieUbicacion}>
+        <View style={[styles.pieUbicacion, { bottom: alturaBarra + espaciado.sm }]}>
           <Ionicons name="location-outline" size={16} color={colores.texto} />
           <Text style={styles.pieUbicacionTexto}>
             Sin tu ubicación, ordenamos por popularidad y medimos desde el centro del distrito.
@@ -293,10 +327,12 @@ function crearEstilos(colores: PaletaColores) {
       gap: espaciado.sm,
       backgroundColor: colores.superficieHundida,
       marginHorizontal: espaciado.lg,
-      marginBottom: espaciado.sm,
       paddingHorizontal: espaciado.md,
       paddingVertical: espaciado.sm + 2,
       borderRadius: 10,
+      position: "absolute",
+      left: 0,
+      right: 0,
     },
     pieUbicacionTexto: { ...tipografia.pie, color: colores.texto, flex: 1 },
   });

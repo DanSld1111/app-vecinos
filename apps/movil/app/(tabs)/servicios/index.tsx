@@ -1,6 +1,9 @@
+import { useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ImageBackground, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, ImageBackground, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useScrollToTop } from "@react-navigation/native";
+import { useAlturaBarra, useDesplazamiento } from "../../../src/utilidades/useDesplazamiento";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { ServicioApp } from "@app-vecinos/tipos";
@@ -12,6 +15,7 @@ import { useComunidadActiva } from "../../../src/estado/comunidadActiva";
 import { useNegocios } from "../../../src/datos/hooks/useNegocios";
 import { useServiciosApp } from "../../../src/datos/hooks/useServiciosApp";
 import { repositorioServicios } from "../../../src/datos/fabricaRepositorios";
+import { BarraTituloFija } from "../../../src/componentes/BarraTituloFija";
 import { BarraBusqueda } from "../../../src/componentes/BarraBusqueda";
 import { IconoServicio, SlugIconoServicio } from "../../../src/componentes/IconoServicio";
 
@@ -71,6 +75,10 @@ export default function Servicios() {
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores);
   const insets = useSafeAreaInsets();
+  const refScroll = useRef<ScrollView>(null);
+  useScrollToTop(refScroll);
+  const desplazamiento = useDesplazamiento();
+  const alturaBarra = useAlturaBarra();
   const { data: servicios } = useServiciosApp();
   const { comunidad } = useComunidadActiva();
   const { data: negocios } = useNegocios({ comunidadId: comunidad?.id ?? "" });
@@ -107,117 +115,125 @@ export default function Servicios() {
   }
 
   return (
-    <ScrollView style={styles.contenedor} contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}>
-      <Text style={styles.titulo}>Servicios</Text>
-      <Text style={styles.subtitulo}>
-        {todosDisponibles.length} de {(servicios ?? []).length} ya activos en {comunidad?.nombre ?? "tu distrito"}
-      </Text>
+    <View style={{ flex: 1 }}>
+      <Animated.ScrollView
+        ref={refScroll}
+        onScroll={desplazamiento.onScroll}
+        scrollEventThrottle={16}
+        style={styles.contenedor}
+        contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top, paddingBottom: alturaBarra + espaciado.xl }]}>
+        <Text style={styles.titulo}>Servicios</Text>
+        <Text style={styles.subtitulo}>
+          {todosDisponibles.length} de {(servicios ?? []).length} ya activos en {comunidad?.nombre ?? "tu distrito"}
+        </Text>
 
-      <BarraBusqueda placeholder="Buscar negocios, platos, productos…" onPress={() => router.push("/buscar")} />
+        <BarraBusqueda placeholder="Buscar negocios, platos, productos…" onPress={() => router.push("/buscar")} />
 
-      {servicioGuia ? (
-        <Pressable style={styles.heroSombra} onPress={() => alTocar(servicioGuia)}>
-          <ImageBackground
-            source={fuenteImagen(servicioGuia) ?? undefined}
-            style={styles.hero}
-            imageStyle={styles.heroImagen}
-            resizeMode="cover"
-          >
-            {/* Un poco más oscuro que el degradado de las tarjetas de rubro: acá el fondo es un
-                paisaje decorativo, no la foto de un negocio — necesita más contraste para que el
-                texto blanco se lea bien encima de cualquier cielo claro. */}
-            <LinearGradient
-              colors={["rgba(8,10,8,0.15)", "rgba(8,10,8,0.35)", "rgba(8,10,8,0.9)"]}
-              locations={[0, 0.5, 1]}
-              style={styles.degradado}
-            />
-            <Text style={styles.heroEtiqueta}>Busca en todo tu distrito</Text>
-            <Text style={styles.heroNombre}>{servicioGuia.nombre}</Text>
-            <View style={styles.heroFila}>
-              <Text style={styles.heroDescripcion} numberOfLines={1}>
-                {/* Este módulo no se queda solo en tu distrito — trae negocios de todos, y los
-                    ordena primero por cercanía real a tu ubicación (ver docs/decisiones/0073),
-                    así que "en San Borja" ya no describe bien lo que muestra. */}
-                {negocios ? `${negocios.items.length} negocios verificados` : "Negocios verificados"}
-              </Text>
-              <View style={styles.heroBoton}>
-                <Text style={styles.heroBotonTexto}>Explorar →</Text>
+        {servicioGuia ? (
+          <Pressable style={styles.heroSombra} onPress={() => alTocar(servicioGuia)}>
+            <ImageBackground
+              source={fuenteImagen(servicioGuia) ?? undefined}
+              style={styles.hero}
+              imageStyle={styles.heroImagen}
+              resizeMode="cover"
+            >
+              {/* Un poco más oscuro que el degradado de las tarjetas de rubro: acá el fondo es un
+                  paisaje decorativo, no la foto de un negocio — necesita más contraste para que el
+                  texto blanco se lea bien encima de cualquier cielo claro. */}
+              <LinearGradient
+                colors={["rgba(8,10,8,0.15)", "rgba(8,10,8,0.35)", "rgba(8,10,8,0.9)"]}
+                locations={[0, 0.5, 1]}
+                style={styles.degradado}
+              />
+              <Text style={styles.heroEtiqueta}>Busca en todo tu distrito</Text>
+              <Text style={styles.heroNombre}>{servicioGuia.nombre}</Text>
+              <View style={styles.heroFila}>
+                <Text style={styles.heroDescripcion} numberOfLines={1}>
+                  {/* Este módulo no se queda solo en tu distrito — trae negocios de todos, y los
+                      ordena primero por cercanía real a tu ubicación (ver docs/decisiones/0073),
+                      así que "en San Borja" ya no describe bien lo que muestra. */}
+                  {negocios ? `${negocios.items.length} negocios verificados` : "Negocios verificados"}
+                </Text>
+                <View style={styles.heroBoton}>
+                  <Text style={styles.heroBotonTexto}>Explorar →</Text>
+                </View>
+              </View>
+            </ImageBackground>
+          </Pressable>
+        ) : null}
+
+        <Text style={styles.etiquetaSeccion}>Explora por rubro</Text>
+        <View style={styles.filaGrid}>
+          {rubros.map((servicio) => {
+            const imagen = fuenteImagen(servicio);
+            const colorIcono = colorIconoPorSlug(servicio.slug, colores, modo === "oscuro");
+
+            return (
+              <Pressable key={servicio.slug} style={styles.tarjetaSombra} onPress={() => alTocar(servicio)}>
+                {imagen ? (
+                  <ImageBackground
+                    source={imagen}
+                    style={styles.tarjeta}
+                    imageStyle={styles.tarjetaImagen}
+                    resizeMode="cover"
+                  >
+                    <LinearGradient
+                      colors={["rgba(8,10,8,0.05)", "rgba(8,10,8,0.18)", "rgba(8,10,8,0.88)"]}
+                      locations={[0, 0.5, 1]}
+                      style={styles.degradado}
+                    />
+                    <View style={styles.tarjetaTextos}>
+                      <Text style={styles.tarjetaNombre}>{servicio.nombre}</Text>
+                      <View style={styles.filaDescripcion}>
+                        <Text style={styles.tarjetaDescripcion} numberOfLines={1}>
+                          {textoConteo(servicio.negocios)}
+                        </Text>
+                        <Ionicons name="chevron-forward" size={16} color="#ffffff" />
+                      </View>
+                    </View>
+                  </ImageBackground>
+                ) : (
+                  // Todavía sin foto subida desde el panel — misma tarjeta, sin degradado ni
+                  // texto blanco (no hay foto oscura de fondo que lo justifique).
+                  <View style={styles.tarjeta}>
+                    <View style={[styles.icono, styles.iconoSinFoto]}>
+                      <IconoServicio slug={servicio.slug as SlugIconoServicio} size={19} color={colorIcono} />
+                    </View>
+                    <View style={styles.tarjetaTextos}>
+                      <Text style={styles.tarjetaNombreSinFoto}>{servicio.nombre}</Text>
+                      <View style={styles.filaDescripcion}>
+                        <Text style={styles.tarjetaDescripcionSinFoto} numberOfLines={1}>
+                          {textoConteo(servicio.negocios)}
+                        </Text>
+                        <Ionicons name="chevron-forward" size={16} color={colores.textoTenue} />
+                      </View>
+                    </View>
+                  </View>
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+
+        <Text style={styles.etiquetaSeccion}>Próximamente</Text>
+        {gruposProximamente
+          .filter((grupo) => grupo.items.length > 0)
+          .map((grupo) => (
+            <View key={grupo.titulo} style={styles.grupoProximo}>
+              <Text style={styles.tituloGrupo}>{grupo.titulo}</Text>
+              <View style={styles.filaProximos}>
+                {grupo.items.map((servicio) => (
+                  <View key={servicio.slug} style={styles.tarjetaProxima} accessibilityLabel={`${servicio.nombre}, próximamente`}>
+                    <IconoServicio slug={servicio.slug as SlugIconoServicio} size={16} color={colores.textoSuave} />
+                    <Text style={styles.textoProximo}>{servicio.nombre}</Text>
+                  </View>
+                ))}
               </View>
             </View>
-          </ImageBackground>
-        </Pressable>
-      ) : null}
-
-      <Text style={styles.etiquetaSeccion}>Explora por rubro</Text>
-      <View style={styles.filaGrid}>
-        {rubros.map((servicio) => {
-          const imagen = fuenteImagen(servicio);
-          const colorIcono = colorIconoPorSlug(servicio.slug, colores, modo === "oscuro");
-
-          return (
-            <Pressable key={servicio.slug} style={styles.tarjetaSombra} onPress={() => alTocar(servicio)}>
-              {imagen ? (
-                <ImageBackground
-                  source={imagen}
-                  style={styles.tarjeta}
-                  imageStyle={styles.tarjetaImagen}
-                  resizeMode="cover"
-                >
-                  <LinearGradient
-                    colors={["rgba(8,10,8,0.05)", "rgba(8,10,8,0.18)", "rgba(8,10,8,0.88)"]}
-                    locations={[0, 0.5, 1]}
-                    style={styles.degradado}
-                  />
-                  <View style={styles.tarjetaTextos}>
-                    <Text style={styles.tarjetaNombre}>{servicio.nombre}</Text>
-                    <View style={styles.filaDescripcion}>
-                      <Text style={styles.tarjetaDescripcion} numberOfLines={1}>
-                        {textoConteo(servicio.negocios)}
-                      </Text>
-                      <Ionicons name="chevron-forward" size={16} color="#ffffff" />
-                    </View>
-                  </View>
-                </ImageBackground>
-              ) : (
-                // Todavía sin foto subida desde el panel — misma tarjeta, sin degradado ni
-                // texto blanco (no hay foto oscura de fondo que lo justifique).
-                <View style={styles.tarjeta}>
-                  <View style={[styles.icono, styles.iconoSinFoto]}>
-                    <IconoServicio slug={servicio.slug as SlugIconoServicio} size={19} color={colorIcono} />
-                  </View>
-                  <View style={styles.tarjetaTextos}>
-                    <Text style={styles.tarjetaNombreSinFoto}>{servicio.nombre}</Text>
-                    <View style={styles.filaDescripcion}>
-                      <Text style={styles.tarjetaDescripcionSinFoto} numberOfLines={1}>
-                        {textoConteo(servicio.negocios)}
-                      </Text>
-                      <Ionicons name="chevron-forward" size={16} color={colores.textoTenue} />
-                    </View>
-                  </View>
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <Text style={styles.etiquetaSeccion}>Próximamente</Text>
-      {gruposProximamente
-        .filter((grupo) => grupo.items.length > 0)
-        .map((grupo) => (
-          <View key={grupo.titulo} style={styles.grupoProximo}>
-            <Text style={styles.tituloGrupo}>{grupo.titulo}</Text>
-            <View style={styles.filaProximos}>
-              {grupo.items.map((servicio) => (
-                <View key={servicio.slug} style={styles.tarjetaProxima} accessibilityLabel={`${servicio.nombre}, próximamente`}>
-                  <IconoServicio slug={servicio.slug as SlugIconoServicio} size={16} color={colores.textoSuave} />
-                  <Text style={styles.textoProximo}>{servicio.nombre}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        ))}
-    </ScrollView>
+          ))}
+      </Animated.ScrollView>
+      <BarraTituloFija titulo="Servicios" scrollY={desplazamiento.scrollY} />
+    </View>
   );
 }
 

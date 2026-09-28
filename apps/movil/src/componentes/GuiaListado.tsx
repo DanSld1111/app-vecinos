@@ -12,6 +12,7 @@ import { useCategorias } from "../datos/hooks/useCategorias";
 import { useNegocios } from "../datos/hooks/useNegocios";
 import { ChipCategoria } from "./ChipCategoria";
 import { abrirNegocio } from "./transicion/abrirNegocio";
+import { useAlturaBarra, useDesplazamiento } from "../utilidades/useDesplazamiento";
 import { TarjetaNegocio } from "./TarjetaNegocio";
 import { TarjetaNegocioMenu } from "./TarjetaNegocioMenu";
 import { TarjetaNegocioCatalogo } from "./TarjetaNegocioCatalogo";
@@ -97,6 +98,8 @@ export function GuiaListado({
     [categoriasDelAmbito]
   );
 
+  const desplazamiento = useDesplazamiento();
+  const alturaBarra = useAlturaBarra();
   const plantilla = servicioSlugFijo ? PLANTILLA_POR_SERVICIO[servicioSlugFijo] : undefined;
   const esCatalogo = plantilla === "catalogo";
 
@@ -177,7 +180,9 @@ export function GuiaListado({
           data={negocios?.items ?? []}
           keyExtractor={(item) => item.id}
           numColumns={esCatalogo ? 2 : 1}
-          contentContainerStyle={{ paddingBottom: espaciado.xl }}
+          contentContainerStyle={{ paddingBottom: alturaBarra + espaciado.xl }}
+          onScroll={desplazamiento.onScroll}
+          scrollEventThrottle={16}
           ItemSeparatorComponent={plantilla === "menu" ? () => <View style={{ height: espaciado.md }} /> : undefined}
           ListEmptyComponent={<EstadoVacio titulo={textos.buscar.sinResultados} />}
           renderItem={({ item, index }) => (

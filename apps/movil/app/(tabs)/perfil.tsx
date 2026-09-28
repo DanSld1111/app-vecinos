@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { ImageBackground, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Animated, ImageBackground, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { useScrollToTop } from "@react-navigation/native";
+import { useAlturaBarra, useDesplazamiento } from "../../src/utilidades/useDesplazamiento";
+import { BarraTituloFija } from "../../src/componentes/BarraTituloFija";
 import { LinearGradient } from "expo-linear-gradient";
 import { iniciales } from "../../src/componentes/FotoNegocio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -105,6 +108,10 @@ export default function Perfil() {
   const colores = useColores();
   const styles = crearEstilos(colores);
   const insets = useSafeAreaInsets();
+  const refScroll = useRef<ScrollView>(null);
+  useScrollToTop(refScroll);
+  const desplazamiento = useDesplazamiento();
+  const alturaBarra = useAlturaBarra();
   const { comunidad } = useComunidadActiva();
   const [hojaComunidadVisible, setHojaComunidadVisible] = useState(false);
   const [hojaSobreComunidadVisible, setHojaSobreComunidadVisible] = useState(false);
@@ -124,125 +131,133 @@ export default function Perfil() {
   }
 
   return (
-    <ScrollView style={styles.contenedor} contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}>
-      <View style={styles.header}>
-        <View style={styles.avatar}>
-          {usuario ? (
-            <Text style={styles.avatarIniciales}>{iniciales(nombreMostrado)}</Text>
-          ) : (
-            <Ionicons name="person-outline" size={24} color={colores.primario} />
-          )}
+    <View style={{ flex: 1 }}>
+      <Animated.ScrollView
+        ref={refScroll}
+        onScroll={desplazamiento.onScroll}
+        scrollEventThrottle={16}
+        style={styles.contenedor}
+        contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top, paddingBottom: alturaBarra + espaciado.xl }]}>
+        <View style={styles.header}>
+          <View style={styles.avatar}>
+            {usuario ? (
+              <Text style={styles.avatarIniciales}>{iniciales(nombreMostrado)}</Text>
+            ) : (
+              <Ionicons name="person-outline" size={24} color={colores.primario} />
+            )}
+          </View>
+          <View style={styles.headerTexto}>
+            <Text style={styles.titulo} numberOfLines={1}>
+              {nombreMostrado}
+            </Text>
+            <Text style={styles.vecinoDe}>
+              {usuario ? "Vecino de " : "Modo invitado · "}
+              {comunidad?.nombre ?? "…"}
+            </Text>
+          </View>
         </View>
-        <View style={styles.headerTexto}>
-          <Text style={styles.titulo} numberOfLines={1}>
-            {nombreMostrado}
-          </Text>
-          <Text style={styles.vecinoDe}>
-            {usuario ? "Vecino de " : "Modo invitado · "}
-            {comunidad?.nombre ?? "…"}
-          </Text>
-        </View>
-      </View>
 
-      <Pressable
-        style={styles.statCardAncha}
-        onPress={() => router.push("/favoritos")}
-        accessibilityRole="button"
-        accessibilityLabel="Favoritos"
-      >
-        <Ionicons name="heart-outline" size={20} color={colores.texto} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.statEtiquetaAncha}>Favoritos</Text>
-          <Text style={styles.statSubtextoAncha}>
-            {idsFavoritos
-              ? `${idsFavoritos.length} negocio${idsFavoritos.length === 1 ? "" : "s"} guardado${idsFavoritos.length === 1 ? "" : "s"}`
-              : "Negocios que guardaste"}
-          </Text>
-        </View>
-        <Ionicons name="chevron-forward" size={18} color={colores.textoTenue} />
-      </Pressable>
+        <Pressable
+          style={styles.statCardAncha}
+          onPress={() => router.push("/favoritos")}
+          accessibilityRole="button"
+          accessibilityLabel="Favoritos"
+        >
+          <Ionicons name="heart-outline" size={20} color={colores.texto} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.statEtiquetaAncha}>Favoritos</Text>
+            <Text style={styles.statSubtextoAncha}>
+              {idsFavoritos
+                ? `${idsFavoritos.length} negocio${idsFavoritos.length === 1 ? "" : "s"} guardado${idsFavoritos.length === 1 ? "" : "s"}`
+                : "Negocios que guardaste"}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colores.textoTenue} />
+        </Pressable>
 
-      <Text style={styles.etiquetaSeccion}>Preferencias</Text>
-      <Grupo>
-        <FilaInterruptor
-          icono="notifications-outline"
-          texto="Notificaciones"
-          activo={notificacionesActivas}
-          onCambiar={(valor) => decidir(valor)}
-          primero
-        />
-        <FilaInterruptor
-          icono="moon-outline"
-          texto="Modo oscuro"
-          activo={modoOscuro}
-          onCambiar={alternarTema}
-        />
-        <FilaPerfil
-          icono="location-outline"
-          texto={textos.perfil.cambiarZona}
-          onPress={() => setHojaComunidadVisible(true)}
-        />
-      </Grupo>
-
-      <Text style={styles.etiquetaSeccion}>Soporte</Text>
-      <Grupo>
-        <FilaPerfil
-          icono="information-circle-outline"
-          texto={textos.perfil.sobreComunidad}
-          primero
-          onPress={() => setHojaSobreComunidadVisible(true)}
-        />
-        <FilaPerfil icono="help-circle-outline" texto={textos.perfil.ayuda} />
-      </Grupo>
-
-      <Text style={styles.etiquetaSeccion}>Gestión</Text>
-      <Grupo>
-        <FilaPerfil
-          icono="briefcase-outline"
-          texto="¿Diriges un negocio o la junta vecinal?"
-          primero
-          onPress={() => router.push("/cuenta")}
-        />
-      </Grupo>
-
-      <Pressable onPress={compartirApp} accessibilityRole="button" accessibilityLabel="Invitar a vecinos">
-        <ImageBackground source={FOTO_INVITAR} style={styles.ctaInvitar} imageStyle={{ borderRadius: 10 }} resizeMode="cover">
-          <LinearGradient
-            colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.72)"]}
-            locations={[0.2, 1]}
-            style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}
+        <Text style={styles.etiquetaSeccion}>Preferencias</Text>
+        <Grupo>
+          <FilaInterruptor
+            icono="notifications-outline"
+            texto="Notificaciones"
+            activo={notificacionesActivas}
+            onCambiar={(valor) => decidir(valor)}
+            primero
           />
-          <Text style={styles.ctaTitulo}>Invita a tus vecinos</Text>
-          <Text style={styles.ctaSubtitulo}>Comparte {marca.nombreApp} con tu comunidad</Text>
-        </ImageBackground>
-      </Pressable>
+          <FilaInterruptor
+            icono="moon-outline"
+            texto="Modo oscuro"
+            activo={modoOscuro}
+            onCambiar={alternarTema}
+          />
+          <FilaPerfil
+            icono="location-outline"
+            texto={textos.perfil.cambiarZona}
+            onPress={() => setHojaComunidadVisible(true)}
+          />
+        </Grupo>
 
-      <Grupo>
-        <FilaPerfil
-          icono="log-out-outline"
-          texto={textos.perfil.cerrarSesion}
-          peligro
-          mostrarFlecha={false}
-          primero
-          onPress={cerrarSesion}
-        />
-      </Grupo>
+        <Text style={styles.etiquetaSeccion}>Soporte</Text>
+        <Grupo>
+          <FilaPerfil
+            icono="information-circle-outline"
+            texto={textos.perfil.sobreComunidad}
+            primero
+            onPress={() => setHojaSobreComunidadVisible(true)}
+          />
+          <FilaPerfil icono="help-circle-outline" texto={textos.perfil.ayuda} />
+        </Grupo>
 
-      <Text style={styles.footerMarca}>
-        {marca.nombreApp} · {comunidad?.nombre ?? "…"}
-      </Text>
+        <Text style={styles.etiquetaSeccion}>Gestión</Text>
+        <Grupo>
+          <FilaPerfil
+            icono="briefcase-outline"
+            texto="¿Diriges un negocio o la junta vecinal?"
+            primero
+            onPress={() => router.push("/cuenta")}
+          />
+        </Grupo>
 
-      <HojaInferior visible={hojaComunidadVisible} onCerrar={() => setHojaComunidadVisible(false)}>
-        <SelectorComunidad onSeleccionar={() => setHojaComunidadVisible(false)} />
-      </HojaInferior>
+        <Pressable onPress={compartirApp} accessibilityRole="button" accessibilityLabel="Invitar a vecinos">
+          <ImageBackground source={FOTO_INVITAR} style={styles.ctaInvitar} imageStyle={{ borderRadius: 10 }} resizeMode="cover">
+            <LinearGradient
+              colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.72)"]}
+              locations={[0.2, 1]}
+              style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}
+            />
+            <Text style={styles.ctaTitulo}>Invita a tus vecinos</Text>
+            <Text style={styles.ctaSubtitulo}>Comparte {marca.nombreApp} con tu comunidad</Text>
+          </ImageBackground>
+        </Pressable>
 
-      <HojaInferior
-        visible={hojaSobreComunidadVisible}
-        onCerrar={() => setHojaSobreComunidadVisible(false)}
-      >
-        {comunidad ? <SobreComunidad comunidad={comunidad} /> : null}
-      </HojaInferior>
-    </ScrollView>
+        <Grupo>
+          <FilaPerfil
+            icono="log-out-outline"
+            texto={textos.perfil.cerrarSesion}
+            peligro
+            mostrarFlecha={false}
+            primero
+            onPress={cerrarSesion}
+          />
+        </Grupo>
+
+        <Text style={styles.footerMarca}>
+          {marca.nombreApp} · {comunidad?.nombre ?? "…"}
+        </Text>
+
+        <HojaInferior visible={hojaComunidadVisible} onCerrar={() => setHojaComunidadVisible(false)}>
+          <SelectorComunidad onSeleccionar={() => setHojaComunidadVisible(false)} />
+        </HojaInferior>
+
+        <HojaInferior
+          visible={hojaSobreComunidadVisible}
+          onCerrar={() => setHojaSobreComunidadVisible(false)}
+        >
+          {comunidad ? <SobreComunidad comunidad={comunidad} /> : null}
+        </HojaInferior>
+      </Animated.ScrollView>
+      <BarraTituloFija titulo={nombreMostrado} scrollY={desplazamiento.scrollY} desde={40} />
+    </View>
   );
 }
 

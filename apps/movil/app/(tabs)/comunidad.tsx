@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
+import { useBarraPestanas } from "../../src/estado/useBarraPestanas";
+import { useAlturaBarra, useDesplazamiento } from "../../src/utilidades/useDesplazamiento";
+import { BarraTituloFija } from "../../src/componentes/BarraTituloFija";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Aviso } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
@@ -37,6 +41,18 @@ export default function Comunidad() {
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
   const insets = useSafeAreaInsets();
+  const refScroll = useRef<ScrollView>(null);
+  useScrollToTop(refScroll);
+  const desplazamiento = useDesplazamiento();
+  const alturaBarra = useAlturaBarra();
+  const marcarComunidadVista = useBarraPestanas((e) => e.marcarComunidadVista);
+  // Mientras el vecino está en Comunidad, las alertas cuentan como vistas: se apaga el punto de la pestaña.
+  useFocusEffect(
+    useCallback(() => {
+      marcarComunidadVista();
+      return () => marcarComunidadVista();
+    }, [marcarComunidadVista]),
+  );
   const { comunidad } = useComunidadActiva();
   const [filtro, setFiltro] = useState<FiltroComunidad>("todo");
   const { data: avisos, isLoading, isError, isRefetching, refetch } = useAvisos(comunidad?.id);
@@ -52,65 +68,71 @@ export default function Comunidad() {
   const grupos = agruparPorFecha(resto);
 
   return (
-    <ScrollView
-      style={styles.contenedor}
-      contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top }]}
-      refreshControl={
-        <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor={colores.primario} />
-      }
-    >
-      <View style={styles.filaTitulo}>
-        <Text style={styles.titulo}>Comunidad</Text>
-        <View style={styles.insigniaZona}>
-          <Text style={styles.insigniaZonaTexto}>{comunidad?.nombre ?? "..."}</Text>
+    <View style={{ flex: 1 }}>
+      <Animated.ScrollView
+        ref={refScroll}
+        onScroll={desplazamiento.onScroll}
+        scrollEventThrottle={16}
+        style={styles.contenedor}
+        contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top, paddingBottom: alturaBarra + espaciado.xl }]}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor={colores.primario} />
+        }
+      >
+        <View style={styles.filaTitulo}>
+          <Text style={styles.titulo}>Comunidad</Text>
+          <View style={styles.insigniaZona}>
+            <Text style={styles.insigniaZonaTexto}>{comunidad?.nombre ?? "..."}</Text>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.filaChips}>
-        {filtros(colores).map((item) => (
-          <ChipCategoria
-            key={item.id}
-            etiqueta={item.etiqueta}
-            activo={filtro === item.id}
-            onPress={() => setFiltro(item.id)}
-            colorPunto={item.colorPunto}
-          />
-        ))}
-      </View>
-
-      {filtro === "perdidos" ? (
-        <EstadoVacio titulo="Esta sección llega pronto a Comunidad." />
-      ) : isLoading ? (
-        <EsqueletoListaAvisos cantidad={3} />
-      ) : isError ? (
-        <EstadoError onReintentar={() => refetch()} />
-      ) : avisosFiltrados.length > 0 ? (
-        <>
-          {fijadas.length > 0 ? (
-            <View style={styles.grupo}>
-              <View style={styles.encabezadoFijado}>
-                <Ionicons name="alert-circle" size={14} color={colores.error} />
-                <Text style={styles.tituloFijado}>Alertas activas</Text>
-              </View>
-              {fijadas.map((aviso) => (
-                <TarjetaAviso key={aviso.id} aviso={aviso} />
-              ))}
-            </View>
-          ) : null}
-
-          {grupos.map((grupo) => (
-            <View key={grupo.etiqueta} style={styles.grupo}>
-              <Text style={styles.tituloGrupo}>{grupo.etiqueta}</Text>
-              {grupo.avisos.map((aviso) => (
-                <TarjetaAviso key={aviso.id} aviso={aviso} />
-              ))}
-            </View>
+        <View style={styles.filaChips}>
+          {filtros(colores).map((item) => (
+            <ChipCategoria
+              key={item.id}
+              etiqueta={item.etiqueta}
+              activo={filtro === item.id}
+              onPress={() => setFiltro(item.id)}
+              colorPunto={item.colorPunto}
+            />
           ))}
-        </>
-      ) : (
-        <EstadoVacio titulo="No hay nada por aquí todavía." />
-      )}
-    </ScrollView>
+        </View>
+
+        {filtro === "perdidos" ? (
+          <EstadoVacio titulo="Esta sección llega pronto a Comunidad." />
+        ) : isLoading ? (
+          <EsqueletoListaAvisos cantidad={3} />
+        ) : isError ? (
+          <EstadoError onReintentar={() => refetch()} />
+        ) : avisosFiltrados.length > 0 ? (
+          <>
+            {fijadas.length > 0 ? (
+              <View style={styles.grupo}>
+                <View style={styles.encabezadoFijado}>
+                  <Ionicons name="alert-circle" size={14} color={colores.error} />
+                  <Text style={styles.tituloFijado}>Alertas activas</Text>
+                </View>
+                {fijadas.map((aviso) => (
+                  <TarjetaAviso key={aviso.id} aviso={aviso} />
+                ))}
+              </View>
+            ) : null}
+
+            {grupos.map((grupo) => (
+              <View key={grupo.etiqueta} style={styles.grupo}>
+                <Text style={styles.tituloGrupo}>{grupo.etiqueta}</Text>
+                {grupo.avisos.map((aviso) => (
+                  <TarjetaAviso key={aviso.id} aviso={aviso} />
+                ))}
+              </View>
+            ))}
+          </>
+        ) : (
+          <EstadoVacio titulo="No hay nada por aquí todavía." />
+        )}
+      </Animated.ScrollView>
+      <BarraTituloFija titulo="Comunidad" scrollY={desplazamiento.scrollY} />
+    </View>
   );
 }
 
