@@ -17,12 +17,13 @@ export interface FilaAviso {
   me_gusta: number;
   compartidos: number;
   distrito_ubigeo: string;
+  version_rechazada: Aviso["versionRechazada"];
 }
 
 export const SELECT_AVISO = `
   SELECT a.id, a.comunidad_id, a.fuente_nombre, a.fuente_verificada, a.titulo, a.cuerpo, a.categoria,
          a.estado, a.creado_por_cuenta_id, a.validado_por_cuenta_id, a.motivo_rechazo, a.publicado_en,
-         a.imagen_url, a.me_gusta, a.compartidos, c.distrito_ubigeo
+         a.imagen_url, a.me_gusta, a.compartidos, a.version_rechazada, c.distrito_ubigeo
   FROM avisos a
   JOIN comunidades c ON c.id = a.comunidad_id
 `;
@@ -44,5 +45,6 @@ export function aAviso(fila: FilaAviso): Aviso {
     imagenUrl: fila.imagen_url,
     meGusta: fila.me_gusta,
     compartidos: fila.compartidos,
+    versionRechazada: fila.version_rechazada ?? null,
   };
 }

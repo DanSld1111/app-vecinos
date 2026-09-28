@@ -76,20 +76,80 @@ export function DetalleNegocioCola({ negocio }: { negocio: Negocio }) {
   );
 }
 
-/** Un aviso pendiente: sus datos y, al lado, cómo lo van a ver los vecinos en Comunidad. */
+/**
+ * Antes y después de un aviso que se reenvió tras un rechazo: la versión rechazada (con su
+ * motivo) al lado de la corregida, con los campos que cambiaron resaltados. El servidor guarda la
+ * versión rechazada al reenviar (columna avisos.version_rechazada, ver decisión 0079).
+ */
+function AntesDespuesAviso({ aviso }: { aviso: Aviso }) {
+  const antes = aviso.versionRechazada!;
+  const filas: { nombre: string; antes: string; ahora: string }[] = [
+    { nombre: "Categoría", antes: ESTILO_CATEGORIA[antes.categoria].etiqueta, ahora: ESTILO_CATEGORIA[aviso.categoria].etiqueta },
+    { nombre: "Título", antes: antes.titulo, ahora: aviso.titulo },
+    { nombre: "Texto", antes: antes.cuerpo, ahora: aviso.cuerpo },
+  ];
+  const cambios = filas.filter((f) => f.antes.trim() !== f.ahora.trim()).length;
+  return (
+    <div className="antes-despues">
+      <div className="nota-alerta">
+        <IconoEmoji e="↩️" /> Reenviado tras un rechazo
+        {antes.motivoRechazo ? (
+          <>
+            . Motivo: <b>“{antes.motivoRechazo}”</b>
+          </>
+        ) : null}
+      </div>
+      <table className="tabla-cola tabla-antes-despues">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Rechazado</th>
+            <th>Reenviado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filas.map((f) => {
+            const cambio = f.antes.trim() !== f.ahora.trim();
+            return (
+              <tr key={f.nombre} className={cambio ? "cambio" : undefined}>
+                <td className="campo-cola">{f.nombre}</td>
+                <td className="valor-antes">{f.antes}</td>
+                <td className="valor-ahora">
+                  {f.ahora}
+                  {cambio ? <span className="marca-cambio">Cambió</span> : null}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p className="resumen-cambios">
+        {cambios === 0
+          ? "Se reenvió sin cambios respecto a la versión rechazada."
+          : `${cambios} ${cambios === 1 ? "campo cambió" : "campos cambiaron"} respecto a la versión rechazada.`}
+      </p>
+    </div>
+  );
+}
+
+/** Un aviso pendiente: sus datos (o el antes y después si fue reenviado) y cómo lo verán los vecinos. */
 export function DetalleAvisoCola({ aviso }: { aviso: Aviso }) {
   const estilo = ESTILO_CATEGORIA[aviso.categoria];
   return (
     <div className="detalle-cola detalle-cola-aviso">
-      <table className="tabla-cola">
-        <tbody>
-          <Campo nombre="Categoría" valor={estilo.etiqueta} />
-          <Campo nombre="Fuente" valor={aviso.fuenteNombre} />
-          <Campo nombre="Verificada" valor={aviso.fuenteVerificada ? "Sí, muestra la insignia" : "No"} />
-          <Campo nombre="Título" valor={aviso.titulo} />
-          <Campo nombre="Texto" valor={aviso.cuerpo} />
-        </tbody>
-      </table>
+      {aviso.versionRechazada ? (
+        <AntesDespuesAviso aviso={aviso} />
+      ) : (
+        <table className="tabla-cola">
+          <tbody>
+            <Campo nombre="Categoría" valor={estilo.etiqueta} />
+            <Campo nombre="Fuente" valor={aviso.fuenteNombre} />
+            <Campo nombre="Verificada" valor={aviso.fuenteVerificada ? "Sí, muestra la insignia" : "No"} />
+            <Campo nombre="Título" valor={aviso.titulo} />
+            <Campo nombre="Texto" valor={aviso.cuerpo} />
+          </tbody>
+        </table>
+      )}
       <div className="telefono telefono-cola">
         <div className="pantalla-tel">
           <div className="mini-titulo-seccion">Comunidad</div>

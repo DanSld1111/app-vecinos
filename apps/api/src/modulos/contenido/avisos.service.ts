@@ -121,9 +121,14 @@ export class AvisosService {
     if (fila.estado !== "rechazado") {
       throw new ForbiddenException("Solo se puede corregir un aviso que fue rechazado.");
     }
+    // En el SET de un UPDATE, las columnas del lado derecho valen lo que había antes: así
+    // version_rechazada guarda el aviso tal como se rechazó, junto con su motivo.
     await this.bd.consultar(
       `UPDATE avisos
-       SET titulo = $2, cuerpo = $3, categoria = $4, estado = 'pendiente',
+       SET version_rechazada = jsonb_build_object(
+             'titulo', titulo, 'cuerpo', cuerpo, 'categoria', categoria, 'motivoRechazo', motivo_rechazo
+           ),
+           titulo = $2, cuerpo = $3, categoria = $4, estado = 'pendiente',
            validado_por_cuenta_id = NULL, motivo_rechazo = NULL, publicado_en = now()
        WHERE id = $1`,
       [id, dto.titulo, dto.cuerpo, dto.categoria],
@@ -138,7 +143,8 @@ export class AvisosService {
     }
     await this.bd.consultar(
       `UPDATE avisos
-       SET estado = 'publicado', publicado_en = now(), validado_por_cuenta_id = $2, motivo_rechazo = NULL
+       SET estado = 'publicado', publicado_en = now(), validado_por_cuenta_id = $2, motivo_rechazo = NULL,
+           version_rechazada = NULL
        WHERE id = $1`,
       [id, cuenta.id],
     );

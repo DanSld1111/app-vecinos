@@ -15,6 +15,8 @@ Esquema de base de datos de Etapa 2 (PostgreSQL 15+ con la extensión PostGIS). 
 | `0007_usuarios_app.sql` | vecinos registrados desde la app móvil |
 | `0008_publicidad_novedades.sql` | anuncios, novedades |
 | `0009_pagos_preparado.sql` | andamiaje de pagos — **no usar todavía** |
+| … | (0010 a 0026: ver cada archivo) |
+| `0027_aviso_version_rechazada.sql` | versión rechazada de un aviso reenviado (antes y después) |
 
 Aplicar todo en una base vacía:
 

@@ -23,4 +23,14 @@ export interface Aviso {
   meGusta: number;
   /** Conteo semilla de veces compartido. Mismo criterio que meGusta: semilla + toggle/incremento local, sin agregación real todavía. */
   compartidos: number;
+  /** Solo en un aviso que se reenvió tras un rechazo: la versión rechazada y el motivo, para que
+   * quien valida vea el antes y el después. null si nunca fue reenviado o ya se aprobó. */
+  versionRechazada?: VersionRechazadaAviso | null;
+}
+
+export interface VersionRechazadaAviso {
+  titulo: string;
+  cuerpo: string;
+  categoria: CategoriaAviso;
+  motivoRechazo: string | null;
 }

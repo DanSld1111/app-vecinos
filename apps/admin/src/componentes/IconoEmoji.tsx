@@ -39,6 +39,7 @@ import {
   LuReceipt,
   LuRuler,
   LuSearch,
+  LuUndo2,
   LuSettings,
   LuShare,
   LuShield,
@@ -127,6 +128,7 @@ const MAPA: Record<string, IconType> = {
   "🗄": LuArchive,
   "🚫": LuBan,
   "ℹ": LuInfo,
+  "↩": LuUndo2,
 };
 
 /** El emoji sin el selector de variación (U+FE0F) que a veces lo acompaña. */
