@@ -35,6 +35,9 @@ export interface FilaNegocio {
   calificacion_promedio: string | null;
   calificacion_total: string;
   total_productos: string;
+  version_rechazada: Negocio["versionRechazada"];
+  nota_reenvio: string | null;
+  creado_por_cuenta_id: string | null;
 }
 
 export function aNegocio(fila: FilaNegocio): Negocio {
@@ -71,6 +74,9 @@ export function aNegocio(fila: FilaNegocio): Negocio {
     calificacionPromedio: fila.calificacion_promedio != null ? Number(fila.calificacion_promedio) : null,
     calificacionTotal: Number(fila.calificacion_total),
     totalProductos: Number(fila.total_productos),
+    versionRechazada: fila.version_rechazada ?? null,
+    notaReenvio: fila.nota_reenvio,
+    creadoPorCuentaId: fila.creado_por_cuenta_id,
   };
 }
 
@@ -79,6 +85,7 @@ export const COLUMNAS_NEGOCIO = `
   n.telefono, n.whatsapp, n.horarios, n.moneda, n.foto_principal_url, n.estado, n.archivado_en, n.verificado_en,
   n.validado_por_cuenta_id, n.motivo_rechazo, n.fuente, n.creado_en, n.actualizado_en,
   n.servicios_ofrecidos, n.rubros_disponibles, n.ofertas, n.pasillos, n.fotos_galeria, n.acerca_del_negocio,
+  n.version_rechazada, n.nota_reenvio, n.creado_por_cuenta_id,
   ST_Y(n.coordenada::geometry) AS lat, ST_X(n.coordenada::geometry) AS lng,
   COALESCE(array_agg(nc.categoria_id) FILTER (WHERE nc.categoria_id IS NOT NULL), '{}') AS categoria_ids,
   (SELECT COUNT(*) FROM negocio_visitas v WHERE v.negocio_id = n.id AND v.creado_en > now() - interval '7 days') AS visitas_7d,

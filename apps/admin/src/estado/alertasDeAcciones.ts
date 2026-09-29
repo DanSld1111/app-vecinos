@@ -82,6 +82,7 @@ conAlertas(useNegocios, {
     exito: ([id, servicios], _a, d) => ["Servicios guardados", `${cantidad(servicios.length, "servicio", "servicios")} · ${negocio(d, id)}`],
   },
   subirFotoServicio: { error: "No se pudo subir la foto del servicio" },
+  reenviar: { error: "No se pudo reenviar a revisión", exito: ([id], a) => ["Reenviado a revisión", `${negocio(a, id)} · el validador lo revisará`] },
   guardarLista: {
     error: "No se pudo guardar la lista",
     exito: ([id, lista, items], _a, d) => [

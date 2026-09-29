@@ -5,6 +5,7 @@ import {
   LuClock,
   LuFlag,
   LuHistory,
+  LuHouse,
   LuImage,
   LuKeyRound,
   LuLayoutDashboard,
@@ -15,6 +16,7 @@ import {
   LuMegaphone,
   LuMoon,
   LuPercent,
+  LuPlus,
   LuSparkles,
   LuStore,
   LuSun,
@@ -24,6 +26,7 @@ import {
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { RolCuenta } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
+import { useNegocios } from "../estado/useNegocios";
 import { useContadorPendientes } from "../estado/useContadorPendientes";
 import { useCategorias } from "../estado/useCategorias";
 import { useGeografia } from "../estado/useGeografia";
@@ -41,7 +44,7 @@ interface ItemNav {
   contador?: number;
 }
 
-function itemsPorRol(rol: RolCuenta, pendientes: number): ItemNav[] {
+function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0): ItemNav[] {
   switch (rol) {
     case "super_admin":
       return [
@@ -73,10 +76,14 @@ function itemsPorRol(rol: RolCuenta, pendientes: number): ItemNav[] {
         { a: "/validacion", texto: "Cola de validación", icono: LuBadgeCheck, grupo: "Validación", contador: pendientes },
         { a: "/validacion/historial", texto: "Historial", icono: LuHistory },
       ];
-    // Acceso total al módulo de negocios (alta, edición, publicar/despublicar) pero nada más
-    // del panel — sin distritos, cuentas, categorías ni el resto de módulos de super_admin.
+    // Módulo de negocios completo (alta, edición, reenvío) pero nada más del panel; publicar es
+    // del validador. El inicio cuenta los negocios rechazados que esperan corrección (0086).
     case "gestor_negocios":
-      return [{ a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" }];
+      return [
+        { a: "/inicio", texto: "Inicio", icono: LuHouse, grupo: "General", contador: rechazados },
+        { a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" },
+        { a: "/negocios/nuevo", texto: "Registrar negocio", icono: LuPlus },
+      ];
   }
 }
 
@@ -138,6 +145,8 @@ export function LayoutAdmin() {
 
   const pendientes = negociosPendientes + avisosPendientes;
 
+  const rechazados = useNegocios((e) => e.negocios.filter((n) => !n.archivadoEn && n.estado === "inactivo" && n.motivoRechazo).length);
+
   return (
     <div className="app-shell">
       <div className="topbar-movil">
@@ -178,12 +187,12 @@ export function LayoutAdmin() {
         </div>
         {cuenta.rol === "dueno_negocio" ? <SelectorNegocioSidebar /> : null}
         <nav>
-          {itemsPorRol(cuenta.rol, pendientes).map((item) => (
+          {itemsPorRol(cuenta.rol, pendientes, rechazados).map((item) => (
             <Fragment key={item.a}>
               {item.grupo ? <span className="grupo-nav">{item.grupo}</span> : null}
               <NavLink
                 to={item.a}
-                end={item.a === "/mi-negocio"}
+                end={item.a === "/mi-negocio" || item.a === "/negocios"}
                 className={({ isActive }) => (isActive ? "activo" : undefined)}
               >
                 <span className="izq">

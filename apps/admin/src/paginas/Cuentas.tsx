@@ -119,7 +119,6 @@ export function Cuentas() {
       return nombres.length > 1 ? [nombres[0], `+${nombres.length - 1} más`] : nombres;
     }
     if (cuenta.rol === "super_admin") return ["Acceso total"];
-    if (cuenta.rol === "gestor_negocios") return ["Todos los negocios"];
     if (cuenta.distritosAsignados.length === 0) return ["Todos los distritos"];
     return cuenta.distritosAsignados.map((u) => distritos.find((d) => d.ubigeo === u)?.nombre ?? u);
   }
@@ -422,7 +421,7 @@ function ModalNuevaCuenta({
       correo: correo.trim(),
       rol,
       negocioIds: rol === "dueno_negocio" && negocioId ? [negocioId] : [],
-      distritosAsignados: rol === "junta_vecinal" || rol === "validador_contenido" ? distritosAsignados : [],
+      distritosAsignados: rol === "junta_vecinal" || rol === "validador_contenido" || rol === "gestor_negocios" ? distritosAsignados : [],
     });
   }
 
@@ -479,7 +478,7 @@ function ModalNuevaCuenta({
           </div>
         ) : null}
 
-        {rol === "junta_vecinal" || rol === "validador_contenido" ? (
+        {rol === "junta_vecinal" || rol === "validador_contenido" || rol === "gestor_negocios" ? (
           <div className="campo-modal">
             <label>Distritos asignados</label>
             <div className="lista-checks-distrito">
@@ -575,7 +574,7 @@ function DrawerEditarCuenta({
       correo: correo.trim(),
       rol,
       negocioIds: cuenta.negocioIds,
-      distritosAsignados: rol === "junta_vecinal" || rol === "validador_contenido" ? distritosAsignados : [],
+      distritosAsignados: rol === "junta_vecinal" || rol === "validador_contenido" || rol === "gestor_negocios" ? distritosAsignados : [],
     });
   }
 
@@ -660,7 +659,7 @@ function DrawerEditarCuenta({
           </div>
         ) : null}
 
-        {rol === "junta_vecinal" || rol === "validador_contenido" ? (
+        {rol === "junta_vecinal" || rol === "validador_contenido" || rol === "gestor_negocios" ? (
           <div className="drawer-seccion">
             <div className="etiqueta">Distritos asignados</div>
             <div className="lista-checks-distrito">

@@ -60,6 +60,8 @@ interface EstadoNegocios {
   /** Sube la foto de un servicio y devuelve su URL, que se guarda después con la lista. */
   subirFotoServicio: (id: string, archivo: File, token: string) => Promise<string | null>;
   guardarLista: (id: string, lista: "rubros" | "pasillos", items: string[], token: string) => Promise<boolean>;
+  /** Tras un rechazo: vuelve a la cola del validador con una nota (decisión 0086). */
+  reenviar: (id: string, nota: string, token: string) => Promise<boolean>;
 }
 
 function mensajeError(error: unknown, fallback: string): string {
@@ -336,6 +338,17 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
       return true;
     } catch (error) {
       set({ error: mensajeError(error, lista === "rubros" ? "No se pudieron guardar los rubros." : "No se pudieron guardar los pasillos.") });
+      return false;
+    }
+  },
+
+  reenviar: async (id, nota, token) => {
+    try {
+      const actualizado = await apiFetch<Negocio>(`/negocios/${id}/reenviar`, { metodo: "PATCH", token, cuerpo: { nota } });
+      set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
+      return true;
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo reenviar el negocio.") });
       return false;
     }
   },

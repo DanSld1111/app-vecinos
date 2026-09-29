@@ -1,4 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { useSesionAdmin } from "../../estado/useSesionAdmin";
+import { ModalReenviar } from "./ModalReenviar";
 import { Negocio } from "@app-vecinos/tipos";
 import { estadoVisualDe } from "../../utilidades/estadoNegocio";
 
@@ -17,6 +19,11 @@ function formatearFecha(fecha: string | null): string {
  */
 export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; acciones?: ReactNode }) {
   const estadoVisual = estadoVisualDe(negocio);
+  const rol = useSesionAdmin((e) => e.cuenta?.rol);
+  const [reenviando, setReenviando] = useState(false);
+  // Solo un negocio nuevo rechazado (no publicado) se reenvía; uno publicado sigue visible.
+  const puedeReenviar =
+    negocio.estado === "inactivo" && Boolean(negocio.motivoRechazo) && (rol === "super_admin" || rol === "gestor_negocios" || rol === "dueno_negocio");
 
   return (
     <>
@@ -25,8 +32,17 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
           <div className="icono-estado-grande"><IconoEmoji e="✕" /></div>
           <div>
             <h3>El último envío fue rechazado</h3>
-            <p>Corrige lo que se indica abajo y vuelve a enviarlo desde "Información".</p>
+            <p>
+              {puedeReenviar
+                ? "Corrige lo que se indica abajo en las otras pestañas y reenvíalo a revisión."
+                : "El negocio sigue publicado con su versión anterior. Revisa el motivo abajo."}
+            </p>
           </div>
+          {puedeReenviar ? (
+            <button className="btn btn-primario" style={{ marginLeft: "auto" }} onClick={() => setReenviando(true)}>
+              Reenviar a revisión
+            </button>
+          ) : null}
         </div>
       ) : estadoVisual === "activo" ? (
         <div className="tarjeta-estado-grande activo">
@@ -116,6 +132,7 @@ export function EditorEstadoNegocio({ negocio, acciones }: { negocio: Negocio; a
           )}
         </div>
       </div>
+      {reenviando ? <ModalReenviar negocio={negocio} onCerrar={() => setReenviando(false)} /> : null}
     </>
   );
 }

@@ -37,6 +37,33 @@ export interface OfertaNegocio {
   etiqueta: string;
 }
 
+/** Cómo estaba la ficha cuando la rechazaron: el validador la compara al recibir el reenvío (decisión 0086). */
+export interface VersionRechazadaNegocio {
+  nombre: string;
+  descripcion: string;
+  direccion: string;
+  telefono: string | null;
+  whatsapp: string | null;
+  fotoPrincipalUrl: string | null;
+  horarios: Horarios;
+  categoriaIds: string[];
+  motivoRechazo: string | null;
+  rechazadoEn: string;
+}
+
+/** Un renglón del historial de un negocio (pestaña Historial del panel). */
+export interface EventoHistorialNegocio {
+  accion: string;
+  entidad: "negocio" | "producto";
+  detalle: Record<string, unknown> | null;
+  creadoEn: string;
+  cuentaNombre: string | null;
+  cuentaRol: string | null;
+  /** Solo en la actividad del inicio del gestor: de qué negocio es. */
+  negocioId?: string;
+  negocioNombre?: string;
+}
+
 export interface Negocio {
   id: string;
   comunidadId: string;
@@ -91,6 +118,11 @@ export interface Negocio {
   /** Productos visibles (sin contar la papelera). Lo usa el panel para saber si la ficha tiene
    * contenido (decisión 0085). Opcional: los datos de ejemplo del modo sin conexión no lo traen. */
   totalProductos?: number;
+  /** Solo si se reenvió tras un rechazo y todavía no se aprueba. */
+  versionRechazada?: VersionRechazadaNegocio | null;
+  notaReenvio?: string | null;
+  /** Quién lo registró (null en negocios anteriores a la decisión 0086). */
+  creadoPorCuentaId?: string | null;
 }
 
 export interface FiltroNegocios {

@@ -19,11 +19,12 @@ import { useCategorias } from "../estado/useCategorias";
 import { pestanasDeContenido } from "../utilidades/fichaNegocio";
 import { partesDeFicha } from "../utilidades/completitudNegocio";
 import { FranjaFaltantes } from "../componentes/negocio/FranjaFaltantes";
+import { HistorialNegocio } from "../componentes/negocio/HistorialNegocio";
 import { alertaInfo } from "../estado/useToasts";
 import { urlCompleta } from "../utilidades/media";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
-type Pestana = "info" | "horario" | "fotos" | "productos" | "servicios" | "rubros" | "ofertas" | "pasillos" | "dueno" | "estado";
+type Pestana = "info" | "horario" | "fotos" | "productos" | "servicios" | "rubros" | "ofertas" | "pasillos" | "dueno" | "estado" | "historial";
 
 const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "info", icono: "📋", texto: "Información" },
@@ -36,11 +37,12 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "pasillos", icono: "🛒", texto: "Pasillos" },
   { id: "dueno", icono: "👤", texto: "Dueño" },
   { id: "estado", icono: "✅", texto: "Estado" },
+  { id: "historial", icono: "🧾", texto: "Historial" },
 ];
 
 /** gestor_negocios arma y completa la ficha (incluido horario y ofertas, decisión 0083), pero no
  * publica ni despublica: eso es del validador de contenido. */
-const PESTANAS_GESTOR: Pestana[] = ["info", "horario", "dueno", "fotos", "productos", "servicios", "rubros", "ofertas", "pasillos", "estado"];
+const PESTANAS_GESTOR: Pestana[] = ["info", "horario", "dueno", "fotos", "productos", "servicios", "rubros", "ofertas", "pasillos", "estado", "historial"];
 
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;
@@ -173,6 +175,7 @@ export function FichaNegocio() {
       {pestana === "pasillos" ? <EditorListaNegocio key={negocio.id} negocio={negocio} lista="pasillos" /> : null}
       {pestana === "dueno" ? <PestanaDueno negocio={negocio} /> : null}
       {pestana === "estado" ? <PestanaEstado negocio={negocio} /> : null}
+      {pestana === "historial" ? <HistorialNegocio negocioId={negocio.id} /> : null}
       </ConVistaPrevia>
     </>
   );

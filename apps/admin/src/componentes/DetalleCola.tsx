@@ -1,11 +1,63 @@
 import { Link } from "react-router-dom";
 import { Aviso, Negocio } from "@app-vecinos/tipos";
 import { useCategorias } from "../estado/useCategorias";
+import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { urlCompleta } from "../utilidades/media";
 import { listaSemanaCompleta } from "../utilidades/horarios";
 import { partesDeFicha } from "../utilidades/completitudNegocio";
 import { ESTILO_CATEGORIA } from "../paginas/Avisos";
 import { IconoEmoji } from "./IconoEmoji";
+import { cambiosDesdeRechazo } from "../utilidades/cambiosRechazo";
+
+/** Negocio reenviado tras un rechazo (decisión 0086): motivo, nota y qué cambió. */
+function ReenvioNegocio({ negocio }: { negocio: Negocio }) {
+  const categorias = useCategorias((e) => e.categorias);
+  const v = negocio.versionRechazada;
+  if (!v) return null;
+  const cambios = cambiosDesdeRechazo(negocio, categorias) ?? [];
+  return (
+    <div className="antes-despues">
+      <div className="nota-alerta">
+        <IconoEmoji e="↩️" /> Reenviado tras un rechazo
+        {v.motivoRechazo ? (
+          <>
+            . Motivo: <b>“{v.motivoRechazo}”</b>
+          </>
+        ) : null}
+      </div>
+      {negocio.notaReenvio ? (
+        <p className="nota-reenvio-cola">
+          <b>Nota de quien lo corrigió:</b> {negocio.notaReenvio}
+        </p>
+      ) : null}
+      {cambios.length ? (
+        <table className="tabla-cola tabla-antes-despues">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Rechazado</th>
+              <th>Reenviado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cambios.map((c) => (
+              <tr key={c.campo} className="cambio">
+                <td className="campo-cola">{c.campo}</td>
+                <td className="valor-antes">{c.antes}</td>
+                <td className="valor-ahora">
+                  {c.ahora}
+                  <span className="marca-cambio">Cambió</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="resumen-cambios">Los datos de la ficha no cambiaron; revisa la nota y el contenido (productos, fotos).</p>
+      )}
+    </div>
+  );
+}
 
 /** Una fila "campo · valor" del detalle; si el valor falta se marca, para que el validador lo vea. */
 function Campo({ nombre, valor }: { nombre: string; valor: string | null | undefined }) {
@@ -24,6 +76,7 @@ function Campo({ nombre, valor }: { nombre: string; valor: string | null | undef
  */
 export function DetalleNegocioCola({ negocio }: { negocio: Negocio }) {
   const categorias = useCategorias((e) => e.categorias);
+  const rol = useSesionAdmin((e) => e.cuenta?.rol);
   const nombresCategorias = negocio.categoriaIds
     .map((id) => categorias.find((c) => c.id === id)?.nombre)
     .filter(Boolean)
@@ -36,6 +89,7 @@ export function DetalleNegocioCola({ negocio }: { negocio: Negocio }) {
 
   return (
     <div className="detalle-cola">
+      <ReenvioNegocio negocio={negocio} />
       <div className="detalle-cola-cab">
         {foto ? (
           <img className="detalle-cola-foto" src={foto} alt={`Foto de ${negocio.nombre}`} />
@@ -48,9 +102,11 @@ export function DetalleNegocioCola({ negocio }: { negocio: Negocio }) {
         <div>
           <div className="detalle-cola-rubro">{nombresCategorias || "Sin categoría"}</div>
           <p className="detalle-cola-desc">{negocio.descripcion || "Sin descripción."}</p>
-          <Link className="ver-todo" to={`/negocios/${negocio.id}`}>
-            Abrir la ficha completa →
-          </Link>
+          {rol === "super_admin" ? (
+            <Link className="ver-todo" to={`/negocios/${negocio.id}`}>
+              Abrir la ficha completa →
+            </Link>
+          ) : null}
         </div>
       </div>
 

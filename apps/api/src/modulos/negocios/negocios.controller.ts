@@ -17,7 +17,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Cuenta, Negocio, Producto, ResultadoPaginado } from "@app-vecinos/tipos";
+import { Cuenta, EventoHistorialNegocio, Negocio, Producto, ResultadoPaginado } from "@app-vecinos/tipos";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "../auth/roles.decorator";
@@ -29,6 +29,7 @@ import { ActualizarInfoNegocioDto } from "./dto/actualizar-info-negocio.dto";
 import { ActualizarHorariosDto } from "./dto/actualizar-horarios.dto";
 import { AgregarOfertaDto } from "./dto/agregar-oferta.dto";
 import { RechazarNegocioDto } from "./dto/rechazar-negocio.dto";
+import { ReenviarNegocioDto } from "./dto/reenviar-negocio.dto";
 import { ListarNegociosAdminDto } from "./dto/listar-negocios-admin.dto";
 import { opcionesUploadFotoNegocio } from "./foto-negocio.config";
 import { opcionesUploadFotoProducto } from "./foto-producto.config";
@@ -57,8 +58,19 @@ export class NegociosController {
   @Get("admin")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("super_admin", "gestor_negocios")
-  listarAdmin(@Query() paginacion: ListarNegociosAdminDto): Promise<ResultadoPaginado<Negocio>> {
-    return this.negocios.listarAdmin(paginacion.cursor, paginacion.limite, paginacion.archivados === "true");
+  listarAdmin(
+    @Query() paginacion: ListarNegociosAdminDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<ResultadoPaginado<Negocio>> {
+    return this.negocios.listarAdmin(paginacion.cursor, paginacion.limite, paginacion.archivados === "true", req.user);
+  }
+
+  /** Inicio del gestor: su actividad reciente y la de los negocios de sus distritos. */
+  @Get("actividad")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("super_admin", "gestor_negocios")
+  actividad(@Req() req: SolicitudConCuenta): Promise<EventoHistorialNegocio[]> {
+    return this.negocios.actividadGestor(req.user);
   }
 
   @Get("pendientes")
@@ -85,8 +97,8 @@ export class NegociosController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("super_admin", "gestor_negocios")
-  crear(@Body() dto: CrearNegocioDto): Promise<Negocio> {
-    return this.negocios.crear(dto);
+  crear(@Body() dto: CrearNegocioDto, @Req() req: SolicitudConCuenta): Promise<Negocio> {
+    return this.negocios.crear(dto, req.user);
   }
 
   @Get(":id")
@@ -227,6 +239,23 @@ export class NegociosController {
   }
 
   /** Reversible — a diferencia de "eliminar" más abajo. super_admin y gestor_negocios (0071). */
+  /** Tras un rechazo: vuelve a la cola del validador (decisión 0086). Gestor, super_admin o el dueño. */
+  @Patch(":id/reenviar")
+  @UseGuards(JwtAuthGuard)
+  reenviar(
+    @Param("id") id: string,
+    @Body() dto: ReenviarNegocioDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Negocio> {
+    return this.negocios.reenviar(id, dto.nota, req.user);
+  }
+
+  @Get(":id/historial")
+  @UseGuards(JwtAuthGuard)
+  historial(@Param("id") id: string, @Req() req: SolicitudConCuenta): Promise<EventoHistorialNegocio[]> {
+    return this.negocios.historial(id, req.user);
+  }
+
   @Patch(":id/archivar")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("super_admin", "gestor_negocios")

@@ -71,7 +71,11 @@ const NEGOCIO_EN_BLANCO: Negocio = {
 export function RegistrarNegocio() {
   const navegar = useNavigate();
   const token = useSesionAdmin((estado) => estado.token)!;
-  const distritos = useGeografia((estado) => estado.distritos);
+  const todosLosDistritos = useGeografia((estado) => estado.distritos);
+  // Un gestor con distritos asignados solo registra negocios en esos distritos (decisión 0086).
+  const cuentaSesion = useSesionAdmin((estado) => estado.cuenta);
+  const asignados = cuentaSesion?.rol === "gestor_negocios" ? cuentaSesion.distritosAsignados : [];
+  const distritos = asignados.length ? todosLosDistritos.filter((d) => asignados.includes(d.ubigeo)) : todosLosDistritos;
   const comunidades = useGeografia((estado) => estado.comunidades);
   const categorias = useCategorias((estado) => estado.categorias);
   const servicios = useServiciosApp((estado) => estado.servicios);
