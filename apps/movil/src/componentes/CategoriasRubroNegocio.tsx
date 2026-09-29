@@ -4,6 +4,11 @@ import { PaletaColores, espaciado, radios, tipografia, useColores } from "../dis
 
 const ICONO_POR_RUBRO: Record<string, keyof typeof Ionicons.glyphMap> = {
   Pintura: "color-palette-outline",
+  Pinturas: "color-palette-outline",
+  Ferretería: "construct-outline",
+  Limpieza: "sparkles-outline",
+  Menaje: "restaurant-outline",
+  Iluminación: "bulb-outline",
   Electricidad: "flash-outline",
   Gasfitería: "water-outline",
   Herramientas: "hammer-outline",

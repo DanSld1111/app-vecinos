@@ -23,6 +23,7 @@ import { MiNegocioHorario } from "./paginas/MiNegocioHorario";
 import { MiNegocioProductos } from "./paginas/MiNegocioProductos";
 import { MiNegocioFotos } from "./paginas/MiNegocioFotos";
 import { MiNegocioOfertas } from "./paginas/MiNegocioOfertas";
+import { MiNegocioPasillos, MiNegocioRubros, MiNegocioServicios } from "./paginas/MiNegocioContenido";
 import { MiNegocioEstado } from "./paginas/MiNegocioEstado";
 import { MisAvisos } from "./paginas/MisAvisos";
 import { MiCuenta } from "./paginas/MiCuenta";
@@ -85,7 +86,10 @@ export function App() {
         <Route path="/mi-negocio/horario" element={<MiNegocioHorario />} />
         <Route path="/mi-negocio/fotos" element={<MiNegocioFotos />} />
         <Route path="/mi-negocio/productos" element={<MiNegocioProductos />} />
+        <Route path="/mi-negocio/servicios" element={<MiNegocioServicios />} />
+        <Route path="/mi-negocio/rubros" element={<MiNegocioRubros />} />
         <Route path="/mi-negocio/ofertas" element={<MiNegocioOfertas />} />
+        <Route path="/mi-negocio/pasillos" element={<MiNegocioPasillos />} />
         <Route path="/mi-negocio/estado" element={<MiNegocioEstado />} />
         <Route path="/mis-avisos" element={<MisAvisos />} />
         <Route path="/mi-cuenta" element={<MiCuenta />} />

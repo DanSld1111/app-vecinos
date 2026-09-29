@@ -15,7 +15,7 @@ workspaces — correr `npm install` en la raíz del monorepo al menos una vez).
 
 - Lima (departamento + provincia) y los 4 distritos piloto (San Borja, Miraflores, Surco, Surquillo)
 - Las 4 comunidades, 10 cuentas del panel (con sus contraseñas de prueba **hasheadas** con bcrypt, no en texto plano) y sus distritos asignados
-- 7 plantillas visuales, 6 arquetipos, 14 categorías
+- 14 categorías, cada una con su ficha (decisión 0080; las plantillas y arquetipos ya no existen)
 - 9 negocios de ejemplo con sus categorías, 3 anuncios, 7 avisos, 8 vecinos de ejemplo, 2 novedades
 
 ## Qué NO carga (a propósito)

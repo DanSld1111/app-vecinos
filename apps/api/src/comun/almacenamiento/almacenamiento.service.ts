@@ -42,6 +42,11 @@ export class AlmacenamientoService {
     return `${this.urlBase}/storage/v1/object/public/${this.bucket}/${ruta}`;
   }
 
+  /** Si la URL es de un archivo subido a nuestro propio almacenamiento (y no un enlace externo). */
+  esPropia(url: string | null | undefined): boolean {
+    return Boolean(url && this.urlBase && url.startsWith(`${this.urlBase}/storage/v1/object/public/${this.bucket}/`));
+  }
+
   async eliminarPorUrl(url: string | null | undefined): Promise<void> {
     if (!url || !this.urlBase || !url.startsWith(`${this.urlBase}/storage/v1/object/public/${this.bucket}/`)) return;
     const ruta = url.slice(`${this.urlBase}/storage/v1/object/public/${this.bucket}/`.length);

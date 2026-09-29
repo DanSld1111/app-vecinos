@@ -12,17 +12,24 @@ import { EditorFotosNegocio } from "../componentes/negocio/EditorFotosNegocio";
 import { EditorProductosNegocio } from "../componentes/negocio/EditorProductosNegocio";
 import { EditorOfertasNegocio } from "../componentes/negocio/EditorOfertasNegocio";
 import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio";
+import { EditorServiciosNegocio } from "../componentes/negocio/EditorServiciosNegocio";
+import { EditorListaNegocio } from "../componentes/negocio/EditorListaNegocio";
+import { useCategorias } from "../estado/useCategorias";
+import { pestanasDeContenido } from "../utilidades/fichaNegocio";
 import { urlCompleta } from "../utilidades/media";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
-type Pestana = "info" | "horario" | "fotos" | "productos" | "ofertas" | "dueno" | "estado";
+type Pestana = "info" | "horario" | "fotos" | "productos" | "servicios" | "rubros" | "ofertas" | "pasillos" | "dueno" | "estado";
 
 const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "info", icono: "📋", texto: "Información" },
   { id: "horario", icono: "🕒", texto: "Horario" },
   { id: "fotos", icono: "📷", texto: "Fotos" },
   { id: "productos", icono: "🍽️", texto: "Productos" },
+  { id: "servicios", icono: "💼", texto: "Servicios y tarifas" },
+  { id: "rubros", icono: "📦", texto: "Rubros" },
   { id: "ofertas", icono: "🏷️", texto: "Ofertas" },
+  { id: "pasillos", icono: "🛒", texto: "Pasillos" },
   { id: "dueno", icono: "👤", texto: "Dueño" },
   { id: "estado", icono: "✅", texto: "Estado" },
 ];
@@ -30,7 +37,7 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
 /** gestor_negocios es administrativo: da de alta, conecta con el dueño, carga los primeros
  * productos y la foto del negocio — nada del resto de lo operativo (horario, ofertas, publicar).
  * Ver docs/decisiones/0071. */
-const PESTANAS_GESTOR: Pestana[] = ["info", "dueno", "fotos", "productos", "estado"];
+const PESTANAS_GESTOR: Pestana[] = ["info", "dueno", "fotos", "productos", "servicios", "rubros", "pasillos", "estado"];
 
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;
@@ -53,7 +60,19 @@ export function FichaNegocio() {
   const [buscando, setBuscando] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const pestanas = cuenta?.rol === "gestor_negocios" ? PESTANAS.filter((p) => PESTANAS_GESTOR.includes(p.id)) : PESTANAS;
+  const categorias = useCategorias((estado) => estado.categorias);
+  const cargarCategorias = useCategorias((estado) => estado.cargar);
+  useEffect(() => {
+    if (categorias.length === 0) cargarCategorias();
+  }, [categorias.length, cargarCategorias]);
+  const negocioActual = negocios.find((n) => n.id === id) ?? null;
+  // Servicios, Rubros y Pasillos solo aparecen si la ficha del negocio los usa (o si ya tiene datos).
+  const deContenido = negocioActual ? pestanasDeContenido(negocioActual, categorias) : [];
+  const pestanas = PESTANAS.filter(
+    (p) =>
+      (!["servicios", "rubros", "pasillos"].includes(p.id) || deContenido.includes(p.id as "servicios")) &&
+      (cuenta?.rol !== "gestor_negocios" || PESTANAS_GESTOR.includes(p.id)),
+  );
   const pestanaUrl = searchParams.get("tab") as Pestana | null;
   const pestana: Pestana = pestanas.some((p) => p.id === pestanaUrl) ? (pestanaUrl as Pestana) : "info";
   const negocio = negocios.find((n) => n.id === id) ?? null;
@@ -121,7 +140,10 @@ export function FichaNegocio() {
       {pestana === "horario" ? <EditorHorarioNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "fotos" ? <EditorFotosNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "productos" ? <EditorProductosNegocio key={negocio.id} negocio={negocio} /> : null}
+      {pestana === "servicios" ? <EditorServiciosNegocio key={negocio.id} negocio={negocio} /> : null}
+      {pestana === "rubros" ? <EditorListaNegocio key={negocio.id} negocio={negocio} lista="rubros" /> : null}
       {pestana === "ofertas" ? <EditorOfertasNegocio key={negocio.id} negocio={negocio} /> : null}
+      {pestana === "pasillos" ? <EditorListaNegocio key={negocio.id} negocio={negocio} lista="pasillos" /> : null}
       {pestana === "dueno" ? <PestanaDueno negocio={negocio} /> : null}
       {pestana === "estado" ? <PestanaEstado negocio={negocio} /> : null}
     </>

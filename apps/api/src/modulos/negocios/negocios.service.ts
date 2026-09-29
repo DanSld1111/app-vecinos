@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { Cuenta, Negocio, OfertaNegocio, Producto, ResultadoPaginado } from "@app-vecinos/tipos";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { Cuenta, Negocio, OfertaNegocio, Producto, ResultadoPaginado, ServicioOfrecido } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
 import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { codificarCursor, decodificarCursor } from "../../comun/paginacion";
@@ -17,6 +17,7 @@ import { ActualizarInfoNegocioDto } from "./dto/actualizar-info-negocio.dto";
 import { ActualizarHorariosDto } from "./dto/actualizar-horarios.dto";
 import { AgregarOfertaDto } from "./dto/agregar-oferta.dto";
 import { GuardarProductoDto } from "./dto/guardar-producto.dto";
+import { GuardarListaTextoDto, GuardarServiciosDto } from "./dto/contenido-ficha.dto";
 
 /** Más allá de esto no tiene sentido mostrar un negocio en "Cerca de ti" aunque sea muy popular
  * — otro distrito, o un error de GPS. Ver docs/decisiones/0073-inicio-orden-real.md. */
@@ -779,6 +780,67 @@ export class NegociosService {
       }
     });
     return this.listarProductos(negocioId);
+  }
+
+  // ---- Contenido de las fichas "Servicios y tarifas", "Rubros" y "Ofertas y pasillos" ----
+  // Antes solo se cargaban directo en la base. Ver docs/decisiones/0081-editores-contenido-ficha.md.
+
+  /** Foto de un servicio: se sube primero y la URL se guarda con la lista (guardarServicios). */
+  async subirFotoServicio(id: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<{ url: string }> {
+    this.verificarAccesoProductos(cuenta, id);
+    await this.obtenerFilaAdminOFallar(id);
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_NEGOCIO, archivo.buffer, archivo.originalname, archivo.mimetype);
+    return { url };
+  }
+
+  /** Reemplaza la lista completa de servicios. Borra del almacenamiento las fotos que ya no usa. */
+  async guardarServicios(id: string, dto: GuardarServiciosDto, cuenta: Cuenta): Promise<Negocio> {
+    this.verificarAccesoProductos(cuenta, id);
+    const anterior = await this.obtenerFilaAdminOFallar(id);
+    const fotosAnteriores = new Set((anterior.servicios_ofrecidos ?? []).map((s) => s.fotoUrl).filter(Boolean));
+    const servicios: ServicioOfrecido[] = dto.servicios.map((s) => {
+      const fotoUrl = s.fotoUrl || null;
+      // Solo fotos subidas por la propia API (o las que ya tenía): no se aceptan enlaces externos.
+      if (fotoUrl && !fotosAnteriores.has(fotoUrl) && !this.almacenamiento.esPropia(fotoUrl)) {
+        throw new BadRequestException(`La foto de "${s.nombre}" no es válida — súbela de nuevo.`);
+      }
+      return { nombre: s.nombre.trim(), detalle: s.detalle?.trim() || undefined, precio: s.precio, fotoUrl };
+    });
+    await this.bd.consultar(
+      "UPDATE negocios SET servicios_ofrecidos = $2::jsonb, actualizado_en = now() WHERE id = $1",
+      [id, JSON.stringify(servicios)],
+    );
+    const enUso = new Set(servicios.map((s) => s.fotoUrl));
+    for (const url of fotosAnteriores) if (!enUso.has(url)) await this.almacenamiento.eliminarPorUrl(url);
+    await this.auditoria.registrar("actualizar_servicios", "negocio", id, cuenta.id);
+    return aNegocio(await this.obtenerFilaAdminOFallar(id));
+  }
+
+  async guardarRubros(id: string, dto: GuardarListaTextoDto, cuenta: Cuenta): Promise<Negocio> {
+    return this.guardarListaTexto(id, "rubros_disponibles", "actualizar_rubros", dto.items, cuenta);
+  }
+
+  async guardarPasillos(id: string, dto: GuardarListaTextoDto, cuenta: Cuenta): Promise<Negocio> {
+    return this.guardarListaTexto(id, "pasillos", "actualizar_pasillos", dto.items, cuenta);
+  }
+
+  private async guardarListaTexto(
+    id: string,
+    columna: "rubros_disponibles" | "pasillos",
+    accion: string,
+    items: string[],
+    cuenta: Cuenta,
+  ): Promise<Negocio> {
+    this.verificarAccesoProductos(cuenta, id);
+    await this.obtenerFilaAdminOFallar(id);
+    // Sin repetidos (sin importar mayúsculas), en el orden en que llegaron.
+    const vistos = new Set<string>();
+    const limpios = items
+      .map((i) => i.trim())
+      .filter((i) => i && !vistos.has(i.toLowerCase()) && vistos.add(i.toLowerCase()));
+    await this.bd.consultar(`UPDATE negocios SET ${columna} = $2, actualizado_en = now() WHERE id = $1`, [id, limpios]);
+    await this.auditoria.registrar(accion, "negocio", id, cuenta.id);
+    return aNegocio(await this.obtenerFilaAdminOFallar(id));
   }
 
   /** Hasta 6 fotos — solo se usan cuando el negocio no tiene menú/catálogo/servicios/ofertas (GaleriaNegocio.tsx). */

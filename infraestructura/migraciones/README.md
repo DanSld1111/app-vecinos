@@ -17,6 +17,8 @@ Esquema de base de datos de Etapa 2 (PostgreSQL 15+ con la extensión PostGIS). 
 | `0009_pagos_preparado.sql` | andamiaje de pagos — **no usar todavía** |
 | … | (0010 a 0026: ver cada archivo) |
 | `0027_aviso_version_rechazada.sql` | versión rechazada de un aviso reenviado (antes y después) |
+| `0028_fichas.sql` | ficha por servicio y por categoría, título de sección (decisión 0080) |
+| `0029_quitar_arquetipos.sql` | borra arquetipos, plantillas visuales y las columnas viejas de categorías |
 
 Aplicar todo en una base vacía:
 

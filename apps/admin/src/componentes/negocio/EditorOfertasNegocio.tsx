@@ -53,9 +53,9 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
         ) : (
           <div className="nota-alerta">
             La categoría principal es "{nombreCategoriaPrincipal}", así que esta sección todavía{" "}
-            <b>no aparece en la ficha pública</b> — solo se muestra para negocios de categorías tipo
-            supermercado. Se pueden dejar preparadas para cuando eso cambie, o para el carrusel de ofertas en
-            Buscar, que sí las toma de aquí.
+            <b>no aparece en la ficha pública</b>: solo se muestra en negocios cuya ficha es "Ofertas y
+            pasillos" (se elige en Categorías). Se pueden dejar preparadas para cuando eso cambie, o para el
+            carrusel de ofertas en Buscar, que sí las toma de aquí.
           </div>
         )}
 

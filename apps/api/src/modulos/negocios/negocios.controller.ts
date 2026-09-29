@@ -35,6 +35,7 @@ import { opcionesUploadFotoProducto } from "./foto-producto.config";
 import { AgregarFotoGaleriaDto } from "./dto/agregar-foto-galeria.dto";
 import { GuardarProductoDto } from "./dto/guardar-producto.dto";
 import { ReordenarProductosDto } from "./dto/reordenar-productos.dto";
+import { GuardarListaTextoDto, GuardarServiciosDto } from "./dto/contenido-ficha.dto";
 
 type SolicitudConCuenta = { user: Cuenta };
 
@@ -299,6 +300,48 @@ export class NegociosController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Negocio> {
     return this.negocios.eliminarOferta(id, Number(indice), req.user);
+  }
+
+  @Put(":id/servicios")
+  @UseGuards(JwtAuthGuard)
+  guardarServicios(
+    @Param("id") id: string,
+    @Body() dto: GuardarServiciosDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Negocio> {
+    return this.negocios.guardarServicios(id, dto, req.user);
+  }
+
+  @Post(":id/servicios/foto")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor("foto", opcionesUploadFotoNegocio))
+  subirFotoServicio(
+    @Param("id") id: string,
+    @UploadedFile() archivo: Express.Multer.File | undefined,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<{ url: string }> {
+    if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
+    return this.negocios.subirFotoServicio(id, archivo, req.user);
+  }
+
+  @Put(":id/rubros")
+  @UseGuards(JwtAuthGuard)
+  guardarRubros(
+    @Param("id") id: string,
+    @Body() dto: GuardarListaTextoDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Negocio> {
+    return this.negocios.guardarRubros(id, dto, req.user);
+  }
+
+  @Put(":id/pasillos")
+  @UseGuards(JwtAuthGuard)
+  guardarPasillos(
+    @Param("id") id: string,
+    @Body() dto: GuardarListaTextoDto,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<Negocio> {
+    return this.negocios.guardarPasillos(id, dto, req.user);
   }
 
   @Post(":id/productos/:productoId/foto")

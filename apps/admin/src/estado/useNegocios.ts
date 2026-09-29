@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Horarios, Negocio, OfertaNegocio, Producto, ResultadoPaginado } from "@app-vecinos/tipos";
+import { Horarios, Negocio, OfertaNegocio, Producto, ResultadoPaginado, ServicioOfrecido } from "@app-vecinos/tipos";
 import { apiFetch, apiSubirArchivo, ErrorApi } from "../datos/clienteApi";
 
 type NegocioNuevo = Pick<
@@ -55,6 +55,11 @@ interface EstadoNegocios {
   subirFotoProducto: (negocioId: string, productoId: string, archivo: File, token: string) => Promise<Producto | null>;
   agregarFotoGaleria: (id: string, archivo: File, token: string) => Promise<boolean>;
   eliminarFotoGaleria: (id: string, url: string, token: string) => Promise<boolean>;
+  /** Contenido de las fichas Servicios y tarifas, Rubros y Ofertas y pasillos: se guarda la lista completa. */
+  guardarServicios: (id: string, servicios: ServicioOfrecido[], token: string) => Promise<boolean>;
+  /** Sube la foto de un servicio y devuelve su URL, que se guarda después con la lista. */
+  subirFotoServicio: (id: string, archivo: File, token: string) => Promise<string | null>;
+  guardarLista: (id: string, lista: "rubros" | "pasillos", items: string[], token: string) => Promise<boolean>;
 }
 
 function mensajeError(error: unknown, fallback: string): string {
@@ -299,6 +304,38 @@ export const useNegocios = create<EstadoNegocios>((set, get) => ({
       return true;
     } catch (error) {
       set({ error: mensajeError(error, "No se pudo subir la foto a la galería.") });
+      return false;
+    }
+  },
+
+  guardarServicios: async (id, servicios, token) => {
+    try {
+      const actualizado = await apiFetch<Negocio>(`/negocios/${id}/servicios`, { metodo: "PUT", token, cuerpo: { servicios } });
+      set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
+      return true;
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudieron guardar los servicios.") });
+      return false;
+    }
+  },
+
+  subirFotoServicio: async (id, archivo, token) => {
+    try {
+      const { url } = await apiSubirArchivo<{ url: string }>(`/negocios/${id}/servicios/foto`, archivo, token);
+      return url;
+    } catch (error) {
+      set({ error: mensajeError(error, "No se pudo subir la foto.") });
+      return null;
+    }
+  },
+
+  guardarLista: async (id, lista, items, token) => {
+    try {
+      const actualizado = await apiFetch<Negocio>(`/negocios/${id}/${lista}`, { metodo: "PUT", token, cuerpo: { items } });
+      set((estado) => ({ negocios: estado.negocios.map((n) => (n.id === id ? actualizado : n)) }));
+      return true;
+    } catch (error) {
+      set({ error: mensajeError(error, lista === "rubros" ? "No se pudieron guardar los rubros." : "No se pudieron guardar los pasillos.") });
       return false;
     }
   },

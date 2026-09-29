@@ -1,4 +1,8 @@
+import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { useNegociosDelDueno } from "../estado/useNegocioActivo";
+import { useCategorias } from "../estado/useCategorias";
+import { pestanasDeContenido } from "../utilidades/fichaNegocio";
 
 import { IconoEmoji } from "./IconoEmoji";
 const TABS = [
@@ -6,14 +10,25 @@ const TABS = [
   { a: "/mi-negocio/horario", fin: false, icono: "🕒", texto: "Horario" },
   { a: "/mi-negocio/fotos", fin: false, icono: "📷", texto: "Fotos" },
   { a: "/mi-negocio/productos", fin: false, icono: "🍽️", texto: "Productos" },
+  { a: "/mi-negocio/servicios", fin: false, icono: "💼", texto: "Servicios y tarifas", contenido: "servicios" },
+  { a: "/mi-negocio/rubros", fin: false, icono: "📦", texto: "Rubros", contenido: "rubros" },
   { a: "/mi-negocio/ofertas", fin: false, icono: "🏷️", texto: "Ofertas" },
+  { a: "/mi-negocio/pasillos", fin: false, icono: "🛒", texto: "Pasillos", contenido: "pasillos" },
   { a: "/mi-negocio/estado", fin: false, icono: "✅", texto: "Estado" },
 ];
 
 export function TabsMiNegocio() {
+  const { activo } = useNegociosDelDueno();
+  const categorias = useCategorias((e) => e.categorias);
+  const cargarCategorias = useCategorias((e) => e.cargar);
+  useEffect(() => {
+    if (categorias.length === 0) cargarCategorias();
+  }, [categorias.length, cargarCategorias]);
+  // Servicios, Rubros y Pasillos solo si la ficha del negocio los usa (o si ya tiene datos).
+  const deContenido: string[] = activo ? pestanasDeContenido(activo, categorias) : [];
   return (
     <div className="tabs-negocio">
-      {TABS.map((tab) => (
+      {TABS.filter((tab) => !("contenido" in tab) || deContenido.includes(tab.contenido as string)).map((tab) => (
         <NavLink
           key={tab.a}
           to={tab.a}

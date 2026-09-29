@@ -78,40 +78,22 @@ const cuentas = [
   { id: "cuenta-validador-surquillo", nombre: "Diego Ramos", correo: "validador@surquillo.pe", rol: "validador_contenido", negocioIds: [], distritosAsignados: ["150142"], activo: true, creadoEn: "2026-08-31T00:00:00.000Z" },
 ];
 
-// ---- Plantillas visuales y arquetipos (apps/admin/src/datos/plantillasVisuales.ts y datos/mock/arquetipos.mock.ts) ----
-const plantillas = [
-  { id: "lista-simple", nombre: "Lista simple", modo: "lista", origen: "sistema", descripcionUso: "El mismo diseño que ya usa hoy el arquetipo Servicios — sin foto, sin destacado.", camposEsperados: [{ etiqueta: "Nombre", tipo: "texto", obligatorio: true }, { etiqueta: "Detalle", tipo: "texto_largo", obligatorio: false }, { etiqueta: "Precio", tipo: "precio", obligatorio: true }] },
-  { id: "grilla-foto", nombre: "Grilla con foto", modo: "lista", origen: "sistema", descripcionUso: "El mismo diseño que ya usa hoy el arquetipo Catálogo — grilla de 2 columnas con foto y precio.", camposEsperados: [{ etiqueta: "Nombre", tipo: "texto", obligatorio: true }, { etiqueta: "Precio", tipo: "precio", obligatorio: true }, { etiqueta: "Sección", tipo: "texto", obligatorio: false }, { etiqueta: "Foto", tipo: "foto", obligatorio: false }, { etiqueta: "Destacado", tipo: "booleano", obligatorio: false }] },
-  { id: "lista-agrupada", nombre: "Lista agrupada por sección", modo: "lista", origen: "sistema", descripcionUso: "El mismo diseño que ya usa hoy el arquetipo Menú — secciones con insignia \"Más pedido\".", camposEsperados: [{ etiqueta: "Nombre", tipo: "texto", obligatorio: true }, { etiqueta: "Precio", tipo: "precio", obligatorio: true }, { etiqueta: "Sección", tipo: "texto", obligatorio: true }, { etiqueta: "Destacado", tipo: "booleano", obligatorio: false }] },
-  { id: "chips", nombre: "Chips", modo: "lista", origen: "sistema", descripcionUso: "El mismo diseño que ya usa hoy el arquetipo Rubros — etiquetas sueltas, sin precio.", camposEsperados: [{ etiqueta: "Nombre", tipo: "texto", obligatorio: true }] },
-  { id: "carrusel-descuento", nombre: "Carrusel con descuento", modo: "lista", origen: "sistema", descripcionUso: "El mismo diseño que ya usa hoy el arquetipo Ofertas — carrusel horizontal con cinta de descuento.", camposEsperados: [{ etiqueta: "Nombre", tipo: "texto", obligatorio: true }, { etiqueta: "Precio", tipo: "precio", obligatorio: true }, { etiqueta: "Precio anterior", tipo: "precio", obligatorio: false }, { etiqueta: "Etiqueta", tipo: "texto", obligatorio: false }] },
-  { id: "ficha-perfil", nombre: "Ficha de perfil", modo: "unico", origen: "nueva", descripcionUso: "Ideal para Consultorías y profesionales independientes — foto, especialidad y tarifa.", camposEsperados: [{ etiqueta: "Foto", tipo: "foto", obligatorio: false }, { etiqueta: "Especialidad", tipo: "texto", obligatorio: true }, { etiqueta: "Tarifa", tipo: "precio", obligatorio: true }, { etiqueta: "Disponible ahora", tipo: "booleano", obligatorio: false }] },
-];
-const arquetipos = [
-  { id: "arq-menu", nombre: "Menú", icono: "restaurant-outline", plantillaId: "lista-agrupada", origen: "sistema", campos: [{ claveOriginal: "Nombre", etiqueta: "Nombre", obligatorio: true }, { claveOriginal: "Precio", etiqueta: "Precio", obligatorio: true }, { claveOriginal: "Sección", etiqueta: "Sección", obligatorio: true }, { claveOriginal: "Destacado", etiqueta: "Destacado", obligatorio: false }] },
-  { id: "arq-catalogo", nombre: "Catálogo", icono: "shirt-outline", plantillaId: "grilla-foto", origen: "sistema", campos: [{ claveOriginal: "Nombre", etiqueta: "Nombre", obligatorio: true }, { claveOriginal: "Precio", etiqueta: "Precio", obligatorio: true }, { claveOriginal: "Sección", etiqueta: "Sección", obligatorio: false }, { claveOriginal: "Foto", etiqueta: "Foto", obligatorio: false }, { claveOriginal: "Destacado", etiqueta: "Destacado", obligatorio: false }] },
-  { id: "arq-servicios", nombre: "Servicios", icono: "briefcase-outline", plantillaId: "lista-simple", origen: "sistema", campos: [{ claveOriginal: "Nombre", etiqueta: "Nombre", obligatorio: true }, { claveOriginal: "Detalle", etiqueta: "Detalle", obligatorio: false }, { claveOriginal: "Precio", etiqueta: "Precio", obligatorio: true }] },
-  { id: "arq-rubros", nombre: "Rubros", icono: "apps-outline", plantillaId: "chips", origen: "sistema", campos: [{ claveOriginal: "Nombre", etiqueta: "Nombre", obligatorio: true }] },
-  { id: "arq-ofertas", nombre: "Ofertas", icono: "cart-outline", plantillaId: "carrusel-descuento", origen: "sistema", campos: [{ claveOriginal: "Nombre", etiqueta: "Nombre", obligatorio: true }, { claveOriginal: "Precio", etiqueta: "Precio", obligatorio: true }, { claveOriginal: "Precio anterior", etiqueta: "Precio anterior", obligatorio: false }, { claveOriginal: "Etiqueta", etiqueta: "Etiqueta", obligatorio: false }] },
-  { id: "arq-consultorias", nombre: "Consultorías", icono: "medical-outline", plantillaId: "ficha-perfil", origen: "personalizado", campos: [{ claveOriginal: "Foto", etiqueta: "Foto", obligatorio: false }, { claveOriginal: "Especialidad", etiqueta: "Especialidad", obligatorio: true }, { claveOriginal: "Tarifa", etiqueta: "Tarifa", obligatorio: true }, { claveOriginal: "Disponible ahora", etiqueta: "Disponible ahora", obligatorio: false }] },
-];
-
 // ---- Categorías (apps/admin/src/datos/mock/categorias.mock.ts) ----
 const categorias = [
-  { id: "cat-comida", padreId: null, nombre: "Comida", slug: "comida", icono: "restaurant-outline", orden: 1, arquetipoFicha: "menu", arquetipoId: "arq-menu" },
-  { id: "cat-salud", padreId: null, nombre: "Salud", slug: "salud", icono: "medkit-outline", orden: 2, arquetipoFicha: "servicios", arquetipoId: "arq-servicios" },
-  { id: "cat-hogar", padreId: null, nombre: "Hogar", slug: "hogar", icono: "construct-outline", orden: 3, arquetipoFicha: "categorias", arquetipoId: "arq-rubros" },
-  { id: "cat-moda", padreId: null, nombre: "Moda", slug: "moda", icono: "shirt-outline", orden: 4, arquetipoFicha: "catalogo", arquetipoId: "arq-catalogo" },
-  { id: "cat-servicios", padreId: null, nombre: "Servicios", slug: "servicios", icono: "briefcase-outline", orden: 5, arquetipoFicha: "servicios", arquetipoId: "arq-servicios" },
-  { id: "cat-mascotas", padreId: null, nombre: "Mascotas", slug: "mascotas", icono: "paw-outline", orden: 6, arquetipoFicha: "servicios", arquetipoId: "arq-servicios" },
-  { id: "cat-restaurantes", padreId: null, nombre: "Restaurantes", slug: "restaurantes", icono: "restaurant-outline", orden: 7, arquetipoFicha: "menu", arquetipoId: "arq-menu" },
-  { id: "cat-supermercado", padreId: null, nombre: "Supermercados", slug: "supermercados", icono: "cart-outline", orden: 8, arquetipoFicha: "ofertas", arquetipoId: "arq-ofertas" },
-  { id: "cat-emprendimientos", padreId: null, nombre: "Emprendimientos", slug: "emprendimientos", icono: "storefront-outline", orden: 9, arquetipoFicha: null, arquetipoId: null },
-  { id: "cat-rescate-animal", padreId: null, nombre: "Rescate animal", slug: "rescate-animal", icono: "paw-outline", orden: 10, arquetipoFicha: "servicios", arquetipoId: "arq-servicios" },
-  { id: "cat-turismo", padreId: null, nombre: "Turismo", slug: "turismo", icono: "airplane-outline", orden: 11, arquetipoFicha: "catalogo", arquetipoId: "arq-catalogo" },
-  { id: "cat-inmobiliaria", padreId: null, nombre: "Inmobiliaria", slug: "inmobiliaria", icono: "business-outline", orden: 12, arquetipoFicha: "catalogo", arquetipoId: "arq-catalogo" },
-  { id: "cat-consultorias", padreId: null, nombre: "Consultorías", slug: "consultorias", icono: "medical-outline", orden: 13, arquetipoFicha: null, arquetipoId: "arq-consultorias" },
-  { id: "cat-otros-servicios", padreId: null, nombre: "Otros servicios", slug: "otros-servicios", icono: "apps-outline", orden: 14, arquetipoFicha: "servicios", arquetipoId: "arq-servicios" },
+  { id: "cat-comida", padreId: null, nombre: "Comida", slug: "comida", icono: "restaurant-outline", orden: 1, ficha: "menu" },
+  { id: "cat-salud", padreId: null, nombre: "Salud", slug: "salud", icono: "medkit-outline", orden: 2, ficha: "servicios" },
+  { id: "cat-hogar", padreId: null, nombre: "Hogar", slug: "hogar", icono: "construct-outline", orden: 3, ficha: "rubros" },
+  { id: "cat-moda", padreId: null, nombre: "Moda", slug: "moda", icono: "shirt-outline", orden: 4, ficha: "catalogo" },
+  { id: "cat-servicios", padreId: null, nombre: "Servicios", slug: "servicios", icono: "briefcase-outline", orden: 5, ficha: "servicios" },
+  { id: "cat-mascotas", padreId: null, nombre: "Mascotas", slug: "mascotas", icono: "paw-outline", orden: 6, ficha: "servicios" },
+  { id: "cat-restaurantes", padreId: null, nombre: "Restaurantes", slug: "restaurantes", icono: "restaurant-outline", orden: 7, ficha: "menu" },
+  { id: "cat-supermercado", padreId: null, nombre: "Supermercados", slug: "supermercados", icono: "cart-outline", orden: 8, ficha: "ofertas" },
+  { id: "cat-emprendimientos", padreId: null, nombre: "Emprendimientos", slug: "emprendimientos", icono: "storefront-outline", orden: 9, ficha: "galeria" },
+  { id: "cat-rescate-animal", padreId: null, nombre: "Rescate animal", slug: "rescate-animal", icono: "paw-outline", orden: 10, ficha: "servicios" },
+  { id: "cat-turismo", padreId: null, nombre: "Turismo", slug: "turismo", icono: "airplane-outline", orden: 11, ficha: "catalogo" },
+  { id: "cat-inmobiliaria", padreId: null, nombre: "Inmobiliaria", slug: "inmobiliaria", icono: "business-outline", orden: 12, ficha: "catalogo" },
+  { id: "cat-consultorias", padreId: null, nombre: "Consultorías", slug: "consultorias", icono: "medical-outline", orden: 13, ficha: "galeria" },
+  { id: "cat-otros-servicios", padreId: null, nombre: "Otros servicios", slug: "otros-servicios", icono: "apps-outline", orden: 14, ficha: "servicios" },
 ];
 
 // ---- Negocios (apps/admin/src/datos/mock/negocios.mock.ts) ----
@@ -226,17 +208,11 @@ function generar() {
   const cuentaDistritos = cuentas.flatMap((c) => c.distritosAsignados.map((ubigeo) => [esc(c.id), esc(ubigeo)]));
   partes.push(insert("cuenta_distritos", ["cuenta_id", "distrito_ubigeo"], cuentaDistritos));
 
+  // Cada categoría con su ficha propia (decisión 0080): la semilla no asigna servicio, así que no
+  // hay ficha que heredar.
   partes.push(insert(
-    "plantillas_visuales", ["id", "nombre", "modo", "origen", "descripcion_uso", "campos_esperados"],
-    plantillas.map((p) => [esc(p.id), esc(p.nombre), esc(p.modo), esc(p.origen), esc(p.descripcionUso), jsonb(p.camposEsperados)]),
-  ));
-  partes.push(insert(
-    "arquetipos", ["id", "nombre", "icono", "plantilla_id", "origen", "campos"],
-    arquetipos.map((a) => [esc(a.id), esc(a.nombre), esc(a.icono), esc(a.plantillaId), esc(a.origen), jsonb(a.campos)]),
-  ));
-  partes.push(insert(
-    "categorias", ["id", "padre_id", "nombre", "slug", "icono", "orden", "arquetipo_ficha", "arquetipo_id"],
-    categorias.map((c) => [esc(c.id), esc(c.padreId), esc(c.nombre), esc(c.slug), esc(c.icono), esc(c.orden), esc(c.arquetipoFicha), esc(c.arquetipoId)]),
+    "categorias", ["id", "padre_id", "nombre", "slug", "icono", "orden", "ficha"],
+    categorias.map((c) => [esc(c.id), esc(c.padreId), esc(c.nombre), esc(c.slug), esc(c.icono), esc(c.orden), esc(c.ficha)]),
   ));
 
   partes.push(insert(
