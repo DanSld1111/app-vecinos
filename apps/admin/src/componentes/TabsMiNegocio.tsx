@@ -30,8 +30,16 @@ export function TabsMiNegocio() {
   const deContenido: string[] = activo ? pestanasDeContenido(activo, categorias) : [];
   // Qué le falta a la ficha (decisión 0084). Quien entra aquí es el dueño: esa parte ya está.
   const navegar = useNavigate();
-  const partes = activo ? partesDeFicha(activo, true) : [];
-  const RUTA_DE: Record<string, string> = { "": "/mi-negocio", horario: "/mi-negocio/horario", fotos: "/mi-negocio/fotos" };
+  const partes = activo ? partesDeFicha(activo, true, categorias) : [];
+  const RUTA_DE: Record<string, string> = {
+    "": "/mi-negocio",
+    horario: "/mi-negocio/horario",
+    fotos: "/mi-negocio/fotos",
+    productos: "/mi-negocio/productos",
+    servicios: "/mi-negocio/servicios",
+    rubros: "/mi-negocio/rubros",
+    ofertas: "/mi-negocio/ofertas",
+  };
   const rutasConFalta = new Set(partes.filter((p) => !p.completa).map((p) => RUTA_DE[p.pestana]));
   return (
     <>

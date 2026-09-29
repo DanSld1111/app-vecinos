@@ -88,6 +88,9 @@ export interface Negocio {
    * calificar". Ver docs/decisiones/0076-calificacion-estrellas.md. */
   calificacionPromedio: number | null;
   calificacionTotal: number;
+  /** Productos visibles (sin contar la papelera). Lo usa el panel para saber si la ficha tiene
+   * contenido (decisión 0085). Opcional: los datos de ejemplo del modo sin conexión no lo traen. */
+  totalProductos?: number;
 }
 
 export interface FiltroNegocios {

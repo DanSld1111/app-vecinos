@@ -76,7 +76,7 @@ export function FichaNegocio() {
     cargarCuentasPanel(token);
   }, [cargarCuentasPanel, token]);
   const tieneDueno = cuentasPanel.some((c) => c.rol === "dueno_negocio" && c.negocioIds.includes(id));
-  const partes = negocioActual ? partesDeFicha(negocioActual, tieneDueno) : [];
+  const partes = negocioActual ? partesDeFicha(negocioActual, tieneDueno, categorias) : [];
   // "¡Ficha completa!" al completar lo último que faltaba (no al abrir una ficha que ya estaba completa).
   const faltabanAntes = useRef<{ id: string; faltan: number } | null>(null);
   const faltanAhora = partes.filter((p) => !p.completa).length;

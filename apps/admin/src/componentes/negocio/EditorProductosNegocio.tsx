@@ -9,6 +9,7 @@ import { ModalVerProducto } from "./ModalVerProducto";
 import { ModalConfirmar } from "../ModalConfirmar";
 import { alertaError, useToasts } from "../../estado/useToasts";
 import { useBorradorNegocio, useEnfoqueVistaPrevia } from "../../estado/useBorradorNegocio";
+import { useNegocios } from "../../estado/useNegocios";
 import { urlCompleta } from "../../utilidades/media";
 
 import { IconoEmoji } from "../IconoEmoji";
@@ -37,8 +38,13 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   useEnfoqueVistaPrevia("contenido");
   // El celular de vista previa usa esta lista (la más fresca: cambia al agregar, editar u ordenar).
   useEffect(() => {
-    if (productos) publicarProductos(productos);
-  }, [productos, publicarProductos]);
+    if (!productos) return;
+    publicarProductos(productos);
+    // Cuántos productos tiene cuenta para "qué le falta a la ficha" (decisión 0085).
+    useNegocios.setState((e) => ({
+      negocios: e.negocios.map((n) => (n.id === negocio.id && n.totalProductos !== productos.length ? { ...n, totalProductos: productos.length } : n)),
+    }));
+  }, [productos, publicarProductos, negocio.id]);
 
   const recargar = useCallback(async () => {
     try {

@@ -34,6 +34,7 @@ export interface FilaNegocio {
   acerca_del_negocio: string | null;
   calificacion_promedio: string | null;
   calificacion_total: string;
+  total_productos: string;
 }
 
 export function aNegocio(fila: FilaNegocio): Negocio {
@@ -69,6 +70,7 @@ export function aNegocio(fila: FilaNegocio): Negocio {
     acercaDelNegocio: fila.acerca_del_negocio,
     calificacionPromedio: fila.calificacion_promedio != null ? Number(fila.calificacion_promedio) : null,
     calificacionTotal: Number(fila.calificacion_total),
+    totalProductos: Number(fila.total_productos),
   };
 }
 
@@ -81,5 +83,6 @@ export const COLUMNAS_NEGOCIO = `
   COALESCE(array_agg(nc.categoria_id) FILTER (WHERE nc.categoria_id IS NOT NULL), '{}') AS categoria_ids,
   (SELECT COUNT(*) FROM negocio_visitas v WHERE v.negocio_id = n.id AND v.creado_en > now() - interval '7 days') AS visitas_7d,
   (SELECT ROUND(AVG(calificacion), 1) FROM resenas r WHERE r.negocio_id = n.id AND NOT r.oculta) AS calificacion_promedio,
-  (SELECT COUNT(*) FROM resenas r WHERE r.negocio_id = n.id AND NOT r.oculta) AS calificacion_total
+  (SELECT COUNT(*) FROM resenas r WHERE r.negocio_id = n.id AND NOT r.oculta) AS calificacion_total,
+  (SELECT COUNT(*) FROM productos p WHERE p.negocio_id = n.id AND p.eliminado_en IS NULL) AS total_productos
 `;

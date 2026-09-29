@@ -67,7 +67,7 @@ export function Negocios() {
     const coincideCategoria = !categoriaId || negocio.categoriaIds.includes(categoriaId);
     const coincideComunidad = !comunidadIdFiltro || negocio.comunidadId === comunidadIdFiltro;
     const coincideEstado = estadoFiltro === "todos" || negocio.estado === estadoFiltro;
-    const coincideCompletitud = !soloIncompletos || !fichaCompleta(negocio, negociosConDueno.has(negocio.id));
+    const coincideCompletitud = !soloIncompletos || !fichaCompleta(negocio, negociosConDueno.has(negocio.id), categorias);
     return coincideBusqueda && coincideCategoria && coincideComunidad && coincideEstado && coincideCompletitud;
   });
 
@@ -76,7 +76,7 @@ export function Negocios() {
       total: negociosMock.length,
       activos: negociosMock.filter((n) => n.estado === "activo").length,
       porVerificar: negociosMock.filter((n) => n.estado === "por_verificar").length,
-      incompletas: negociosMock.filter((n) => !fichaCompleta(n, negociosConDueno.has(n.id))).length,
+      incompletas: negociosMock.filter((n) => !fichaCompleta(n, negociosConDueno.has(n.id), categorias)).length,
     }),
     [negociosMock, negociosConDueno]
   );
@@ -209,7 +209,7 @@ export function Negocios() {
 
       <div className="grid-negocios">
         {negocios.map((negocio) => {
-          const partes = partesDeFicha(negocio, negociosConDueno.has(negocio.id));
+          const partes = partesDeFicha(negocio, negociosConDueno.has(negocio.id), categorias);
           const completadas = partes.filter((p) => p.completa).length;
           const faltantes = partes.filter((p) => !p.completa);
           const completa = faltantes.length === 0;

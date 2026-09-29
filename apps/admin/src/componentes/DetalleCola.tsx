@@ -31,7 +31,7 @@ export function DetalleNegocioCola({ negocio }: { negocio: Negocio }) {
   const diasAbiertos = listaSemanaCompleta(negocio.horarios)
     .filter((d) => d.texto !== "Cerrado")
     .map((d) => `${d.nombre.slice(0, 3)} ${d.texto}`);
-  const faltantes = partesDeFicha(negocio, true).filter((p) => !p.completa && p.clave !== "dueno");
+  const faltantes = partesDeFicha(negocio, true, categorias).filter((p) => !p.completa && p.clave !== "dueno");
   const foto = urlCompleta(negocio.fotoPrincipalUrl);
 
   return (
