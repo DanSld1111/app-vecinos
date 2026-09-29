@@ -128,7 +128,9 @@ export function RegistrarNegocio() {
 
   const categoriaActual = categorias.find((c) => c.id === categoriaId) ?? null;
   const atributosDef = (categoriaActual?.atributosProducto ?? []).filter((c) => !c.oculto);
-  const mostrarSeccion = categoriaActual?.fichaEfectiva === "menu";
+  // Menú y Catálogo agrupan los productos por sección (en la app: títulos o chips de filtro).
+  const mostrarSeccion = categoriaActual?.fichaEfectiva === "menu" || categoriaActual?.fichaEfectiva === "catalogo";
+  const etiquetaSeccion = categoriaActual?.fichaEfectiva === "catalogo" ? "Sección del catálogo" : "Sección del menú";
 
   // Dueño (paso 2)
   const cuentas = useCuentas((estado) => estado.cuentas);
@@ -567,6 +569,7 @@ export function RegistrarNegocio() {
           secciones={[]}
           atributosDef={atributosDef}
           mostrarSeccion={mostrarSeccion}
+          etiquetaSeccion={etiquetaSeccion}
           onGuardar={guardarOtroProducto}
           onCerrar={() => setModalProducto(null)}
         />
@@ -579,6 +582,7 @@ export function RegistrarNegocio() {
           secciones={[productoCreado.categoriaMenu]}
           atributosDef={atributosDef}
           mostrarSeccion={mostrarSeccion}
+          etiquetaSeccion={etiquetaSeccion}
           onGuardar={guardarOtroProducto}
           onCerrar={() => setModalProducto(null)}
         />

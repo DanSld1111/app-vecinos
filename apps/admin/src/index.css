@@ -3891,3 +3891,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .tab-negocio .punto-falta { position: absolute; top: 5px; right: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--oro); box-shadow: 0 0 0 2px var(--fondo-app); }
 .barra-progreso.completa .relleno-progreso { background: var(--verde-texto); }
 @media (prefers-reduced-motion: reduce) { .franja-falta { animation: none; } }
+
+/* Selector de sección del producto: el campo de sección nueva con su botón al lado. */
+.seccion-nueva { display: flex; gap: 8px; align-items: center; }
+.seccion-nueva input { flex: 1; min-width: 0; }
+.seccion-nueva .btn-accion-mini { white-space: nowrap; }

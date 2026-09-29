@@ -20,6 +20,7 @@ export function ModalProducto({
   secciones,
   atributosDef = [],
   mostrarSeccion = true,
+  etiquetaSeccion = "Sección del menú",
   onGuardar,
   onEliminar,
   onQuitarFoto,
@@ -37,6 +38,8 @@ export function ModalProducto({
    * ArquetipoFicha) — el campo no tiene sentido ahí, así que ni se muestra: el producto se
    * guarda con categoriaMenu = "General" sin pedírselo a la persona. */
   mostrarSeccion?: boolean;
+  /** "Sección del menú" (Menú) o "Sección del catálogo" (Catálogo). */
+  etiquetaSeccion?: string;
   onGuardar: (datos: DatosProducto, fotoNueva: File | null) => Promise<void>;
   onEliminar?: () => Promise<void>;
   onQuitarFoto?: () => Promise<void>;
@@ -181,20 +184,13 @@ export function ModalProducto({
                 <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Ej. 28" />
               </div>
               {mostrarSeccion ? (
-                <div className="campo-modal">
-                  <label>Sección del menú</label>
-                  <input
-                    value={categoriaMenu}
-                    onChange={(e) => setCategoriaMenu(e.target.value)}
-                    placeholder="Ej. Platos de fondo"
-                    list="secciones-menu"
-                  />
-                  <datalist id="secciones-menu">
-                    {secciones.map((s) => (
-                      <option key={s} value={s} />
-                    ))}
-                  </datalist>
-                </div>
+                <SelectorSeccion
+                  etiqueta={etiquetaSeccion}
+                  valor={categoriaMenu}
+                  secciones={secciones}
+                  onCambiar={setCategoriaMenu}
+                />
+
               ) : null}
             </div>
 
@@ -281,6 +277,86 @@ export function ModalProducto({
           }}
         />
       ) : null}
+    </div>
+  );
+}
+
+const NUEVA = "__nueva__";
+
+/**
+ * Sección del producto: una lista con las secciones que ya tiene el negocio y la opción de crear
+ * otra. Antes era un texto con sugerencias (datalist) que el navegador solo mostraba al borrar lo
+ * escrito, así que parecía que no había opciones.
+ */
+function SelectorSeccion({
+  etiqueta,
+  valor,
+  secciones,
+  onCambiar,
+}: {
+  etiqueta: string;
+  valor: string;
+  secciones: string[];
+  onCambiar: (seccion: string) => void;
+}) {
+  const opciones = Array.from(new Set([...secciones, valor].map((s) => s.trim()).filter(Boolean)));
+  const [creando, setCreando] = useState(opciones.length === 0);
+  const [nueva, setNueva] = useState("");
+
+  if (creando) {
+    return (
+      <div className="campo-modal">
+        <label htmlFor="seccion-nueva">{etiqueta}</label>
+        <div className="seccion-nueva">
+          <input
+            id="seccion-nueva"
+            value={nueva}
+            autoFocus={opciones.length > 0}
+            maxLength={40}
+            placeholder={etiqueta.includes("catálogo") ? "Ej. Chompas" : "Ej. Platos de fondo"}
+            onChange={(e) => {
+              setNueva(e.target.value);
+              onCambiar(e.target.value);
+            }}
+          />
+          {opciones.length > 0 ? (
+            <button
+              type="button"
+              className="btn-accion-mini"
+              onClick={() => {
+                setCreando(false);
+                onCambiar(opciones.includes(valor) ? valor : opciones[0]);
+              }}
+            >
+              Elegir de la lista
+            </button>
+          ) : null}
+        </div>
+        <p className="ayuda-modal">Escribe el nombre de la sección nueva. Aparecerá en la lista la próxima vez.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="campo-modal">
+      <label htmlFor="seccion-producto">{etiqueta}</label>
+      <select
+        id="seccion-producto"
+        value={opciones.includes(valor) ? valor : opciones[0]}
+        onChange={(e) => {
+          if (e.target.value === NUEVA) {
+            setNueva("");
+            setCreando(true);
+            onCambiar("");
+          } else onCambiar(e.target.value);
+        }}
+      >
+        {opciones.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+        <option value={NUEVA}>+ Nueva sección…</option>
+      </select>
     </div>
   );
 }

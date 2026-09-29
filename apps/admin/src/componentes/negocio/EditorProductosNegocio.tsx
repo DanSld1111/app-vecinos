@@ -88,7 +88,9 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   const atributosDef = (categoriaPrincipal?.atributosProducto ?? []).filter((c) => !c.oculto);
   // "Sección del menú" solo tiene sentido para categorías tipo carta (restaurantes) — para
   // catálogo, servicios, rubros u ofertas es un campo sin relación con lo que se está cargando.
-  const mostrarSeccion = categoriaPrincipal?.fichaEfectiva === "menu";
+  // Menú y Catálogo agrupan los productos por sección (en la app: títulos o chips de filtro).
+  const mostrarSeccion = categoriaPrincipal?.fichaEfectiva === "menu" || categoriaPrincipal?.fichaEfectiva === "catalogo";
+  const etiquetaSeccion = categoriaPrincipal?.fichaEfectiva === "catalogo" ? "Sección del catálogo" : "Sección del menú";
 
   async function guardar(datos: DatosProducto, fotoNueva: File | null) {
     // Al crear, la foto va en un segundo paso: hasta que el producto no existe no hay id al que
@@ -311,6 +313,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           secciones={secciones.map((s) => s.nombre)}
           atributosDef={atributosDef}
           mostrarSeccion={mostrarSeccion}
+          etiquetaSeccion={etiquetaSeccion}
           onGuardar={guardar}
           onCerrar={() => {
             setEditando(null);
