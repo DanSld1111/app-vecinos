@@ -39,7 +39,7 @@ export async function apiFetch<T>(ruta: string, opciones: Opciones = {}): Promis
       body: opciones.cuerpo !== undefined ? JSON.stringify(opciones.cuerpo) : undefined,
     });
   } catch {
-    throw new ErrorApi("No pudimos conectarnos al servidor. Revisa que la API esté corriendo.", 0);
+    throw new ErrorApi("No pudimos conectarnos al servidor. Revisa tu conexión a internet e intenta de nuevo.", 0);
   }
 
   if (respuesta.status === 204) return undefined as T;
@@ -76,7 +76,7 @@ export async function apiSubirArchivo<T>(ruta: string, archivo: File, token: str
       body: cuerpo,
     });
   } catch {
-    throw new ErrorApi("No pudimos conectarnos al servidor. Revisa que la API esté corriendo.", 0);
+    throw new ErrorApi("No pudimos conectarnos al servidor. Revisa tu conexión a internet e intenta de nuevo.", 0);
   }
 
   const datos = await respuesta.json().catch(() => null);

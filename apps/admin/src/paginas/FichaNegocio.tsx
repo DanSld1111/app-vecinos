@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Negocio } from "@app-vecinos/tipos";
 import { useNegocios } from "../estado/useNegocios";
@@ -17,6 +17,9 @@ import { EditorServiciosNegocio } from "../componentes/negocio/EditorServiciosNe
 import { EditorListaNegocio } from "../componentes/negocio/EditorListaNegocio";
 import { useCategorias } from "../estado/useCategorias";
 import { pestanasDeContenido } from "../utilidades/fichaNegocio";
+import { partesDeFicha } from "../utilidades/completitudNegocio";
+import { FranjaFaltantes } from "../componentes/negocio/FranjaFaltantes";
+import { alertaInfo } from "../estado/useToasts";
 import { urlCompleta } from "../utilidades/media";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
@@ -66,6 +69,26 @@ export function FichaNegocio() {
     if (categorias.length === 0) cargarCategorias();
   }, [categorias.length, cargarCategorias]);
   const negocioActual = negocios.find((n) => n.id === id) ?? null;
+  // Qué le falta a la ficha (decisión 0084): el dueño sale de las cuentas.
+  const cuentasPanel = useCuentas((estado) => estado.cuentas);
+  const cargarCuentasPanel = useCuentas((estado) => estado.cargar);
+  useEffect(() => {
+    cargarCuentasPanel(token);
+  }, [cargarCuentasPanel, token]);
+  const tieneDueno = cuentasPanel.some((c) => c.rol === "dueno_negocio" && c.negocioIds.includes(id));
+  const partes = negocioActual ? partesDeFicha(negocioActual, tieneDueno) : [];
+  // "¡Ficha completa!" al completar lo último que faltaba (no al abrir una ficha que ya estaba completa).
+  const faltabanAntes = useRef<{ id: string; faltan: number } | null>(null);
+  const faltanAhora = partes.filter((p) => !p.completa).length;
+  useEffect(() => {
+    if (!negocioActual || cuentasPanel.length === 0) return;
+    const previo = faltabanAntes.current;
+    if (previo && previo.id === negocioActual.id && previo.faltan > 0 && faltanAhora === 0) {
+      alertaInfo("¡Ficha completa!", `${negocioActual.nombre} ya tiene todo lo que los vecinos necesitan ver.`);
+    }
+    faltabanAntes.current = { id: negocioActual.id, faltan: faltanAhora };
+  }, [negocioActual, faltanAhora, cuentasPanel.length]);
+  const tabsConFalta = new Set<string>(partes.filter((p) => !p.completa).map((p) => p.pestana || "info"));
   // Servicios, Rubros y Pasillos solo aparecen si la ficha del negocio los usa (o si ya tiene datos).
   const deContenido = negocioActual ? pestanasDeContenido(negocioActual, categorias) : [];
   const pestanas = PESTANAS.filter(
@@ -123,6 +146,8 @@ export function FichaNegocio() {
         </div>
       </div>
 
+      <FranjaFaltantes partes={partes} onIr={(tab) => setSearchParams(tab ? { tab } : {})} />
+
       <div className="tabs-negocio">
         {pestanas.map((p) => (
           <button
@@ -132,6 +157,7 @@ export function FichaNegocio() {
             onClick={() => setSearchParams(p.id === "info" ? {} : { tab: p.id })}
           >
             <IconoEmoji e={p.icono} /> {p.texto}
+            {tabsConFalta.has(p.id) ? <span className="punto-falta" title="Falta completar algo aquí" /> : null}
           </button>
         ))}
       </div>

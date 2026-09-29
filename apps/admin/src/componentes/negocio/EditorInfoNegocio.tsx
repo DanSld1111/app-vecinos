@@ -7,7 +7,6 @@ import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { SelectorServicioYCategoria } from "./SelectorServicioYCategoria";
 import { CampoDireccionConMapa } from "./CampoDireccionConMapa";
 import { soloDigitos } from "../../utilidades/telefono";
-import { useToasts } from "../../estado/useToasts";
 import { usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
@@ -23,7 +22,6 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   const categorias = useCategorias((estado) => estado.categorias);
   const servicios = useServiciosApp((estado) => estado.servicios);
   const cargarServicios = useServiciosApp((estado) => estado.cargar);
-  const avisos = useToasts((estado) => estado.mostrar);
 
   useEffect(() => {
     cargarServicios();
@@ -75,9 +73,6 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
     if (ok) {
       setGuardado(true);
       setTimeout(() => setGuardado(false), 2000);
-      avisos("Información guardada con éxito");
-    } else {
-      avisos("No se pudo guardar. Intenta de nuevo.", "error");
     }
   }
 

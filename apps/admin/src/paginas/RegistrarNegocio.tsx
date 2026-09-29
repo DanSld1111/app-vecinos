@@ -78,7 +78,7 @@ export function RegistrarNegocio() {
   const cargarServicios = useServiciosApp((estado) => estado.cargar);
   const crearNegocio = useNegocios((estado) => estado.crear);
   const actualizarInfo = useNegocios((estado) => estado.actualizarInfo);
-  const avisos = useToasts((estado) => estado.mostrar);
+  const alertar = useToasts((estado) => estado.alertar);
 
   const [paso, setPaso] = useState<Paso>(1);
   const [negocioId, setNegocioId] = useState<string | null>(null);
@@ -197,14 +197,12 @@ export function RegistrarNegocio() {
     }
     setNegocioId(id);
     setPaso(2);
-    avisos("Negocio creado con éxito");
   }
 
   async function confirmarVincularDueno() {
     if (!negocioId || !cuentaAVincular) return;
     await agregarNegocio(cuentaAVincular, negocioId, token);
     setPaso(3);
-    avisos("Dueño vinculado con éxito");
   }
 
   async function confirmarCrearDueno() {
@@ -228,7 +226,7 @@ export function RegistrarNegocio() {
     setProductoCreado(final);
     setModalProducto(null);
     setPaso(4);
-    avisos("Producto agregado con éxito");
+    alertar({ titulo: "Producto agregado", detalle: `"${final.nombre}" · ${nombre}` });
   }
 
   async function guardarOtroProducto(datos: DatosProducto, fotoNueva: File | null) {
@@ -240,7 +238,7 @@ export function RegistrarNegocio() {
     const final = fotoNueva ? await productosApi.subirFotoProducto(negocioId, guardado.id, fotoNueva, token) : guardado;
     setProductoCreado(final);
     setModalProducto(null);
-    avisos(esNuevo ? "Producto agregado con éxito" : "Producto guardado con éxito");
+    alertar({ titulo: esNuevo ? "Producto agregado" : "Producto guardado", detalle: `"${final.nombre}" · ${nombre}` });
   }
 
   const pasos: Paso[] = [1, 2, 3, 4];

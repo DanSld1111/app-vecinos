@@ -6,7 +6,8 @@ import { useGeografia } from "../estado/useGeografia";
 import { useCuentas } from "../estado/useCuentas";
 import { useCategorias } from "../estado/useCategorias";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
-import { fichaCompleta, partesDeFicha, resumenDeLoQueFalta } from "../utilidades/completitudNegocio";
+import { fichaCompleta, partesDeFicha } from "../utilidades/completitudNegocio";
+import { LuArrowRight } from "react-icons/lu";
 import { urlCompleta } from "../utilidades/media";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
@@ -210,7 +211,8 @@ export function Negocios() {
         {negocios.map((negocio) => {
           const partes = partesDeFicha(negocio, negociosConDueno.has(negocio.id));
           const completadas = partes.filter((p) => p.completa).length;
-          const falta = resumenDeLoQueFalta(negocio, negociosConDueno.has(negocio.id));
+          const faltantes = partes.filter((p) => !p.completa);
+          const completa = faltantes.length === 0;
           return (
             <div className="tarjeta-negocio" key={negocio.id} onClick={() => navegar(`/negocios/${negocio.id}`)}>
               <div className="foto-tarjeta">
@@ -229,12 +231,34 @@ export function Negocios() {
                     </span>
                   ))}
                 </div>
-                <div className="progreso-tarjeta" title={falta ?? "Ficha completa"}>
-                  <div className="barra-progreso">
+                <div className="progreso-tarjeta">
+                  <div className={`barra-progreso ${completa ? "completa" : ""}`}>
                     <i style={{ width: `${(completadas / partes.length) * 100}%` }} />
                   </div>
-                  <span className="frac-progreso">{completadas === partes.length ? "Completa" : `${completadas}/${partes.length}`}</span>
+                  <span className="frac-progreso">{`${completadas}/${partes.length}`}</span>
                 </div>
+                {/* Qué falta, a la vista: cada chip abre la pestaña donde se completa. */}
+                {completa ? (
+                  <div className="ficha-completa-linea">✓ Ficha completa</div>
+                ) : (
+                  <div className="faltas-tarjeta">
+                    <span className="rotulo-falta">Falta:</span>
+                    {faltantes.map((p) => (
+                      <button
+                        type="button"
+                        key={p.clave}
+                        className="chip-falta"
+                        title={`Ir a completar ${p.etiqueta}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navegar(`/negocios/${negocio.id}${p.pestana ? `?tab=${p.pestana}` : ""}`);
+                        }}
+                      >
+                        {p.etiqueta.charAt(0).toUpperCase() + p.etiqueta.slice(1)} <LuArrowRight />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           );

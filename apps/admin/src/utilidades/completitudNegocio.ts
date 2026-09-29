@@ -5,6 +5,8 @@ export interface ParteFicha {
   icono: string;
   etiqueta: string;
   completa: boolean;
+  /** Pestaña de la ficha del negocio donde se completa ("" = Información). */
+  pestana: "" | "horario" | "fotos" | "dueno";
 }
 
 /**
@@ -19,11 +21,11 @@ export interface ParteFicha {
 export function partesDeFicha(negocio: Negocio, tieneDueno: boolean): ParteFicha[] {
   const tieneHorario = Object.values(negocio.horarios ?? {}).some((dia) => !dia.cerrado);
   return [
-    { clave: "foto", icono: "📷", etiqueta: "foto", completa: Boolean(negocio.fotoPrincipalUrl) },
-    { clave: "horario", icono: "🕒", etiqueta: "horario", completa: tieneHorario },
-    { clave: "descripcion", icono: "📝", etiqueta: "descripción", completa: negocio.descripcion.trim() !== "" },
-    { clave: "categoria", icono: "🏷️", etiqueta: "categoría", completa: negocio.categoriaIds.length > 0 },
-    { clave: "dueno", icono: "👤", etiqueta: "dueño", completa: tieneDueno },
+    { clave: "foto", icono: "📷", etiqueta: "foto", completa: Boolean(negocio.fotoPrincipalUrl), pestana: "fotos" },
+    { clave: "horario", icono: "🕒", etiqueta: "horario", completa: tieneHorario, pestana: "horario" },
+    { clave: "descripcion", icono: "📝", etiqueta: "descripción", completa: negocio.descripcion.trim() !== "", pestana: "" },
+    { clave: "categoria", icono: "🏷️", etiqueta: "categoría", completa: negocio.categoriaIds.length > 0, pestana: "" },
+    { clave: "dueno", icono: "👤", etiqueta: "dueño", completa: tieneDueno, pestana: "dueno" },
   ];
 }
 

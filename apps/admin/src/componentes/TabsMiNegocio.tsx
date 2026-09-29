@@ -1,5 +1,7 @@
 import { useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { partesDeFicha } from "../utilidades/completitudNegocio";
+import { FranjaFaltantes } from "./negocio/FranjaFaltantes";
 import { useNegociosDelDueno } from "../estado/useNegocioActivo";
 import { useCategorias } from "../estado/useCategorias";
 import { pestanasDeContenido } from "../utilidades/fichaNegocio";
@@ -26,7 +28,14 @@ export function TabsMiNegocio() {
   }, [categorias.length, cargarCategorias]);
   // Servicios, Rubros y Pasillos solo si la ficha del negocio los usa (o si ya tiene datos).
   const deContenido: string[] = activo ? pestanasDeContenido(activo, categorias) : [];
+  // Qué le falta a la ficha (decisión 0084). Quien entra aquí es el dueño: esa parte ya está.
+  const navegar = useNavigate();
+  const partes = activo ? partesDeFicha(activo, true) : [];
+  const RUTA_DE: Record<string, string> = { "": "/mi-negocio", horario: "/mi-negocio/horario", fotos: "/mi-negocio/fotos" };
+  const rutasConFalta = new Set(partes.filter((p) => !p.completa).map((p) => RUTA_DE[p.pestana]));
   return (
+    <>
+    {activo ? <FranjaFaltantes partes={partes} onIr={(tab) => navegar(RUTA_DE[tab] ?? "/mi-negocio")} /> : null}
     <div className="tabs-negocio">
       {TABS.filter((tab) => !("contenido" in tab) || deContenido.includes(tab.contenido as string)).map((tab) => (
         <NavLink
@@ -36,8 +45,10 @@ export function TabsMiNegocio() {
           className={({ isActive }) => `tab-negocio ${isActive ? "activo" : ""}`}
         >
           <IconoEmoji e={tab.icono} /> {tab.texto}
+          {rutasConFalta.has(tab.a) ? <span className="punto-falta" title="Falta completar algo aquí" /> : null}
         </NavLink>
       ))}
     </div>
+    </>
   );
 }

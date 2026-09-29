@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App";
 import "./index.css";
+// Conecta las alertas emergentes a todas las acciones del panel (decisión 0084).
+import "./estado/alertasDeAcciones";
 import { aplicarTema, useTemaAdmin } from "./estado/useTemaAdmin";
 
 aplicarTema(useTemaAdmin.getState().preferencia);

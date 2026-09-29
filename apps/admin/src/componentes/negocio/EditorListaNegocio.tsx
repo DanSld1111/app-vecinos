@@ -4,7 +4,6 @@ import { LuArrowLeft, LuArrowRight, LuPlus, LuX } from "react-icons/lu";
 import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
-import { useToasts } from "../../estado/useToasts";
 import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
 import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
@@ -38,7 +37,6 @@ export function EditorListaNegocio({ negocio, lista }: { negocio: Negocio; lista
   const token = useSesionAdmin((e) => e.token)!;
   const categorias = useCategorias((e) => e.categorias);
   const guardarLista = useNegocios((e) => e.guardarLista);
-  const avisos = useToasts((e) => e.mostrar);
 
   const guardados = negocio[cfg.campoNegocio] ?? [];
   const [items, setItems] = useState<string[]>(guardados);
@@ -71,7 +69,6 @@ export function EditorListaNegocio({ negocio, lista }: { negocio: Negocio; lista
     setGuardando(true);
     const ok = await guardarLista(negocio.id, lista, items, token);
     setGuardando(false);
-    avisos(ok ? `${cfg.plural[0].toUpperCase()}${cfg.plural.slice(1)} guardados` : `No se pudieron guardar los ${cfg.plural}.`, ok ? "exito" : "error");
   }
 
   return (

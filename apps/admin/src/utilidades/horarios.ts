@@ -117,3 +117,22 @@ export function listaSemanaCompleta(horarios: Horarios, ahora: Date = new Date()
     };
   });
 }
+
+/**
+ * El horario en una línea, para las alertas: "lunes a sábado, 10:00–20:00", "lunes, miércoles y
+ * viernes, 09:00–13:00", o "5 días, con horarios distintos". Sin días abiertos: "cerrado todos los días".
+ */
+export function resumenHorario(horarios: Horarios): string {
+  const abiertos = ORDEN_SEMANA.filter((d) => !horarios[d].cerrado);
+  if (abiertos.length === 0) return "cerrado todos los días";
+  const nombre = (d: DiaSemana) => NOMBRE_DIA[d].toLowerCase();
+  const indices = abiertos.map((d) => ORDEN_SEMANA.indexOf(d));
+  const seguidos = indices.every((v, i) => i === 0 || v === indices[i - 1] + 1);
+  let dias: string;
+  if (abiertos.length === 7) dias = "todos los días";
+  else if (abiertos.length === 1) dias = nombre(abiertos[0]);
+  else if (seguidos && abiertos.length > 2) dias = `${nombre(abiertos[0])} a ${nombre(abiertos[abiertos.length - 1])}`;
+  else dias = `${abiertos.slice(0, -1).map(nombre).join(", ")} y ${nombre(abiertos[abiertos.length - 1])}`;
+  const horas = new Set(abiertos.map((d) => `${horarios[d].abre ?? ""}–${horarios[d].cierra ?? ""}`));
+  return horas.size === 1 ? `${dias}, ${[...horas][0]}` : `${dias}, con horarios distintos`;
+}

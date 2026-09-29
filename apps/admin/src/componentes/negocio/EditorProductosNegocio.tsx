@@ -7,7 +7,7 @@ import { DatosProducto } from "../../datos/productosApi";
 import { ModalProducto } from "./ModalProducto";
 import { ModalVerProducto } from "./ModalVerProducto";
 import { ModalConfirmar } from "../ModalConfirmar";
-import { useToasts } from "../../estado/useToasts";
+import { alertaError, useToasts } from "../../estado/useToasts";
 import { useBorradorNegocio, useEnfoqueVistaPrevia } from "../../estado/useBorradorNegocio";
 import { urlCompleta } from "../../utilidades/media";
 
@@ -31,7 +31,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   const [confirmandoBorrado, setConfirmandoBorrado] = useState<string | null>(null);
   const [enviandoAPapelera, setEnviandoAPapelera] = useState<Producto | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const avisos = useToasts((estado) => estado.mostrar);
+  const alertar = useToasts((estado) => estado.alertar);
   const publicarProductos = useBorradorNegocio((estado) => estado.publicarProductos);
 
   useEnfoqueVistaPrevia("contenido");
@@ -95,17 +95,17 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
     setEditando(null);
     setCreandoEn(null);
     await recargar();
-    avisos(eraEdicion ? "Producto guardado con éxito" : "Producto agregado con éxito");
+    alertar({ titulo: eraEdicion ? "Producto guardado" : "Producto agregado", detalle: `"${datos.nombre}" · ${negocio.nombre}` });
   }
 
-  async function accion(fn: () => Promise<unknown>, mensajeExito?: string) {
+  async function accion(fn: () => Promise<unknown>, titulo?: string, detalle?: string) {
     try {
       await fn();
       await recargar();
-      if (mensajeExito) avisos(mensajeExito);
-    } catch {
+      if (titulo) alertar({ titulo, detalle });
+    } catch (e) {
       setError("No se pudo completar la acción.");
-      avisos("No se pudo completar la acción.", "error");
+      alertaError(titulo ? `No se pudo: ${titulo.toLowerCase()}` : "No se pudo completar la acción", e, () => void accion(fn, titulo, detalle));
     }
   }
 
@@ -252,7 +252,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                     </span>
                     <button
                       className="btn-accion-mini"
-                      onClick={() => accion(() => api.restaurarProducto(negocio.id, producto.id, token), "Producto restaurado con éxito")}
+                      onClick={() => accion(() => api.restaurarProducto(negocio.id, producto.id, token), "Producto restaurado", `"${producto.nombre}" · vuelve a verse en la app`)}
                     >
                       Restaurar
                     </button>
@@ -263,7 +263,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                         textoConfirmar="Sí, eliminar para siempre"
                         onCancelar={() => setConfirmandoBorrado(null)}
                         onConfirmar={async () => {
-                          await accion(() => api.eliminarDefinitivo(negocio.id, producto.id, token), "Producto eliminado para siempre");
+                          await accion(() => api.eliminarDefinitivo(negocio.id, producto.id, token), "Producto eliminado para siempre", `"${producto.nombre}"`);
                           setConfirmandoBorrado(null);
                         }}
                       />
@@ -313,7 +313,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           onEliminar={
             editando
               ? async () => {
-                  await accion(() => api.eliminarProducto(negocio.id, editando.id, token), "Producto enviado a la papelera");
+                  await accion(() => api.eliminarProducto(negocio.id, editando.id, token), "Producto enviado a la papelera", `"${editando.nombre}" · puedes restaurarlo desde la papelera`);
                   setEditando(null);
                 }
               : undefined
@@ -321,7 +321,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           onQuitarFoto={
             editando
               ? async () => {
-                  await accion(() => api.quitarFotoProducto(negocio.id, editando.id, token), "Foto eliminada con éxito");
+                  await accion(() => api.quitarFotoProducto(negocio.id, editando.id, token), "Foto del producto quitada", `"${editando.nombre}"`);
                   setEditando(null);
                 }
               : undefined
@@ -336,7 +336,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           textoConfirmar="Sí, enviar a papelera"
           onCancelar={() => setEnviandoAPapelera(null)}
           onConfirmar={async () => {
-            await accion(() => api.eliminarProducto(negocio.id, enviandoAPapelera.id, token), "Producto enviado a la papelera");
+            await accion(() => api.eliminarProducto(negocio.id, enviandoAPapelera.id, token), "Producto enviado a la papelera", `"${enviandoAPapelera.nombre}" · puedes restaurarlo desde la papelera`);
             setEnviandoAPapelera(null);
           }}
         />

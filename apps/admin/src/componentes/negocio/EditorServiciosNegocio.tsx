@@ -4,7 +4,6 @@ import { LuArrowDown, LuArrowUp, LuImagePlus, LuPlus, LuTrash2, LuX } from "reac
 import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
-import { useToasts } from "../../estado/useToasts";
 import { urlCompleta } from "../../utilidades/media";
 import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
 import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
@@ -37,7 +36,6 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
   const categorias = useCategorias((e) => e.categorias);
   const guardarServicios = useNegocios((e) => e.guardarServicios);
   const subirFotoServicio = useNegocios((e) => e.subirFotoServicio);
-  const avisos = useToasts((e) => e.mostrar);
 
   const [filas, setFilas] = useState<Fila[]>(() => aFilas(negocio.serviciosOfrecidos));
   const [guardando, setGuardando] = useState(false);
@@ -72,14 +70,12 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
     const url = await subirFotoServicio(negocio.id, archivo, token);
     setSubiendo(null);
     if (url) cambiar(i, { fotoUrl: url });
-    else avisos("No se pudo subir la foto.", "error");
   }
 
   async function guardar() {
     setGuardando(true);
     const ok = await guardarServicios(negocio.id, borrador, token);
     setGuardando(false);
-    avisos(ok ? "Servicios guardados" : "No se pudieron guardar los servicios.", ok ? "exito" : "error");
     if (ok) setFilas(aFilas(borrador));
   }
 

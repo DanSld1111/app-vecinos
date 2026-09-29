@@ -3,7 +3,6 @@ import { EstadoServicioApp, FICHAS, ServicioApp, TIPOS_FICHA, TipoFicha, tituloS
 import { useServiciosApp } from "../estado/useServiciosApp";
 import { useCategorias } from "../estado/useCategorias";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
-import { useToasts } from "../estado/useToasts";
 import { urlCompleta } from "../utilidades/media";
 import { TarjetaFicha } from "../componentes/fichas/TarjetaFicha";
 import { TelefonoFicha } from "../componentes/fichas/TelefonoFicha";
@@ -167,7 +166,6 @@ function ModalServicio({
   const categorias = useCategorias((estado) => estado.categorias);
   const cargarCategorias = useCategorias((estado) => estado.cargar);
   const actualizarCategoria = useCategorias((estado) => estado.actualizar);
-  const avisos = useToasts((estado) => estado.mostrar);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [nombre, setNombre] = useState(servicio.nombre);
@@ -206,12 +204,10 @@ function ModalServicio({
     }
   }
 
-  async function heredar(categoriaId: string, nombreCategoria: string) {
+  async function heredar(categoriaId: string) {
     const ok = await actualizarCategoria(categoriaId, { ficha: null }, token);
-    if (ok) {
-      setVistaId(categoriaId);
-      avisos(`${nombreCategoria} ahora usa la ficha del servicio`);
-    }
+    // La alerta la muestra el store (Categoría guardada); aquí solo se enfoca en el celular.
+    if (ok) setVistaId(categoriaId);
   }
 
   async function alElegirFoto(archivo: File) {
@@ -340,7 +336,7 @@ function ModalServicio({
                           className="btn-accion-mini"
                           onClick={(e) => {
                             e.stopPropagation();
-                            heredar(c.id, c.nombre);
+                            heredar(c.id);
                           }}
                         >
                           Usar la del servicio
