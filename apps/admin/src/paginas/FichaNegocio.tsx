@@ -35,10 +35,9 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "estado", icono: "✅", texto: "Estado" },
 ];
 
-/** gestor_negocios es administrativo: da de alta, conecta con el dueño, carga los primeros
- * productos y la foto del negocio — nada del resto de lo operativo (horario, ofertas, publicar).
- * Ver docs/decisiones/0071. */
-const PESTANAS_GESTOR: Pestana[] = ["info", "dueno", "fotos", "productos", "servicios", "rubros", "pasillos", "estado"];
+/** gestor_negocios arma y completa la ficha (incluido horario y ofertas, decisión 0083), pero no
+ * publica ni despublica: eso es del validador de contenido. */
+const PESTANAS_GESTOR: Pestana[] = ["info", "horario", "dueno", "fotos", "productos", "servicios", "rubros", "ofertas", "pasillos", "estado"];
 
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;

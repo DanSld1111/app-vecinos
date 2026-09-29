@@ -234,16 +234,15 @@ export class NegociosService {
   }
 
   /**
-   * Gestión operativa del día a día: horario y ofertas. Ver
-   * docs/decisiones/0071-plan-v2-modulo-negocios.md — gestor_negocios queda deliberadamente
-   * afuera de este círculo: es un rol administrativo (alta + vínculo con el dueño), no quien
-   * lleva el negocio. (Productos y fotos son la excepción — ver verificarAccesoProductos() y
-   * verificarAccesoFotos() más abajo.)
+   * Horario y ofertas. Al principio (decisión 0071) quedaban solo para el dueño y el super_admin,
+   * pero si el dueño no usa el panel nadie más podía completarlos: desde la decisión 0083 también
+   * los edita gestor_negocios, igual que el resto de la ficha. Publicar/despublicar sigue siendo
+   * del validador de contenido.
    */
   private verificarGestionOperativa(cuenta: Cuenta, negocioId: string): void {
-    if (cuenta.rol === "super_admin") return;
+    if (cuenta.rol === "super_admin" || cuenta.rol === "gestor_negocios") return;
     if (cuenta.rol === "dueno_negocio" && cuenta.negocioIds.includes(negocioId)) return;
-    throw new ForbiddenException("Esta acción es del dueño del negocio — un gestor administrativo no la tiene.");
+    throw new ForbiddenException("No administras este negocio.");
   }
 
   /**
