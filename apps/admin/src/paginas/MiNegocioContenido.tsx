@@ -2,6 +2,7 @@ import { useNegociosDelDueno } from "../estado/useNegocioActivo";
 import { TabsMiNegocio } from "../componentes/TabsMiNegocio";
 import { EditorServiciosNegocio } from "../componentes/negocio/EditorServiciosNegocio";
 import { EditorListaNegocio } from "../componentes/negocio/EditorListaNegocio";
+import { ConVistaPrevia } from "../componentes/negocio/ConVistaPrevia";
 
 /** Servicios y tarifas, Rubros y Pasillos del dueño — los mismos editores que usa el admin. */
 function PaginaContenido({ titulo, children }: { titulo: string; children: (negocio: NonNullable<ReturnType<typeof useNegociosDelDueno>["activo"]>) => React.ReactNode }) {
@@ -16,7 +17,7 @@ function PaginaContenido({ titulo, children }: { titulo: string; children: (nego
         </div>
       </div>
       <TabsMiNegocio />
-      {children(activo)}
+      <ConVistaPrevia negocio={activo}>{children(activo)}</ConVistaPrevia>
     </>
   );
 }

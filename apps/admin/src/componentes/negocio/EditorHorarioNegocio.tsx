@@ -2,7 +2,8 @@ import { useState } from "react";
 import { DiaSemana, Horarios, Negocio } from "@app-vecinos/tipos";
 import { useNegocios } from "../../estado/useNegocios";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
-import { estadoHoyTexto, listaSemanaCompleta, NOMBRE_DIA, resumenSemana } from "../../utilidades/horarios";
+import { NOMBRE_DIA } from "../../utilidades/horarios";
+import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 const DIAS_ORDEN: DiaSemana[] = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
 
@@ -37,12 +38,12 @@ export function EditorHorarioNegocio({ negocio }: { negocio: Negocio }) {
     }
   }
 
-  const estadoHoy = estadoHoyTexto(horarios);
-  const semana = resumenSemana(horarios);
-  const listaCompleta = listaSemanaCompleta(horarios);
+  // El celular de vista previa (ConVistaPrevia) muestra este horario antes de guardar.
+  usePublicarBorrador({ horarios });
+  useEnfoqueVistaPrevia("horario");
 
   return (
-    <div className="layout-editor">
+    <div className="editor-negocio">
       <div className="tarjeta">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
           <p style={{ margin: 0, fontSize: 11.5, color: "var(--texto-suave)" }}>
@@ -90,38 +91,6 @@ export function EditorHorarioNegocio({ negocio }: { negocio: Negocio }) {
         </div>
       </div>
 
-      <div className="panel-referencia">
-        <h3>Así te ven los vecinos</h3>
-        <p className="sub-ref">Mismo cálculo de "abierto ahora" que usa la app — se actualiza solo.</p>
-        <div className="etiqueta-pantalla">Ficha del negocio</div>
-        <div className="telefono">
-          <div className="pantalla-tel">
-            <div className={`estado-abierto-mini ${estadoHoy.abierto ? "abierto" : "cerradonow"}`}>
-              <span className={`punto-abierto ${estadoHoy.abierto ? "" : "cerrado"}`}></span>
-              {estadoHoy.abierto ? `Abierto ahora · ${estadoHoy.detalle}` : estadoHoy.detalle}
-            </div>
-            <div className="semana-mini">
-              {semana.map((d) => (
-                <div className={`dia-mini ${d.esHoy ? "hoy" : ""}`} key={d.dia}>
-                  <span className="letra">{d.abreviatura}</span>
-                  <div className={`punto-dia ${d.abierto ? "" : "apagado"}`} />
-                </div>
-              ))}
-            </div>
-            <div className="lista-semana-mini">
-              {listaCompleta.map((d) => (
-                <div className="fila-semana-mini" key={d.dia}>
-                  <b>{d.nombre}</b>
-                  <span>{d.texto}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <p className="nota-mini">
-          Si marcas todos los días como cerrados, la app mostrará "Cerrado por ahora" sin próxima apertura.
-        </p>
-      </div>
     </div>
   );
 }

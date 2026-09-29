@@ -8,6 +8,7 @@ import { entorno } from "../config/entorno";
  */
 export function urlCompleta(ruta: string | null | undefined): string | undefined {
   if (!ruta) return undefined;
-  if (/^https?:\/\//.test(ruta)) return ruta;
+  // blob:/data: = una foto elegida en este navegador que todavía no se sube (vista previa).
+  if (/^(https?:\/\/|blob:|data:)/.test(ruta)) return ruta;
   return `${entorno.origenApi}${ruta}`;
 }

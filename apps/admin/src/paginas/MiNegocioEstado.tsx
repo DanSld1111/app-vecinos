@@ -1,5 +1,6 @@
 import { useNegociosDelDueno } from "../estado/useNegocioActivo";
 import { TabsMiNegocio } from "../componentes/TabsMiNegocio";
+import { ConVistaPrevia } from "../componentes/negocio/ConVistaPrevia";
 import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio";
 
 export function MiNegocioEstado() {
@@ -18,7 +19,9 @@ export function MiNegocioEstado() {
       <TabsMiNegocio />
 
       {/* Sin `acciones`: publicar o despublicar lo decide el equipo ELISUR desde el panel. */}
-      <EditorEstadoNegocio negocio={activo} />
+      <ConVistaPrevia negocio={activo}>
+        <EditorEstadoNegocio negocio={activo} />
+      </ConVistaPrevia>
     </>
   );
 }

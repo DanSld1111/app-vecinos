@@ -8,6 +8,7 @@ import { ModalProducto } from "./ModalProducto";
 import { ModalVerProducto } from "./ModalVerProducto";
 import { ModalConfirmar } from "../ModalConfirmar";
 import { useToasts } from "../../estado/useToasts";
+import { useBorradorNegocio, useEnfoqueVistaPrevia } from "../../estado/useBorradorNegocio";
 import { urlCompleta } from "../../utilidades/media";
 
 import { IconoEmoji } from "../IconoEmoji";
@@ -31,6 +32,13 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
   const [enviandoAPapelera, setEnviandoAPapelera] = useState<Producto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const avisos = useToasts((estado) => estado.mostrar);
+  const publicarProductos = useBorradorNegocio((estado) => estado.publicarProductos);
+
+  useEnfoqueVistaPrevia("contenido");
+  // El celular de vista previa usa esta lista (la más fresca: cambia al agregar, editar u ordenar).
+  useEffect(() => {
+    if (productos) publicarProductos(productos);
+  }, [productos, publicarProductos]);
 
   const recargar = useCallback(async () => {
     try {

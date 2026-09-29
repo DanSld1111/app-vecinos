@@ -1,5 +1,6 @@
 import { useNegociosDelDueno } from "../estado/useNegocioActivo";
 import { TabsMiNegocio } from "../componentes/TabsMiNegocio";
+import { ConVistaPrevia } from "../componentes/negocio/ConVistaPrevia";
 import { EditorHorarioNegocio } from "../componentes/negocio/EditorHorarioNegocio";
 
 export function MiNegocioHorario() {
@@ -17,7 +18,9 @@ export function MiNegocioHorario() {
 
       <TabsMiNegocio />
 
-      <EditorHorarioNegocio key={activo.id} negocio={activo} />
+      <ConVistaPrevia negocio={activo}>
+        <EditorHorarioNegocio key={activo.id} negocio={activo} />
+      </ConVistaPrevia>
     </>
   );
 }

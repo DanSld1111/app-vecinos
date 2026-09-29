@@ -1,5 +1,6 @@
 import { useNegociosDelDueno } from "../estado/useNegocioActivo";
 import { TabsMiNegocio } from "../componentes/TabsMiNegocio";
+import { ConVistaPrevia } from "../componentes/negocio/ConVistaPrevia";
 import { EditorFotosNegocio } from "../componentes/negocio/EditorFotosNegocio";
 
 export function MiNegocioFotos() {
@@ -17,7 +18,9 @@ export function MiNegocioFotos() {
 
       <TabsMiNegocio />
 
-      <EditorFotosNegocio key={activo.id} negocio={activo} />
+      <ConVistaPrevia negocio={activo}>
+        <EditorFotosNegocio key={activo.id} negocio={activo} />
+      </ConVistaPrevia>
     </>
   );
 }

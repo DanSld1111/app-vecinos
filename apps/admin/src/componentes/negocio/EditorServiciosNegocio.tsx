@@ -7,7 +7,7 @@ import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { useToasts } from "../../estado/useToasts";
 import { urlCompleta } from "../../utilidades/media";
 import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
-import { TelefonoFicha } from "../fichas/TelefonoFicha";
+import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 /** Un renglón mientras se edita: el precio queda como texto hasta guardar. */
 type Fila = { nombre: string; detalle: string; precio: string; fotoUrl: string | null };
@@ -45,8 +45,10 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
   const archivoRef = useRef<HTMLInputElement>(null);
   const filaFoto = useRef<number | null>(null);
 
-  const { ficha, categoria, titulo } = fichaDelNegocio(negocio, categorias);
+  const { ficha } = fichaDelNegocio(negocio, categorias);
   const borrador = aServicios(filas);
+  usePublicarBorrador({ serviciosOfrecidos: borrador });
+  useEnfoqueVistaPrevia("contenido");
   const huboCambio = JSON.stringify(borrador) !== JSON.stringify(aServicios(aFilas(negocio.serviciosOfrecidos)));
   const precioInvalido = filas.some((f) => f.nombre.trim() && (f.precio.trim() === "" || Number.isNaN(Number(f.precio.replace(",", ".")))));
 
@@ -82,7 +84,7 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
   }
 
   return (
-    <div className="layout-editor con-tf">
+    <div className="editor-negocio">
       <div className="tarjeta">
         {ficha === "servicios" ? null : (
           <div className="nota-alerta">
@@ -168,19 +170,6 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
         {precioInvalido ? <p className="error-editor">Cada servicio necesita un precio en números (ej. 80 o 12.50).</p> : null}
       </div>
 
-      <div className="panel-referencia">
-        <h3>Así se ve en la app</h3>
-        <p className="sub-ref">Se actualiza mientras editas; los vecinos lo ven al guardar.</p>
-        <TelefonoFicha
-          ficha="servicios"
-          titulo={ficha === "servicios" ? titulo : FICHAS.servicios.tituloPorDefecto}
-          campos={[]}
-          rotulo={categoria?.nombre ?? ""}
-          negocio={{ ...negocio, serviciosOfrecidos: borrador }}
-          productos={[]}
-          cargando={false}
-        />
-      </div>
     </div>
   );
 }

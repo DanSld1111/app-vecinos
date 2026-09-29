@@ -3,6 +3,7 @@ import { Negocio, OfertaNegocio, formatearPrecio } from "@app-vecinos/tipos";
 import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
+import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 import { IconoEmoji } from "../IconoEmoji";
 
@@ -19,6 +20,19 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
   const [etiqueta, setEtiqueta] = useState("");
 
   const ofertas = negocio.ofertas ?? [];
+  // La oferta que se está escribiendo aparece en el celular antes de agregarla.
+  const precioBorrador = Number(precio.replace(",", "."));
+  const enCurso: OfertaNegocio | null =
+    nombre.trim() && precio.trim() && Number.isFinite(precioBorrador)
+      ? {
+          nombre: nombre.trim(),
+          precio: precioBorrador,
+          precioOriginal: precioAnterior.trim() ? Number(precioAnterior.replace(",", ".")) || undefined : undefined,
+          etiqueta: etiqueta.trim() || "Oferta",
+        }
+      : null;
+  usePublicarBorrador({ ofertas: enCurso ? [...ofertas, enCurso] : ofertas });
+  useEnfoqueVistaPrevia("contenido");
   const precioDe = (valor: number) => formatearPrecio(valor, negocio.moneda);
   const categoriasDelNegocio = negocio.categoriaIds
     .map((id) => categorias.find((c) => c.id === id))
@@ -43,7 +57,7 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
   }
 
   return (
-    <div className="layout-editor">
+    <div className="editor-negocio">
       <div className="tarjeta">
         {apareceEnFicha ? (
           <div className="nota-info">
@@ -115,42 +129,6 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
         </button>
       </div>
 
-      <div className="panel-referencia">
-        <h3>{apareceEnFicha ? "Así se ve" : "Así se vería (si aplicara)"}</h3>
-        <p className="sub-ref">
-          {apareceEnFicha
-            ? "Carrusel de ofertas dentro de la ficha."
-            : "Carrusel de ofertas dentro de la ficha — hoy oculto para esta categoría."}
-        </p>
-        <div className="etiqueta-pantalla">Ficha del negocio</div>
-        <div className="telefono">
-          <div className="pantalla-tel">
-            {ofertas.length > 0 ? (
-              <div className="fila-mini-ofertas">
-                {ofertas.slice(0, 3).map((o, i) => (
-                  <div className="mini-tarjeta-oferta" key={i}>
-                    <div className="mini-foto-oferta">
-                      <span className="mini-cinta">{o.etiqueta}</span>
-                    </div>
-                    <b>{o.nombre}</b>
-                    <div className="mini-precios">
-                      {o.precioOriginal ? <span className="tachado">{precioDe(o.precioOriginal)}</span> : null}
-                      {precioDe(o.precio)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ fontSize: 10.5, color: "var(--texto-tenue)", margin: 0 }}>
-                Todavía no hay ninguna oferta.
-              </p>
-            )}
-          </div>
-        </div>
-        <p className="nota-mini">
-          Estas mismas ofertas sí aparecen en el carrusel de "Buscar", sin importar la categoría.
-        </p>
-      </div>
     </div>
   );
 }

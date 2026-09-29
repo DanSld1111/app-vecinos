@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AtributoProductoDef, Coordenada, Producto } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Coordenada, Negocio, Producto } from "@app-vecinos/tipos";
 import { useNegocios } from "../estado/useNegocios";
 import { useGeografia } from "../estado/useGeografia";
 import { useCuentas } from "../estado/useCuentas";
@@ -18,6 +18,7 @@ import { ModalProducto } from "../componentes/negocio/ModalProducto";
 import { SelectorColorAtributo } from "../componentes/negocio/SelectorColorAtributo";
 import * as productosApi from "../datos/productosApi";
 import { DatosProducto } from "../datos/productosApi";
+import { VistaPreviaNegocio } from "../componentes/fichas/VistaPreviaNegocio";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
 type Paso = 1 | 2 | 3 | 4;
@@ -29,6 +30,37 @@ const ETIQUETAS_PASO: Record<Paso, string> = {
 };
 
 const CENTRO_LIMA: Coordenada = { lat: -12.0851, lng: -77.0}; // San Borja, aprox — solo mientras no hay comunidad elegida.
+
+const CERRADO = { cerrado: true };
+/** Un negocio vacío para la vista previa mientras todavía no existe (antes de terminar el paso 1). */
+const NEGOCIO_EN_BLANCO: Negocio = {
+  id: "nuevo",
+  comunidadId: "",
+  distritoUbigeo: "",
+  nombre: "",
+  descripcion: "",
+  categoriaIds: [],
+  coordenada: CENTRO_LIMA,
+  direccion: "",
+  telefono: null,
+  whatsapp: null,
+  horarios: { lunes: CERRADO, martes: CERRADO, miercoles: CERRADO, jueves: CERRADO, viernes: CERRADO, sabado: CERRADO, domingo: CERRADO },
+  moneda: "PEN",
+  fotoPrincipalUrl: null,
+  estado: "por_verificar",
+  archivadoEn: null,
+  verificadoEn: null,
+  validadoPorCuentaId: null,
+  motivoRechazo: null,
+  fuente: "carga_manual_piloto",
+  creadoEn: "",
+  actualizadoEn: "",
+  fotosGaleria: [],
+  visitas7d: 0,
+  acercaDelNegocio: null,
+  calificacionPromedio: null,
+  calificacionTotal: 0,
+};
 
 /**
  * Alta de negocio en pantalla completa, por pasos — reemplaza al modal de "Alta rápida". El
@@ -119,6 +151,22 @@ export function RegistrarNegocio() {
   const [productoCreado, setProductoCreado] = useState<Producto | null>(null);
   const [modalProducto, setModalProducto] = useState<"nuevo" | "editar" | null>(null);
   const [busqueda, setBusqueda] = useState("");
+  const [productoBorrador, setProductoBorrador] = useState<Producto | null>(null);
+
+  // Vista previa en vivo: lo que se lleva escrito sobre el negocio ya creado (o uno en blanco).
+  const negocioCreado = useNegocios((estado) => estado.negocios.find((n) => n.id === negocioId) ?? null);
+  const vistaPrevia: Negocio = {
+    ...(negocioCreado ?? NEGOCIO_EN_BLANCO),
+    nombre,
+    categoriaIds: categoriaId ? [categoriaId] : [],
+    distritoUbigeo,
+    comunidadId,
+    direccion,
+    telefono: telefono.trim() || null,
+    whatsapp: whatsapp.trim() || null,
+    coordenada,
+  };
+  const productosVistaPrevia = [productoCreado, paso === 3 ? productoBorrador : null].filter((p): p is Producto => Boolean(p));
 
   const validoPaso1 = nombre.trim() && categoriaId && distritoUbigeo && comunidadId && direccion.trim();
 
@@ -409,7 +457,7 @@ export function RegistrarNegocio() {
               <p className="ayuda-paso-registro">
                 Último paso — agrega el primer producto o servicio. Los campos cambian según la categoría elegida en el paso 1.
               </p>
-              <FormularioPrimerProducto atributosDef={atributosDef} onGuardar={guardarPrimerProducto} />
+              <FormularioPrimerProducto atributosDef={atributosDef} onGuardar={guardarPrimerProducto} onCambio={setProductoBorrador} />
               <button type="button" className="link-omitir-registro" onClick={() => setPaso(4)}>
                 Omitir, lo hago después →
               </button>
@@ -473,6 +521,12 @@ export function RegistrarNegocio() {
             </div>
           ) : null}
         </div>
+        <VistaPreviaNegocio
+          negocio={vistaPrevia}
+          categorias={categorias}
+          productos={productosVistaPrevia}
+          enfoque={paso === 3 ? "contenido" : "arriba"}
+        />
       </div>
 
       <div className="barra-inferior-registro">
@@ -550,9 +604,12 @@ export function RegistrarNegocio() {
 function FormularioPrimerProducto({
   atributosDef,
   onGuardar,
+  onCambio,
 }: {
   atributosDef: AtributoProductoDef[];
   onGuardar: (datos: DatosProducto, foto: File | null) => Promise<void>;
+  /** El producto tal como va, para la vista previa (null si todavía no tiene nombre). */
+  onCambio?: (producto: Producto | null) => void;
 }) {
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
@@ -560,7 +617,18 @@ function FormularioPrimerProducto({
   const [foto, setFoto] = useState<File | null>(null);
   const [guardando, setGuardando] = useState(false);
   const inputFoto = useRef<HTMLInputElement>(null);
-  const previsualizacion = foto ? URL.createObjectURL(foto) : null;
+  // Una sola URL local por foto elegida (antes se creaba una en cada render y nunca se liberaba).
+  const previsualizacion = useMemo(() => (foto ? URL.createObjectURL(foto) : null), [foto]);
+  useEffect(() => () => {
+    if (previsualizacion) URL.revokeObjectURL(previsualizacion);
+  }, [previsualizacion]);
+  useEffect(() => {
+    onCambio?.(
+      nombre.trim()
+        ? { id: "borrador", negocioId: "", nombre: nombre.trim(), descripcion: "", precio: Number(precio) || 0, categoriaMenu: "General", destacado: false, fotoUrl: previsualizacion, orden: 0, atributos }
+        : null,
+    );
+  }, [nombre, precio, previsualizacion, atributos, onCambio]);
 
   const precioValido = precio.trim() !== "" && Number.isFinite(Number(precio)) && Number(precio) >= 0;
   const valido = nombre.trim() !== "" && precioValido;

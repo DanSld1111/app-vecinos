@@ -4,12 +4,11 @@ import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useServiciosApp } from "../../estado/useServiciosApp";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
-import { IconoCategoria } from "../IconoCategoria";
 import { SelectorServicioYCategoria } from "./SelectorServicioYCategoria";
 import { CampoDireccionConMapa } from "./CampoDireccionConMapa";
-import { urlCompleta } from "../../utilidades/media";
 import { soloDigitos } from "../../utilidades/telefono";
 import { useToasts } from "../../estado/useToasts";
+import { usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 const MONEDAS: Moneda[] = ["PEN", "USD", "EUR"];
 
@@ -42,7 +41,18 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
 
-  const categoria = categorias.find((c) => c.id === categoriaId);
+  // El celular de vista previa (ConVistaPrevia) muestra estos datos mientras se escriben.
+  usePublicarBorrador({
+    nombre,
+    descripcion,
+    categoriaIds: categoriaId ? [categoriaId] : [],
+    direccion,
+    telefono: telefono.trim() || null,
+    whatsapp: whatsapp.trim() || null,
+    moneda,
+    coordenada,
+    acercaDelNegocio: acercaDelNegocio.trim() || null,
+  });
 
   async function guardar() {
     setGuardando(true);
@@ -72,7 +82,7 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
   }
 
   return (
-    <div className="layout-editor">
+    <div className="editor-negocio">
       <div className="tarjeta">
         <div className="nota-info">Los cambios se guardan directo y se ven en la app de inmediato.</div>
 
@@ -162,34 +172,6 @@ export function EditorInfoNegocio({ negocio }: { negocio: Negocio }) {
         </div>
       </div>
 
-      <div className="panel-referencia">
-        <h3>Así te ven los vecinos</h3>
-        <p className="sub-ref">Vista previa de la ficha pública, tal cual aparece en la app.</p>
-        <div className="etiqueta-pantalla">Ficha del negocio</div>
-        <div className="telefono">
-          <div className="pantalla-tel">
-            <div className="mini-ficha-foto">
-              {negocio.fotoPrincipalUrl ? (
-                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
-              ) : (
-                <IconoCategoria nombre={categoria?.icono ?? "storefront-outline"} size={22} />
-              )}
-            </div>
-            <div className="mini-ficha-nombre">{nombre || "Nombre del negocio"}</div>
-            <div className="mini-ficha-desc">{descripcion || "Sin descripción todavía."}</div>
-            <div className="mini-ficha-botones">
-              <span className="whatsapp">WhatsApp</span>
-              <span className="llamar">Llamar</span>
-            </div>
-            <div className="mini-ficha-pie">
-              {negocio.verificadoEn ? `Datos verificados el ${negocio.verificadoEn}` : "Aún no verificado"}
-            </div>
-          </div>
-        </div>
-        <p className="nota-mini">
-          Si el teléfono o WhatsApp quedan vacíos, ese botón simplemente no hace nada — no se oculta.
-        </p>
-      </div>
     </div>
   );
 }

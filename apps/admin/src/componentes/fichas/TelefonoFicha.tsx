@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   AtributoProductoDef,
   FICHAS,
@@ -60,11 +60,27 @@ function Atributos({ valores, campos }: { valores: Record<string, string>; campo
   );
 }
 
+/** Carrusel de ofertas que se desliza hasta la última al agregar una (la que se está escribiendo). */
+function Carrusel({ cantidad, children }: { cantidad: number; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const anterior = useRef(cantidad);
+  useEffect(() => {
+    if (cantidad > anterior.current && ref.current) ref.current.scrollLeft = ref.current.scrollWidth;
+    anterior.current = cantidad;
+  }, [cantidad]);
+  return (
+    <div className="tf-carrusel" ref={ref}>
+      {children}
+    </div>
+  );
+}
+
 function NotaEjemplo({ que }: { que: string }) {
   return <p className="tf-nota">Contenido de ejemplo: este negocio todavía no cargó {que}.</p>;
 }
 
-function Contenido({
+/** El bloque de contenido de una ficha (menú, catálogo, servicios…). También lo usa VistaPreviaNegocio. */
+export function Contenido({
   ficha,
   negocio,
   productos,
@@ -189,9 +205,9 @@ function Contenido({
     const foto = urlCompleta(negocio?.fotoPrincipalUrl);
     return (
       <>
-        <div className="tf-carrusel">
-          {ofertas.slice(0, 4).map((o) => (
-            <div className="tf-oferta" key={o.nombre}>
+        <Carrusel cantidad={ofertas.length}>
+          {ofertas.map((o, i) => (
+            <div className="tf-oferta" key={`${i}-${o.nombre}`}>
               <div className="tf-oferta-img" style={foto ? { backgroundImage: `url(${foto})` } : undefined}>
                 <em>{o.etiqueta || "Oferta"}</em>
               </div>
@@ -202,7 +218,7 @@ function Contenido({
               </div>
             </div>
           ))}
-        </div>
+        </Carrusel>
         {pasillos.length ? (
           <>
             <div className="tf-sub">Pasillos</div>

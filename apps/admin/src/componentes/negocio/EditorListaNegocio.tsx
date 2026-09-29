@@ -6,7 +6,7 @@ import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { useToasts } from "../../estado/useToasts";
 import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
-import { TelefonoFicha } from "../fichas/TelefonoFicha";
+import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 const CONFIG = {
   rubros: {
@@ -33,7 +33,7 @@ const CONFIG = {
  * Una lista de nombres cortos del negocio: los rubros (ficha "Rubros") o los pasillos (ficha
  * "Ofertas y pasillos"). Se guarda la lista entera. Compartido entre admin y dueño.
  */
-export function EditorListaNegocio({ negocio, lista, conTelefono = true }: { negocio: Negocio; lista: "rubros" | "pasillos"; conTelefono?: boolean }) {
+export function EditorListaNegocio({ negocio, lista }: { negocio: Negocio; lista: "rubros" | "pasillos" }) {
   const cfg = CONFIG[lista];
   const token = useSesionAdmin((e) => e.token)!;
   const categorias = useCategorias((e) => e.categorias);
@@ -45,7 +45,10 @@ export function EditorListaNegocio({ negocio, lista, conTelefono = true }: { neg
   const [nuevo, setNuevo] = useState("");
   const [guardando, setGuardando] = useState(false);
 
-  const { ficha, categoria, titulo } = fichaDelNegocio(negocio, categorias);
+  const { ficha } = fichaDelNegocio(negocio, categorias);
+  // El celular de vista previa (ConVistaPrevia) muestra la lista mientras se edita.
+  usePublicarBorrador({ [cfg.campoNegocio]: items });
+  useEnfoqueVistaPrevia("contenido");
   const huboCambio = JSON.stringify(items) !== JSON.stringify(guardados);
   const existe = (t: string) => items.some((i) => i.toLowerCase() === t.trim().toLowerCase());
 
@@ -71,7 +74,7 @@ export function EditorListaNegocio({ negocio, lista, conTelefono = true }: { neg
     avisos(ok ? `${cfg.plural[0].toUpperCase()}${cfg.plural.slice(1)} guardados` : `No se pudieron guardar los ${cfg.plural}.`, ok ? "exito" : "error");
   }
 
-  const editor = (
+  return (
     <div className="tarjeta">
       {ficha === cfg.ficha ? null : (
         <div className="nota-alerta">
@@ -134,26 +137,6 @@ export function EditorListaNegocio({ negocio, lista, conTelefono = true }: { neg
         <button type="button" className="btn btn-primario" disabled={!huboCambio || guardando} onClick={guardar}>
           {guardando ? "Guardando…" : `Guardar ${cfg.plural}`}
         </button>
-      </div>
-    </div>
-  );
-
-  if (!conTelefono) return editor;
-  return (
-    <div className="layout-editor con-tf">
-      {editor}
-      <div className="panel-referencia">
-        <h3>Así se ve en la app</h3>
-        <p className="sub-ref">Se actualiza mientras editas; los vecinos lo ven al guardar.</p>
-        <TelefonoFicha
-          ficha={cfg.ficha}
-          titulo={ficha === cfg.ficha ? titulo : FICHAS[cfg.ficha].tituloPorDefecto}
-          campos={[]}
-          rotulo={categoria?.nombre ?? ""}
-          negocio={{ ...negocio, [cfg.campoNegocio]: items }}
-          productos={[]}
-          cargando={false}
-        />
       </div>
     </div>
   );

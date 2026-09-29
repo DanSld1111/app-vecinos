@@ -28,7 +28,7 @@ export function EditorFotosNegocio({ negocio }: { negocio: Negocio }) {
   }
 
   return (
-    <div className="layout-editor">
+    <div className="editor-negocio">
       <div>
         <div className="tarjeta">
           <div className="campo-modal">
@@ -82,31 +82,6 @@ export function EditorFotosNegocio({ negocio }: { negocio: Negocio }) {
         <EditorGaleria negocioId={negocio.id} token={token} fotos={negocio.fotosGaleria} />
       </div>
 
-      <div className="panel-referencia">
-        <h3>Así te ven los vecinos</h3>
-        <p className="sub-ref">
-          {negocio.fotoPrincipalUrl ? "La ficha con la foto subida." : "La ficha sin foto propia todavía."}
-        </p>
-        <div className="etiqueta-pantalla">Ficha del negocio</div>
-        <div className="telefono">
-          <div className="pantalla-tel">
-            <div className="mini-ficha-foto">
-              {negocio.fotoPrincipalUrl ? (
-                <img src={urlCompleta(negocio.fotoPrincipalUrl)} alt="" />
-              ) : (
-                <IconoEmoji e="🖼️" />
-              )}
-            </div>
-            <div className="mini-ficha-nombre">{negocio.nombre}</div>
-            <div className="mini-ficha-desc">
-              {negocio.fotoPrincipalUrl
-                ? "Foto propia del negocio."
-                : "Sin foto propia — se ve un espacio neutro, nunca una foto inventada."}
-            </div>
-          </div>
-        </div>
-        <p className="nota-mini">Nunca mostramos una foto que no se subió — es un espacio gris a propósito.</p>
-      </div>
     </div>
   );
 }

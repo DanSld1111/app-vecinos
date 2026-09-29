@@ -12,6 +12,7 @@ import { EditorFotosNegocio } from "../componentes/negocio/EditorFotosNegocio";
 import { EditorProductosNegocio } from "../componentes/negocio/EditorProductosNegocio";
 import { EditorOfertasNegocio } from "../componentes/negocio/EditorOfertasNegocio";
 import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio";
+import { ConVistaPrevia } from "../componentes/negocio/ConVistaPrevia";
 import { EditorServiciosNegocio } from "../componentes/negocio/EditorServiciosNegocio";
 import { EditorListaNegocio } from "../componentes/negocio/EditorListaNegocio";
 import { useCategorias } from "../estado/useCategorias";
@@ -136,6 +137,7 @@ export function FichaNegocio() {
         ))}
       </div>
 
+      <ConVistaPrevia negocio={negocio}>
       {pestana === "info" ? <EditorInfoNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "horario" ? <EditorHorarioNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "fotos" ? <EditorFotosNegocio key={negocio.id} negocio={negocio} /> : null}
@@ -146,6 +148,7 @@ export function FichaNegocio() {
       {pestana === "pasillos" ? <EditorListaNegocio key={negocio.id} negocio={negocio} lista="pasillos" /> : null}
       {pestana === "dueno" ? <PestanaDueno negocio={negocio} /> : null}
       {pestana === "estado" ? <PestanaEstado negocio={negocio} /> : null}
+      </ConVistaPrevia>
     </>
   );
 }
