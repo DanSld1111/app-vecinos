@@ -44,7 +44,7 @@ export function SelectorServicioYCategoria({
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+    <div className="fila-servicio-categoria">
       <div>
         <label style={{ fontSize: 10.5, fontWeight: 700, color: "var(--texto-tenue)", textTransform: "none", letterSpacing: ".03em", display: "block", marginBottom: 4 }}>
           Servicio

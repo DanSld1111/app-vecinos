@@ -145,7 +145,7 @@ export function MiCuenta() {
             {iniciales(cuenta.nombre)}
           </div>
         )}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>
           <b style={{ display: "block", fontSize: 15 }}>{cuenta.nombre}</b>
           <span style={{ fontSize: 11.5, color: "var(--texto-suave)" }}>{cuenta.correo}</span>
         </div>

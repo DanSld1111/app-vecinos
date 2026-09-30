@@ -100,7 +100,7 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
         <div className="fila-2-campos">
           <div className="campo-modal">
             <label>Precio ({negocio.moneda})</label>
-            <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Ej. 71" />
+            <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 71" />
           </div>
           <div className="campo-modal">
             <label>Precio anterior (opcional, para tachar)</label>

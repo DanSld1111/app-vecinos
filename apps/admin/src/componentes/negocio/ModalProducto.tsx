@@ -181,7 +181,7 @@ export function ModalProducto({
             <div className={mostrarSeccion ? "fila-2-campos" : undefined}>
               <div className="campo-modal">
                 <label>Precio ({SIMBOLO_MONEDA[moneda]})</label>
-                <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Ej. 28" />
+                <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 28" />
               </div>
               {mostrarSeccion ? (
                 <SelectorSeccion

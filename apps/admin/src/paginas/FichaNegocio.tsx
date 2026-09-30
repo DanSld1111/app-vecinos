@@ -293,10 +293,10 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
             listado del panel (Archivar, reversible) o la borran de verdad (Eliminar, definitivo). No
             hay papelera para negocios — esa es solo de productos.
           </p>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             <div
               style={{
-                flex: 1,
+                flex: "1 1 220px",
                 background: "var(--oro-suave)",
                 borderRadius: 10,
                 padding: "12px 14px",
@@ -340,7 +340,7 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
 
             <div
               style={{
-                flex: 1,
+                flex: "1 1 220px",
                 background: "var(--rojo-suave)",
                 borderRadius: 10,
                 padding: "12px 14px",
@@ -445,7 +445,7 @@ function PestanaDueno({ negocio }: { negocio: Negocio }) {
       ) : modo === "crear" ? (
         <div className="form-inline-dueno">
           <input autoFocus placeholder="Nombre del dueño" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-          <input placeholder="Correo" value={correo} onChange={(e) => setCorreo(e.target.value)} />
+          <input type="email" autoCapitalize="none" autoComplete="off" placeholder="Correo" value={correo} onChange={(e) => setCorreo(e.target.value)} />
           <div className="fila-botones-inline">
             <button style={{ background: "var(--coral)", color: "#fff" }} onClick={confirmarCrear} type="button">
               Crear cuenta

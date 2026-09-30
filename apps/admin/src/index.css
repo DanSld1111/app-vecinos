@@ -360,6 +360,10 @@ h1, h2, h3 {
   .login-panel-marca {
     display: none;
   }
+  .login-panel-form {
+    min-width: 0;
+    padding: 40px 18px;
+  }
 }
 
 /* ---- Layout ---- */
@@ -3985,4 +3989,53 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
   .miniatura-gestor { width: 44px; height: 44px; }
   .acciones-pendiente { grid-column: 1 / -1; flex-direction: row; }
   .lista-historial li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+/* ---- Celular: sin zoom al tocar un campo en iPhone y filas de 2 campos apiladas ---- */
+@media (max-width: 760px) {
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+@media (max-width: 420px) {
+  .fila-2-campos-alta { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+}
+/* El mapa (Leaflet usa z-index 400–1000 por dentro) queda en su propia capa: al hacer scroll en
+   el celular ya no tapa la barra superior ni el menú lateral. */
+.leaflet-container { z-index: 0; }
+/* En el celular, "Atrás · Paso N de 4 · Siguiente" queda fijo abajo: sin esto había que bajar
+   pasando toda la vista previa para continuar. */
+@media (max-width: 1024px) {
+  .barra-inferior-registro {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -6px 18px -12px rgba(0, 0, 0, 0.25);
+  }
+}
+@media (max-width: 1024px) {
+  /* En el celular la página entera hace scroll (no .contenido): así la barra de pasos del registro
+     puede quedar fija abajo. */
+  .contenido { overflow: visible; }
+  .layout-cola { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  /* Horario: las horas bajan a su propia línea en vez de salirse de la pantalla. */
+  .fila-dia-horario { flex-wrap: wrap; row-gap: 8px; }
+  .horas-dia { flex-basis: 100%; }
+  .horas-dia input { flex: 1 1 0; min-width: 0; width: 0; }
+}
+.fila-servicio-categoria { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 380px) {
+  .fila-servicio-categoria { grid-template-columns: minmax(0, 1fr); }
+  .detalle-cola-cab { grid-template-columns: minmax(0, 1fr); }
+  .detalle-cola-foto { width: 100%; height: 150px; }
+  .tabla-cola .campo-cola { width: 88px; }
+}
+@media (max-width: 640px) {
+  .panel-detalle { padding: 18px 16px; }
+  .tabla-cola td { overflow-wrap: anywhere; }
 }

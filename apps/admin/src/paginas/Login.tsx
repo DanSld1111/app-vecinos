@@ -125,6 +125,7 @@ function PantallaLogin({ onOlvideClave }: { onOlvideClave: () => void }) {
               <IoMailOutline size={17} />
               <input
                 type="email"
+                autoComplete="username"
                 value={correo}
                 onChange={(e) => {
                   setCorreo(e.target.value);
@@ -142,6 +143,7 @@ function PantallaLogin({ onOlvideClave }: { onOlvideClave: () => void }) {
               <IoLockClosedOutline size={17} />
               <input
                 type={claveVisible ? "text" : "password"}
+                autoComplete="current-password"
                 value={contrasena}
                 onChange={(e) => {
                   setContrasena(e.target.value);
@@ -203,6 +205,7 @@ function PantallaOlvideClave({ onVolver, onEnviado }: { onVolver: () => void; on
           <label>Correo</label>
           <input
             type="email"
+                autoComplete="username"
             value={correo}
             onChange={(e) => {
               setCorreo(e.target.value);
@@ -302,7 +305,7 @@ function PantallaRestablecerClave({
 
         <div className="campo" style={{ marginBottom: 7 }}>
           <label>Contraseña nueva</label>
-          <input type="password" value={clave} onChange={(e) => setClave(e.target.value)} placeholder="Contraseña segura" />
+          <input type="password" autoComplete="new-password" value={clave} onChange={(e) => setClave(e.target.value)} placeholder="Contraseña segura" />
         </div>
 
         {clave.length > 0 ? (
@@ -320,7 +323,7 @@ function PantallaRestablecerClave({
 
         <div className="campo" style={{ marginBottom: 7 }}>
           <label>Confirma la contraseña</label>
-          <input type="password" value={confirmar} onChange={(e) => setConfirmar(e.target.value)} placeholder="Repite tu contraseña" />
+          <input type="password" autoComplete="new-password" value={confirmar} onChange={(e) => setConfirmar(e.target.value)} placeholder="Repite tu contraseña" />
         </div>
         {confirmar.length > 0 && !clavesCoinciden ? (
           <p style={{ fontSize: 13, color: "var(--rojo, #c0392b)", marginTop: 0, marginBottom: 14 }}>Las contraseñas no coinciden.</p>

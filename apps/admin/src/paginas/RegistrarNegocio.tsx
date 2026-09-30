@@ -442,7 +442,7 @@ export function RegistrarNegocio() {
                   </div>
                   <div className="campo-modal" style={{ marginBottom: 0 }}>
                     <label>Correo</label>
-                    <input value={correoDueno} onChange={(e) => setCorreoDueno(e.target.value)} placeholder="correo@ejemplo.com" />
+                    <input type="email" autoCapitalize="none" autoComplete="off" value={correoDueno} onChange={(e) => setCorreoDueno(e.target.value)} placeholder="correo@ejemplo.com" />
                   </div>
                   <div className="nota-crear-dueno">
                     Se crea la cuenta con rol "Dueño de negocio" y una clave temporal para compartirle.
@@ -675,7 +675,7 @@ function FormularioPrimerProducto({
           </div>
           <div className="campo-modal" style={{ marginBottom: 0 }}>
             <label>Precio (S/)</label>
-            <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="0.00" />
+            <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="0.00" />
           </div>
         </div>
       </div>

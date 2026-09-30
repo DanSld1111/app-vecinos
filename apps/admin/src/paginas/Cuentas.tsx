@@ -437,7 +437,7 @@ function ModalNuevaCuenta({
         </div>
         <div className="campo-modal">
           <label>Correo</label>
-          <input value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="correo@ejemplo.com" />
+          <input type="email" autoCapitalize="none" autoComplete="off" value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="correo@ejemplo.com" />
         </div>
 
         <div className="campo-modal">
@@ -596,7 +596,7 @@ function DrawerEditarCuenta({
         </div>
         <div className="campo-modal">
           <label>Correo</label>
-          <input value={correo} onChange={(e) => setCorreo(e.target.value)} />
+          <input type="email" autoCapitalize="none" autoComplete="off" value={correo} onChange={(e) => setCorreo(e.target.value)} />
         </div>
 
         <div className="campo-modal">
