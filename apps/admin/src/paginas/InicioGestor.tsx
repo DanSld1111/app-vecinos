@@ -75,7 +75,7 @@ export function InicioGestor() {
   ];
 
   const cifras: { id: Filtro; valor: number; texto: string; pie: string; tono: string }[] = [
-    { id: "todos", valor: grupos.vigentes.length, texto: "Negocios en tus distritos", pie: grupos.mios ? `${grupos.mios} registrados por ti` : "Registra el primero", tono: "verde" },
+    { id: "todos", valor: grupos.vigentes.length, texto: "Negocios en tus distritos", pie: grupos.mios ? `${grupos.mios} ${grupos.mios === 1 ? "registrado" : "registrados"} por ti` : grupos.vigentes.length ? "Ninguno registrado por ti aún" : "Registra el primero", tono: "verde" },
     { id: "rechazado", valor: grupos.rechazados.length, texto: "Rechazados", pie: "Corrige y reenvía", tono: "rojo" },
     { id: "revision", valor: grupos.revision.length, texto: "En revisión", pie: "Los revisa el validador", tono: "azul" },
     { id: "incompleto", valor: grupos.incompletos.length, texto: "Con la ficha incompleta", pie: "Les falta algo", tono: "oro" },
