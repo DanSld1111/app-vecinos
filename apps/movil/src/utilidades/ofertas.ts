@@ -19,7 +19,7 @@ export function recolectarOfertas(negocios: Negocio[]): OfertaConNegocio[] {
         negocioId: negocio.id,
         negocioNombre: negocio.nombre,
         negocioFotoUrl: negocio.fotoPrincipalUrl,
-        moneda: negocio.moneda,
+        moneda: oferta.moneda ?? negocio.moneda,
         oferta,
       });
     }

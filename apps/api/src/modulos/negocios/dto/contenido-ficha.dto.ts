@@ -2,6 +2,7 @@ import { Type } from "class-transformer";
 import {
   ArrayMaxSize,
   IsArray,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -33,6 +34,11 @@ export class ServicioOfrecidoDto {
   @IsString()
   @MaxLength(500)
   fotoUrl?: string | null;
+
+  /** null u omitido = la moneda del negocio. */
+  @IsOptional()
+  @IsIn(["PEN", "USD", "EUR"])
+  moneda?: "PEN" | "USD" | "EUR" | null;
 }
 
 /** La lista completa: se guarda tal cual, en este orden (reemplaza la anterior). */

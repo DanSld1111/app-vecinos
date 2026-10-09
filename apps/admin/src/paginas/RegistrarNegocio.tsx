@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AtributoProductoDef, Coordenada, Negocio, Producto } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Coordenada, Moneda, Negocio, Producto } from "@app-vecinos/tipos";
+import { SelectorMoneda } from "../componentes/negocio/SelectorMoneda";
 import { useNegocios } from "../estado/useNegocios";
 import { useGeografia } from "../estado/useGeografia";
 import { useCuentas } from "../estado/useCuentas";
@@ -619,6 +620,7 @@ function FormularioPrimerProducto({
 }) {
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
+  const [monedaPropia, setMonedaPropia] = useState<Moneda | null>(null);
   const [atributos, setAtributos] = useState<Record<string, string>>({});
   const [foto, setFoto] = useState<File | null>(null);
   const [guardando, setGuardando] = useState(false);
@@ -643,7 +645,7 @@ function FormularioPrimerProducto({
     if (!valido) return;
     setGuardando(true);
     await onGuardar(
-      { nombre: nombre.trim(), descripcion: "", precio: Number(precio), categoriaMenu: "General", destacado: false, atributos },
+      { nombre: nombre.trim(), descripcion: "", precio: Number(precio), categoriaMenu: "General", destacado: false, atributos, moneda: monedaPropia },
       foto,
     );
     setGuardando(false);
@@ -674,8 +676,11 @@ function FormularioPrimerProducto({
             <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Casaca de jean" autoFocus />
           </div>
           <div className="campo-modal" style={{ marginBottom: 0 }}>
-            <label>Precio (S/)</label>
-            <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="0.00" />
+            <label>Precio</label>
+            <div className="precio-con-moneda">
+              <SelectorMoneda valor={monedaPropia} monedaNegocio="PEN" onCambiar={setMonedaPropia} etiqueta="Moneda del precio" />
+              <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="0.00" aria-label="Precio" />
+            </div>
           </div>
         </div>
       </div>

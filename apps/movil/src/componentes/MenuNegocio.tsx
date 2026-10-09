@@ -55,7 +55,7 @@ function ItemMenu({
           {producto.descripcion}
         </Text>
         <Text style={styles.itemPrecio}>
-          {formatearPrecio(producto.precio, moneda)}
+          {formatearPrecio(producto.precio, producto.moneda ?? moneda)}
           {sufijoPrecio(producto.atributos, campos)}
         </Text>
         {campos.length > 0 && atributosVisibles(producto.atributos, campos).length > 0 ? (

@@ -122,7 +122,7 @@ export function CatalogoNegocio({
                     {producto.nombre}
                   </Text>
                   <Text style={styles.precio}>
-                    {formatearPrecio(producto.precio, moneda)}
+                    {formatearPrecio(producto.precio, producto.moneda ?? moneda)}
                     {sufijoPrecio(producto.atributos, campos)}
                   </Text>
                 </View>
@@ -149,7 +149,7 @@ export function CatalogoNegocio({
                 </View>
                 <Text style={styles.nombreHoja}>{abierto.nombre}</Text>
                 <Text style={styles.precioHoja}>
-                  {formatearPrecio(abierto.precio, moneda)}
+                  {formatearPrecio(abierto.precio, abierto.moneda ?? moneda)}
                   {sufijoPrecio(abierto.atributos, campos)}
                 </Text>
                 {abierto.descripcion ? <Text style={styles.descripcionHoja}>{abierto.descripcion}</Text> : null}

@@ -124,13 +124,13 @@ export function Contenido({
   campos: AtributoProductoDef[];
   moneda: Moneda;
 }) {
-  const precio = (n: number) => formatearPrecio(n, moneda);
+  const precio = (n: number, propia?: Moneda | null) => formatearPrecio(n, propia ?? moneda);
 
   if (ficha === "menu" || ficha === "catalogo") {
     const reales = productos.length > 0;
     const items = reales
-      ? productos.map((p) => ({ id: p.id, nombre: p.nombre, descripcion: p.descripcion, precio: p.precio, seccion: p.categoriaMenu, foto: urlCompleta(p.fotoUrl), valores: p.atributos ?? {} }))
-      : EJEMPLO.productos.map((p, i) => ({ id: String(i), ...p, foto: undefined, valores: {} as Record<string, string> }));
+      ? productos.map((p) => ({ id: p.id, nombre: p.nombre, descripcion: p.descripcion, precio: p.precio, moneda: p.moneda ?? null, seccion: p.categoriaMenu, foto: urlCompleta(p.fotoUrl), valores: p.atributos ?? {} }))
+      : EJEMPLO.productos.map((p, i) => ({ id: String(i), ...p, moneda: null as Moneda | null, foto: undefined, valores: {} as Record<string, string> }));
     if (ficha === "catalogo") {
       const [primero] = items;
       const segmentos = filtroDeCampos(campos);
@@ -159,7 +159,7 @@ export function Contenido({
                 <div className="tf-card-txt">
                   <b>{p.nombre}</b>
                   <span className="tf-precio">
-                    {precio(p.precio)}
+                    {precio(p.precio, p.moneda)}
                     {sufijoPrecio(p.valores, campos)}
                   </span>
                 </div>
@@ -194,7 +194,7 @@ export function Contenido({
                     <b>{p.nombre}</b>
                     {p.descripcion ? <span>{p.descripcion}</span> : null}
                     <span className="tf-precio">
-                      {precio(p.precio)}
+                      {precio(p.precio, p.moneda)}
                       {sufijoPrecio(p.valores, campos)}
                     </span>
                     <Atributos valores={p.valores} campos={campos} />

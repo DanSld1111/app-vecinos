@@ -376,8 +376,8 @@ function TabOfertas({ negocio, token }: { negocio: Negocio; token: string }) {
               <View style={{ flex: 1 }}>
                 <Text style={styles.filaTitulo}>{oferta.etiqueta} · {oferta.nombre}</Text>
                 <Text style={styles.filaCuerpo}>
-                  {oferta.precioOriginal ? `${formatearPrecio(oferta.precioOriginal, negocio.moneda)} → ` : ""}
-                  {formatearPrecio(oferta.precio, negocio.moneda)}
+                  {oferta.precioOriginal ? `${formatearPrecio(oferta.precioOriginal, oferta.moneda ?? negocio.moneda)} → ` : ""}
+                  {formatearPrecio(oferta.precio, oferta.moneda ?? negocio.moneda)}
                 </Text>
               </View>
               <Pressable onPress={() => eliminarOferta(negocio.id, indice, token)} hitSlop={8}>

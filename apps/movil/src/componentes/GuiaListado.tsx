@@ -186,7 +186,19 @@ export function GuiaListado({
           onScroll={desplazamiento.onScroll}
           scrollEventThrottle={16}
           ItemSeparatorComponent={plantilla === "menu" ? () => <View style={{ height: espaciado.md }} /> : undefined}
-          ListEmptyComponent={<EstadoVacio titulo={textos.buscar.sinResultados} />}
+          ListEmptyComponent={
+            // "Con ese filtro" solo si de verdad se buscó o se eligió una categoría; si no, el
+            // servicio todavía no tiene negocios publicados.
+            <EstadoVacio
+              titulo={
+                busquedaDebounced.trim() || categoriaId
+                  ? textos.buscar.sinResultados
+                  : servicioSlugFijo
+                    ? "Todavía no hay negocios en este servicio."
+                    : "Todavía no hay negocios publicados."
+              }
+            />
+          }
           renderItem={({ item, index }) => (
             <EntradaAnimada
               retraso={Math.min(index, 8) * 40}

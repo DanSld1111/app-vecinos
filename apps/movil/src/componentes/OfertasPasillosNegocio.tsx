@@ -55,9 +55,9 @@ export function OfertasPasillosNegocio({
                       {oferta.nombre}
                     </Text>
                     {oferta.precioOriginal ? (
-                      <Text style={styles.precioAntes}>{formatearPrecio(oferta.precioOriginal, moneda)}</Text>
+                      <Text style={styles.precioAntes}>{formatearPrecio(oferta.precioOriginal, oferta.moneda ?? moneda)}</Text>
                     ) : null}
-                    <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio, moneda)}</Text>
+                    <Text style={styles.precioOferta}>{formatearPrecio(oferta.precio, oferta.moneda ?? moneda)}</Text>
                   </View>
                 </EntradaAnimada>
               ))}

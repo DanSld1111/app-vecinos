@@ -27,11 +27,15 @@ export interface ServicioOfrecido {
   /** Opcional — solo cuando ayuda a mostrar el servicio (un corte de cabello, un ambiente).
    * Un trámite (una declaración, un certificado) normalmente no la necesita. */
   fotoUrl?: string | null;
+  /** null o ausente = la moneda del negocio. */
+  moneda?: Moneda | null;
 }
 
 export interface OfertaNegocio {
   nombre: string;
   precio: number;
+  /** null o ausente = la moneda del negocio. */
+  moneda?: Moneda | null;
   /** Precio antes del descuento, para mostrarlo tachado. Si no se define, no se muestra comparación. */
   precioOriginal?: number;
   etiqueta: string;

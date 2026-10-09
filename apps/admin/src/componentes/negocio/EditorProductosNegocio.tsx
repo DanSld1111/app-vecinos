@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Negocio, Producto, formatearPrecio } from "@app-vecinos/tipos";
+import { Moneda, Negocio, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
 import { useCategorias } from "../../estado/useCategorias";
 import * as api from "../../datos/productosApi";
@@ -73,7 +73,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
     }));
   }, [productos]);
 
-  const precioDe = (valor: number) => formatearPrecio(valor, negocio.moneda);
+  const precioDe = (valor: number, monedaPropia?: Moneda | null) => formatearPrecio(valor, monedaPropia ?? negocio.moneda);
 
   // La categoría principal (la primera de la lista) define qué campos extra pide el producto —
   // ej. talla/color en Moda. Un negocio con varias categorías no combina sus plantillas: la
@@ -159,7 +159,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
         }}
       >
         <p style={{ margin: 0, fontSize: 11.5, color: "var(--texto-suave)" }}>
-          La carta que ven los vecinos. Los precios van en {negocio.moneda} — se cambia en Información.
+          La carta que ven los vecinos. Los precios van en {negocio.moneda} (se cambia en Información); un producto puede usar otra moneda.
         </p>
         <button className="btn btn-primario" onClick={() => setCreandoEn(secciones[0]?.nombre ?? "")}>
           ＋ Agregar producto
@@ -210,7 +210,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                     </span>
                   ) : null}
                 </span>
-                <b style={{ fontSize: 12.5, whiteSpace: "nowrap" }}>{precioDe(producto.precio)}</b>
+                <b style={{ fontSize: 12.5, whiteSpace: "nowrap" }}>{precioDe(producto.precio, producto.moneda)}</b>
                 <div style={{ display: "flex", gap: 4 }}>
                   <button className="btn-icono-crud" title="Ver" onClick={() => setViendo(producto)}>
                     <IconoEmoji e="👁️" />
@@ -255,7 +255,7 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
                     <span className="nombre-producto-foto" style={{ flex: 1 }}>
                       {producto.nombre}
                       <span style={{ display: "block", fontSize: 11, color: "var(--texto-tenue)" }}>
-                        {producto.categoriaMenu} · {precioDe(producto.precio)}
+                        {producto.categoriaMenu} · {precioDe(producto.precio, producto.moneda)}
                       </span>
                     </span>
                     <button

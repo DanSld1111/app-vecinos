@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from "class-validator";
+import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from "class-validator";
 
 /** Mismos campos al crear y al editar — el id va en la ruta, no en el cuerpo. */
 export class GuardarProductoDto {
@@ -28,4 +28,9 @@ export class GuardarProductoDto {
   @IsOptional()
   @IsObject()
   atributos?: Record<string, string>;
+
+  /** null u omitido = la moneda del negocio. */
+  @IsOptional()
+  @IsIn(["PEN", "USD", "EUR"])
+  moneda?: "PEN" | "USD" | "EUR" | null;
 }

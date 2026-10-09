@@ -4067,3 +4067,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .sufijo-campo-extra { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .campo-modal .sufijo-campo-extra select, .campo-modal .sufijo-campo-extra input { width: auto; padding: 4px 8px; font-size: 12.5px; }
 .campo-modal .sufijo-campo-extra input { width: 80px; }
+
+/* Precio con su moneda (decisión 0090): S/ · $ · € delante del monto */
+.precio-con-moneda { display: flex; gap: 6px; align-items: stretch; }
+.precio-con-moneda input { flex: 1; min-width: 0; }
+.campo-modal .precio-con-moneda .selector-moneda, .precio-con-moneda .selector-moneda { flex: none; width: 76px; padding-left: 8px; padding-right: 4px; font-weight: 700; }
+
+.fila-servicio-editor { grid-template-columns: 52px minmax(0, 1fr) 170px 124px; }
+.fila-servicio-editor .precio-con-moneda .selector-moneda { width: 64px; padding: 7px 4px 7px 8px; border-radius: 9px; border: 1.5px solid transparent; background: var(--superficie-hundida); font: inherit; font-size: 14px; font-weight: 700; color: var(--texto); }
+.fila-servicio-editor .precio-con-moneda input { text-align: right; font-variant-numeric: tabular-nums; }

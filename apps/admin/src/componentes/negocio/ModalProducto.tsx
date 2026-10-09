@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { SelectorMoneda } from "./SelectorMoneda";
 import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
 import { DatosProducto } from "../../datos/productosApi";
 import { urlCompleta } from "../../utilidades/media";
@@ -51,6 +52,7 @@ export function ModalProducto({
   const [categoriaMenu, setCategoriaMenu] = useState(producto?.categoriaMenu || seccionSugerida || "General");
   const [destacado, setDestacado] = useState(producto?.destacado ?? false);
   const [atributos, setAtributos] = useState<Record<string, string>>(producto?.atributos ?? {});
+  const [monedaPropia, setMonedaPropia] = useState<Moneda | null>(producto?.moneda ?? null);
   const [fotoNueva, setFotoNueva] = useState<File | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +79,7 @@ export function ModalProducto({
           categoriaMenu: categoriaMenu.trim(),
           destacado,
           atributos,
+          moneda: monedaPropia,
         },
         fotoNueva,
       );
@@ -90,7 +93,9 @@ export function ModalProducto({
     <div className="overlay-modal" onClick={onCerrar}>
       <div className="modal-card" style={{ width: "min(680px, 94vw)" }} onClick={(e) => e.stopPropagation()}>
         <h3>{producto ? "Editar producto" : "Nuevo producto"}</h3>
-        <p className="sub">Los precios de este negocio van en {SIMBOLO_MONEDA[moneda]} ({moneda}).</p>
+        <p className="sub">
+          Los precios de este negocio van en {SIMBOLO_MONEDA[moneda]} ({moneda}); este producto puede usar otra moneda.
+        </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "130px minmax(0,1fr)", gap: 14 }}>
           <div>
@@ -180,8 +185,11 @@ export function ModalProducto({
             </div>
             <div className={mostrarSeccion ? "fila-2-campos" : undefined}>
               <div className="campo-modal">
-                <label>Precio ({SIMBOLO_MONEDA[moneda]})</label>
-                <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 28" />
+                <label>Precio</label>
+                <div className="precio-con-moneda">
+                  <SelectorMoneda valor={monedaPropia} monedaNegocio={moneda} onCambiar={setMonedaPropia} etiqueta="Moneda del precio" />
+                  <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 28" aria-label="Precio" />
+                </div>
               </div>
               {mostrarSeccion ? (
                 <SelectorSeccion

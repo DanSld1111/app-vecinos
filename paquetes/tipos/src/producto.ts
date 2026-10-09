@@ -1,3 +1,5 @@
+import type { Moneda } from "./comun";
+
 export interface Producto {
   id: string;
   negocioId: string;
@@ -13,4 +15,7 @@ export interface Producto {
   /** Campos según la categoría del negocio (ej. talla/color en Moda) — clave del AtributoProductoDef
    * → valor elegido. Vacío si la categoría no define atributos. Ver categoria.ts. */
   atributos: Record<string, string>;
+  /** Moneda de este producto si no es la del negocio (ej. una venta en dólares en una inmobiliaria
+   * que alquila en soles). null o ausente = la del negocio. Ver docs/decisiones/0090. */
+  moneda?: Moneda | null;
 }

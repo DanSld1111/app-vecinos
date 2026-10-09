@@ -1,4 +1,4 @@
-import { Producto } from "@app-vecinos/tipos";
+import { Moneda, Producto } from "@app-vecinos/tipos";
 import { apiFetch, apiSubirArchivo } from "./clienteApi";
 
 /**
@@ -15,6 +15,8 @@ export interface DatosProducto {
   destacado: boolean;
   /** Campos propios de la categoría del negocio (ej. talla en Moda) — vacío si no aplica. */
   atributos?: Record<string, string>;
+  /** null = la moneda del negocio. */
+  moneda?: Moneda | null;
 }
 
 export const listarProductos = (negocioId: string) =>

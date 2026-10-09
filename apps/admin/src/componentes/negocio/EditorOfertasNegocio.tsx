@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Negocio, OfertaNegocio, formatearPrecio } from "@app-vecinos/tipos";
+import { Moneda, Negocio, OfertaNegocio, formatearPrecio } from "@app-vecinos/tipos";
+import { SelectorMoneda } from "./SelectorMoneda";
 import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
 import { useSesionAdmin } from "../../estado/useSesionAdmin";
@@ -18,6 +19,7 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
   const [precio, setPrecio] = useState("");
   const [precioAnterior, setPrecioAnterior] = useState("");
   const [etiqueta, setEtiqueta] = useState("");
+  const [monedaPropia, setMonedaPropia] = useState<Moneda | null>(null);
 
   const ofertas = negocio.ofertas ?? [];
   // La oferta que se está escribiendo aparece en el celular antes de agregarla.
@@ -29,11 +31,12 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
           precio: precioBorrador,
           precioOriginal: precioAnterior.trim() ? Number(precioAnterior.replace(",", ".")) || undefined : undefined,
           etiqueta: etiqueta.trim() || "Oferta",
+          ...(monedaPropia ? { moneda: monedaPropia } : {}),
         }
       : null;
   usePublicarBorrador({ ofertas: enCurso ? [...ofertas, enCurso] : ofertas });
   useEnfoqueVistaPrevia("contenido");
-  const precioDe = (valor: number) => formatearPrecio(valor, negocio.moneda);
+  const precioDe = (valor: number, monedaPropia?: Moneda | null) => formatearPrecio(valor, monedaPropia ?? negocio.moneda);
   const categoriasDelNegocio = negocio.categoriaIds
     .map((id) => categorias.find((c) => c.id === id))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
@@ -48,6 +51,7 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
       precio: Number(precio),
       precioOriginal: precioAnterior.trim() ? Number(precioAnterior) : undefined,
       etiqueta: etiqueta.trim() || "Oferta",
+      ...(monedaPropia ? { moneda: monedaPropia } : {}),
     };
     agregarOferta(negocio.id, oferta, token);
     setNombre("");
@@ -82,8 +86,8 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
                   <b>{o.nombre}</b>
                 </div>
                 <span className="precio-oferta">
-                  {o.precioOriginal ? <span className="tachado">{precioDe(o.precioOriginal)}</span> : null}
-                  {precioDe(o.precio)}
+                  {o.precioOriginal ? <span className="tachado">{precioDe(o.precioOriginal, o.moneda)}</span> : null}
+                  {precioDe(o.precio, o.moneda)}
                 </span>
                 <button type="button" onClick={() => eliminarOferta(negocio.id, i, token)}>
                   <IconoEmoji e="🗑️" />
@@ -99,8 +103,11 @@ export function EditorOfertasNegocio({ negocio }: { negocio: Negocio }) {
         </div>
         <div className="fila-2-campos">
           <div className="campo-modal">
-            <label>Precio ({negocio.moneda})</label>
-            <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 71" />
+            <label>Precio</label>
+            <div className="precio-con-moneda">
+              <SelectorMoneda valor={monedaPropia} monedaNegocio={negocio.moneda} onCambiar={setMonedaPropia} etiqueta="Moneda de la oferta" />
+              <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 71" aria-label="Precio" />
+            </div>
           </div>
           <div className="campo-modal">
             <label>Precio anterior (opcional, para tachar)</label>

@@ -1,4 +1,4 @@
-import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { urlCompleta } from "../../utilidades/media";
 import { PALETA_COLORES } from "./SelectorColorAtributo";
 
@@ -58,7 +58,7 @@ export function ModalVerProducto({
         </div>
 
         <p style={{ fontSize: 20, fontWeight: 800, margin: "0 0 8px" }}>
-          {SIMBOLO_MONEDA[moneda]} {producto.precio.toFixed(2)}
+          {formatearPrecio(producto.precio, producto.moneda ?? moneda)}
         </p>
 
         {producto.descripcion ? (

@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNumber, IsOptional, IsString, MinLength } from "class-validator";
+import { IsIn, IsNumber, IsOptional, IsString, MinLength } from "class-validator";
 
 export class AgregarOfertaDto {
   @IsString()
@@ -17,4 +17,9 @@ export class AgregarOfertaDto {
 
   @IsString()
   etiqueta!: string;
+
+  /** null u omitido = la moneda del negocio. */
+  @IsOptional()
+  @IsIn(["PEN", "USD", "EUR"])
+  moneda?: "PEN" | "USD" | "EUR" | null;
 }

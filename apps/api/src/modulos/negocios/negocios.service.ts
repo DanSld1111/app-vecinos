@@ -718,6 +718,7 @@ export class NegociosService {
       precio: dto.precio,
       precioOriginal: dto.precioOriginal,
       etiqueta: dto.etiqueta,
+      ...(dto.moneda ? { moneda: dto.moneda } : {}),
     };
     await this.bd.consultar(
       `UPDATE negocios SET ofertas = COALESCE(ofertas, '[]'::jsonb) || $2::jsonb, actualizado_en = now() WHERE id = $1`,
@@ -809,8 +810,8 @@ export class NegociosService {
     const id = `prod-${randomUUID()}`;
     // Entra al final de su sección, no al principio — quien lo agrega espera verlo abajo.
     await this.bd.consultar(
-      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, atributos, orden)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
+      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, atributos, moneda, orden)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
                COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0))`,
       [
         id,
@@ -821,6 +822,7 @@ export class NegociosService {
         dto.categoriaMenu,
         dto.destacado ?? false,
         JSON.stringify(dto.atributos ?? {}),
+        dto.moneda ?? null,
       ],
     );
     await this.auditoria.registrar("crear", "producto", id, cuenta.id, { negocioId });
@@ -840,7 +842,7 @@ export class NegociosService {
     const cambioDeSeccion = dto.categoriaMenu !== anterior.categoriaMenu;
     await this.bd.consultar(
       `UPDATE productos
-       SET nombre = $3, descripcion = $4, precio = $5, categoria_menu = $6, destacado = $7, atributos = $9,
+       SET nombre = $3, descripcion = $4, precio = $5, categoria_menu = $6, destacado = $7, atributos = $9, moneda = $10,
            orden = CASE WHEN $8
                         THEN COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0)
                         ELSE orden END
@@ -855,6 +857,7 @@ export class NegociosService {
         dto.destacado ?? false,
         cambioDeSeccion,
         JSON.stringify(dto.atributos ?? {}),
+        dto.moneda ?? null,
       ],
     );
     await this.auditoria.registrar("actualizar", "producto", productoId, cuenta.id, { negocioId });
@@ -942,7 +945,7 @@ export class NegociosService {
       if (fotoUrl && !fotosAnteriores.has(fotoUrl) && !this.almacenamiento.esPropia(fotoUrl)) {
         throw new BadRequestException(`La foto de "${s.nombre}" no es válida — súbela de nuevo.`);
       }
-      return { nombre: s.nombre.trim(), detalle: s.detalle?.trim() || undefined, precio: s.precio, fotoUrl };
+      return { nombre: s.nombre.trim(), detalle: s.detalle?.trim() || undefined, precio: s.precio, fotoUrl, ...(s.moneda ? { moneda: s.moneda } : {}) };
     });
     await this.bd.consultar(
       "UPDATE negocios SET servicios_ofrecidos = $2::jsonb, actualizado_en = now() WHERE id = $1",

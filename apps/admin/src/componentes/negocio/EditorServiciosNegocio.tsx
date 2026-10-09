@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { FICHAS, Negocio, ServicioOfrecido } from "@app-vecinos/tipos";
+import { FICHAS, Moneda, Negocio, ServicioOfrecido } from "@app-vecinos/tipos";
+import { SelectorMoneda } from "./SelectorMoneda";
 import { LuArrowDown, LuArrowUp, LuImagePlus, LuPlus, LuTrash2, LuX } from "react-icons/lu";
 import { useNegocios } from "../../estado/useNegocios";
 import { useCategorias } from "../../estado/useCategorias";
@@ -9,10 +10,10 @@ import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
 import { useEnfoqueVistaPrevia, usePublicarBorrador } from "../../estado/useBorradorNegocio";
 
 /** Un renglón mientras se edita: el precio queda como texto hasta guardar. */
-type Fila = { nombre: string; detalle: string; precio: string; fotoUrl: string | null };
+type Fila = { nombre: string; detalle: string; precio: string; fotoUrl: string | null; moneda: Moneda | null };
 
 function aFilas(servicios: ServicioOfrecido[] | undefined): Fila[] {
-  return (servicios ?? []).map((s) => ({ nombre: s.nombre, detalle: s.detalle ?? "", precio: String(s.precio), fotoUrl: s.fotoUrl ?? null }));
+  return (servicios ?? []).map((s) => ({ nombre: s.nombre, detalle: s.detalle ?? "", precio: String(s.precio), fotoUrl: s.fotoUrl ?? null, moneda: s.moneda ?? null }));
 }
 
 function aServicios(filas: Fila[]): ServicioOfrecido[] {
@@ -23,6 +24,7 @@ function aServicios(filas: Fila[]): ServicioOfrecido[] {
       ...(f.detalle.trim() ? { detalle: f.detalle.trim() } : {}),
       precio: Number(f.precio.replace(",", ".")) || 0,
       fotoUrl: f.fotoUrl,
+      ...(f.moneda ? { moneda: f.moneda } : {}),
     }));
 }
 
@@ -122,14 +124,10 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
                   <input aria-label="Nombre del servicio" placeholder="Nombre del servicio" value={f.nombre} maxLength={80} onChange={(e) => cambiar(i, { nombre: e.target.value })} />
                   <input aria-label="Detalle" placeholder="Detalle corto (opcional)" value={f.detalle} maxLength={120} onChange={(e) => cambiar(i, { detalle: e.target.value })} />
                 </div>
-                <input
-                  className="precio-servicio-editor"
-                  aria-label={`Precio (${negocio.moneda})`}
-                  placeholder={`Precio ${negocio.moneda}`}
-                  inputMode="decimal"
-                  value={f.precio}
-                  onChange={(e) => cambiar(i, { precio: e.target.value })}
-                />
+                <div className="precio-con-moneda precio-servicio-editor">
+                  <SelectorMoneda valor={f.moneda} monedaNegocio={negocio.moneda} onCambiar={(m) => cambiar(i, { moneda: m })} etiqueta="Moneda del servicio" />
+                  <input aria-label="Precio" placeholder="Precio" inputMode="decimal" value={f.precio} onChange={(e) => cambiar(i, { precio: e.target.value })} />
+                </div>
                 <div className="acciones-servicio-editor">
                   <button type="button" aria-label="Subir" disabled={i === 0} onClick={() => mover(i, -1)}>
                     <LuArrowUp />
@@ -154,7 +152,7 @@ export function EditorServiciosNegocio({ negocio }: { negocio: Negocio }) {
         )}
 
         <div className="pie-editor-lista">
-          <button type="button" className="btn-accion-mini" disabled={filas.length >= 40} onClick={() => setFilas((l) => [...l, { nombre: "", detalle: "", precio: "", fotoUrl: null }])}>
+          <button type="button" className="btn-accion-mini" disabled={filas.length >= 40} onClick={() => setFilas((l) => [...l, { nombre: "", detalle: "", precio: "", fotoUrl: null, moneda: null }])}>
             <LuPlus /> Agregar servicio
           </button>
           <span className="espaciador" />
