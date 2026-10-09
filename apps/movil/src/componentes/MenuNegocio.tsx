@@ -3,7 +3,7 @@ import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vec
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { FotoNegocio } from "./FotoNegocio";
 import { EntradaAnimada } from "./EntradaAnimada";
-import { atributosVisibles } from "../utilidades/fichaNegocio";
+import { atributosVisibles, insigniasDe } from "../utilidades/fichaNegocio";
 
 
 function agruparPorCategoria(productos: Producto[]) {
@@ -40,7 +40,16 @@ function ItemMenu({
     <EntradaAnimada retraso={retraso} style={styles.item}>
       <FotoNegocio nombre={producto.nombre} url={producto.fotoUrl} style={styles.itemImagen} tamanoIniciales={18} />
       <View style={styles.itemTexto}>
-        {producto.destacado ? <Text style={styles.badge}>Más pedido</Text> : null}
+        {producto.destacado || insigniasDe(producto.atributos, campos).length > 0 ? (
+          <View style={styles.filaBadges}>
+            {producto.destacado ? <Text style={styles.badge}>Más pedido</Text> : null}
+            {insigniasDe(producto.atributos, campos).map((i) => (
+              <Text key={i} style={styles.insignia}>
+                {i}
+              </Text>
+            ))}
+          </View>
+        ) : null}
         <Text style={styles.itemNombre}>{producto.nombre}</Text>
         <Text style={styles.itemDescripcion} numberOfLines={2}>
           {producto.descripcion}
@@ -167,6 +176,24 @@ function crearEstilos(colores: PaletaColores) {
       borderRadius: radios.sm,
       marginBottom: 2,
       textTransform: "uppercase",
+    },
+    filaBadges: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 4,
+    },
+    insignia: {
+      ...tipografia.pie,
+      fontSize: 10,
+      fontFamily: "SchibstedGrotesk_700Bold",
+      color: colores.primarioFuerte,
+      backgroundColor: colores.primarioSuave,
+      alignSelf: "flex-start",
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: radios.sm,
+      marginBottom: 2,
+      overflow: "hidden",
     },
     itemNombre: {
       ...tipografia.cuerpoDestacado,

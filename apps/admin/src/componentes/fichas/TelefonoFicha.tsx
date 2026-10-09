@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   AtributoProductoDef,
+  AvisoFicha,
   FICHAS,
   Moneda,
   Negocio,
@@ -41,8 +42,34 @@ function iniciales(nombre: string) {
     .toUpperCase();
 }
 
+/** Igual que en la app (apps/movil/src/utilidades/fichaNegocio.ts): insignias y filtro por un campo. */
+const normalizar = (t: string) => t.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function insigniasDe(valores: Record<string, string>, campos: AtributoProductoDef[]) {
+  return campos.filter((c) => c.insignia && !c.oculto && normalizar(valores[c.clave] ?? "") === "si").map((c) => c.etiqueta);
+}
+function filtroDeCampos(campos: AtributoProductoDef[]) {
+  const campo = campos.find((c) => c.filtro && !c.oculto && c.tipo === "opciones" && (c.opciones?.length ?? 0) > 1);
+  if (!campo) return null;
+  const todas = campo.opciones ?? [];
+  return todas.filter((o) => !todas.some((otra) => otra !== o && normalizar(o).includes(normalizar(otra))));
+}
+
+/** El aviso de la categoría bajo la descripción ("+18", receta o informativo). */
+export function AvisoTelefono({ aviso }: { aviso: AvisoFicha }) {
+  const corte = aviso.texto.indexOf(". ");
+  return (
+    <div className={`tf-aviso ${aviso.tipo}`}>
+      <span className="tf-aviso-circulo">{aviso.tipo === "mayores18" ? "+18" : aviso.tipo === "receta" ? "Rx" : "i"}</span>
+      <span>
+        <b>{corte > 0 ? aviso.texto.slice(0, corte + 1) : aviso.texto}</b>
+        {corte > 0 ? aviso.texto.slice(corte + 1) : ""}
+      </span>
+    </div>
+  );
+}
+
 function Atributos({ valores, campos }: { valores: Record<string, string>; campos: AtributoProductoDef[] }) {
-  const visibles = campos.filter((c) => !c.oculto);
+  const visibles = campos.filter((c) => !c.oculto && !c.insignia);
   if (visibles.length === 0) return null;
   return (
     <div className="tf-attrs">
@@ -102,13 +129,28 @@ export function Contenido({
       : EJEMPLO.productos.map((p, i) => ({ id: String(i), ...p, foto: undefined, valores: {} as Record<string, string> }));
     if (ficha === "catalogo") {
       const [primero] = items;
+      const segmentos = filtroDeCampos(campos);
       return (
         <>
+          {segmentos ? (
+            <div className="tf-segmentos">
+              {["Todos", ...segmentos].map((s, i) => (
+                <span key={s} className={i === 0 ? "activo" : ""}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          ) : null}
           <div className="tf-grid">
             {items.slice(0, 6).map((p) => (
               <div className="tf-card" key={p.id}>
                 <div className="tf-card-img" style={p.foto ? { backgroundImage: `url(${p.foto})` } : undefined}>
                   {p.foto ? null : p.nombre.slice(0, 1)}
+                  {insigniasDe(p.valores, campos).map((i) => (
+                    <em key={i} className="tf-insignia">
+                      {i}
+                    </em>
+                  ))}
                 </div>
                 <div className="tf-card-txt">
                   <b>{p.nombre}</b>
@@ -232,6 +274,12 @@ export function Contenido({
           </>
         ) : null}
         {reales ? null : <NotaEjemplo que="ofertas" />}
+        {productos.length ? (
+          <>
+            <div className="tf-tit">Todo lo que vende</div>
+            <Contenido ficha="menu" negocio={negocio} productos={productos} campos={campos} moneda={moneda} />
+          </>
+        ) : null}
       </>
     );
   }
@@ -266,10 +314,13 @@ export function TelefonoFicha({
   negocio,
   productos,
   cargando,
+  aviso = null,
 }: {
   ficha: TipoFicha;
   titulo: string;
   campos: AtributoProductoDef[];
+  /** Aviso de la categoría (ej. "+18"), bajo la descripción. */
+  aviso?: AvisoFicha | null;
   /** Texto sobre el nombre del negocio (la categoría). */
   rotulo: string;
   negocio: Negocio | null;
@@ -300,6 +351,7 @@ export function TelefonoFicha({
           <div className="tf-eyebrow">{rotulo}</div>
           <div className="tf-nombre">{nombre}</div>
           {negocio?.descripcion ? <p className="tf-desc">{negocio.descripcion}</p> : null}
+          {aviso ? <AvisoTelefono aviso={aviso} /> : null}
           <div className="tf-btns">
             <span className="tf-btn verde">WhatsApp</span>
             <span className="tf-btn">

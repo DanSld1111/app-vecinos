@@ -30,4 +30,25 @@ export class CampoProductoDto {
   @IsOptional()
   @IsBoolean()
   oculto?: boolean;
+
+  /** Solo "opciones": la ficha ofrece filtrar los productos por este campo (ej. Especie). */
+  @IsOptional()
+  @IsBoolean()
+  filtro?: boolean;
+
+  /** Solo "opciones" con un "Sí": los productos que lo tienen muestran la etiqueta como insignia (ej. "Receta"). */
+  @IsOptional()
+  @IsBoolean()
+  insignia?: boolean;
+}
+
+/** Aviso fijo en la ficha de los negocios de una categoría (ej. venta solo a mayores de 18). */
+export class AvisoFichaDto {
+  @IsIn(["mayores18", "receta", "info"])
+  tipo!: "mayores18" | "receta" | "info";
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(160)
+  texto!: string;
 }

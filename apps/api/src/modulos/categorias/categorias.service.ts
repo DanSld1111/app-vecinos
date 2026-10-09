@@ -21,6 +21,7 @@ interface FilaCategoria {
   titulo_seccion: string | null;
   atributos_producto: Categoria["atributosProducto"] | null;
   servicio_slug: string | null;
+  aviso_ficha: Categoria["avisoFicha"] | null;
 }
 
 // La ficha efectiva se resuelve aquí para que la app y el panel no repitan la regla: la propia de
@@ -28,7 +29,7 @@ interface FilaCategoria {
 // docs/decisiones/0080-fichas.md.
 const COLUMNAS = `
   c.id, c.padre_id, c.nombre, c.slug, c.icono, c.foto_url, c.orden, c.ficha, c.titulo_seccion,
-  c.atributos_producto, c.servicio_slug, COALESCE(c.ficha, s.ficha, 'galeria') AS ficha_efectiva`;
+  c.atributos_producto, c.servicio_slug, c.aviso_ficha, COALESCE(c.ficha, s.ficha, 'galeria') AS ficha_efectiva`;
 const DESDE = "categorias c LEFT JOIN servicios_app s ON s.slug = c.servicio_slug";
 
 /** Para versiones viejas de la app, que todavía leen `arquetipoFicha`. */
@@ -56,6 +57,7 @@ function aCategoria(fila: FilaCategoria): Categoria {
     tituloSeccion: fila.titulo_seccion,
     atributosProducto: fila.atributos_producto ?? undefined,
     servicioSlug: fila.servicio_slug,
+    avisoFicha: fila.aviso_ficha ?? null,
   };
 }
 
@@ -75,8 +77,21 @@ function normalizarCampos(campos: CampoProductoDto[]): NonNullable<Categoria["at
       usadas.add(clave);
     }
     const opciones = c.tipo === "opciones" ? (c.opciones ?? []).map((o) => o.trim()).filter(Boolean) : undefined;
-    return { clave, etiqueta: c.etiqueta.trim(), tipo: c.tipo, ...(opciones ? { opciones } : {}), ...(c.oculto ? { oculto: true } : {}) };
+    return {
+      clave,
+      etiqueta: c.etiqueta.trim(),
+      tipo: c.tipo,
+      ...(opciones ? { opciones } : {}),
+      ...(c.oculto ? { oculto: true } : {}),
+      ...(opciones && c.filtro ? { filtro: true } : {}),
+      ...(opciones && c.insignia ? { insignia: true } : {}),
+    };
   });
+}
+
+function avisoJson(aviso: CrearCategoriaDto["avisoFicha"]): string | null {
+  const texto = aviso?.texto?.trim();
+  return aviso && texto ? JSON.stringify({ tipo: aviso.tipo, texto }) : null;
 }
 
 function slugificar(texto: string): string {
@@ -124,8 +139,8 @@ export class CategoriasService {
       "SELECT COALESCE(MAX(orden), 0) + 1 AS siguiente FROM categorias",
     );
     await this.bd.consultar(
-      `INSERT INTO categorias (id, padre_id, nombre, slug, icono, orden, servicio_slug, ficha, titulo_seccion, atributos_producto)
-       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      `INSERT INTO categorias (id, padre_id, nombre, slug, icono, orden, servicio_slug, ficha, titulo_seccion, atributos_producto, aviso_ficha)
+       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         id,
         dto.nombre,
@@ -136,6 +151,7 @@ export class CategoriasService {
         dto.ficha ?? null,
         dto.tituloSeccion?.trim() || null,
         dto.atributosProducto ? JSON.stringify(normalizarCampos(dto.atributosProducto)) : null,
+        avisoJson(dto.avisoFicha),
       ],
     );
     return aCategoria(await this.obtenerFilaOFallar(id));
@@ -151,7 +167,8 @@ export class CategoriasService {
            servicio_slug = CASE WHEN $5 THEN $6 ELSE servicio_slug END,
            ficha = CASE WHEN $7 THEN $8 ELSE ficha END,
            titulo_seccion = CASE WHEN $9 THEN $10 ELSE titulo_seccion END,
-           atributos_producto = CASE WHEN $11 THEN $12::jsonb ELSE atributos_producto END
+           atributos_producto = CASE WHEN $11 THEN $12::jsonb ELSE atributos_producto END,
+           aviso_ficha = CASE WHEN $13 THEN $14::jsonb ELSE aviso_ficha END
        WHERE id = $1`,
       [
         id,
@@ -166,6 +183,8 @@ export class CategoriasService {
         dto.tituloSeccion?.trim() || null,
         "atributosProducto" in dto,
         dto.atributosProducto ? JSON.stringify(normalizarCampos(dto.atributosProducto)) : null,
+        "avisoFicha" in dto,
+        avisoJson(dto.avisoFicha),
       ],
     );
     return aCategoria(await this.obtenerFilaOFallar(id));

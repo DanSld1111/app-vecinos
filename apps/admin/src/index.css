@@ -4039,3 +4039,26 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
   .panel-detalle { padding: 18px 16px; }
   .tabla-cola td { overflow-wrap: anywhere; }
 }
+
+/* ---- Aviso de la categoría, filtro por un campo e insignias (decisión 0088) ---- */
+.tf-aviso { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; padding: 7px 9px; border-radius: 10px; background: var(--tf-chip); font-size: 11.5px; line-height: 1.35; }
+.tf-aviso.mayores18 { background: #fce2d7; }
+.tf-aviso.receta { background: #dbf1e3; }
+.tf-aviso-circulo { flex: none; width: 26px; height: 26px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 10.5px; font-weight: 800; color: var(--tf-suave); }
+.tf-aviso.mayores18 .tf-aviso-circulo { color: #c8532e; }
+.tf-aviso.receta .tf-aviso-circulo { color: var(--tf-verde); }
+.tf-segmentos { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; padding: 3px; margin-bottom: 8px; border-radius: 9px; background: var(--tf-chip); }
+.tf-segmentos span { padding: 5px 2px; border-radius: 7px; text-align: center; font-size: 11px; font-weight: 600; color: var(--tf-suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tf-segmentos span.activo { background: #fff; color: var(--tf-texto); font-weight: 800; box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+.tf-card-img { position: relative; }
+.tf-insignia { position: absolute; top: 5px; left: 5px; padding: 1px 6px; border-radius: 6px; background: #fff; border: 1px solid #c9d0cb; color: var(--tf-texto); font-size: 9.5px; font-weight: 800; font-style: normal; }
+
+/* Editor de categoría: para qué sirve cada campo de opciones, y el aviso */
+.usos-campo-extra { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 16px; margin: -2px 0 6px; font-size: 12.5px; color: var(--texto-suave); }
+.usos-campo-extra label { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--texto-suave); margin: 0; }
+.usos-campo-extra small { color: var(--texto-tenue); }
+.campo-modal .usos-campo-extra input[type="checkbox"] { flex: none; width: 16px; height: 16px; padding: 0; margin: 0; accent-color: var(--verde); }
+.fila-aviso-categoria { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 8px; }
+@media (max-width: 640px) {
+  .fila-aviso-categoria { grid-template-columns: minmax(0, 1fr); }
+}

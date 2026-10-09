@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AtributoProductoDef, Categoria, FICHAS, ServicioApp, TIPOS_FICHA, TipoFicha, tituloSeccionFicha } from "@app-vecinos/tipos";
+import { AtributoProductoDef, AvisoFicha, Categoria, FICHAS, ServicioApp, TIPOS_FICHA, TipoFicha, tituloSeccionFicha } from "@app-vecinos/tipos";
 import { LuEye, LuEyeOff, LuPlus, LuX } from "react-icons/lu";
 import { useCategorias } from "../estado/useCategorias";
 import { useNegocios } from "../estado/useNegocios";
@@ -175,7 +175,22 @@ export function Categorias() {
 }
 
 /** Un campo extra mientras se edita: `clave` vacía = campo nuevo (la API la genera). */
-type CampoEditable = { clave: string; etiqueta: string; tipo: AtributoProductoDef["tipo"]; opciones: string; oculto: boolean };
+type CampoEditable = {
+  clave: string;
+  etiqueta: string;
+  tipo: AtributoProductoDef["tipo"];
+  opciones: string;
+  oculto: boolean;
+  filtro: boolean;
+  insignia: boolean;
+};
+
+/** Texto sugerido al elegir un tipo de aviso (se puede cambiar). */
+const AVISO_SUGERIDO: Record<AvisoFicha["tipo"], string> = {
+  mayores18: "Venta solo a mayores de 18 años. Toma con responsabilidad.",
+  receta: "Los productos con Receta se venden con indicación del veterinario.",
+  info: "",
+};
 
 function aEditables(campos: AtributoProductoDef[] | undefined): CampoEditable[] {
   return (campos ?? []).map((c) => ({
@@ -184,6 +199,8 @@ function aEditables(campos: AtributoProductoDef[] | undefined): CampoEditable[] 
     tipo: c.tipo,
     opciones: (c.opciones ?? []).join(", "),
     oculto: Boolean(c.oculto),
+    filtro: Boolean(c.filtro),
+    insignia: Boolean(c.insignia),
   }));
 }
 
@@ -198,6 +215,8 @@ function aDefiniciones(campos: CampoEditable[]): AtributoProductoDef[] {
         ? { opciones: c.opciones.split(",").map((o) => o.trim()).filter(Boolean) }
         : {}),
       ...(c.oculto ? { oculto: true } : {}),
+      ...(c.tipo === "opciones" && c.filtro ? { filtro: true } : {}),
+      ...(c.tipo === "opciones" && c.insignia ? { insignia: true } : {}),
     }));
 }
 
@@ -223,6 +242,9 @@ function EditorCategoria({
   const [fichaPropia, setFichaPropia] = useState<TipoFicha | null>(categoria?.ficha ?? null);
   const [tituloSeccion, setTituloSeccion] = useState(categoria?.tituloSeccion ?? "");
   const [campos, setCampos] = useState<CampoEditable[]>(() => aEditables(categoria?.atributosProducto));
+  const [avisoTipo, setAvisoTipo] = useState<AvisoFicha["tipo"] | "">(categoria?.avisoFicha?.tipo ?? "");
+  const [avisoTexto, setAvisoTexto] = useState(categoria?.avisoFicha?.texto ?? "");
+  const aviso: AvisoFicha | null = avisoTipo && avisoTexto.trim() ? { tipo: avisoTipo, texto: avisoTexto.trim() } : null;
   const [guardando, setGuardando] = useState(false);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -242,7 +264,8 @@ function EditorCategoria({
     (servicioSlug || null) !== categoria.servicioSlug ||
     fichaPropia !== (categoria.ficha ?? null) ||
     tituloSeccion.trim() !== (categoria.tituloSeccion ?? "") ||
-    JSON.stringify(definiciones) !== JSON.stringify(aDefiniciones(aEditables(categoria.atributosProducto)));
+    JSON.stringify(definiciones) !== JSON.stringify(aDefiniciones(aEditables(categoria.atributosProducto))) ||
+    JSON.stringify(aviso) !== JSON.stringify(categoria.avisoFicha ?? null);
 
   function cambiarCampo(i: number, cambios: Partial<CampoEditable>) {
     setCampos((lista) => lista.map((c, j) => (j === i ? { ...c, ...cambios } : c)));
@@ -258,6 +281,7 @@ function EditorCategoria({
       ficha: fichaPropia,
       tituloSeccion: tituloSeccion.trim() || null,
       atributosProducto: definiciones,
+      avisoFicha: aviso,
     };
     const ok = categoria ? await actualizar(categoria.id, datos, token) : await crear(datos, token);
     setGuardando(false);
@@ -444,6 +468,18 @@ function EditorCategoria({
                             </button>
                           )}
                         </span>
+                        {c.tipo === "opciones" ? (
+                          <div className="usos-campo-extra">
+                            <label>
+                              <input type="checkbox" checked={c.filtro} onChange={(e) => cambiarCampo(i, { filtro: e.target.checked })} />
+                              Filtro en la ficha <small>(Todos / cada opción)</small>
+                            </label>
+                            <label>
+                              <input type="checkbox" checked={c.insignia} onChange={(e) => cambiarCampo(i, { insignia: e.target.checked })} />
+                              Insignia sobre la foto <small>(si el valor es “Sí”)</small>
+                            </label>
+                          </div>
+                        ) : null}
                       </div>
                     ))}
                   </div>
@@ -453,7 +489,12 @@ function EditorCategoria({
                   className="btn-accion-mini"
                   style={{ marginTop: 8 }}
                   disabled={campos.length >= 12}
-                  onClick={() => setCampos((lista) => [...lista, { clave: "", etiqueta: "", tipo: "opciones", opciones: "", oculto: false }])}
+                  onClick={() =>
+                    setCampos((lista) => [
+                      ...lista,
+                      { clave: "", etiqueta: "", tipo: "opciones", opciones: "", oculto: false, filtro: false, insignia: false },
+                    ])
+                  }
                 >
                   <LuPlus /> Agregar campo
                 </button>
@@ -464,6 +505,35 @@ function EditorCategoria({
                 {campos.length ? " Los campos que ya tenía se conservan por si vuelves a Menú o Catálogo." : ""}
               </p>
             )}
+          </div>
+
+          <div className="campo-modal">
+            <label htmlFor="cat-aviso">Aviso en la ficha</label>
+            <div className="fila-aviso-categoria">
+              <select
+                id="cat-aviso"
+                value={avisoTipo}
+                onChange={(e) => {
+                  const tipo = e.target.value as AvisoFicha["tipo"] | "";
+                  setAvisoTipo(tipo);
+                  if (tipo && !avisoTexto.trim()) setAvisoTexto(AVISO_SUGERIDO[tipo]);
+                }}
+              >
+                <option value="">Sin aviso</option>
+                <option value="mayores18">+18 · solo mayores de edad</option>
+                <option value="receta">Receta</option>
+                <option value="info">Informativo</option>
+              </select>
+              <input
+                aria-label="Texto del aviso"
+                value={avisoTexto}
+                maxLength={160}
+                disabled={!avisoTipo}
+                onChange={(e) => setAvisoTexto(e.target.value)}
+                placeholder={avisoTipo ? "Texto que verán los vecinos" : "Elige un tipo de aviso"}
+              />
+            </div>
+            <p className="ayuda-modal">Aparece bajo la descripción de todos los negocios de esta categoría. La primera oración va en negrita.</p>
           </div>
 
           <div className="modal-footer">
@@ -485,6 +555,7 @@ function EditorCategoria({
             titulo={tituloSeccionFicha(ficha, tituloSeccion)}
             campos={usaCampos ? definiciones : []}
             rotulo={nombre.trim() || "Categoría"}
+            aviso={aviso}
             negocio={ejemplo.negocio}
             productos={ejemplo.productos}
             cargando={ejemplo.cargando}

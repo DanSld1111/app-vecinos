@@ -28,6 +28,19 @@ export interface AtributoProductoDef {
   /** Oculto = no se pide al cargar productos ni se muestra en la app, pero los valores ya
    * guardados se conservan (se puede volver a mostrar). */
   oculto?: boolean;
+  /** Solo "opciones": la ficha ofrece filtrar los productos por este campo ("Todos" + cada
+   * opción), ej. Especie en Veterinarias. Ver docs/decisiones/0088. */
+  filtro?: boolean;
+  /** Solo "opciones": un producto con valor "Sí" muestra la etiqueta del campo como insignia sobre
+   * su foto en vez de un dato más, ej. "Receta". */
+  insignia?: boolean;
+}
+
+/** Aviso fijo en la ficha de todos los negocios de una categoría, bajo la descripción. */
+export interface AvisoFicha {
+  /** mayores18 = venta solo a mayores de edad; receta = medicamentos con receta; info = otro. */
+  tipo: "mayores18" | "receta" | "info";
+  texto: string;
 }
 
 export interface Categoria {
@@ -54,4 +67,6 @@ export interface Categoria {
    * el servicio en el alta de negocio, y qué negocios entran en la pantalla de ese servicio en
    * la app. null = todavía sin asignar. Ver docs/decisiones/0072-servicio-dueno-de-categoria.md. */
   servicioSlug: string | null;
+  /** Aviso en la ficha de sus negocios (ej. "+18" en Licorerías). null o ausente = ninguno. */
+  avisoFicha?: AvisoFicha | null;
 }

@@ -28,6 +28,7 @@ import { HojaCalificar } from "../../../src/componentes/HojaCalificar";
 import { MiniMapaNegocio } from "../../../src/componentes/MiniMapaNegocio";
 import { FotoNegocio } from "../../../src/componentes/FotoNegocio";
 import { Aviso } from "../../../src/componentes/Aviso";
+import { AvisoFichaNegocio } from "../../../src/componentes/AvisoFichaNegocio";
 import { FotoEnVuelo } from "../../../src/componentes/transicion/FotoEnVuelo";
 import { OrigenFoto, useTransicionFoto } from "../../../src/estado/useTransicionFoto";
 import { useProductosPorNegocio } from "../../../src/datos/hooks/useProductos";
@@ -296,15 +297,21 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
   } else if (arquetipo === "rubros" && negocio.rubrosDisponibles?.length) {
     contenido = <CategoriasRubroNegocio rubros={negocio.rubrosDisponibles} titulo={tituloDe("rubros")} />;
   } else if (arquetipo === "ofertas" && (negocio.ofertas?.length || negocio.pasillos?.length)) {
+    // Si además cargó productos (ej. una licorería), van debajo de las ofertas con sus campos.
     contenido = (
-      <OfertasPasillosNegocio
-        titulo={tituloDe("ofertas")}
-        ofertas={negocio.ofertas ?? []}
-        pasillos={negocio.pasillos ?? []}
-        negocioFotoUrl={negocio.fotoPrincipalUrl}
-        moneda={negocio.moneda}
-        busqueda={busqueda}
-      />
+      <>
+        <OfertasPasillosNegocio
+          titulo={tituloDe("ofertas")}
+          ofertas={negocio.ofertas ?? []}
+          pasillos={negocio.pasillos ?? []}
+          negocioFotoUrl={negocio.fotoPrincipalUrl}
+          moneda={negocio.moneda}
+          busqueda={busqueda}
+        />
+        {productos && productos.length > 0 ? (
+          <MenuNegocio productos={productos} moneda={negocio.moneda} busqueda={busqueda} titulo="Todo lo que vende" campos={camposExtra} />
+        ) : null}
+      </>
     );
   } else if (arquetipo === "catalogo" && productos && productos.length > 0) {
     contenido = (
@@ -324,7 +331,7 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
         moneda={negocio.moneda}
         busqueda={busqueda}
         titulo={tituloDe("menu")}
-        campos={arquetipo === "menu" ? camposExtra : []}
+        campos={arquetipo === "menu" || arquetipo === "ofertas" ? camposExtra : []}
       />
     );
   } else {
@@ -423,6 +430,7 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
           </View>
 
           {negocio.descripcion ? <Text style={styles.descripcion}>{negocio.descripcion}</Text> : null}
+          {fichaNegocio?.aviso ? <AvisoFichaNegocio aviso={fichaNegocio.aviso} /> : null}
 
           {negocio.whatsapp || negocio.telefono ? (
             <View style={styles.filaAcciones}>

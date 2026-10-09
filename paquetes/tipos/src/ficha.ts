@@ -52,8 +52,10 @@ export const FICHAS: Record<TipoFicha, InfoFicha> = {
     nombre: "Ofertas y pasillos",
     tituloPorDefecto: "Ofertas de la semana",
     descripcion: "Carrusel de ofertas con precio tachado, y los pasillos del local.",
-    queCarga: ["Oferta: nombre, precio y precio anterior", "Etiqueta (Oferta, Del día…)", "Pasillos"],
-    usaProductos: false,
+    queCarga: ["Oferta: nombre, precio y precio anterior", "Etiqueta (Oferta, Del día…)", "Pasillos", "Productos (opcional, bajo las ofertas)"],
+    // Los productos son opcionales: si el negocio los carga, se listan bajo las ofertas con los
+    // campos de la categoría (ej. Licorerías: Tipo, Presentación, Volumen).
+    usaProductos: true,
   },
   galeria: {
     nombre: "Galería",

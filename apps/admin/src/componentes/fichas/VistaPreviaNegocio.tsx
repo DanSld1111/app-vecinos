@@ -5,7 +5,7 @@ import { LuChevronLeft, LuHeart, LuMapPin, LuPhone, LuSearch, LuStar } from "rea
 import { urlCompleta } from "../../utilidades/media";
 import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
 import { estadoHoyTexto, resumenSemana } from "../../utilidades/horarios";
-import { Contenido } from "./TelefonoFicha";
+import { AvisoTelefono, Contenido } from "./TelefonoFicha";
 
 function iniciales(nombre: string) {
   return (
@@ -70,6 +70,7 @@ function PantallaFicha({ negocio, categorias, productos }: { negocio: Negocio; c
               : hoy.detalle}
         </div>
         {negocio.descripcion.trim() ? <p className="tf-desc">{negocio.descripcion}</p> : <p className="tf-desc vp-falta">Sin descripción todavía.</p>}
+        {categoria?.avisoFicha ? <AvisoTelefono aviso={categoria.avisoFicha} /> : null}
 
         {botones.length ? (
           <div className="tf-btns" style={botones.length === 1 ? { gridTemplateColumns: "1fr" } : undefined}>

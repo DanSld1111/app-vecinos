@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
-import { atributosVisibles } from "../utilidades/fichaNegocio";
+import { atributosVisibles, coincideFiltro, filtroDeCampos, insigniasDe } from "../utilidades/fichaNegocio";
 import { ChipCategoria } from "./ChipCategoria";
 import { SinFoto } from "./SinFoto";
 import { EntradaAnimada } from "./EntradaAnimada";
@@ -35,6 +35,9 @@ export function CatalogoNegocio({
     [productos]
   );
   const [filtro, setFiltro] = useState<string | null>(null);
+  // Filtro por un campo de la categoría (ej. Especie en Veterinarias), aparte de las secciones.
+  const filtroCampo = useMemo(() => filtroDeCampos(campos), [campos]);
+  const [opcionCampo, setOpcionCampo] = useState<string | null>(null);
   const [abierto, setAbierto] = useState<Producto | null>(null);
 
   if (productos.length === 0) return null;
@@ -43,7 +46,8 @@ export function CatalogoNegocio({
   const visibles = productos.filter((p) => {
     const coincideCategoria = !filtro || p.categoriaMenu === filtro;
     const coincideBusqueda = !termino || p.nombre.toLowerCase().includes(termino);
-    return coincideCategoria && coincideBusqueda;
+    const coincideCampo = !filtroCampo || !opcionCampo || coincideFiltro(p.atributos?.[filtroCampo.campo.clave], opcionCampo);
+    return coincideCategoria && coincideBusqueda && coincideCampo;
   });
 
   function alConsultar() {
@@ -54,6 +58,27 @@ export function CatalogoNegocio({
   return (
     <View>
       <Text style={styles.tituloSeccion}>{titulo}</Text>
+
+      {filtroCampo ? (
+        <View style={styles.segmentos} accessibilityRole="tablist" accessibilityLabel={filtroCampo.campo.etiqueta}>
+          {[null, ...filtroCampo.opciones].map((opcion) => {
+            const activo = opcionCampo === opcion;
+            return (
+              <Pressable
+                key={opcion ?? "todos"}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: activo }}
+                style={[styles.segmento, activo && styles.segmentoActivo]}
+                onPress={() => setOpcionCampo(opcion)}
+              >
+                <Text style={[styles.segmentoTexto, activo && styles.segmentoTextoActivo]} numberOfLines={1}>
+                  {opcion ?? "Todos"}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : null}
 
       {subcategorias.length > 1 ? (
         <View style={styles.filaChips}>
@@ -70,7 +95,9 @@ export function CatalogoNegocio({
       ) : null}
 
       {visibles.length === 0 ? (
-        <Text style={styles.sinResultados}>Sin resultados para "{busqueda}"</Text>
+        <Text style={styles.sinResultados}>
+          {termino ? `Sin resultados para "${busqueda}"` : "No hay productos con ese filtro."}
+        </Text>
       ) : (
         <View style={styles.grid}>
           {visibles.map((producto, indice) => (
@@ -81,6 +108,15 @@ export function CatalogoNegocio({
                 ) : (
                   <SinFoto icono="pricetag-outline" tamanoIcono={22} style={styles.foto} />
                 )}
+                {insigniasDe(producto.atributos, campos).length > 0 ? (
+                  <View style={styles.filaInsignias}>
+                    {insigniasDe(producto.atributos, campos).map((i) => (
+                      <Text key={i} style={styles.insignia}>
+                        {i}
+                      </Text>
+                    ))}
+                  </View>
+                ) : null}
                 <View style={styles.info}>
                   <Text style={styles.nombre} numberOfLines={1}>
                     {producto.nombre}
@@ -111,6 +147,15 @@ export function CatalogoNegocio({
                 <Text style={styles.nombreHoja}>{abierto.nombre}</Text>
                 <Text style={styles.precioHoja}>{formatearPrecio(abierto.precio, moneda)}</Text>
                 {abierto.descripcion ? <Text style={styles.descripcionHoja}>{abierto.descripcion}</Text> : null}
+                {insigniasDe(abierto.atributos, campos).length > 0 ? (
+                  <View style={styles.filaAtributos}>
+                    {insigniasDe(abierto.atributos, campos).map((i) => (
+                      <Text key={i} style={styles.insigniaHoja}>
+                        {i}
+                      </Text>
+                    ))}
+                  </View>
+                ) : null}
                 {atributosVisibles(abierto.atributos, campos).length > 0 ? (
                   <View style={styles.filaAtributos}>
                     {atributosVisibles(abierto.atributos, campos).map((a) => (
@@ -142,6 +187,71 @@ function crearEstilos(colores: PaletaColores) {
       color: colores.texto,
       marginTop: espaciado.lg,
       marginBottom: espaciado.xs,
+    },
+    segmentos: {
+      flexDirection: "row",
+      gap: 4,
+      padding: 4,
+      borderRadius: radios.md,
+      backgroundColor: colores.superficieHundida,
+      marginBottom: espaciado.sm,
+    },
+    segmento: {
+      flex: 1,
+      minHeight: 38,
+      borderRadius: radios.sm,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    segmentoActivo: {
+      backgroundColor: colores.superficie,
+      shadowColor: "#000",
+      shadowOpacity: 0.12,
+      shadowRadius: 3,
+      shadowOffset: { width: 0, height: 1 },
+      elevation: 1,
+    },
+    segmentoTexto: {
+      ...tipografia.pie,
+      fontSize: 13,
+      fontFamily: "SchibstedGrotesk_600SemiBold",
+      color: colores.textoSuave,
+    },
+    segmentoTextoActivo: {
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
+      color: colores.texto,
+    },
+    filaInsignias: {
+      position: "absolute",
+      top: 8,
+      left: 8,
+      flexDirection: "row",
+      gap: 4,
+    },
+    insignia: {
+      ...tipografia.pie,
+      fontSize: 11,
+      fontFamily: "SchibstedGrotesk_700Bold",
+      color: colores.texto,
+      backgroundColor: colores.superficie,
+      borderWidth: 1,
+      borderColor: colores.bordeFuerte,
+      borderRadius: radios.sm,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      overflow: "hidden",
+    },
+    insigniaHoja: {
+      ...tipografia.pie,
+      fontSize: 12,
+      fontFamily: "SchibstedGrotesk_700Bold",
+      color: colores.primarioFuerte,
+      backgroundColor: colores.primarioSuave,
+      borderRadius: radios.sm,
+      paddingHorizontal: espaciado.sm,
+      paddingVertical: 4,
+      overflow: "hidden",
     },
     filaChips: {
       flexDirection: "row",
