@@ -14,16 +14,20 @@ import {
   LuLogOut,
   LuMap,
   LuMegaphone,
+  LuMessageSquare,
   LuMoon,
+  LuNewspaper,
   LuPercent,
   LuPlus,
   LuSparkles,
   LuStore,
   LuSun,
   LuTag,
+  LuToggleRight,
   LuUsers,
 } from "react-icons/lu";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { usePanelActivo } from "../estado/useParaTi";
 import { RolCuenta } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { useNegocios } from "../estado/useNegocios";
@@ -44,17 +48,27 @@ interface ItemNav {
   contador?: number;
 }
 
-function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0): ItemNav[] {
+/** El módulo Para ti: lo que ve el Editor de redes sociales, y el super admin en ese panel (0091). */
+const ITEMS_PARA_TI: ItemNav[] = [
+  { a: "/para-ti", texto: "Publicaciones", icono: LuNewspaper, grupo: "Para ti" },
+  { a: "/para-ti/nueva", texto: "Nueva publicación", icono: LuPlus },
+  { a: "/para-ti/comentarios", texto: "Comentarios", icono: LuMessageSquare },
+];
+
+function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: "admin" | "para-ti" = "admin"): ItemNav[] {
   switch (rol) {
     case "super_admin":
+      if (panel === "para-ti") return ITEMS_PARA_TI;
       return [
         { a: "/dashboard", texto: "Dashboard", icono: LuLayoutDashboard, grupo: "General" },
+        { a: "/modulos", texto: "Módulos de la app", icono: LuToggleRight },
         { a: "/distritos", texto: "Distritos", icono: LuMap, grupo: "Territorio" },
         { a: "/categorias", texto: "Categorías", icono: LuTag, grupo: "Catálogo" },
         { a: "/fichas", texto: "Fichas", icono: LuLayoutTemplate },
         { a: "/servicios", texto: "Servicios", icono: LuLayoutGrid },
         { a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" },
         { a: "/avisos", texto: "Avisos", icono: LuMegaphone, grupo: "Comunicación" },
+        { a: "/para-ti", texto: "Para ti", icono: LuNewspaper },
         { a: "/novedades", texto: "Novedades", icono: LuSparkles },
         { a: "/publicidad", texto: "Publicidad", icono: LuImage },
         { a: "/validacion", texto: "Validación", icono: LuBadgeCheck, grupo: "Validación", contador: pendientes },
@@ -84,6 +98,8 @@ function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0): ItemNa
         { a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" },
         { a: "/negocios/nuevo", texto: "Registrar negocio", icono: LuPlus },
       ];
+    case "editor_redes":
+      return ITEMS_PARA_TI;
   }
 }
 
@@ -93,6 +109,7 @@ const NOMBRE_ROL: Record<RolCuenta, string> = {
   junta_vecinal: "Junta vecinal",
   validador_contenido: "Validador de contenido",
   gestor_negocios: "Gestor de negocios",
+  editor_redes: "Editor de redes sociales",
 };
 
 export function LayoutAdmin() {
@@ -109,6 +126,12 @@ export function LayoutAdmin() {
   const alternarTema = useTemaAdmin((estado) => estado.alternar);
   const oscuro = temaEfectivo(preferenciaTema) === "oscuro";
   const ubicacion = useLocation();
+  const navegar = useNavigate();
+  const panel = usePanelActivo((e) => e.panel);
+  const cambiarPanel = usePanelActivo((e) => e.cambiar);
+  // Antes del return condicional de abajo: un hook después de él rompe el orden de hooks al
+  // cerrar sesión (cuenta pasa a null).
+  const rechazados = useNegocios((e) => e.negocios.filter((n) => !n.archivadoEn && n.estado === "inactivo" && n.motivoRechazo).length);
 
   // En móvil/tablet el menú es un panel deslizable — se cierra solo al navegar,
   // para no dejarlo abierto tapando la pantalla después de elegir una opción.
@@ -144,8 +167,7 @@ export function LayoutAdmin() {
   if (!cuenta) return null;
 
   const pendientes = negociosPendientes + avisosPendientes;
-
-  const rechazados = useNegocios((e) => e.negocios.filter((n) => !n.archivadoEn && n.estado === "inactivo" && n.motivoRechazo).length);
+  const panelVisible = cuenta.rol === "super_admin" ? panel : "admin";
 
   return (
     <div className="app-shell">
@@ -186,13 +208,41 @@ export function LayoutAdmin() {
           <small>Panel de administración</small>
         </div>
         {cuenta.rol === "dueno_negocio" ? <SelectorNegocioSidebar /> : null}
+        {cuenta.rol === "super_admin" ? (
+          <div className="selector-panel" role="tablist" aria-label="Panel">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={panelVisible === "admin"}
+              className={panelVisible === "admin" ? "activo" : ""}
+              onClick={() => {
+                cambiarPanel("admin");
+                navegar("/dashboard");
+              }}
+            >
+              Administración
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={panelVisible === "para-ti"}
+              className={panelVisible === "para-ti" ? "activo" : ""}
+              onClick={() => {
+                cambiarPanel("para-ti");
+                navegar("/para-ti");
+              }}
+            >
+              Para ti
+            </button>
+          </div>
+        ) : null}
         <nav>
-          {itemsPorRol(cuenta.rol, pendientes, rechazados).map((item) => (
+          {itemsPorRol(cuenta.rol, pendientes, rechazados, panelVisible).map((item) => (
             <Fragment key={item.a}>
               {item.grupo ? <span className="grupo-nav">{item.grupo}</span> : null}
               <NavLink
                 to={item.a}
-                end={item.a === "/mi-negocio" || item.a === "/negocios"}
+                end={item.a === "/mi-negocio" || item.a === "/negocios" || item.a === "/para-ti"}
                 className={({ isActive }) => (isActive ? "activo" : undefined)}
               >
                 <span className="izq">

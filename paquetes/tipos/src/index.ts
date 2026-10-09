@@ -12,3 +12,4 @@ export * from "./ficha";
 export * from "./usuario";
 export * from "./servicio";
 export * from "./resena";
+export * from "./para-ti";

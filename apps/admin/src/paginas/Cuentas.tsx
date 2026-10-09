@@ -14,6 +14,7 @@ const NOMBRE_ROL: Record<RolCuenta, string> = {
   junta_vecinal: "Junta vecinal",
   validador_contenido: "Validador",
   gestor_negocios: "Gestor de negocios",
+  editor_redes: "Editor de redes sociales",
 };
 
 const COLOR_ROL: Record<RolCuenta, string> = {
@@ -22,6 +23,7 @@ const COLOR_ROL: Record<RolCuenta, string> = {
   junta_vecinal: "var(--azul)",
   validador_contenido: "var(--coral)",
   gestor_negocios: "var(--morado)",
+  editor_redes: "var(--oro)",
 };
 
 const COLOR_ROL_SUAVE: Record<RolCuenta, string> = {
@@ -30,6 +32,7 @@ const COLOR_ROL_SUAVE: Record<RolCuenta, string> = {
   junta_vecinal: "var(--azul-suave)",
   validador_contenido: "var(--coral-suave)",
   gestor_negocios: "var(--morado-suave)",
+  editor_redes: "var(--oro-suave)",
 };
 
 const COLOR_ROL_TEXTO: Record<RolCuenta, string> = {
@@ -38,6 +41,7 @@ const COLOR_ROL_TEXTO: Record<RolCuenta, string> = {
   junta_vecinal: "var(--azul)",
   validador_contenido: "var(--coral-fuerte)",
   gestor_negocios: "var(--morado)",
+  editor_redes: "var(--oro)",
 };
 
 function iniciales(nombre: string): string {

@@ -10,11 +10,13 @@ import { useTema } from "../estado/useTema";
 import { useBarraPestanas } from "../estado/useBarraPestanas";
 import { useComunidadActiva } from "../estado/comunidadActiva";
 import { useAvisos } from "../datos/hooks/useAvisos";
+import { useModulos } from "../datos/hooks/useParaTi";
 import { useMovimientoReducido } from "../utilidades/useMovimientoReducido";
 
 const ICONOS: Record<string, { activo: keyof typeof Ionicons.glyphMap; inactivo: keyof typeof Ionicons.glyphMap }> = {
   index: { activo: "home", inactivo: "home-outline" },
   servicios: { activo: "grid", inactivo: "grid-outline" },
+  "para-ti": { activo: "star", inactivo: "star-outline" },
   comunidad: { activo: "megaphone", inactivo: "megaphone-outline" },
   perfil: { activo: "person", inactivo: "person-outline" },
 };
@@ -97,18 +99,26 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
   const { comunidad } = useComunidadActiva();
   const { data: avisos } = useAvisos(comunidad?.id);
 
+  // Pestañas apagadas desde el panel (decisión 0091): no se dibujan. La rayita y el ancho se
+  // calculan sobre las visibles.
+  const modulos = useModulos();
+  const visibles = state.routes
+    .map((ruta, i) => ({ ruta, i }))
+    .filter(({ ruta }) => !(ruta.name === "comunidad" && !modulos.comunidad) && !(ruta.name === "para-ti" && !modulos.paraTi));
+  const indiceVisible = Math.max(0, visibles.findIndex((v) => v.i === state.index));
+
   const hayAlertaNueva = (avisos ?? []).some(
     (a) => a.categoria === "seguridad" && (!comunidadVistaHasta || a.publicadoEn > comunidadVistaHasta),
   );
 
   useEffect(() => {
     Animated.timing(posicion, {
-      toValue: state.index,
+      toValue: indiceVisible,
       duration: reducido ? 0 : 280,
       easing: Easing.bezier(0.2, 0.8, 0.2, 1),
       useNativeDriver: NATIVO,
     }).start();
-  }, [state.index, reducido, posicion]);
+  }, [indiceVisible, reducido, posicion]);
 
   useEffect(() => {
     Animated.timing(ocultar, {
@@ -119,10 +129,10 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
     }).start();
   }, [oculta, reducido, ocultar]);
 
-  const anchoPestana = ancho / Math.max(1, state.routes.length);
+  const anchoPestana = ancho / Math.max(1, visibles.length);
   const traslado = posicion.interpolate({
-    inputRange: state.routes.map((_r, i) => i),
-    outputRange: state.routes.map((_r, i) => i * anchoPestana + anchoPestana / 2 - ANCHO_RAYA / 2),
+    inputRange: visibles.length > 1 ? visibles.map((_v, i) => i) : [0, 1],
+    outputRange: visibles.length > 1 ? visibles.map((_v, i) => i * anchoPestana + anchoPestana / 2 - ANCHO_RAYA / 2) : [anchoPestana / 2 - ANCHO_RAYA / 2, anchoPestana / 2 - ANCHO_RAYA / 2],
   });
 
   const fondo = USA_DESENFOQUE ? (
@@ -150,10 +160,10 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
       accessibilityRole="tablist"
     >
       {fondo}
-      {ancho > 0 && state.routes.length > 1 ? (
+      {ancho > 0 && visibles.length > 1 ? (
         <Animated.View style={[styles.raya, { transform: [{ translateX: traslado }] }]} />
       ) : null}
-      {state.routes.map((ruta, i) => {
+      {visibles.map(({ ruta, i }) => {
         const { options } = descriptors[ruta.key];
         const enfocada = state.index === i;
         const titulo = (options.title ?? ruta.name) as string;

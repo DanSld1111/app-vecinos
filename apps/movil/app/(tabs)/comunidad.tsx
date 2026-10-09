@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback } from "react";
+import { Redirect } from "expo-router";
+import { useModulos } from "../../src/datos/hooks/useParaTi";
 import { Ionicons } from "@expo/vector-icons";
 import { Animated, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
@@ -43,7 +45,7 @@ function filtrarAvisos(avisos: Aviso[], filtro: FiltroComunidad): Aviso[] {
   return avisos.filter((a) => a.categoria === filtro);
 }
 
-export default function Comunidad() {
+function PantallaComunidad() {
   const colores = useColores();
   const modo = useTema((estado) => estado.modo);
   const styles = crearEstilos(colores, modo === "oscuro");
@@ -212,4 +214,11 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       color: colores.error,
     },
   });
+}
+
+/** Si el super admin apagó Comunidad (decisión 0091), quien llegue por un enlace vuelve a Inicio. */
+export default function Comunidad() {
+  const modulos = useModulos();
+  if (modulos.cargado && !modulos.comunidad) return <Redirect href="/" />;
+  return <PantallaComunidad />;
 }

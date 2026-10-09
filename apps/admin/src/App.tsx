@@ -31,6 +31,10 @@ import { MiNegocioPasillos, MiNegocioRubros, MiNegocioServicios } from "./pagina
 import { MiNegocioEstado } from "./paginas/MiNegocioEstado";
 import { MisAvisos } from "./paginas/MisAvisos";
 import { MiCuenta } from "./paginas/MiCuenta";
+import { ParaTiPublicaciones } from "./paginas/ParaTiPublicaciones";
+import { EditorPublicacion } from "./paginas/EditorPublicacion";
+import { ParaTiComentarios } from "./paginas/ParaTiComentarios";
+import { ModulosApp } from "./paginas/ModulosApp";
 
 /**
  * Qué secciones del panel abre cada rol (decisión 0086). Antes cualquier cuenta abría cualquier
@@ -42,6 +46,7 @@ const ACCESO: Record<Exclude<RolCuenta, "super_admin">, string[]> = {
   dueno_negocio: ["/mis-negocios", "/mi-negocio"],
   junta_vecinal: ["/mis-avisos"],
   validador_contenido: ["/validacion"],
+  editor_redes: ["/para-ti"],
 };
 
 function permitido(rol: RolCuenta, ruta: string): boolean {
@@ -75,6 +80,8 @@ function RutaInicial() {
       return <Navigate to="/validacion" replace />;
     case "gestor_negocios":
       return <Navigate to="/inicio" replace />;
+    case "editor_redes":
+      return <Navigate to="/para-ti" replace />;
   }
 }
 
@@ -121,6 +128,11 @@ export function App() {
         <Route path="/mi-negocio/estado" element={<MiNegocioEstado />} />
         <Route path="/mis-avisos" element={<MisAvisos />} />
         <Route path="/mi-cuenta" element={<MiCuenta />} />
+        <Route path="/para-ti" element={<ParaTiPublicaciones />} />
+        <Route path="/para-ti/nueva" element={<EditorPublicacion />} />
+        <Route path="/para-ti/comentarios" element={<ParaTiComentarios />} />
+        <Route path="/para-ti/:id" element={<EditorPublicacion />} />
+        <Route path="/modulos" element={<ModulosApp />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

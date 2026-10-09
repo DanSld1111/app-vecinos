@@ -19,6 +19,7 @@ export default function LayoutTabs() {
     <Tabs tabBar={(props) => <BarraPestanas {...props} />} screenOptions={{ headerShown: false, animation: "fade" }}>
       <Tabs.Screen name="index" options={{ title: "Inicio" }} />
       <Tabs.Screen name="servicios" options={{ title: "Servicios" }} />
+      <Tabs.Screen name="para-ti" options={{ title: "Para ti" }} />
       <Tabs.Screen name="comunidad" options={{ title: "Comunidad" }} />
       <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />
     </Tabs>

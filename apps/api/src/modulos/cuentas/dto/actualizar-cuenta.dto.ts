@@ -7,6 +7,7 @@ const ROLES: RolCuenta[] = [
   "junta_vecinal",
   "validador_contenido",
   "gestor_negocios",
+  "editor_redes",
 ];
 
 export class ActualizarCuentaDto {

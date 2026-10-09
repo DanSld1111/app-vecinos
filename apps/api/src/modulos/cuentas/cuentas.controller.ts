@@ -36,6 +36,7 @@ const TODOS_LOS_ROLES: RolCuenta[] = [
   "junta_vecinal",
   "validador_contenido",
   "gestor_negocios",
+  "editor_redes",
 ];
 
 type SolicitudConCuenta = { user: Cuenta };

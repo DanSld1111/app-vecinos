@@ -3,7 +3,9 @@ export type RolCuenta =
   | "dueno_negocio"
   | "junta_vecinal"
   | "validador_contenido"
-  | "gestor_negocios";
+  | "gestor_negocios"
+  /** Publica y administra todo el módulo "Para ti" (decisión 0091). Solo ve ese módulo en el panel. */
+  | "editor_redes";
 
 export interface Cuenta {
   id: string;

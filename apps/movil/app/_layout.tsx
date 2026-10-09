@@ -107,6 +107,8 @@ export default function LayoutRaiz() {
                 }
               />
               <Stack.Screen name="notificaciones" />
+              <Stack.Screen name="para-ti/[id]" />
+              <Stack.Screen name="para-ti/destacadas" options={{ presentation: "fullScreenModal", animation: "fade" }} />
               <Stack.Screen name="cuenta/index" options={{ presentation: "fullScreenModal" }} />
             </Stack>
           )}

@@ -42,6 +42,36 @@ export class AlmacenamientoService {
     return `${this.urlBase}/storage/v1/object/public/${this.bucket}/${ruta}`;
   }
 
+  /**
+   * Permiso de un solo uso para que el navegador suba un archivo grande (un video) directo a
+   * Supabase Storage, sin pasar por esta API (Render corta las peticiones largas y pesadas).
+   * El navegador hace PUT a `urlSubida` con el archivo; al terminar, el archivo queda en
+   * `urlPublica`. Ver docs/decisiones/0091.
+   */
+  async firmarSubida(carpeta: string, nombreOriginal: string): Promise<{ urlSubida: string; urlPublica: string }> {
+    this.verificarConfigurado();
+    const extension = nombreOriginal.includes(".") ? nombreOriginal.slice(nombreOriginal.lastIndexOf(".")).toLowerCase() : "";
+    const ruta = `${carpeta}/${randomUUID()}${extension}`;
+    const respuesta = await fetch(`${this.urlBase}/storage/v1/object/upload/sign/${this.bucket}/${ruta}`, {
+      method: "POST",
+      headers: {
+        apikey: this.claveServicio as string,
+        Authorization: `Bearer ${this.claveServicio}`,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    if (!respuesta.ok) {
+      const detalle = await respuesta.text().catch(() => "");
+      throw new Error(`No se pudo preparar la subida en Supabase Storage (${respuesta.status}): ${detalle}`);
+    }
+    const { url } = (await respuesta.json()) as { url: string };
+    return {
+      urlSubida: `${this.urlBase}/storage/v1${url}`,
+      urlPublica: `${this.urlBase}/storage/v1/object/public/${this.bucket}/${ruta}`,
+    };
+  }
+
   /** Si la URL es de un archivo subido a nuestro propio almacenamiento (y no un enlace externo). */
   esPropia(url: string | null | undefined): boolean {
     return Boolean(url && this.urlBase && url.startsWith(`${this.urlBase}/storage/v1/object/public/${this.bucket}/`));
