@@ -37,6 +37,7 @@ export default function LayoutServicios() {
       <Stack.Screen name="productos" options={{ headerShown: false }} />
       <Stack.Screen name="restaurantes" options={{ headerShown: false }} />
       <Stack.Screen name="supermarket" options={{ headerShown: false }} />
+      <Stack.Screen name="[slug]" options={{ headerShown: false }} />
     </Stack>
   );
 }

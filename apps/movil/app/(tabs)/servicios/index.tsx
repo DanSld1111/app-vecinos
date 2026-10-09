@@ -55,6 +55,9 @@ function colorIconoPorSlug(slug: string, colores: PaletaColores, oscuro: boolean
     restaurantes: colores.acentoFuerte,
     "market-space": oscuro ? "#e0b565" : "#b8862e",
     supermarket: colores.primarioFuerte,
+    turismo: oscuro ? "#6fc3c9" : "#1f7a80",
+    inmobiliaria: oscuro ? "#b3a3e0" : "#5b4a99",
+    "rescate-animal": oscuro ? "#f0a38a" : "#b34f2e",
   };
   return mapa[slug] ?? colores.primarioFuerte;
 }
@@ -107,8 +110,10 @@ export default function Servicios() {
 
   function alTocar(servicio: ServicioApp) {
     void repositorioServicios.registrarVisita(servicio.slug);
+    // Un servicio sin pantalla propia usa la genérica (app/(tabs)/servicios/[slug].tsx).
     const ruta = RUTA_POR_SLUG[servicio.slug];
     if (ruta) router.push(ruta);
+    else router.push({ pathname: "/servicios/[slug]", params: { slug: servicio.slug } });
     // Si un servicio nuevo se marca "disponible" desde el panel antes de que exista su
     // pantalla real, tocar la tarjeta no navega a ningún lado — a propósito, ver comentario
     // de RUTA_POR_SLUG arriba.

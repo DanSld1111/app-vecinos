@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { urlCompleta } from "../utilidades/media";
-import { atributosVisibles, coincideFiltro, filtroDeCampos, insigniasDe } from "../utilidades/fichaNegocio";
+import { atributosVisibles, coincideFiltro, filtroDeCampos, insigniasDe, sufijoPrecio } from "../utilidades/fichaNegocio";
 import { ChipCategoria } from "./ChipCategoria";
 import { SinFoto } from "./SinFoto";
 import { EntradaAnimada } from "./EntradaAnimada";
@@ -121,7 +121,10 @@ export function CatalogoNegocio({
                   <Text style={styles.nombre} numberOfLines={1}>
                     {producto.nombre}
                   </Text>
-                  <Text style={styles.precio}>{formatearPrecio(producto.precio, moneda)}</Text>
+                  <Text style={styles.precio}>
+                    {formatearPrecio(producto.precio, moneda)}
+                    {sufijoPrecio(producto.atributos, campos)}
+                  </Text>
                 </View>
               </Pressable>
             </EntradaAnimada>
@@ -145,7 +148,10 @@ export function CatalogoNegocio({
                   </Pressable>
                 </View>
                 <Text style={styles.nombreHoja}>{abierto.nombre}</Text>
-                <Text style={styles.precioHoja}>{formatearPrecio(abierto.precio, moneda)}</Text>
+                <Text style={styles.precioHoja}>
+                  {formatearPrecio(abierto.precio, moneda)}
+                  {sufijoPrecio(abierto.atributos, campos)}
+                </Text>
                 {abierto.descripcion ? <Text style={styles.descripcionHoja}>{abierto.descripcion}</Text> : null}
                 {insigniasDe(abierto.atributos, campos).length > 0 ? (
                   <View style={styles.filaAtributos}>

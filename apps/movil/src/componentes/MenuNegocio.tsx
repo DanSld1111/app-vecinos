@@ -3,7 +3,7 @@ import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vec
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
 import { FotoNegocio } from "./FotoNegocio";
 import { EntradaAnimada } from "./EntradaAnimada";
-import { atributosVisibles, insigniasDe } from "../utilidades/fichaNegocio";
+import { atributosVisibles, insigniasDe, sufijoPrecio } from "../utilidades/fichaNegocio";
 
 
 function agruparPorCategoria(productos: Producto[]) {
@@ -54,7 +54,10 @@ function ItemMenu({
         <Text style={styles.itemDescripcion} numberOfLines={2}>
           {producto.descripcion}
         </Text>
-        <Text style={styles.itemPrecio}>{formatearPrecio(producto.precio, moneda)}</Text>
+        <Text style={styles.itemPrecio}>
+          {formatearPrecio(producto.precio, moneda)}
+          {sufijoPrecio(producto.atributos, campos)}
+        </Text>
         {campos.length > 0 && atributosVisibles(producto.atributos, campos).length > 0 ? (
           <View style={styles.filaAtributos}>
             {atributosVisibles(producto.atributos, campos).map((a) => (

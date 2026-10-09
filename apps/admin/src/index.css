@@ -4062,3 +4062,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 @media (max-width: 640px) {
   .fila-aviso-categoria { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Texto detrás del precio según una opción (decisión 0089) */
+.sufijo-campo-extra { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.campo-modal .sufijo-campo-extra select, .campo-modal .sufijo-campo-extra input { width: auto; padding: 4px 8px; font-size: 12.5px; }
+.campo-modal .sufijo-campo-extra input { width: 80px; }

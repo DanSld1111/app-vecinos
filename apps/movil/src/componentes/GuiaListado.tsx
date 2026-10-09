@@ -149,7 +149,8 @@ export function GuiaListado({
         ) : null}
       </View>
 
-      {mostrarFiltroCategorias ? (
+      {/* Con una sola categoría en el servicio, "Todos | Turismo" no filtra nada: no se muestra. */}
+      {mostrarFiltroCategorias && listaCategorias.length > 2 ? (
         <FlashList
           horizontal
           data={listaCategorias}
@@ -167,7 +168,7 @@ export function GuiaListado({
       ) : null}
 
       <Text style={styles.contador}>
-        {negocios ? `${negocios.items.length} ${textos.buscar.resultados}` : ""}
+        {negocios ? (negocios.items.length === 1 ? "1 negocio" : `${negocios.items.length} ${textos.buscar.resultados}`) : ""}
       </Text>
 
       {isLoading ? (

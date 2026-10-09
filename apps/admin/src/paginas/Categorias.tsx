@@ -183,6 +183,9 @@ type CampoEditable = {
   oculto: boolean;
   filtro: boolean;
   insignia: boolean;
+  /** Texto detrás del precio cuando el producto tiene `sufijoOpcion` (ej. Alquiler → "/mes"). */
+  sufijoOpcion: string;
+  sufijoTexto: string;
 };
 
 /** Texto sugerido al elegir un tipo de aviso (se puede cambiar). */
@@ -201,6 +204,8 @@ function aEditables(campos: AtributoProductoDef[] | undefined): CampoEditable[] 
     oculto: Boolean(c.oculto),
     filtro: Boolean(c.filtro),
     insignia: Boolean(c.insignia),
+    sufijoOpcion: c.sufijoPrecio?.opcion ?? "",
+    sufijoTexto: c.sufijoPrecio?.sufijo ?? "",
   }));
 }
 
@@ -217,6 +222,9 @@ function aDefiniciones(campos: CampoEditable[]): AtributoProductoDef[] {
       ...(c.oculto ? { oculto: true } : {}),
       ...(c.tipo === "opciones" && c.filtro ? { filtro: true } : {}),
       ...(c.tipo === "opciones" && c.insignia ? { insignia: true } : {}),
+      ...(c.tipo === "opciones" && c.sufijoOpcion && c.sufijoTexto.trim()
+        ? { sufijoPrecio: { opcion: c.sufijoOpcion, sufijo: c.sufijoTexto.trim() } }
+        : {}),
     }));
 }
 
@@ -478,6 +486,34 @@ function EditorCategoria({
                               <input type="checkbox" checked={c.insignia} onChange={(e) => cambiarCampo(i, { insignia: e.target.checked })} />
                               Insignia sobre la foto <small>(si el valor es “Sí”)</small>
                             </label>
+                            <span className="sufijo-campo-extra">
+                              Si es
+                              <select
+                                aria-label={`Opción de ${c.etiqueta} que agrega texto al precio`}
+                                value={c.sufijoOpcion}
+                                onChange={(e) => cambiarCampo(i, { sufijoOpcion: e.target.value })}
+                              >
+                                <option value="">—</option>
+                                {c.opciones
+                                  .split(",")
+                                  .map((o) => o.trim())
+                                  .filter(Boolean)
+                                  .map((o) => (
+                                    <option key={o} value={o}>
+                                      {o}
+                                    </option>
+                                  ))}
+                              </select>
+                              el precio dice
+                              <input
+                                aria-label="Texto después del precio"
+                                value={c.sufijoTexto}
+                                maxLength={12}
+                                disabled={!c.sufijoOpcion}
+                                placeholder="/mes"
+                                onChange={(e) => cambiarCampo(i, { sufijoTexto: e.target.value })}
+                              />
+                            </span>
                           </div>
                         ) : null}
                       </div>
@@ -492,7 +528,7 @@ function EditorCategoria({
                   onClick={() =>
                     setCampos((lista) => [
                       ...lista,
-                      { clave: "", etiqueta: "", tipo: "opciones", opciones: "", oculto: false, filtro: false, insignia: false },
+                      { clave: "", etiqueta: "", tipo: "opciones", opciones: "", oculto: false, filtro: false, insignia: false, sufijoOpcion: "", sufijoTexto: "" },
                     ])
                   }
                 >

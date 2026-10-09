@@ -85,6 +85,10 @@ function normalizarCampos(campos: CampoProductoDto[]): NonNullable<Categoria["at
       ...(c.oculto ? { oculto: true } : {}),
       ...(opciones && c.filtro ? { filtro: true } : {}),
       ...(opciones && c.insignia ? { insignia: true } : {}),
+      // Solo si la opción existe en el campo; un sufijo de una opción borrada se descarta.
+      ...(opciones && c.sufijoPrecio?.sufijo.trim() && opciones.includes(c.sufijoPrecio.opcion.trim())
+        ? { sufijoPrecio: { opcion: c.sufijoPrecio.opcion.trim(), sufijo: c.sufijoPrecio.sufijo.trim() } }
+        : {}),
     };
   });
 }

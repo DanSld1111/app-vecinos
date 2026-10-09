@@ -34,6 +34,9 @@ export interface AtributoProductoDef {
   /** Solo "opciones": un producto con valor "Sí" muestra la etiqueta del campo como insignia sobre
    * su foto en vez de un dato más, ej. "Receta". */
   insignia?: boolean;
+  /** Solo "opciones": cuando el producto tiene `opcion`, el precio lleva `sufijo` detrás (ej.
+   * Operación = Alquiler → "$ 950 /mes"). Ver docs/decisiones/0089. */
+  sufijoPrecio?: { opcion: string; sufijo: string };
 }
 
 /** Aviso fijo en la ficha de todos los negocios de una categoría, bajo la descripción. */

@@ -29,5 +29,9 @@ export const NOMBRE_MONEDA: Record<Moneda, string> = {
  */
 export function formatearPrecio(precio: number, moneda: Moneda = "PEN"): string {
   const monto = precio % 1 === 0 ? precio.toFixed(0) : precio.toFixed(2);
-  return `${SIMBOLO_MONEDA[moneda]} ${monto}`;
+  // Separador de miles como en Perú ("S/ 1,290" · "$ 189,000"); sin Intl para que se vea igual
+  // en cualquier dispositivo.
+  const [entero, decimales] = monto.split(".");
+  const conMiles = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return `${SIMBOLO_MONEDA[moneda]} ${decimales ? `${conMiles}.${decimales}` : conMiles}`;
 }

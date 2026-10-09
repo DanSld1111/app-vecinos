@@ -47,6 +47,10 @@ const normalizar = (t: string) => t.trim().toLowerCase().normalize("NFD").replac
 function insigniasDe(valores: Record<string, string>, campos: AtributoProductoDef[]) {
   return campos.filter((c) => c.insignia && !c.oculto && normalizar(valores[c.clave] ?? "") === "si").map((c) => c.etiqueta);
 }
+function sufijoPrecio(valores: Record<string, string>, campos: AtributoProductoDef[]) {
+  const campo = campos.find((c) => c.sufijoPrecio && !c.oculto && valores[c.clave] === c.sufijoPrecio.opcion);
+  return campo ? ` ${campo.sufijoPrecio!.sufijo}` : "";
+}
 function filtroDeCampos(campos: AtributoProductoDef[]) {
   const campo = campos.find((c) => c.filtro && !c.oculto && c.tipo === "opciones" && (c.opciones?.length ?? 0) > 1);
   if (!campo) return null;
@@ -154,7 +158,10 @@ export function Contenido({
                 </div>
                 <div className="tf-card-txt">
                   <b>{p.nombre}</b>
-                  <span className="tf-precio">{precio(p.precio)}</span>
+                  <span className="tf-precio">
+                    {precio(p.precio)}
+                    {sufijoPrecio(p.valores, campos)}
+                  </span>
                 </div>
               </div>
             ))}
@@ -186,7 +193,10 @@ export function Contenido({
                   <div className="tf-inf">
                     <b>{p.nombre}</b>
                     {p.descripcion ? <span>{p.descripcion}</span> : null}
-                    <span className="tf-precio">{precio(p.precio)}</span>
+                    <span className="tf-precio">
+                      {precio(p.precio)}
+                      {sufijoPrecio(p.valores, campos)}
+                    </span>
                     <Atributos valores={p.valores} campos={campos} />
                   </div>
                 </div>

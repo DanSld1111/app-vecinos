@@ -62,7 +62,7 @@ export function ServiciosNegocio({
             <Text style={styles.nombre}>{servicio.nombre}</Text>
             {servicio.detalle ? <Text style={styles.detalle}>{servicio.detalle}</Text> : null}
           </View>
-          <Text style={styles.precio}>{formatearPrecio(servicio.precio, moneda)}</Text>
+          <Text style={styles.precio}>{servicio.precio === 0 ? "Gratis" : formatearPrecio(servicio.precio, moneda)}</Text>
         </EntradaAnimada>
       ))}
       <Text style={styles.nota}>Tarifas referenciales. Confirma el precio final con el negocio.</Text>

@@ -1,8 +1,22 @@
-import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateIf } from "class-validator";
+import { Type } from "class-transformer";
+import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsOptional, IsString, Matches, MaxLength, MinLength, ValidateIf, ValidateNested } from "class-validator";
 
 /** Las fichas que la app sabe dibujar — igual que TIPOS_FICHA en paquetes/tipos/src/ficha.ts
  * (la API solo importa tipos de ese paquete, no valores). */
 export const TIPOS_FICHA = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria"] as const;
+
+/** Texto detrás del precio cuando el producto tiene cierta opción (ej. Alquiler → "/mes"). */
+export class SufijoPrecioDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(40)
+  opcion!: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(12)
+  sufijo!: string;
+}
 
 /** Un campo extra de los productos de una categoría (ej. "Talla" en Moda). */
 export class CampoProductoDto {
@@ -40,6 +54,11 @@ export class CampoProductoDto {
   @IsOptional()
   @IsBoolean()
   insignia?: boolean;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SufijoPrecioDto)
+  sufijoPrecio?: SufijoPrecioDto;
 }
 
 /** Aviso fijo en la ficha de los negocios de una categoría (ej. venta solo a mayores de 18). */

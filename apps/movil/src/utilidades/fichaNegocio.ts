@@ -90,3 +90,10 @@ export function filtroDeCampos(campos: AtributoProductoDef[]): { campo: Atributo
 export function coincideFiltro(valor: string | undefined, opcion: string): boolean {
   return Boolean(valor) && normalizar(valor!).includes(normalizar(opcion));
 }
+
+/** Texto detrás del precio según un campo del producto (ej. Operación = Alquiler → " /mes"), o "". */
+export function sufijoPrecio(atributos: Record<string, string> | undefined, campos: AtributoProductoDef[]): string {
+  const valores = atributos ?? {};
+  const campo = campos.find((c) => c.sufijoPrecio && !c.oculto && valores[c.clave] === c.sufijoPrecio.opcion);
+  return campo ? ` ${campo.sufijoPrecio!.sufijo}` : "";
+}
