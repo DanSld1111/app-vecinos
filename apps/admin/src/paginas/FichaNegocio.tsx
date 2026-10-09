@@ -309,7 +309,8 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
               {confirmandoArchivar ? (
                 <>
                   <span style={{ fontSize: 11.5, color: "var(--texto-suave)" }}>
-                    Sale del listado. Se puede restaurar desde "Ver archivados".
+                    Sale del listado y de la app, y sus anuncios de publicidad se desactivan. Se puede
+                    restaurar desde "Ver archivados" (los anuncios se reactivan a mano en Publicidad).
                   </span>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button
@@ -353,7 +354,8 @@ function PestanaEstado({ negocio }: { negocio: Negocio }) {
               {confirmandoEliminar ? (
                 <>
                   <span style={{ fontSize: 11.5, color: "var(--rojo)", fontWeight: 700 }}>
-                    ¿Eliminar "{negocio.nombre}"? Se borran también sus productos y fotos. Esta acción no
+                    ¿Eliminar "{negocio.nombre}"? Se borran también sus productos y fotos, y sus anuncios de
+                    publicidad se desactivan. Esta acción no
                     se puede deshacer.
                   </span>
                   <div style={{ display: "flex", gap: 6 }}>

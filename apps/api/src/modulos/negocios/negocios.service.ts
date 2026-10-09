@@ -584,10 +584,26 @@ export class NegociosService {
     if (cuenta.rol === "gestor_negocios") await this.verificarDistritoGestor(cuenta, id);
     await this.obtenerFilaAdminOFallar(id);
     await this.bd.consultar("UPDATE negocios SET archivado_en = now(), actualizado_en = now() WHERE id = $1", [id]);
+    await this.desactivarAnunciosDelNegocio(id, cuenta, "archivar");
     const negocio = aNegocio(await this.obtenerFilaAdminOFallar(id));
     await this.busqueda.sincronizarNegocio({ ...negocio, estado: "inactivo" }); // fuera del índice mientras esté archivado
     await this.auditoria.registrar("archivar", "negocio", id, cuenta.id);
     return negocio;
+  }
+
+  /**
+   * Un negocio archivado o eliminado no debe seguir promocionándose: sus anuncios activos se
+   * desactivan (no se borran). Restaurar el negocio NO los reactiva — se revisan y reactivan a
+   * mano en Publicidad, porque sus fechas o su texto pueden haber quedado viejos.
+   */
+  private async desactivarAnunciosDelNegocio(negocioId: string, cuenta: Cuenta, motivo: "archivar" | "eliminar"): Promise<void> {
+    const { rows } = await this.bd.consultar<{ id: string }>(
+      "UPDATE anuncios SET activo = false WHERE negocio_id = $1 AND activo RETURNING id",
+      [negocioId],
+    );
+    for (const anuncio of rows) {
+      await this.auditoria.registrar("desactivar", "anuncio", anuncio.id, cuenta.id, { motivo, negocioId });
+    }
   }
 
   async restaurarArchivo(id: string, cuenta: Cuenta): Promise<Negocio> {
@@ -616,6 +632,8 @@ export class NegociosService {
     );
 
     await this.busqueda.sincronizarNegocio({ ...negocio, estado: "inactivo" });
+    // Antes del DELETE: después el anuncio queda con negocio_id NULL y ya no se sabría cuál era.
+    await this.desactivarAnunciosDelNegocio(id, cuenta, "eliminar");
     await this.bd.consultar("DELETE FROM negocios WHERE id = $1", [id]);
 
     await Promise.all([
