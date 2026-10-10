@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -18,6 +19,7 @@ import { Roles } from "../auth/roles.decorator";
 import { CategoriasService } from "./categorias.service";
 import { CrearCategoriaDto } from "./dto/crear-categoria.dto";
 import { ActualizarCategoriaDto } from "./dto/actualizar-categoria.dto";
+import { OrdenCategoriasDto } from "./dto/orden-categorias.dto";
 import { opcionesUploadFotoCategoria } from "./foto-categoria.config";
 
 @Controller("categorias")
@@ -34,6 +36,14 @@ export class CategoriasController {
   @Roles("super_admin")
   crear(@Body() dto: CrearCategoriaDto): Promise<Categoria> {
     return this.categorias.crear(dto);
+  }
+
+  /** Botones de subir y bajar del panel: se manda la lista completa ya ordenada. */
+  @Put("orden")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("super_admin")
+  reordenar(@Body() dto: OrdenCategoriasDto): Promise<Categoria[]> {
+    return this.categorias.reordenar(dto.ids);
   }
 
   @Patch(":id")

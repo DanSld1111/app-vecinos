@@ -4468,3 +4468,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
   .buscador-para-ti { flex-basis: 100%; }
   .hora-evento { width: 56px; }
 }
+
+/* Subir y bajar categorías: el orden en que salen en la app. */
+.orden-cat { display: flex; align-items: center; gap: 4px; }
+.mover-cat { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.mover-cat:hover:not(:disabled) { border-color: var(--texto); }
+.mover-cat:disabled { opacity: .3; cursor: default; }
+.mover-cat:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }

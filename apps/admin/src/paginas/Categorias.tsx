@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AtributoProductoDef, AvisoFicha, Categoria, FICHAS, ServicioApp, TIPOS_FICHA, TipoFicha, tituloSeccionFicha } from "@app-vecinos/tipos";
-import { LuEye, LuEyeOff, LuPlus, LuX } from "react-icons/lu";
+import { LuArrowLeft, LuArrowRight, LuEye, LuEyeOff, LuPlus, LuX } from "react-icons/lu";
 import { useCategorias } from "../estado/useCategorias";
 import { useNegocios } from "../estado/useNegocios";
 import { useServiciosApp } from "../estado/useServiciosApp";
@@ -12,10 +12,12 @@ import { TelefonoFicha } from "../componentes/fichas/TelefonoFicha";
 import { useNegocioEjemplo } from "../componentes/fichas/useNegocioEjemplo";
 import { urlCompleta } from "../utilidades/media";
 import { IconoEmoji } from "../componentes/IconoEmoji";
+import { useToasts } from "../estado/useToasts";
 
 export function Categorias() {
   const categorias = useCategorias((estado) => estado.categorias);
   const cargar = useCategorias((estado) => estado.cargar);
+  const mover = useCategorias((estado) => estado.mover);
   const negocios = useNegocios((estado) => estado.negocios);
   const servicios = useServiciosApp((estado) => estado.servicios);
   const cargarServicios = useServiciosApp((estado) => estado.cargar);
@@ -39,7 +41,18 @@ export function Categorias() {
     return { total: categorias.length, propias, heredan: categorias.length - propias, sinServicio, negociosCategorizados };
   }, [categorias, negocios]);
 
-  const categoriasFiltradas = categorias.filter((c) => c.nombre.toLowerCase().includes(busqueda.toLowerCase()));
+  const categoriasFiltradas = categorias
+    .filter((c) => c.nombre.toLowerCase().includes(busqueda.toLowerCase()))
+    .sort((a, b) => a.orden - b.orden);
+  // El orden se cambia sobre la lista completa: con el buscador activo se esconden las flechas.
+  const principales = categorias.filter((c) => !c.padreId).sort((a, b) => a.orden - b.orden);
+  const puedeOrdenar = !busqueda.trim();
+
+  async function moverCategoria(cat: Categoria, direccion: -1 | 1) {
+    if (!(await mover(cat.id, direccion, token))) {
+      useToasts.getState().alertar({ tipo: "error", titulo: "No se pudo cambiar el orden", detalle: useCategorias.getState().error ?? undefined });
+    }
+  }
 
   return (
     <>
@@ -134,7 +147,39 @@ export function Categorias() {
                     <IconoCategoria nombre={cat.icono} size={22} />
                   )}
                 </div>
-                <span className="orden-badge">{String(cat.orden).padStart(2, "0")}</span>
+                <div className="orden-cat">
+                  {puedeOrdenar && !cat.padreId ? (
+                    <button
+                      type="button"
+                      className="mover-cat"
+                      aria-label={`Mover ${cat.nombre} antes`}
+                      title="Mover antes"
+                      disabled={principales[0]?.id === cat.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        moverCategoria(cat, -1);
+                      }}
+                    >
+                      <LuArrowLeft aria-hidden />
+                    </button>
+                  ) : null}
+                  <span className="orden-badge">{String(cat.orden).padStart(2, "0")}</span>
+                  {puedeOrdenar && !cat.padreId ? (
+                    <button
+                      type="button"
+                      className="mover-cat"
+                      aria-label={`Mover ${cat.nombre} después`}
+                      title="Mover después"
+                      disabled={principales[principales.length - 1]?.id === cat.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        moverCategoria(cat, 1);
+                      }}
+                    >
+                      <LuArrowRight aria-hidden />
+                    </button>
+                  ) : null}
+                </div>
               </div>
               <div>
                 <p className="nombre-cat">{cat.nombre}</p>

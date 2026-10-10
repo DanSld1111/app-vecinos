@@ -194,6 +194,14 @@ export class CategoriasService {
     return aCategoria(await this.obtenerFilaOFallar(id));
   }
 
+  /** Orden de la app: el primero de la lista queda con orden 1. Las que no vienen en la lista no cambian. */
+  async reordenar(ids: string[]): Promise<Categoria[]> {
+    await this.bd.transaccion(async (db) => {
+      for (const [i, id] of ids.entries()) await db.consultar("UPDATE categorias SET orden = $2 WHERE id = $1", [id, i + 1]);
+    });
+    return this.listarTodas();
+  }
+
   /** Igual que NegociosService.actualizarFoto: borra el archivo anterior de Supabase Storage al reemplazarlo. */
   async actualizarFoto(id: string, archivo: Express.Multer.File): Promise<Categoria> {
     const fila = await this.obtenerFilaOFallar(id);

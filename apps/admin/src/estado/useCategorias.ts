@@ -23,13 +23,15 @@ interface EstadoCategorias {
   crear: (categoria: CategoriaNueva, token: string) => Promise<boolean>;
   actualizar: (id: string, datos: CategoriaEditable, token: string) => Promise<boolean>;
   subirFoto: (id: string, archivo: File, token: string) => Promise<boolean>;
+  /** Mueve una categoría un lugar antes (-1) o después (1) en la app. */
+  mover: (id: string, direccion: -1 | 1, token: string) => Promise<boolean>;
 }
 
 function mensajeError(error: unknown, fallback: string): string {
   return error instanceof ErrorApi ? error.message : fallback;
 }
 
-export const useCategorias = create<EstadoCategorias>((set) => ({
+export const useCategorias = create<EstadoCategorias>((set, get) => ({
   categorias: [],
   cargando: false,
   error: null,
@@ -62,6 +64,26 @@ export const useCategorias = create<EstadoCategorias>((set) => ({
       return true;
     } catch (error) {
       set({ error: mensajeError(error, "No se pudo guardar la categoría.") });
+      return false;
+    }
+  },
+
+  mover: async (id, direccion, token) => {
+    const antes = get().categorias;
+    const lista = [...antes].filter((c) => !c.padreId).sort((a, b) => a.orden - b.orden);
+    const i = lista.findIndex((c) => c.id === id);
+    const j = i + direccion;
+    if (i < 0 || j < 0 || j >= lista.length) return false;
+    [lista[i], lista[j]] = [lista[j], lista[i]];
+    // Se ve al instante; si la API falla, vuelve como estaba.
+    const conOrden = lista.map((c, n) => ({ ...c, orden: n + 1 }));
+    set({ categorias: [...conOrden, ...antes.filter((c) => c.padreId)], error: null });
+    try {
+      const categorias = await apiFetch<Categoria[]>("/categorias/orden", { metodo: "PUT", token, cuerpo: { ids: lista.map((c) => c.id) } });
+      set({ categorias });
+      return true;
+    } catch (error) {
+      set({ categorias: antes, error: mensajeError(error, "No se pudo cambiar el orden.") });
       return false;
     }
   },
