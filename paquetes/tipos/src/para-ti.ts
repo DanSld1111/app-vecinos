@@ -27,6 +27,10 @@ export interface Publicacion {
   permiteComentarios: boolean;
   /** null = no está destacada. Si ya pasó, deja de estarlo. */
   destacadaHasta: string | null;
+  /** Orden manual entre las destacadas (menor primero); null = por fecha. */
+  destacadaOrden: number | null;
+  /** Publicada con fecha futura: sale sola en publicadoEn (decisión 0092). */
+  programada: boolean;
   corazones: number;
   compartidos: number;
   /** Comentarios visibles (no ocultos). */
@@ -38,17 +42,57 @@ export interface Publicacion {
   actualizadoEn: string;
 }
 
+export type MotivoReporte = "publicidad" | "ofensivo" | "enganoso" | "otro";
+export const MOTIVOS_REPORTE: Record<MotivoReporte, string> = {
+  publicidad: "Es publicidad o spam",
+  ofensivo: "Es ofensivo",
+  enganoso: "Es engañoso",
+  otro: "Otro motivo",
+};
+/** Con esta cantidad de reportes un comentario se oculta solo hasta que el panel lo revise. */
+export const REPORTES_PARA_OCULTAR = 3;
+
 export interface ComentarioPublicacion {
   id: string;
   publicacionId: string;
   texto: string;
-  /** "María R." — nombre y la inicial del apellido del vecino. */
+  /** "María R." — nombre y la inicial del apellido del vecino; "ELISUR" si es oficial. */
   autorNombre: string;
   creadoEn: string;
+  /** Escrito desde el panel: se muestra como ELISUR con la insignia de cuenta oficial. */
+  oficial: boolean;
+  /** Id del comentario principal al que responde (las respuestas tienen un solo nivel). */
+  respuestaA: string | null;
+  /** Fijado arriba por ELISUR (uno por publicación). */
+  fijado: boolean;
+  corazones: number;
   /** Solo en el panel. */
   oculto?: boolean;
   reportes?: number;
+  revisado?: boolean;
+  motivos?: { motivo: MotivoReporte; cantidad: number }[];
+  usuarioId?: string | null;
+  autorComunidad?: string | null;
+  silenciadoHasta?: string | null;
+  /** Un comentario principal de vecino que ya tiene respuesta de ELISUR. */
+  respondido?: boolean;
   publicacionTexto?: string;
+  publicacionTipo?: TipoPublicacion;
+  publicacionMiniatura?: string | null;
+  publicacionComentarios?: number;
+  publicacionPermiteComentarios?: boolean;
+}
+
+export type FiltroComentarios = "reportados" | "todos" | "ocultos" | "sin_responder";
+export type ResumenComentarios = Record<FiltroComentarios, number>;
+
+/** Números de Para ti para el inicio del panel: los últimos 7 días contra los 7 anteriores. */
+export interface MetricaParaTi {
+  clave: "corazones" | "comentarios" | "compartidos" | "visitantes";
+  total: number;
+  anterior: number;
+  /** 7 valores, del más antiguo a hoy. */
+  porDia: number[];
 }
 
 /** Pestañas que se encienden y apagan desde el panel. */
