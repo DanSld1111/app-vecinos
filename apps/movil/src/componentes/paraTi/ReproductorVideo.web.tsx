@@ -43,3 +43,15 @@ export function ReproductorYoutube({ videoId, style }: { videoId: string; style?
     </View>
   );
 }
+
+/** Web: el primer cuadro del video, para usarlo de portada cuando el editor no subió una. */
+export function CuadroVideo({ url }: { url: string }) {
+  return createElement("video", {
+    src: `${url}#t=0.1`,
+    muted: true,
+    playsInline: true,
+    preload: "metadata",
+    "aria-hidden": true,
+    style: { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" },
+  });
+}

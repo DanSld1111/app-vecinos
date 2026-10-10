@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Publicacion, idYoutube } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../disenio";
 import { urlCompleta } from "../../utilidades/media";
-import { ReproductorVideo, ReproductorYoutube } from "./ReproductorVideo";
+import { CuadroVideo, ReproductorVideo, ReproductorYoutube } from "./ReproductorVideo";
 
 const TIPO: Record<Publicacion["tipo"], string> = { fotos: "Fotos", video: "Video", youtube: "YouTube", texto: "Noticia" };
 
@@ -89,7 +89,7 @@ export function MediaPublicacion({ p, reproducir, alto = 300, onAbrir }: { p: Pu
     if (reproducir) return <ReproductorVideo url={urlCompleta(p.videoUrl)!} portada={urlCompleta(p.portadaUrl)} style={[styles.media, { height: alto }]} />;
     return (
       <Pressable onPress={onAbrir} style={[styles.media, styles.mediaOscura, { height: alto }]} accessibilityLabel="Reproducir video">
-        {p.portadaUrl ? <Image source={{ uri: urlCompleta(p.portadaUrl) }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
+        {p.portadaUrl ? <Image source={{ uri: urlCompleta(p.portadaUrl) }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : <CuadroVideo url={urlCompleta(p.videoUrl)!} />}
         <View style={styles.play}>
           <Ionicons name="play" size={26} color="#141a16" />
         </View>

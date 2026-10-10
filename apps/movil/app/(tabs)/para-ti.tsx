@@ -12,6 +12,8 @@ import { useDestacadas, useModulos, usePublicacionesParaTi } from "../../src/dat
 import { useDestacadasVistas } from "../../src/estado/useDestacadasVistas";
 import { TarjetaPublicacion, imagenDe } from "../../src/componentes/paraTi/TarjetaPublicacion";
 import { useAccionesPublicacion } from "../../src/componentes/paraTi/useAccionesPublicacion";
+import { CuadroVideo } from "../../src/componentes/paraTi/ReproductorVideo";
+import { urlCompleta } from "../../src/utilidades/media";
 import { Aviso } from "../../src/componentes/Aviso";
 import { EstadoVacio } from "../../src/componentes/EstadoVacio";
 
@@ -50,14 +52,15 @@ export default function ParaTi() {
           renderItem={({ item }) => {
             const imagen = imagenDe(item);
             const vista = vistas.includes(item.id);
+            const cuadro = !imagen && item.tipo === "video" && item.videoUrl ? urlCompleta(item.videoUrl) : null;
             return (
               <Pressable
-                style={[styles.destacada, { backgroundColor: imagen ? colores.superficieHundida : colores.primarioFuerte }]}
+                style={[styles.destacada, { backgroundColor: imagen || cuadro ? colores.superficieHundida : colores.primarioFuerte }]}
                 onPress={() => router.push({ pathname: "/para-ti/destacadas", params: { inicio: item.id } })}
                 accessibilityRole="button"
                 accessibilityLabel={`Destacada: ${item.texto || item.enlaceTitulo || "publicación"}`}
               >
-                {imagen ? <Image source={{ uri: imagen }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
+                {imagen ? <Image source={{ uri: imagen }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : cuadro ? <CuadroVideo url={cuadro} /> : null}
                 <LinearGradient colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.75)"]} locations={[0.45, 1]} style={StyleSheet.absoluteFill} />
                 <View style={[styles.anillo, { borderColor: vista ? "rgba(255,255,255,0.6)" : colores.acento }]}>
                   <Text style={styles.anilloTexto}>EL</Text>

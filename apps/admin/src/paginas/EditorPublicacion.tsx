@@ -116,7 +116,20 @@ export function EditorPublicacion() {
   const listo =
     tipo === "texto" ? texto.trim() !== "" : tipo === "fotos" ? fotos.length > 0 : tipo === "video" ? Boolean(videoUrl) : Boolean(vista);
 
+  // Lo que se subió para otro tipo no se publica. Pasó: un video subido terminó publicado como
+  // "Solo texto" y se perdió sin aviso. Ahora se avisa y se pide confirmar.
+  const descartado: { tipo: TipoPublicacion; texto: string } | null =
+    videoUrl && tipo !== "video"
+      ? { tipo: "video", texto: "el video que subiste" }
+      : fotos.length && tipo !== "fotos"
+        ? { tipo: "fotos", texto: "las fotos que subiste" }
+        : vista && tipo !== "youtube"
+          ? { tipo: "youtube", texto: "el enlace de YouTube" }
+          : null;
+  const nombreTipo = (t: TipoPublicacion) => TIPOS.find((x) => x.id === t)!.texto;
+
   async function enviar(estado: Publicacion["estado"]) {
+    if (descartado && !window.confirm(`Elegiste «${nombreTipo(tipo)}»: ${descartado.texto} no se va a publicar. ¿Guardar igual?`)) return;
     setGuardando(true);
     const p = await guardar(
       id ?? null,
@@ -161,6 +174,16 @@ export function EditorPublicacion() {
               </button>
             ))}
           </div>
+          {descartado ? (
+            <div className="nota-alerta" style={{ marginTop: 10 }}>
+              <span>
+                Elegiste <b>{nombreTipo(tipo)}</b>: {descartado.texto} no se va a publicar.{" "}
+                <button type="button" className="btn-accion-mini" onClick={() => setTipo(descartado.tipo)}>
+                  Volver a {nombreTipo(descartado.tipo)}
+                </button>
+              </span>
+            </div>
+          ) : null}
         </div>
 
         {tipo === "fotos" ? (

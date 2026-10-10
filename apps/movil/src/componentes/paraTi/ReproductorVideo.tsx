@@ -40,3 +40,8 @@ export function ReproductorYoutube({ videoId, style }: { videoId: string; style?
     </View>
   );
 }
+
+/** Celular: sin portada se deja el fondo oscuro con el botón de reproducir. */
+export function CuadroVideo(_: { url: string }) {
+  return null;
+}
