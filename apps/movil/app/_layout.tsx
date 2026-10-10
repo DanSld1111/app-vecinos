@@ -108,6 +108,7 @@ export default function LayoutRaiz() {
               />
               <Stack.Screen name="notificaciones" />
               <Stack.Screen name="para-ti/[id]" />
+              <Stack.Screen name="para-ti/videos" options={{ animation: "fade", contentStyle: { backgroundColor: "#000000" } }} />
               <Stack.Screen name="para-ti/destacadas" options={{ presentation: "fullScreenModal", animation: "fade" }} />
               <Stack.Screen name="cuenta/index" options={{ presentation: "fullScreenModal" }} />
             </Stack>

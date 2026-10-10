@@ -21,7 +21,9 @@ const ICONOS: Record<string, { activo: keyof typeof Ionicons.glyphMap; inactivo:
   perfil: { activo: "person", inactivo: "person-outline" },
 };
 
-const ANCHO_RAYA = 34;
+// La pestaña elegida lleva una cápsula de color detrás del ícono, que se desliza (decisión 0092).
+const ANCHO_CAPSULA = 56;
+const ALTO_CAPSULA = 32;
 const NATIVO = Platform.OS !== "web";
 // En Android el desenfoque de expo-blur todavía es experimental y se ve sucio: ahí la barra es
 // casi opaca. En iOS y web se ve el contenido pasar por detrás, desenfocado.
@@ -58,7 +60,7 @@ function Pestana({
     Animated.spring(escala, { toValue: 1, friction: 4, tension: 220, useNativeDriver: NATIVO }).start();
   }, [enfocada, reducido, escala]);
 
-  const color = enfocada ? colores.texto : colores.textoTenue;
+  const color = enfocada ? "#ffffff" : colores.textoTenue;
 
   return (
     <Pressable
@@ -72,7 +74,7 @@ function Pestana({
         <Ionicons name={enfocada ? icono.activo : icono.inactivo} size={22} color={color} />
         {conPunto ? <View style={styles.punto} /> : null}
       </Animated.View>
-      <Text style={[styles.etiqueta, { color }, enfocada && styles.etiquetaActiva]}>{titulo}</Text>
+      <Text style={[styles.etiqueta, { color: enfocada ? colores.texto : colores.textoTenue }, enfocada && styles.etiquetaActiva]}>{titulo}</Text>
     </Pressable>
   );
 }
@@ -132,7 +134,7 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
   const anchoPestana = ancho / Math.max(1, visibles.length);
   const traslado = posicion.interpolate({
     inputRange: visibles.length > 1 ? visibles.map((_v, i) => i) : [0, 1],
-    outputRange: visibles.length > 1 ? visibles.map((_v, i) => i * anchoPestana + anchoPestana / 2 - ANCHO_RAYA / 2) : [anchoPestana / 2 - ANCHO_RAYA / 2, anchoPestana / 2 - ANCHO_RAYA / 2],
+    outputRange: visibles.length > 1 ? visibles.map((_v, i) => i * anchoPestana + anchoPestana / 2 - ANCHO_CAPSULA / 2) : [anchoPestana / 2 - ANCHO_CAPSULA / 2, anchoPestana / 2 - ANCHO_CAPSULA / 2],
   });
 
   const fondo = USA_DESENFOQUE ? (
@@ -144,7 +146,7 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
       style={[
         styles.barra,
         {
-          paddingBottom: Math.max(insets.bottom, 6),
+          bottom: Math.max(insets.bottom, 10),
           backgroundColor: USA_DESENFOQUE
             ? oscuro
               ? "rgba(18,19,22,0.72)"
@@ -155,14 +157,13 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
       ]}
       onLayout={(e) => {
         setAncho(e.nativeEvent.layout.width);
-        setAltura(e.nativeEvent.layout.height);
+        // Lo que tapa abajo: la cápsula más el margen que la separa del borde.
+        setAltura(e.nativeEvent.layout.height + Math.max(insets.bottom, 10));
       }}
       accessibilityRole="tablist"
     >
       {fondo}
-      {ancho > 0 && visibles.length > 1 ? (
-        <Animated.View style={[styles.raya, { transform: [{ translateX: traslado }] }]} />
-      ) : null}
+      {ancho > 0 ? <Animated.View style={[styles.capsula, { transform: [{ translateX: traslado }] }]} /> : null}
       {visibles.map(({ ruta, i }) => {
         const { options } = descriptors[ruta.key];
         const enfocada = state.index === i;
@@ -196,31 +197,38 @@ function crearEstilos(colores: PaletaColores) {
   return StyleSheet.create({
     barra: {
       position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 0,
+      left: 12,
+      right: 12,
       flexDirection: "row",
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colores.bordeFuerte,
-      paddingTop: 8,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colores.bordeFuerte,
+      borderRadius: 32,
+      paddingTop: 4,
+      paddingBottom: 6,
       overflow: "hidden",
+      shadowColor: "#000000",
+      shadowOpacity: 0.14,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 8,
     },
-    raya: {
+    capsula: {
       position: "absolute",
-      top: 0,
+      top: 4,
       left: 0,
-      width: ANCHO_RAYA,
-      height: 2.5,
-      borderBottomLeftRadius: 2,
-      borderBottomRightRadius: 2,
-      backgroundColor: colores.texto,
+      width: ANCHO_CAPSULA,
+      height: ALTO_CAPSULA,
+      borderRadius: ALTO_CAPSULA / 2,
+      backgroundColor: colores.primario,
     },
     pestana: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      gap: 3,
-      paddingVertical: 2,
+      gap: 6,
+      paddingTop: 2,
+      paddingBottom: 2,
+      minHeight: 52,
     },
     punto: {
       position: "absolute",

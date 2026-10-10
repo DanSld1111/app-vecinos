@@ -6,15 +6,35 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDestacadas, useModulos } from "../../src/datos/hooks/useParaTi";
 import { useDestacadasVistas } from "../../src/estado/useDestacadasVistas";
-import { imagenDe, tiempoPublicacion } from "../../src/componentes/paraTi/TarjetaPublicacion";
+import { NombreOficial, imagenDe, tiempoPublicacion } from "../../src/componentes/paraTi/TarjetaPublicacion";
+import { CuadroVideo } from "../../src/componentes/paraTi/ReproductorVideo";
+import { urlCompleta } from "../../src/utilidades/media";
 import { useAccionesPublicacion } from "../../src/componentes/paraTi/useAccionesPublicacion";
 import { Aviso } from "../../src/componentes/Aviso";
 
 const DURACION_MS = 6000;
 
+/** El título en etiquetas blancas, como en las historias: hasta 3 renglones de unas 4 palabras. */
+function etiquetas(texto: string): string[] {
+  const palabras = texto.trim().split(/\s+/).filter(Boolean);
+  const lineas: string[] = [];
+  let actual = "";
+  for (const p of palabras) {
+    if ((actual + " " + p).trim().length > 18 && actual) {
+      lineas.push(actual);
+      actual = p;
+    } else actual = (actual + " " + p).trim();
+    if (lineas.length === 3) break;
+  }
+  if (actual && lineas.length < 3) lineas.push(actual);
+  const usadas = lineas.join(" ").split(/\s+/).length;
+  if (usadas < palabras.length && lineas.length) lineas[lineas.length - 1] += "…";
+  return lineas;
+}
+
 /**
- * Destacadas a pantalla completa, como los estados (decisión 0091): barritas de avance arriba,
- * tocar a los lados para pasar, y "Ver publicación completa" para el video, el texto y los comentarios.
+ * Destacadas a pantalla completa, como las historias (decisiones 0091 y 0092): barritas de avance,
+ * tocar a los lados para pasar, pausa, el título en etiquetas y "Ver publicación completa".
  */
 export default function DestacadasParaTi() {
   const { inicio } = useLocalSearchParams<{ inicio?: string }>();
@@ -56,11 +76,18 @@ export default function DestacadasParaTi() {
   if (!actual) return <View style={[styles.raiz, { backgroundColor: "#0f1210" }]} />;
 
   const imagen = imagenDe(actual);
+  const cuadro = !imagen && actual.tipo === "video" && actual.videoUrl ? urlCompleta(actual.videoUrl) : null;
+  const esVideo = actual.tipo === "video" || actual.tipo === "youtube";
+  const titulo = etiquetas(actual.texto || actual.enlaceTitulo || "");
+  const verCompleta = () =>
+    esVideo
+      ? router.replace({ pathname: "/para-ti/videos", params: { inicio: actual.id } })
+      : router.replace({ pathname: "/para-ti/[id]", params: { id: actual.id } });
   const ancho = avance.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] });
 
   return (
     <View style={[styles.raiz, { backgroundColor: "#2b2420" }]}>
-      {imagen ? <Image source={{ uri: imagen }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
+      {imagen ? <Image source={{ uri: imagen }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : cuadro ? <CuadroVideo url={cuadro} /> : null}
       <LinearGradient
         colors={["rgba(0,0,0,0.55)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0.85)"]}
         locations={[0, 0.22, 0.55, 1]}
@@ -85,10 +112,13 @@ export default function DestacadasParaTi() {
           <View style={styles.avatar}>
             <Text style={styles.avatarTexto}>EL</Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.autorNombre}>{actual.autor}</Text>
-            <Text style={styles.autorMeta}>Destacada · {tiempoPublicacion(actual.publicadoEn)}</Text>
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <NombreOficial nombre={actual.autor} color="#ffffff" />
+            <Text style={styles.autorMeta}>· {tiempoPublicacion(actual.publicadoEn)}</Text>
           </View>
+          <Pressable onPress={() => setPausa(!pausa)} style={styles.cerrar} accessibilityRole="button" accessibilityLabel={pausa ? "Seguir" : "Pausar"}>
+            <Ionicons name={pausa ? "play" : "pause"} size={22} color="#ffffff" />
+          </Pressable>
           <Pressable onPress={cerrar} style={styles.cerrar} accessibilityRole="button" accessibilityLabel="Cerrar">
             <Ionicons name="close" size={26} color="#ffffff" />
           </Pressable>
@@ -96,25 +126,31 @@ export default function DestacadasParaTi() {
       </View>
 
       <View style={[styles.abajo, { paddingBottom: insets.bottom + 18 }]} pointerEvents="box-none">
-        {actual.texto || actual.enlaceTitulo ? (
-          <Text style={styles.texto} numberOfLines={5}>
-            {actual.texto || actual.enlaceTitulo}
-          </Text>
+        {titulo.length ? (
+          <View style={styles.etiquetas} accessibilityRole="header" accessibilityLabel={actual.texto || actual.enlaceTitulo || ""}>
+            {titulo.map((l, i) => (
+              <Text key={i} style={styles.etiqueta}>
+                {l}
+              </Text>
+            ))}
+            {esVideo ? (
+              <View style={styles.chipVideo}>
+                <Ionicons name="play" size={13} color="#141a16" />
+                <Text style={styles.chipVideoTexto}>Video</Text>
+              </View>
+            ) : null}
+          </View>
         ) : null}
         <View style={styles.fila}>
-          <Pressable
-            style={styles.verCompleta}
-            onPress={() => router.replace({ pathname: "/para-ti/[id]", params: { id: actual.id } })}
-            accessibilityRole="button"
-          >
-            {actual.tipo === "video" || actual.tipo === "youtube" ? <Ionicons name="play" size={16} color="#141a16" /> : null}
-            <Text style={styles.verCompletaTexto}>{actual.tipo === "video" || actual.tipo === "youtube" ? "Ver video" : "Ver publicación completa"}</Text>
+          <Pressable style={styles.verCompleta} onPress={verCompleta} accessibilityRole="button">
+            <Text style={styles.verCompletaTexto}>{esVideo ? "Ver el video" : "Ver publicación completa"}</Text>
+            <Ionicons name="chevron-forward" size={16} color="#ffffff" />
           </Pressable>
-          <Pressable style={styles.redondo} onPress={() => acciones.corazon(actual)} accessibilityRole="button" accessibilityLabel="Dar corazón">
-            <Ionicons name={acciones.tieneCorazon(actual.id) ? "heart" : "heart-outline"} size={22} color={acciones.tieneCorazon(actual.id) ? "#ff5a4e" : "#ffffff"} />
+          <Pressable style={styles.redondo} onPress={() => acciones.corazon(actual)} accessibilityRole="button" accessibilityLabel={acciones.tieneCorazon(actual.id) ? "Quitar corazón" : "Dar corazón"}>
+            <Ionicons name={acciones.tieneCorazon(actual.id) ? "heart" : "heart-outline"} size={28} color={acciones.tieneCorazon(actual.id) ? "#ff5a4e" : "#ffffff"} />
           </Pressable>
           <Pressable style={styles.redondo} onPress={() => acciones.compartir(actual)} accessibilityRole="button" accessibilityLabel="Compartir">
-            <Ionicons name="share-outline" size={21} color="#ffffff" />
+            <Ionicons name="paper-plane-outline" size={26} color="#ffffff" />
           </Pressable>
         </View>
       </View>
@@ -133,13 +169,25 @@ const styles = StyleSheet.create({
   autor: { flexDirection: "row", alignItems: "center", gap: 10, paddingLeft: 2 },
   avatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#1a531a", alignItems: "center", justifyContent: "center" },
   avatarTexto: { color: "#ffffff", fontFamily: "SchibstedGrotesk_800ExtraBold", fontSize: 11 },
-  autorNombre: { color: "#ffffff", fontFamily: "SchibstedGrotesk_700Bold", fontSize: 14 },
-  autorMeta: { color: "#e6e9e7", fontFamily: "SchibstedGrotesk_400Regular", fontSize: 12 },
+  autorMeta: { color: "#e6e9e7", fontFamily: "SchibstedGrotesk_500Medium", fontSize: 13 },
   cerrar: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-  abajo: { position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: 18, gap: 14 },
-  texto: { color: "#ffffff", fontFamily: "SchibstedGrotesk_700Bold", fontSize: 18, lineHeight: 24 },
-  fila: { flexDirection: "row", alignItems: "center", gap: 10 },
-  verCompleta: { flex: 1, height: 46, borderRadius: 23, backgroundColor: "#ffffff", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
-  verCompletaTexto: { color: "#141a16", fontFamily: "SchibstedGrotesk_800ExtraBold", fontSize: 14.5 },
-  redondo: { width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.7)", backgroundColor: "rgba(0,0,0,0.25)", alignItems: "center", justifyContent: "center" },
+  abajo: { position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: 14, gap: 26 },
+  etiquetas: { alignItems: "flex-start", gap: 6, paddingHorizontal: 8 },
+  etiqueta: {
+    backgroundColor: "#ffffff",
+    color: "#141a16",
+    fontFamily: "SchibstedGrotesk_800ExtraBold",
+    fontSize: 26,
+    lineHeight: 31,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  chipVideo: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 4, backgroundColor: "#ef7148", borderRadius: 99, paddingHorizontal: 12, paddingVertical: 5 },
+  chipVideoTexto: { color: "#141a16", fontFamily: "SchibstedGrotesk_700Bold", fontSize: 14 },
+  fila: { flexDirection: "row", alignItems: "center", gap: 6 },
+  verCompleta: { flex: 1, height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.55)", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+  verCompletaTexto: { color: "#ffffff", fontFamily: "SchibstedGrotesk_700Bold", fontSize: 14.5 },
+  redondo: { width: 48, height: 48, alignItems: "center", justifyContent: "center" },
 });

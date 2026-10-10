@@ -1,6 +1,6 @@
 import { Platform, Share } from "react-native";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ComentarioPublicacion, ModulosApp, Publicacion } from "@app-vecinos/tipos";
+import { ComentarioPublicacion, ModulosApp, MotivoReporte, Publicacion } from "@app-vecinos/tipos";
 import { apiFetch, apiGet } from "../api/clienteApi";
 import { useSesion } from "../../estado/useSesion";
 import { entorno } from "../../config/entorno";
@@ -22,12 +22,18 @@ export function useModulos(): ModulosApp & { cargado: boolean } {
   return { ...(data ?? MODULOS_POR_DEFECTO), cargado: !esApi || data !== undefined };
 }
 
-export function usePublicacionesParaTi(activo: boolean) {
+/** El muro. `q` = buscador; `videos` = solo videos (la vista en vertical, decisión 0092). */
+export function usePublicacionesParaTi(activo: boolean, filtros: { q?: string; videos?: boolean } = {}) {
+  const q = filtros.q?.trim() || undefined;
   return useInfiniteQuery({
-    queryKey: ["para-ti", "feed"],
+    queryKey: ["para-ti", "feed", q ?? "", filtros.videos ? "videos" : "todo"],
     // apiGet devuelve null en un 404 (módulo apagado): se trata como lista vacía.
     queryFn: async ({ pageParam }) =>
-      (await apiGet<{ items: Publicacion[]; cursorSiguiente: string | null } | null>("/para-ti/publicaciones", { antesDe: pageParam ?? undefined })) ?? {
+      (await apiGet<{ items: Publicacion[]; cursorSiguiente: string | null } | null>("/para-ti/publicaciones", {
+        antesDe: pageParam ?? undefined,
+        q,
+        videos: filtros.videos ? "1" : undefined,
+      })) ?? {
         items: [],
         cursorSiguiente: null,
       },
@@ -75,8 +81,8 @@ export function useMisCorazones() {
 export function useActualizarPublicacionEnCache() {
   const cliente = useQueryClient();
   return (id: string, cambio: (p: Publicacion) => Publicacion) => {
-    cliente.setQueryData<{ pages: { items: Publicacion[]; cursorSiguiente: string | null }[]; pageParams: unknown[] }>(
-      ["para-ti", "feed"],
+    cliente.setQueriesData<{ pages: { items: Publicacion[]; cursorSiguiente: string | null }[]; pageParams: unknown[] }>(
+      { queryKey: ["para-ti", "feed"] },
       (datos) => (datos ? { ...datos, pages: datos.pages.map((pg) => ({ ...pg, items: pg.items.map((p) => (p.id === id ? cambio(p) : p)) })) } : datos),
     );
     cliente.setQueryData<Publicacion[]>(["para-ti", "destacadas"], (lista) => lista?.map((p) => (p.id === id ? cambio(p) : p)));
@@ -89,12 +95,56 @@ export async function alternarCorazon(id: string, token: string, tieneCorazon: b
   return r.corazones;
 }
 
-export function comentar(id: string, texto: string, token: string): Promise<ComentarioPublicacion> {
-  return apiFetch<ComentarioPublicacion>(`/para-ti/publicaciones/${id}/comentarios`, { metodo: "POST", cuerpo: { texto }, token });
+export function comentar(id: string, texto: string, token: string, respuestaA?: string): Promise<ComentarioPublicacion> {
+  return apiFetch<ComentarioPublicacion>(`/para-ti/publicaciones/${id}/comentarios`, {
+    metodo: "POST",
+    cuerpo: { texto, ...(respuestaA ? { respuestaA } : {}) },
+    token,
+  });
 }
 
-export function reportarComentario(comentarioId: string, token: string): Promise<void> {
-  return apiFetch<void>(`/para-ti/comentarios/${comentarioId}/reportar`, { metodo: "POST", token });
+export function reportarComentario(comentarioId: string, token: string, motivo: MotivoReporte): Promise<void> {
+  return apiFetch<void>(`/para-ti/comentarios/${comentarioId}/reportar`, { metodo: "POST", cuerpo: { motivo }, token });
+}
+
+/** Comentarios de una publicación a los que este vecino ya les dio corazón. */
+export function useMisCorazonesEnComentarios(publicacionId: string | undefined) {
+  const token = useSesion((e) => e.token);
+  return useQuery({
+    queryKey: ["para-ti", "corazones-comentarios", publicacionId, token],
+    queryFn: () => apiFetch<string[]>(`/para-ti/publicaciones/${publicacionId}/comentarios/corazones`, { token }),
+    enabled: esApi && Boolean(token) && Boolean(publicacionId),
+  });
+}
+
+export async function alternarCorazonComentario(comentarioId: string, token: string, tieneCorazon: boolean): Promise<number> {
+  const r = await apiFetch<{ corazones: number }>(`/para-ti/comentarios/${comentarioId}/corazon`, { metodo: tieneCorazon ? "DELETE" : "POST", token });
+  return r.corazones;
+}
+
+/** Un id al azar de este celular (no identifica a la persona) para contar visitas por día. */
+function idVisitante(): string {
+  const clave = "elisur-visitante";
+  try {
+    const guardado = globalThis.localStorage?.getItem(clave);
+    if (guardado) return guardado;
+    const nuevo = `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+    globalThis.localStorage?.setItem(clave, nuevo);
+    return nuevo;
+  } catch {
+    return `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+  }
+}
+let visitaRegistrada = "";
+/** Avisa una vez por día que este celular abrió Para ti (decisión 0092). */
+export function registrarVisitaParaTi() {
+  if (!esApi) return;
+  const hoy = new Date().toDateString();
+  if (visitaRegistrada === hoy) return;
+  visitaRegistrada = hoy;
+  apiFetch<void>("/para-ti/visita", { metodo: "POST", cuerpo: { visitante: idVisitante() } }).catch(() => {
+    visitaRegistrada = "";
+  });
 }
 
 /** Enlace propio de la publicación: abre la app web en esa publicación. */
