@@ -1,12 +1,21 @@
 import { randomUUID } from "crypto";
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { ComentarioPublicacion, MAX_DESTACADAS, ModulosApp, Publicacion, idYoutube } from "@app-vecinos/tipos";
+import type { ComentarioPublicacion, ModulosApp, Publicacion } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
 import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
 import { GuardarPublicacionDto } from "./dto/guardar-publicacion.dto";
 
 export const CARPETA_PARA_TI = "para-ti";
+
+// La API solo importa TIPOS de @app-vecinos/tipos: en producción ese paquete no se puede cargar en
+// tiempo de ejecución (Render se cayó por esto). Estos dos valores repiten los de para-ti.ts.
+const MAX_DESTACADAS = 10;
+function idYoutube(enlace: string | null | undefined): string | null {
+  if (!enlace) return null;
+  const m = enlace.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
 const AUTOR = "ELISUR";
 
 interface FilaPublicacion {
