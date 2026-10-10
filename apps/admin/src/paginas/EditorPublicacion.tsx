@@ -1,23 +1,65 @@
-import { useEffect, useRef, useState } from "react";
+import { DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { LuArrowLeft, LuArrowRight, LuPlay, LuUpload, LuX } from "react-icons/lu";
-import { DIAS_DESTACADA_MAX, MAX_FOTOS_PUBLICACION, Publicacion, TipoPublicacion } from "@app-vecinos/tipos";
+import { LuArrowLeft, LuArrowRight, LuCheck, LuHeart, LuMessageCircle, LuPlay, LuPlus, LuSend, LuUpload, LuX } from "react-icons/lu";
+import { DIAS_DESTACADA_MAX, MAX_DESTACADAS, MAX_FOTOS_PUBLICACION, Publicacion, TipoPublicacion, idYoutube } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { avisarErrorParaTi, useParaTi } from "../estado/useParaTi";
-import { alertaExito } from "../estado/useToasts";
+import { alertaExito, useToasts } from "../estado/useToasts";
 import { urlCompleta } from "../utilidades/media";
-import { estaDestacada } from "./ParaTiPublicaciones";
+import { NOMBRE_TIPO, destacadasEnOrden, estaDestacada, fechaCorta, fechaHora, fondoTexto } from "../utilidades/paraTi";
 
-const TIPOS: { id: TipoPublicacion; texto: string }[] = [
-  { id: "fotos", texto: "Fotos" },
-  { id: "video", texto: "Subir video" },
-  { id: "youtube", texto: "Enlace de YouTube" },
-  { id: "texto", texto: "Solo texto" },
-];
+type Vista = { enlaceUrl: string; titulo: string | null; miniatura: string };
+type ModoVista = "muro" | "destacada" | "completa";
 
-const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-PE", { weekday: "short", day: "numeric", month: "short" });
+const avisar = (titulo: string, detalle?: string) => useToasts.getState().alertar({ tipo: "error", titulo, detalle });
 
-/** Crear o editar una publicación de Para ti (decisión 0091). */
+/** "2026-10-10T09:00" para un <input type="datetime-local"> en la hora del navegador. */
+function aLocal(fecha: Date): string {
+  const d = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000);
+  return d.toISOString().slice(0, 16);
+}
+
+const duracionTexto = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+/**
+ * Cuadros del video para elegir portada. Con el archivo recién elegido se lee local; con un video
+ * ya subido se pide con CORS (si el almacenamiento no lo permite, solo queda subir una imagen).
+ */
+async function capturarCuadros(src: string): Promise<{ cuadros: string[]; duracion: number }> {
+  const v = document.createElement("video");
+  v.crossOrigin = "anonymous";
+  v.muted = true;
+  v.playsInline = true;
+  v.preload = "auto";
+  v.src = src;
+  await new Promise<void>((ok, mal) => {
+    v.onloadeddata = () => ok();
+    v.onerror = () => mal(new Error("No se pudo leer el video"));
+  });
+  const duracion = Number.isFinite(v.duration) ? v.duration : 0;
+  const lienzo = document.createElement("canvas");
+  const ancho = Math.min(v.videoWidth || 720, 1080);
+  lienzo.width = ancho;
+  lienzo.height = Math.round((ancho * (v.videoHeight || 1280)) / (v.videoWidth || 720));
+  const ctx = lienzo.getContext("2d")!;
+  const cuadros: string[] = [];
+  for (const f of [0.05, 0.3, 0.55, 0.8]) {
+    v.currentTime = Math.max(0, Math.min(duracion * f, duracion - 0.1));
+    await new Promise<void>((ok) => {
+      v.onseeked = () => ok();
+    });
+    ctx.drawImage(v, 0, 0, lienzo.width, lienzo.height);
+    cuadros.push(lienzo.toDataURL("image/jpeg", 0.86));
+  }
+  return { cuadros, duracion };
+}
+
+async function dataUrlAArchivo(dataUrl: string, nombre: string): Promise<File> {
+  const blob = await (await fetch(dataUrl)).blob();
+  return new File([blob], nombre, { type: "image/jpeg" });
+}
+
+/** Crear o editar una publicación de Para ti (decisión 0092): el tipo sale de lo que se sube. */
 export function EditorPublicacion() {
   const { id } = useParams<{ id: string }>();
   const esNueva = !id;
@@ -26,50 +68,101 @@ export function EditorPublicacion() {
   const { publicaciones, cargar, guardar, subirFoto, subirVideo, vistaPreviaYoutube } = useParaTi();
   const existente = publicaciones.find((p) => p.id === id) ?? null;
 
-  const [tipo, setTipo] = useState<TipoPublicacion>("fotos");
   const [texto, setTexto] = useState("");
   const [fotos, setFotos] = useState<string[]>([]);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoLocal, setVideoLocal] = useState<string | null>(null);
+  const [videoPeso, setVideoPeso] = useState<number | null>(null);
+  const [duracion, setDuracion] = useState<number | null>(null);
+  const [cuadros, setCuadros] = useState<string[]>([]);
+  const [cuadroElegido, setCuadroElegido] = useState<number | null>(null);
   const [portadaUrl, setPortadaUrl] = useState<string | null>(null);
   const [enlace, setEnlace] = useState("");
-  const [vista, setVista] = useState<{ enlaceUrl: string; titulo: string | null; miniatura: string } | null>(null);
+  const [vista, setVista] = useState<Vista | null>(null);
   const [permiteComentarios, setPermiteComentarios] = useState(false);
-  const [destacar, setDestacar] = useState(false);
-  const [dias, setDias] = useState(3);
-  const [cambioDestacada, setCambioDestacada] = useState(false);
+  /** null = no cambiar la destacada (solo al editar); 0 = sin destacar; 1–7 días. */
+  const [dias, setDias] = useState<number | null>(0);
+  const [cuando, setCuando] = useState<"ahora" | "programar">("ahora");
+  const [fechaProg, setFechaProg] = useState(() => aLocal(new Date(Date.now() + 864e5)));
+  const [modo, setModo] = useState<ModoVista>("muro");
   const [subiendo, setSubiendo] = useState<string | null>(null);
   const [progreso, setProgreso] = useState(0);
   const [guardando, setGuardando] = useState(false);
+  const [arrastrando, setArrastrando] = useState(false);
   const cargada = useRef(false);
-  const inputFotos = useRef<HTMLInputElement>(null);
-  const inputVideo = useRef<HTMLInputElement>(null);
+  const inputArchivos = useRef<HTMLInputElement>(null);
   const inputPortada = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!esNueva && !existente) cargar(token);
-  }, [esNueva, existente, cargar, token]);
+    if (publicaciones.length === 0 || (!esNueva && !existente)) cargar(token);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [esNueva, token]);
 
   // Al editar, el formulario arranca con lo guardado (una sola vez).
   useEffect(() => {
     if (!existente || cargada.current) return;
     cargada.current = true;
-    setTipo(existente.tipo);
     setTexto(existente.texto);
     setFotos(existente.fotos);
     setVideoUrl(existente.videoUrl);
     setPortadaUrl(existente.portadaUrl);
-    setEnlace(existente.enlaceUrl ?? "");
-    if (existente.enlaceUrl) setVista({ enlaceUrl: existente.enlaceUrl, titulo: existente.enlaceTitulo, miniatura: existente.enlaceMiniatura ?? "" });
+    if (existente.enlaceUrl) {
+      setEnlace(existente.enlaceUrl);
+      setVista({ enlaceUrl: existente.enlaceUrl, titulo: existente.enlaceTitulo, miniatura: existente.enlaceMiniatura ?? "" });
+    }
     setPermiteComentarios(existente.permiteComentarios);
-    setDestacar(estaDestacada(existente));
+    setDias(estaDestacada(existente) ? null : 0);
+    if (existente.programada && existente.publicadoEn) {
+      setCuando("programar");
+      setFechaProg(aLocal(new Date(existente.publicadoEn)));
+    }
   }, [existente]);
 
-  async function agregarFotos(archivos: FileList | null) {
-    if (!archivos) return;
+  // Cuadros del video para la portada (y su duración).
+  const fuenteVideo = videoLocal ?? urlCompleta(videoUrl) ?? null;
+  useEffect(() => {
+    if (!fuenteVideo) {
+      setCuadros([]);
+      setDuracion(null);
+      return;
+    }
+    let vigente = true;
+    capturarCuadros(fuenteVideo)
+      .then((r) => vigente && (setCuadros(r.cuadros), setDuracion(r.duracion)))
+      .catch(() => vigente && setCuadros([]));
+    return () => {
+      vigente = false;
+    };
+  }, [fuenteVideo]);
+
+  useEffect(() => () => (videoLocal ? URL.revokeObjectURL(videoLocal) : undefined), [videoLocal]);
+
+  const tipo: TipoPublicacion = fotos.length ? "fotos" : videoUrl ? "video" : vista ? "youtube" : "texto";
+  const hayMedia = tipo !== "texto";
+  const yaPublicada = existente?.estado === "publicada" && !existente.programada;
+  const programar = !yaPublicada && cuando === "programar";
+  const otrasDestacadas = useMemo(() => destacadasEnOrden(publicaciones).filter((p) => p.id !== id).length, [publicaciones, id]);
+  const libres = Math.max(0, MAX_DESTACADAS - otrasDestacadas);
+  const listo = (tipo !== "texto" || texto.trim() !== "") && (!programar || Boolean(fechaProg));
+
+  // ---------- Contenido: se detecta el tipo ----------
+
+  async function recibirArchivos(lista: File[]) {
+    if (!lista.length) return;
+    const imagenes = lista.filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
+    const videos = lista.filter((f) => f.type.startsWith("video/"));
+    if (imagenes.length && videos.length) return avisar("Sube fotos o un video, no ambos a la vez");
+    if (!imagenes.length && !videos.length) return avisar("Ese archivo no sirve", "Fotos JPG, PNG o WEBP, o un video.");
+    if (videos.length) {
+      if (fotos.length || vista) return avisar("Ya hay contenido", "Quita lo que subiste para poner un video.");
+      return elegirVideo(videos[0]);
+    }
+    if (videoUrl || vista) return avisar("Ya hay contenido", "Quita el video o el enlace para poner fotos.");
     const lugar = MAX_FOTOS_PUBLICACION - fotos.length;
-    const lista = Array.from(archivos).slice(0, lugar);
-    for (const [i, archivo] of lista.entries()) {
-      setSubiendo(`Subiendo foto ${i + 1} de ${lista.length}…`);
+    if (lugar <= 0) return avisar(`Hasta ${MAX_FOTOS_PUBLICACION} fotos por publicación`);
+    const tanda = imagenes.slice(0, lugar);
+    for (const [i, archivo] of tanda.entries()) {
+      setSubiendo(`Subiendo foto ${i + 1} de ${tanda.length}…`);
       const url = await subirFoto(archivo, token);
       if (url) setFotos((f) => [...f, url]);
       else avisarErrorParaTi("No se pudo subir una foto");
@@ -77,32 +170,76 @@ export function EditorPublicacion() {
     setSubiendo(null);
   }
 
-  async function elegirVideo(archivo: File | undefined) {
-    if (!archivo) return;
+  async function elegirVideo(archivo: File) {
     setSubiendo(`Subiendo video (${(archivo.size / 1024 / 1024).toFixed(1)} MB)…`);
     setProgreso(0);
+    const local = URL.createObjectURL(archivo);
     const url = await subirVideo(archivo, token, setProgreso);
-    if (url) setVideoUrl(url);
-    else avisarErrorParaTi("No se pudo subir el video");
+    if (url) {
+      setVideoUrl(url);
+      setVideoLocal(local);
+      setVideoPeso(archivo.size);
+      setPortadaUrl(null);
+      setCuadroElegido(null);
+    } else {
+      URL.revokeObjectURL(local);
+      avisarErrorParaTi("No se pudo subir el video");
+    }
     setSubiendo(null);
   }
 
-  async function elegirPortada(archivo: File | undefined) {
+  async function leerEnlace(valor = enlace) {
+    const limpio = valor.trim();
+    if (!limpio || subiendo) return;
+    if (!idYoutube(limpio)) return avisar("Ese enlace no es de YouTube", "Pega un enlace de un video de YouTube.");
+    if (fotos.length || videoUrl) return avisar("Ya hay contenido", "Quita lo que subiste para poner un enlace.");
+    setSubiendo("Leyendo el enlace…");
+    const v = await vistaPreviaYoutube(limpio, token);
+    setVista(v);
+    if (!v) avisarErrorParaTi("No se pudo leer el enlace");
+    setSubiendo(null);
+  }
+
+  function soltar(e: DragEvent) {
+    e.preventDefault();
+    setArrastrando(false);
+    const archivos = Array.from(e.dataTransfer.files);
+    if (archivos.length) return recibirArchivos(archivos);
+    const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain");
+    if (url) {
+      setEnlace(url);
+      leerEnlace(url);
+    }
+  }
+
+  function quitarContenido() {
+    setFotos([]);
+    setVideoUrl(null);
+    setVideoLocal(null);
+    setPortadaUrl(null);
+    setCuadroElegido(null);
+    setVista(null);
+    setEnlace("");
+  }
+
+  async function elegirCuadro(i: number) {
+    setSubiendo("Guardando portada…");
+    const url = await subirFoto(await dataUrlAArchivo(cuadros[i], "portada.jpg"), token);
+    if (url) {
+      setPortadaUrl(url);
+      setCuadroElegido(i);
+    } else avisarErrorParaTi("No se pudo guardar la portada");
+    setSubiendo(null);
+  }
+
+  async function subirPortada(archivo: File | undefined) {
     if (!archivo) return;
     setSubiendo("Subiendo portada…");
     const url = await subirFoto(archivo, token);
-    if (url) setPortadaUrl(url);
-    else avisarErrorParaTi("No se pudo subir la portada");
-    setSubiendo(null);
-  }
-
-  async function buscarVistaPrevia() {
-    // Ya hay vista previa de este enlace (cambiarlo la borra), o se está pidiendo.
-    if (!enlace.trim() || vista || subiendo) return;
-    setSubiendo("Leyendo el enlace…");
-    const v = await vistaPreviaYoutube(enlace.trim(), token);
-    setVista(v);
-    if (!v) avisarErrorParaTi("No se pudo leer el enlace");
+    if (url) {
+      setPortadaUrl(url);
+      setCuadroElegido(null);
+    } else avisarErrorParaTi("No se pudo subir la portada");
     setSubiendo(null);
   }
 
@@ -113,23 +250,11 @@ export function EditorPublicacion() {
       return n;
     });
 
-  const listo =
-    tipo === "texto" ? texto.trim() !== "" : tipo === "fotos" ? fotos.length > 0 : tipo === "video" ? Boolean(videoUrl) : Boolean(vista);
-
-  // Lo que se subió para otro tipo no se publica. Pasó: un video subido terminó publicado como
-  // "Solo texto" y se perdió sin aviso. Ahora se avisa y se pide confirmar.
-  const descartado: { tipo: TipoPublicacion; texto: string } | null =
-    videoUrl && tipo !== "video"
-      ? { tipo: "video", texto: "el video que subiste" }
-      : fotos.length && tipo !== "fotos"
-        ? { tipo: "fotos", texto: "las fotos que subiste" }
-        : vista && tipo !== "youtube"
-          ? { tipo: "youtube", texto: "el enlace de YouTube" }
-          : null;
-  const nombreTipo = (t: TipoPublicacion) => TIPOS.find((x) => x.id === t)!.texto;
+  // ---------- Guardar ----------
 
   async function enviar(estado: Publicacion["estado"]) {
-    if (descartado && !window.confirm(`Elegiste «${nombreTipo(tipo)}»: ${descartado.texto} no se va a publicar. ¿Guardar igual?`)) return;
+    const fecha = programar ? new Date(fechaProg) : null;
+    if (estado === "publicada" && fecha && fecha.getTime() < Date.now() + 60_000) return avisar("La fecha tiene que ser en el futuro");
     setGuardando(true);
     const p = await guardar(
       id ?? null,
@@ -142,116 +267,140 @@ export function EditorPublicacion() {
         enlaceUrl: tipo === "youtube" ? vista?.enlaceUrl ?? enlace : null,
         estado,
         permiteComentarios,
-        // En una nueva siempre se manda; al editar, solo si se tocó el interruptor o los días.
-        ...(esNueva || cambioDestacada ? { diasDestacada: destacar ? dias : 0 } : {}),
+        ...(dias === null ? {} : { diasDestacada: dias }),
+        ...(estado === "publicada" ? { programadaPara: fecha ? fecha.toISOString() : existente?.programada ? null : undefined } : {}),
       },
       token,
     );
     setGuardando(false);
     if (!p) return avisarErrorParaTi("No se pudo guardar");
-    alertaExito(estado === "publicada" ? (existente?.estado === "publicada" ? "Cambios guardados" : "Publicado en Para ti") : "Borrador guardado");
-    navegar("/para-ti");
+    alertaExito(
+      estado === "borrador"
+        ? "Borrador guardado"
+        : p.programada
+          ? `Programada para el ${fechaHora(p.publicadoEn!)}`
+          : yaPublicada
+            ? "Cambios guardados"
+            : "Publicado en Para ti",
+    );
+    navegar("/para-ti/publicaciones");
   }
 
   if (!esNueva && !existente) return <p className="vacio-editor">Cargando publicación…</p>;
 
-  const miniaturaVista = tipo === "fotos" ? urlCompleta(fotos[0]) : tipo === "video" ? urlCompleta(portadaUrl) : tipo === "youtube" ? vista?.miniatura : null;
+  const estadoTexto = !existente
+    ? "Nueva"
+    : existente.estado === "borrador"
+      ? "Borrador"
+      : existente.programada
+        ? `Programada para el ${fechaHora(existente.publicadoEn!)}`
+        : `Publicada el ${fechaCorta(existente.publicadoEn!)}`;
+  const textoPrincipal = guardando ? "Guardando…" : yaPublicada ? "Guardar cambios" : programar ? "Programar" : "Publicar ahora";
+  const opcionesDias = [...(existente && estaDestacada(existente) ? [null] : []), 0, ...Array.from({ length: DIAS_DESTACADA_MAX }, (_, i) => i + 1)];
 
   return (
-    <div className="editor-publicacion">
-      <div className="form-publicacion">
-        <Link to="/para-ti" className="volver-para-ti">
-          ← Para ti
+    <div className="compositor">
+      <div className="cabecera-compositor">
+        <Link to="/para-ti" className="volver-redondo" aria-label="Volver a Para ti">
+          <LuArrowLeft />
         </Link>
-        <h2>{esNueva ? "Nueva publicación" : "Editar publicación"}</h2>
+        <h2>{esNueva ? "Crear publicación" : "Editar publicación"}</h2>
+        <span className="estado-compositor">{estadoTexto}</span>
+        <div className="botones-compositor">
+          <button type="button" className="btn-pildora" disabled={guardando || Boolean(subiendo) || !listo} onClick={() => enviar("borrador")}>
+            {yaPublicada || existente?.programada ? "Pasar a borrador" : "Guardar borrador"}
+          </button>
+          <button type="button" className="btn-pildora primario" disabled={guardando || Boolean(subiendo) || !listo} onClick={() => enviar("publicada")}>
+            {textoPrincipal}
+          </button>
+        </div>
+      </div>
 
-        <div className="campo-modal">
-          <label>Qué vas a publicar</label>
-          <div className="tipos-publicacion" role="radiogroup" aria-label="Tipo de publicación">
-            {TIPOS.map((t) => (
-              <button key={t.id} type="button" role="radio" aria-checked={tipo === t.id} className={tipo === t.id ? "activo" : ""} onClick={() => setTipo(t.id)}>
-                {t.texto}
-              </button>
-            ))}
-          </div>
-          {descartado ? (
-            <div className="nota-alerta" style={{ marginTop: 10 }}>
-              <span>
-                Elegiste <b>{nombreTipo(tipo)}</b>: {descartado.texto} no se va a publicar.{" "}
-                <button type="button" className="btn-accion-mini" onClick={() => setTipo(descartado.tipo)}>
-                  Volver a {nombreTipo(descartado.tipo)}
-                </button>
+      <div className="cuerpo-compositor">
+        <div className="columna-compositor">
+          <section className="tarjeta-para-ti" aria-label="Contenido">
+            <div className="titulo-tarjeta-para-ti">
+              <h3>Contenido</h3>
+              <span className="chip-detectado">
+                <LuCheck aria-hidden /> {hayMedia ? `Detectado: ${NOMBRE_TIPO[tipo].toLowerCase()}` : "Solo texto"}
               </span>
             </div>
-          ) : null}
-        </div>
 
-        {tipo === "fotos" ? (
-          <div className="campo-modal">
-            <label>
-              Fotos <small>· hasta {MAX_FOTOS_PUBLICACION}; la primera es la portada</small>
-            </label>
-            <input ref={inputFotos} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={(e) => { agregarFotos(e.target.files); e.target.value = ""; }} />
-            <div className="fotos-publicacion">
-              {fotos.map((f, i) => (
-                <div className="foto-publicacion" key={f} style={{ backgroundImage: `url(${urlCompleta(f)})` }}>
-                  <div className="acciones-foto-publicacion">
-                    <button type="button" aria-label="Mover a la izquierda" disabled={i === 0} onClick={() => mover(i, -1)}><LuArrowLeft /></button>
-                    <button type="button" aria-label="Quitar foto" onClick={() => setFotos((l) => l.filter((x) => x !== f))}><LuX /></button>
-                    <button type="button" aria-label="Mover a la derecha" disabled={i === fotos.length - 1} onClick={() => mover(i, 1)}><LuArrowRight /></button>
+            <input
+              ref={inputArchivos}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,video/*"
+              multiple
+              hidden
+              onChange={(e) => {
+                recibirArchivos(Array.from(e.target.files ?? []));
+                e.target.value = "";
+              }}
+            />
+            <input ref={inputPortada} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { subirPortada(e.target.files?.[0]); e.target.value = ""; }} />
+
+            {tipo === "fotos" ? (
+              <div className="fotos-compositor">
+                {fotos.map((f, i) => (
+                  <div className="foto-compositor" key={f} style={{ backgroundImage: `url(${urlCompleta(f)})` }}>
+                    {i === 0 ? <span className="chip-portada">Portada</span> : null}
+                    <div className="acciones-foto-publicacion">
+                      <button type="button" aria-label="Mover a la izquierda" disabled={i === 0} onClick={() => mover(i, -1)}><LuArrowLeft /></button>
+                      <button type="button" aria-label="Quitar foto" onClick={() => setFotos((l) => l.filter((x) => x !== f))}><LuX /></button>
+                      <button type="button" aria-label="Mover a la derecha" disabled={i === fotos.length - 1} onClick={() => mover(i, 1)}><LuArrowRight /></button>
+                    </div>
                   </div>
-                </div>
-              ))}
-              {fotos.length < MAX_FOTOS_PUBLICACION ? (
-                <button type="button" className="agregar-foto-publicacion" disabled={Boolean(subiendo)} onClick={() => inputFotos.current?.click()}>
-                  <LuUpload aria-hidden /> Agregar
-                </button>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-
-        {tipo === "video" ? (
-          <div className="campo-modal">
-            <label>Video</label>
-            <input ref={inputVideo} type="file" accept="video/*" hidden onChange={(e) => { elegirVideo(e.target.files?.[0]); e.target.value = ""; }} />
-            <input ref={inputPortada} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { elegirPortada(e.target.files?.[0]); e.target.value = ""; }} />
-            {videoUrl ? (
-              <video className="video-publicacion" src={urlCompleta(videoUrl)} poster={urlCompleta(portadaUrl) ?? undefined} controls preload="metadata" />
-            ) : null}
-            {subiendo?.startsWith("Subiendo video") ? (
-              <div className="progreso-video" role="progressbar" aria-valuenow={progreso} aria-valuemin={0} aria-valuemax={100}>
-                <i style={{ width: `${progreso}%` }} />
-                <span>{progreso}%</span>
+                ))}
+                {fotos.length < MAX_FOTOS_PUBLICACION ? (
+                  <button type="button" className="agregar-foto-compositor" disabled={Boolean(subiendo)} onClick={() => inputArchivos.current?.click()}>
+                    <LuPlus aria-hidden /> Agregar
+                  </button>
+                ) : null}
               </div>
             ) : null}
-            <div className="botones-video">
-              <button type="button" className="btn-accion-mini" disabled={Boolean(subiendo)} onClick={() => inputVideo.current?.click()}>
-                <LuUpload aria-hidden /> {videoUrl ? "Cambiar video" : "Elegir video"}
-              </button>
-              <button type="button" className="btn-accion-mini" disabled={Boolean(subiendo)} onClick={() => inputPortada.current?.click()}>
-                {portadaUrl ? "Cambiar portada" : "Agregar portada (opcional)"}
-              </button>
-              {portadaUrl ? (
-                <button type="button" className="btn-accion-mini" onClick={() => setPortadaUrl(null)}>
-                  Quitar portada
-                </button>
-              ) : null}
-            </div>
-            <p className="ayuda-modal">Sin límite de duración. El tamaño máximo lo pone el plan de almacenamiento; si un video es muy pesado, súbelo a YouTube y pega el enlace.</p>
-          </div>
-        ) : null}
 
-        {tipo === "youtube" ? (
-          <div className="campo-modal">
-            <label htmlFor="enlace-yt">Enlace del video</label>
-            <div className="fila-enlace-yt">
-              <input id="enlace-yt" value={enlace} onChange={(e) => { setEnlace(e.target.value); setVista(null); }} onBlur={buscarVistaPrevia} placeholder="https://www.youtube.com/watch?v=…" />
-              <button type="button" className="btn-accion-mini" disabled={!enlace.trim() || Boolean(subiendo)} onClick={buscarVistaPrevia}>
-                Ver vista previa
-              </button>
-            </div>
-            {vista ? (
+            {tipo === "video" ? (
+              <div className="video-compositor">
+                <div className="caja-video-compositor">
+                  <video src={fuenteVideo ?? undefined} poster={urlCompleta(portadaUrl) ?? undefined} controls playsInline preload="metadata" />
+                  <span className="chip-video">
+                    Video{videoPeso ? ` · ${(videoPeso / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : ""}
+                    {duracion ? ` · ${duracionTexto(duracion)}` : ""}
+                  </span>
+                </div>
+                <div className="portada-compositor">
+                  <b>Portada</b>
+                  <span>Elige un cuadro del video o sube una imagen. Sin portada se usa el primer cuadro.</span>
+                  <div className="cuadros-compositor">
+                    {cuadros.map((c, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`Usar el cuadro ${i + 1} como portada`}
+                        aria-pressed={cuadroElegido === i}
+                        className={cuadroElegido === i ? "elegido" : ""}
+                        style={{ backgroundImage: `url(${c})` }}
+                        disabled={Boolean(subiendo)}
+                        onClick={() => elegirCuadro(i)}
+                      />
+                    ))}
+                    {portadaUrl && cuadroElegido === null ? (
+                      <span className="cuadro-subido elegido" style={{ backgroundImage: `url(${urlCompleta(portadaUrl)})` }} aria-label="Portada subida" />
+                    ) : null}
+                    <button type="button" className="cuadro-subir" aria-label="Subir imagen de portada" disabled={Boolean(subiendo)} onClick={() => inputPortada.current?.click()}>
+                      <LuUpload aria-hidden />
+                    </button>
+                  </div>
+                  {portadaUrl ? (
+                    <button type="button" className="enlace-boton" onClick={() => { setPortadaUrl(null); setCuadroElegido(null); }}>
+                      Quitar portada
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
+            {tipo === "youtube" && vista ? (
               <div className="vista-yt">
                 <div className="mini-yt" style={{ backgroundImage: `url(${vista.miniatura})` }}>
                   <span aria-hidden><LuPlay /></span>
@@ -259,123 +408,310 @@ export function EditorPublicacion() {
                 <div>
                   <span className="ok-yt">Vista previa encontrada</span>
                   <b>{vista.titulo ?? "Video de YouTube"}</b>
-                  <span>youtube.com</span>
+                  <span>youtube.com · el título y la miniatura se toman solos del enlace</span>
                 </div>
               </div>
             ) : null}
-          </div>
-        ) : null}
 
-        <div className="campo-modal">
-          <label htmlFor="texto-publicacion">{tipo === "texto" ? "Texto" : "Texto (opcional)"}</label>
-          <textarea id="texto-publicacion" rows={4} maxLength={2000} value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="¿Qué quieres contar?" />
-        </div>
-
-        <div className="opciones-publicacion">
-          <div className="opcion-publicacion">
-            <div>
-              <b>Destacar arriba en Para ti</b>
-              <span>
-                {existente && estaDestacada(existente) && !cambioDestacada
-                  ? `Destacada hasta el ${fecha(existente.destacadaHasta!)}.`
-                  : "Aparece en los rectángulos de arriba y se quita sola al cumplir los días."}
-              </span>
-            </div>
-            {destacar ? (
-              <select
-                aria-label="Días destacada"
-                value={dias}
-                onChange={(e) => {
-                  setDias(Number(e.target.value));
-                  setCambioDestacada(true);
-                }}
-              >
-                {Array.from({ length: DIAS_DESTACADA_MAX }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>
-                    {d === 1 ? "1 día" : `${d} días`}
-                  </option>
-                ))}
-              </select>
+            {subiendo?.startsWith("Subiendo video") ? (
+              <div className="progreso-video" role="progressbar" aria-valuenow={progreso} aria-valuemin={0} aria-valuemax={100}>
+                <i style={{ width: `${progreso}%` }} />
+                <span>{progreso}%</span>
+              </div>
             ) : null}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={destacar}
-              aria-label="Destacar arriba en Para ti"
-              className={`interruptor ${destacar ? "encendido" : ""}`}
-              onClick={() => {
-                setDestacar((d) => !d);
-                setCambioDestacada(true);
-              }}
-            >
-              <i />
-            </button>
-          </div>
-          <div className="opcion-publicacion">
-            <div>
-              <b>Permitir comentarios</b>
-              <span>Encendido: los vecinos con cuenta comentan al instante. Apagado: solo corazón y compartir.</span>
+
+            {hayMedia ? (
+              <div className="botones-video">
+                {tipo === "video" ? (
+                  <button type="button" className="btn-pildora chico" disabled={Boolean(subiendo)} onClick={() => inputArchivos.current?.click()}>
+                    Cambiar video
+                  </button>
+                ) : null}
+                <button type="button" className="btn-pildora chico peligro-texto" disabled={Boolean(subiendo)} onClick={quitarContenido}>
+                  Quitar {tipo === "fotos" ? "las fotos" : tipo === "video" ? "el video" : "el enlace"}
+                </button>
+              </div>
+            ) : (
+              <div
+                className={`zona-soltar ${arrastrando ? "encima" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setArrastrando(true);
+                }}
+                onDragLeave={() => setArrastrando(false)}
+                onDrop={soltar}
+              >
+                <LuUpload aria-hidden className="icono-soltar" />
+                <div>
+                  <b>Arrastra aquí fotos o un video, o pega un enlace de YouTube</b>
+                  <span>El tipo se detecta solo. Hasta {MAX_FOTOS_PUBLICACION} fotos; videos sin límite de duración. Sin nada, es una publicación de solo texto.</span>
+                </div>
+                <div className="acciones-soltar">
+                  <button type="button" className="btn-pildora" disabled={Boolean(subiendo)} onClick={() => inputArchivos.current?.click()}>
+                    Elegir archivos
+                  </button>
+                  <label className="solo-lector" htmlFor="pegar-enlace">
+                    Pegar enlace de YouTube
+                  </label>
+                  <input
+                    id="pegar-enlace"
+                    value={enlace}
+                    placeholder="Pegar enlace de YouTube…"
+                    onChange={(e) => setEnlace(e.target.value)}
+                    onPaste={(e) => {
+                      const valor = e.clipboardData.getData("text");
+                      if (valor) {
+                        e.preventDefault();
+                        setEnlace(valor);
+                        leerEnlace(valor);
+                      }
+                    }}
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), leerEnlace())}
+                    onBlur={() => enlace.trim() && leerEnlace()}
+                  />
+                </div>
+              </div>
+            )}
+            {subiendo && !subiendo.startsWith("Subiendo video") ? <p className="ayuda-modal">{subiendo}</p> : null}
+          </section>
+
+          <section className="tarjeta-para-ti" aria-label="Texto">
+            <label htmlFor="texto-publicacion" className="titulo-campo">
+              {tipo === "texto" ? "Texto" : "Texto (opcional)"}
+            </label>
+            <textarea id="texto-publicacion" rows={4} maxLength={2000} value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="¿Qué quieres contar?" />
+            <div className="pie-texto">
+              <span>Las primeras 2 líneas se ven en el muro; el resto con «más».</span>
+              <span>{texto.length} / 2000</span>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={permiteComentarios}
-              aria-label="Permitir comentarios"
-              className={`interruptor ${permiteComentarios ? "encendido" : ""}`}
-              onClick={() => setPermiteComentarios((v) => !v)}
-            >
-              <i />
-            </button>
-          </div>
-          <p className="alcance-publicacion">
-            <b>Se ve en todos los distritos.</b> Para ti no se separa por comunidad. El autor que ven los vecinos es «ELISUR».
-          </p>
+          </section>
+
+          <section className="tarjeta-para-ti opciones-compositor" aria-label="Opciones">
+            <div className="opcion-compositor">
+              <div>
+                <b>Destacar arriba</b>
+                <span>
+                  {dias === null && existente?.destacadaHasta
+                    ? `Destacada hasta el ${fechaHora(existente.destacadaHasta)}.`
+                    : `Quedan ${libres} de ${MAX_DESTACADAS} lugares libres. Los días cuentan desde que sale.`}
+                </span>
+              </div>
+              <div className="segmentos" role="radiogroup" aria-label="Días destacada">
+                {opcionesDias.map((d) => (
+                  <button key={String(d)} type="button" role="radio" aria-checked={dias === d} className={dias === d ? "activo" : ""} onClick={() => setDias(d)}>
+                    {d === null ? "Igual" : d === 0 ? "No" : `${d} d`}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {dias && libres === 0 ? <p className="nota-alerta">Ya hay {MAX_DESTACADAS} destacadas: en la app se ven las 10 primeras del orden.</p> : null}
+            <div className="opcion-compositor">
+              <div>
+                <b>Permitir comentarios</b>
+                <span>Solo vecinos con cuenta. Puedes responder y fijar un comentario desde Comentarios.</span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={permiteComentarios}
+                aria-label="Permitir comentarios"
+                className={`interruptor grande ${permiteComentarios ? "encendido" : ""}`}
+                onClick={() => setPermiteComentarios((v) => !v)}
+              >
+                <i />
+              </button>
+            </div>
+            {!yaPublicada ? (
+              <div className="opcion-compositor">
+                <div>
+                  <b>Cuándo sale</b>
+                  <span>Prográmala y se publica sola a esa hora.</span>
+                </div>
+                <div className="cuando-compositor">
+                  <div className="segmentos" role="radiogroup" aria-label="Cuándo sale">
+                    <button type="button" role="radio" aria-checked={cuando === "ahora"} className={cuando === "ahora" ? "activo" : ""} onClick={() => setCuando("ahora")}>
+                      Ahora
+                    </button>
+                    <button type="button" role="radio" aria-checked={cuando === "programar"} className={cuando === "programar" ? "activo" : ""} onClick={() => setCuando("programar")}>
+                      Programar
+                    </button>
+                  </div>
+                  {cuando === "programar" ? (
+                    <input
+                      type="datetime-local"
+                      aria-label="Fecha y hora en que sale"
+                      value={fechaProg}
+                      min={aLocal(new Date(Date.now() + 5 * 60000))}
+                      onChange={(e) => setFechaProg(e.target.value)}
+                    />
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </section>
         </div>
 
-        {subiendo && !subiendo.startsWith("Subiendo video") ? <p className="ayuda-modal">{subiendo}</p> : null}
+        <aside className="vista-compositor" aria-label="Vista previa">
+          <div className="segmentos" role="tablist" aria-label="Dónde se ve">
+            {(["muro", "destacada", "completa"] as ModoVista[]).map((m) => (
+              <button key={m} type="button" role="tab" aria-selected={modo === m} className={modo === m ? "activo" : ""} onClick={() => setModo(m)}>
+                {m === "muro" ? "En el muro" : m === "destacada" ? "Destacada" : "Pantalla completa"}
+              </button>
+            ))}
+          </div>
+          <VistaPrevia
+            modo={modo}
+            idPub={id ?? "nueva"}
+            tipo={tipo}
+            texto={texto}
+            imagen={tipo === "fotos" ? urlCompleta(fotos[0]) ?? null : tipo === "video" ? urlCompleta(portadaUrl) ?? null : tipo === "youtube" ? vista?.miniatura ?? null : null}
+            video={tipo === "video" && !portadaUrl ? fuenteVideo : null}
+            cantidadFotos={fotos.length}
+            cuando={programar ? fechaHora(new Date(fechaProg).toISOString()) : "Ahora"}
+            permiteComentarios={permiteComentarios}
+            tituloYoutube={vista?.titulo ?? null}
+          />
+          <span className="alcance-vista">Se ve en todos los distritos. El autor que ven los vecinos es «ELISUR».</span>
+        </aside>
+      </div>
+    </div>
+  );
+}
 
-        <div className="botones-publicacion">
-          <button type="button" className="btn-cancelar" disabled={guardando || Boolean(subiendo) || !listo} onClick={() => enviar("borrador")}>
-            {existente?.estado === "publicada" ? "Pasar a borrador" : "Guardar borrador"}
-          </button>
-          <button type="button" className="btn-crear" disabled={guardando || Boolean(subiendo) || !listo} onClick={() => enviar("publicada")}>
-            {guardando ? "Guardando…" : existente?.estado === "publicada" ? "Guardar cambios" : "Publicar ahora"}
-          </button>
+function Verificado() {
+  return (
+    <svg className="verificado" width="13" height="13" viewBox="0 0 24 24" role="img" aria-label="Cuenta oficial">
+      <circle cx="12" cy="12" r="10" fill="#1a531a" />
+      <path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Cómo se verá en la app: en el muro, como destacada (historia) o a pantalla completa. */
+function VistaPrevia(props: {
+  modo: ModoVista;
+  idPub: string;
+  tipo: TipoPublicacion;
+  texto: string;
+  imagen: string | null;
+  video: string | null;
+  cantidadFotos: number;
+  cuando: string;
+  permiteComentarios: boolean;
+  tituloYoutube: string | null;
+}) {
+  const { modo, tipo, texto, imagen, video } = props;
+  const fondo = imagen ? (
+    <span className="vp2-imagen" style={{ backgroundImage: `url(${imagen})` }} />
+  ) : video ? (
+    <video className="vp2-imagen" src={`${video}#t=0.1`} muted playsInline preload="metadata" />
+  ) : (
+    <span className="vp2-imagen" style={{ background: fondoTexto(props.idPub) }} />
+  );
+  const esVideo = tipo === "video" || tipo === "youtube";
+  const titulo = texto.trim() || props.tituloYoutube || "Tu publicación";
+
+  if (modo === "destacada") {
+    const palabras = titulo.split(/\s+/).slice(0, 8);
+    const lineas = [palabras.slice(0, 4).join(" "), palabras.slice(4, 8).join(" ")].filter(Boolean);
+    return (
+      <div className="vp2-telefono oscuro">
+        <div className="vp2-historia">
+          {fondo}
+          <span className="vp2-velo-arriba" />
+          <span className="vp2-progreso">
+            <i className="lleno" />
+            <i />
+            <i />
+          </span>
+          <span className="vp2-autor-historia">
+            <span className="vp2-avatar">EL</span> ELISUR <small>· {props.cuando}</small>
+          </span>
+          <span className="vp2-etiquetas">
+            {lineas.map((l) => (
+              <span key={l}>{l}</span>
+            ))}
+          </span>
+          <span className="vp2-pie-historia">
+            <span>Ver publicación completa</span>
+            <LuHeart aria-hidden />
+            <LuSend aria-hidden />
+          </span>
         </div>
       </div>
+    );
+  }
 
-      <aside className="vista-publicacion" aria-label="Vista previa">
-        <span className="rotulo-telefono">Así lo verán en la app</span>
-        <div className="tf-telefono">
-          <div className="tf-pantalla">
-            <div className="vp-para-ti">
-              <div className="vp-autor">
-                <span>EL</span>
-                <div>
-                  <b>ELISUR</b>
-                  <small>Ahora{destacar ? " · destacada" : ""}</small>
-                </div>
-              </div>
-              {texto ? <p>{texto}</p> : null}
-              {miniaturaVista ? (
-                <div className="vp-media" style={{ backgroundImage: `url(${miniaturaVista})` }}>
-                  {tipo === "video" || tipo === "youtube" ? <span aria-hidden><LuPlay /></span> : null}
-                  {tipo === "fotos" && fotos.length > 1 ? <em>1/{fotos.length}</em> : null}
-                </div>
-              ) : tipo === "video" && videoUrl ? (
-                <div className="vp-media vacia"><span aria-hidden><LuPlay /></span></div>
-              ) : null}
-              {tipo === "youtube" && vista ? <small className="vp-yt">youtube.com · {vista.titulo ?? ""}</small> : null}
-              <div className="vp-acciones">
-                <span>♡ 0</span>
-                {permiteComentarios ? <span>Comentar</span> : null}
-                <span>Compartir</span>
-                {!permiteComentarios ? <span className="vp-cerrados">Comentarios cerrados</span> : null}
-              </div>
-            </div>
-          </div>
+  if (modo === "completa") {
+    return (
+      <div className="vp2-telefono oscuro">
+        <div className="vp2-completa">
+          {tipo === "texto" ? <span className="vp2-imagen" style={{ background: fondoTexto(props.idPub) }} /> : fondo}
+          <span className="vp2-velo-abajo" />
+          {esVideo ? (
+            <span className="vp2-play grande" aria-hidden>
+              <LuPlay />
+            </span>
+          ) : null}
+          <span className="vp2-riel" aria-hidden>
+            <span className="vp2-avatar borde">EL</span>
+            <span>
+              <LuHeart />0
+            </span>
+            {props.permiteComentarios ? (
+              <span>
+                <LuMessageCircle />0
+              </span>
+            ) : null}
+            <span>
+              <LuSend />0
+            </span>
+          </span>
+          <span className="vp2-texto-completa">
+            <b>
+              ELISUR <Verificado />
+            </b>
+            <span>{texto.trim() || props.tituloYoutube || ""}</span>
+          </span>
         </div>
-      </aside>
+      </div>
+    );
+  }
+
+  return (
+    <div className="vp2-telefono">
+      <div className="vp2-muro">
+        <span className="vp2-autor">
+          <span className="vp2-avatar">EL</span>
+          <b>
+            ELISUR <Verificado />
+          </b>
+          <small>· {props.cuando}</small>
+        </span>
+        {tipo !== "texto" ? (
+          <span className={`vp2-media ${tipo === "youtube" ? "ancho" : ""}`}>
+            {fondo}
+            {esVideo ? (
+              <span className={`vp2-play ${tipo === "youtube" ? "yt" : ""}`} aria-hidden>
+                <LuPlay />
+              </span>
+            ) : null}
+            {tipo === "fotos" && props.cantidadFotos > 1 ? <em>1/{props.cantidadFotos}</em> : null}
+          </span>
+        ) : null}
+        {tipo === "youtube" && props.tituloYoutube ? <span className="vp2-yt">youtube.com · {props.tituloYoutube}</span> : null}
+        <span className="vp2-acciones" aria-hidden>
+          <LuHeart />
+          {props.permiteComentarios ? <LuMessageCircle /> : null}
+          <LuSend />
+        </span>
+        {texto.trim() ? (
+          <p className="vp2-pie">
+            <b>ELISUR</b> {texto}
+          </p>
+        ) : null}
+        {props.permiteComentarios ? <span className="vp2-ver-com">Sé el primero en comentar</span> : <span className="vp2-ver-com">Comentarios cerrados</span>}
+      </div>
     </div>
   );
 }

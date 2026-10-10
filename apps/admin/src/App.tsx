@@ -32,6 +32,8 @@ import { MiNegocioEstado } from "./paginas/MiNegocioEstado";
 import { MisAvisos } from "./paginas/MisAvisos";
 import { MiCuenta } from "./paginas/MiCuenta";
 import { ParaTiPublicaciones } from "./paginas/ParaTiPublicaciones";
+import { ParaTiInicio } from "./paginas/ParaTiInicio";
+import { ParaTiCalendario } from "./paginas/ParaTiCalendario";
 import { EditorPublicacion } from "./paginas/EditorPublicacion";
 import { ParaTiComentarios } from "./paginas/ParaTiComentarios";
 import { ModulosApp } from "./paginas/ModulosApp";
@@ -128,7 +130,9 @@ export function App() {
         <Route path="/mi-negocio/estado" element={<MiNegocioEstado />} />
         <Route path="/mis-avisos" element={<MisAvisos />} />
         <Route path="/mi-cuenta" element={<MiCuenta />} />
-        <Route path="/para-ti" element={<ParaTiPublicaciones />} />
+        <Route path="/para-ti" element={<ParaTiInicio />} />
+        <Route path="/para-ti/publicaciones" element={<ParaTiPublicaciones />} />
+        <Route path="/para-ti/calendario" element={<ParaTiCalendario />} />
         <Route path="/para-ti/nueva" element={<EditorPublicacion />} />
         <Route path="/para-ti/comentarios" element={<ParaTiComentarios />} />
         <Route path="/para-ti/:id" element={<EditorPublicacion />} />

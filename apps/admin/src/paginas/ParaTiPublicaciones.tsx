@@ -1,56 +1,40 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { LuFileText, LuHeart, LuImage, LuMessageSquare, LuPencil, LuPlay, LuShare2, LuTrash2, LuYoutube } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
+import { LuPencil, LuPlus, LuSearch, LuTrash2 } from "react-icons/lu";
 import { Publicacion } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { avisarErrorParaTi, useParaTi } from "../estado/useParaTi";
 import { alertaExito } from "../estado/useToasts";
-import { urlCompleta } from "../utilidades/media";
+import { estadoDe, estaDestacada } from "../utilidades/paraTi";
+import { TarjetaMuro } from "./ParaTiInicio";
 
-type Filtro = "todas" | "publicadas" | "destacadas" | "borradores";
+type Filtro = "todas" | "publicadas" | "programadas" | "destacadas" | "borradores";
 
-const TIPO: Record<Publicacion["tipo"], { texto: string; icono: typeof LuImage }> = {
-  fotos: { texto: "Fotos", icono: LuImage },
-  video: { texto: "Video", icono: LuPlay },
-  youtube: { texto: "YouTube", icono: LuYoutube },
-  texto: { texto: "Texto", icono: LuFileText },
-};
+const FILTROS: { id: Filtro; texto: string; cumple: (p: Publicacion) => boolean }[] = [
+  { id: "todas", texto: "Todas", cumple: () => true },
+  { id: "publicadas", texto: "Publicadas", cumple: (p) => estadoDe(p) === "publicada" },
+  { id: "programadas", texto: "Programadas", cumple: (p) => estadoDe(p) === "programada" },
+  { id: "destacadas", texto: "Destacadas", cumple: estaDestacada },
+  { id: "borradores", texto: "Borradores", cumple: (p) => p.estado === "borrador" },
+];
 
-export const estaDestacada = (p: Publicacion) => Boolean(p.destacadaHasta && new Date(p.destacadaHasta) > new Date());
-
-export function miniaturaDe(p: Publicacion): string | null {
-  if (p.tipo === "fotos") return urlCompleta(p.fotos[0]) ?? null;
-  if (p.tipo === "video") return urlCompleta(p.portadaUrl) ?? null;
-  if (p.tipo === "youtube") return p.enlaceMiniatura;
-  return null;
-}
-
-const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-PE", { day: "numeric", month: "short" });
-
-/** "Para ti" en el panel (decisión 0091): todas las publicaciones, con filtros y acciones. */
+/** Todas las publicaciones de Para ti en cuadrícula, con filtros, buscador y acciones (0092). */
 export function ParaTiPublicaciones() {
   const token = useSesionAdmin((e) => e.token)!;
   const navegar = useNavigate();
-  const { publicaciones, cargar, cargando, eliminar, modulos, cargarModulos } = useParaTi();
+  const { publicaciones, cargar, cargando, eliminar } = useParaTi();
   const [filtro, setFiltro] = useState<Filtro>("todas");
+  const [busqueda, setBusqueda] = useState("");
   const [confirmando, setConfirmando] = useState<string | null>(null);
 
   useEffect(() => {
     cargar(token);
-    cargarModulos();
-  }, [token, cargar, cargarModulos]);
+  }, [token, cargar]);
 
-  const cuentas = useMemo(
-    () => ({
-      todas: publicaciones.length,
-      publicadas: publicaciones.filter((p) => p.estado === "publicada").length,
-      destacadas: publicaciones.filter((p) => p.estado === "publicada" && estaDestacada(p)).length,
-      borradores: publicaciones.filter((p) => p.estado === "borrador").length,
-    }),
-    [publicaciones],
-  );
-  const lista = publicaciones.filter((p) =>
-    filtro === "todas" ? true : filtro === "publicadas" ? p.estado === "publicada" : filtro === "borradores" ? p.estado === "borrador" : p.estado === "publicada" && estaDestacada(p),
+  const cuentas = useMemo(() => Object.fromEntries(FILTROS.map((f) => [f.id, publicaciones.filter(f.cumple).length])) as Record<Filtro, number>, [publicaciones]);
+  const q = busqueda.trim().toLowerCase();
+  const lista = publicaciones.filter(
+    (p) => FILTROS.find((f) => f.id === filtro)!.cumple(p) && (!q || `${p.texto} ${p.enlaceTitulo ?? ""}`.toLowerCase().includes(q)),
   );
 
   async function borrar(p: Publicacion) {
@@ -61,74 +45,45 @@ export function ParaTiPublicaciones() {
 
   return (
     <div className="para-ti-admin">
-      <div className="topbar">
+      <div className="cabecera-para-ti">
         <div>
-          <h2>Para ti</h2>
-          <p>Publicaciones para todos los distritos: fotos, videos, enlaces de YouTube y texto.</p>
+          <h2>Publicaciones</h2>
+          <span className="fecha-para-ti">Se ven en todos los distritos. El autor que ven los vecinos es «ELISUR».</span>
         </div>
-        <button className="btn btn-primario" onClick={() => navegar("/para-ti/nueva")}>
-          ＋ Nueva publicación
+        <button className="btn-pildora primario" onClick={() => navegar("/para-ti/nueva")}>
+          <LuPlus aria-hidden /> Crear publicación
         </button>
       </div>
 
-      {modulos && !modulos.paraTi ? (
-        <div className="nota-alerta" style={{ marginBottom: 14 }}>
-          <span>
-            La pestaña Para ti está <b>apagada</b>: los vecinos todavía no la ven. Puedes preparar publicaciones y encenderla en Módulos de la app.
-          </span>
+      <div className="barra-filtros-para-ti">
+        <div className="filtros-para-ti" role="tablist" aria-label="Filtrar publicaciones">
+          {FILTROS.map((f) => (
+            <button key={f.id} type="button" role="tab" aria-selected={filtro === f.id} className={filtro === f.id ? "activo" : ""} onClick={() => setFiltro(f.id)}>
+              {f.texto} <span>{cuentas[f.id]}</span>
+            </button>
+          ))}
         </div>
-      ) : null}
-
-      <div className="filtros-para-ti" role="tablist" aria-label="Filtrar publicaciones">
-        {(["todas", "publicadas", "destacadas", "borradores"] as Filtro[]).map((f) => (
-          <button key={f} type="button" role="tab" aria-selected={filtro === f} className={filtro === f ? "activo" : ""} onClick={() => setFiltro(f)}>
-            {f === "todas" ? "Todas" : f === "publicadas" ? "Publicadas" : f === "destacadas" ? "Destacadas" : "Borradores"} <span>{cuentas[f]}</span>
-          </button>
-        ))}
+        <label className="buscador-para-ti">
+          <LuSearch aria-hidden />
+          <span className="solo-lector">Buscar publicaciones</span>
+          <input value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por texto…" />
+        </label>
       </div>
 
       {cargando && publicaciones.length === 0 ? <p className="vacio-editor">Cargando…</p> : null}
       {!cargando && lista.length === 0 ? (
         <div className="tarjeta vacio-para-ti">
-          <b>{filtro === "todas" ? "Todavía no hay publicaciones." : "Nada en este filtro."}</b>
-          {filtro === "todas" ? <Link to="/para-ti/nueva">Crear la primera</Link> : null}
+          <b>{publicaciones.length === 0 ? "Todavía no hay publicaciones." : "Nada en este filtro."}</b>
         </div>
       ) : null}
 
-      <div className="lista-para-ti">
-        {lista.map((p) => {
-          const tipo = TIPO[p.tipo];
-          const mini = miniaturaDe(p);
-          return (
-            <div className="fila-para-ti" key={p.id}>
-              <div className="mini-para-ti" style={mini ? { backgroundImage: `url(${mini})` } : undefined}>
-                {mini ? null : <tipo.icono aria-hidden />}
-                {p.tipo === "video" || p.tipo === "youtube" ? <span className="play-mini" aria-hidden><LuPlay /></span> : null}
-              </div>
-              <div className="info-para-ti">
-                <div className="chips-para-ti">
-                  <span className={`chip-estado ${p.estado}`}>{p.estado === "publicada" ? "Publicada" : "Borrador"}</span>
-                  <span className="chip-tipo">
-                    <tipo.icono aria-hidden /> {tipo.texto}
-                  </span>
-                  {estaDestacada(p) ? <span className="chip-destacada">Destacada hasta {fecha(p.destacadaHasta!)}</span> : null}
-                  {!p.permiteComentarios ? <span className="chip-tipo">Comentarios cerrados</span> : null}
-                </div>
-                <p>{p.texto || p.enlaceTitulo || "Sin texto"}</p>
-                <span className="meta-para-ti">
-                  {p.publicadoEn ? `Publicada el ${fecha(p.publicadoEn)}` : `Creada el ${fecha(p.creadoEn)}`}
-                  <span>
-                    <LuHeart aria-hidden /> {p.corazones}
-                  </span>
-                  <span>
-                    <LuMessageSquare aria-hidden /> {p.comentarios}
-                  </span>
-                  <span>
-                    <LuShare2 aria-hidden /> {p.compartidos}
-                  </span>
-                </span>
-              </div>
-              <div className="acciones-para-ti">
+      <div className="cuadricula-para-ti">
+        {lista.map((p) => (
+          <TarjetaMuro
+            key={p.id}
+            p={p}
+            acciones={
+              <div className="acciones-muro">
                 {confirmando === p.id ? (
                   <>
                     <span className="confirmar-texto">¿Eliminar para siempre?</span>
@@ -150,9 +105,9 @@ export function ParaTiPublicaciones() {
                   </>
                 )}
               </div>
-            </div>
-          );
-        })}
+            }
+          />
+        ))}
       </div>
     </div>
   );

@@ -2,6 +2,8 @@ import { Fragment, useEffect, useState } from "react";
 import type { IconType } from "react-icons";
 import {
   LuBadgeCheck,
+  LuCalendarDays,
+  LuSquarePlus,
   LuClock,
   LuFlag,
   LuHistory,
@@ -27,7 +29,7 @@ import {
   LuUsers,
 } from "react-icons/lu";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { usePanelActivo } from "../estado/useParaTi";
+import { useParaTi, usePanelActivo } from "../estado/useParaTi";
 import { RolCuenta } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { useNegocios } from "../estado/useNegocios";
@@ -48,17 +50,19 @@ interface ItemNav {
   contador?: number;
 }
 
-/** El módulo Para ti: lo que ve el Editor de redes sociales, y el super admin en ese panel (0091). */
-const ITEMS_PARA_TI: ItemNav[] = [
-  { a: "/para-ti", texto: "Publicaciones", icono: LuNewspaper, grupo: "Para ti" },
-  { a: "/para-ti/nueva", texto: "Nueva publicación", icono: LuPlus },
-  { a: "/para-ti/comentarios", texto: "Comentarios", icono: LuMessageSquare },
+/** El módulo Para ti: lo que ve el Editor de redes sociales, y el super admin en ese panel (0091, 0092). */
+const itemsParaTi = (reportados: number): ItemNav[] => [
+  { a: "/para-ti", texto: "Inicio", icono: LuHouse, grupo: "Para ti" },
+  { a: "/para-ti/nueva", texto: "Crear", icono: LuSquarePlus },
+  { a: "/para-ti/publicaciones", texto: "Publicaciones", icono: LuLayoutGrid },
+  { a: "/para-ti/calendario", texto: "Calendario", icono: LuCalendarDays },
+  { a: "/para-ti/comentarios", texto: "Comentarios", icono: LuMessageSquare, contador: reportados },
 ];
 
-function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: "admin" | "para-ti" = "admin"): ItemNav[] {
+function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: "admin" | "para-ti" = "admin", reportados = 0): ItemNav[] {
   switch (rol) {
     case "super_admin":
-      if (panel === "para-ti") return ITEMS_PARA_TI;
+      if (panel === "para-ti") return itemsParaTi(reportados);
       return [
         { a: "/dashboard", texto: "Dashboard", icono: LuLayoutDashboard, grupo: "General" },
         { a: "/modulos", texto: "Módulos de la app", icono: LuToggleRight },
@@ -99,7 +103,7 @@ function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: 
         { a: "/negocios/nuevo", texto: "Registrar negocio", icono: LuPlus },
       ];
     case "editor_redes":
-      return ITEMS_PARA_TI;
+      return itemsParaTi(reportados);
   }
 }
 
@@ -132,6 +136,14 @@ export function LayoutAdmin() {
   // Antes del return condicional de abajo: un hook después de él rompe el orden de hooks al
   // cerrar sesión (cuenta pasa a null).
   const rechazados = useNegocios((e) => e.negocios.filter((n) => !n.archivadoEn && n.estado === "inactivo" && n.motivoRechazo).length);
+  const reportados = useParaTi((e) => e.resumenComentarios?.reportados ?? 0);
+  const cargarResumenComentarios = useParaTi((e) => e.cargarResumenComentarios);
+  const veParaTi = cuenta?.rol === "editor_redes" || (cuenta?.rol === "super_admin" && panel === "para-ti");
+
+  // Comentarios reportados en el menú de Para ti (decisión 0092).
+  useEffect(() => {
+    if (token && veParaTi) cargarResumenComentarios(token);
+  }, [token, veParaTi, cargarResumenComentarios, ubicacion.pathname]);
 
   // En móvil/tablet el menú es un panel deslizable — se cierra solo al navegar,
   // para no dejarlo abierto tapando la pantalla después de elegir una opción.
@@ -237,7 +249,7 @@ export function LayoutAdmin() {
           </div>
         ) : null}
         <nav>
-          {itemsPorRol(cuenta.rol, pendientes, rechazados, panelVisible).map((item) => (
+          {itemsPorRol(cuenta.rol, pendientes, rechazados, panelVisible, reportados).map((item) => (
             <Fragment key={item.a}>
               {item.grupo ? <span className="grupo-nav">{item.grupo}</span> : null}
               <NavLink
