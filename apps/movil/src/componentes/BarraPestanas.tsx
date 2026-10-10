@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -21,9 +21,8 @@ const ICONOS: Record<string, { activo: keyof typeof Ionicons.glyphMap; inactivo:
   perfil: { activo: "person", inactivo: "person-outline" },
 };
 
-// La pestaña elegida lleva una cápsula de color detrás del ícono, que se desliza (decisión 0092).
-const ANCHO_CAPSULA = 56;
-const ALTO_CAPSULA = 32;
+// Opción B del lienzo (decisión 0093): la pestaña elegida se estira en una píldora verde con su
+// nombre; las demás muestran solo el ícono (el nombre queda para lectores de pantalla).
 const NATIVO = Platform.OS !== "web";
 // En Android el desenfoque de expo-blur todavía es experimental y se ve sucio: ahí la barra es
 // casi opaca. En iOS y web se ve el contenido pasar por detrás, desenfocado.
@@ -60,21 +59,23 @@ function Pestana({
     Animated.spring(escala, { toValue: 1, friction: 4, tension: 220, useNativeDriver: NATIVO }).start();
   }, [enfocada, reducido, escala]);
 
-  const color = enfocada ? "#ffffff" : colores.textoTenue;
-
   return (
     <Pressable
       onPress={onPress}
-      style={styles.pestana}
+      style={[styles.pestana, enfocada && styles.pestanaActiva]}
       accessibilityRole="tab"
       accessibilityState={{ selected: enfocada }}
       accessibilityLabel={conPunto ? `${titulo}, hay una alerta nueva` : titulo}
     >
       <Animated.View style={{ transform: [{ scale: escala }] }}>
-        <Ionicons name={enfocada ? icono.activo : icono.inactivo} size={22} color={color} />
+        <Ionicons name={enfocada ? icono.activo : icono.inactivo} size={22} color={enfocada ? "#ffffff" : colores.textoSuave} />
         {conPunto ? <View style={styles.punto} /> : null}
       </Animated.View>
-      <Text style={[styles.etiqueta, { color: enfocada ? colores.texto : colores.textoTenue }, enfocada && styles.etiquetaActiva]}>{titulo}</Text>
+      {enfocada ? (
+        <Text style={styles.etiqueta} numberOfLines={1}>
+          {titulo}
+        </Text>
+      ) : null}
     </Pressable>
   );
 }
@@ -91,8 +92,6 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
   const oscuro = useTema((e) => e.modo === "oscuro");
   const insets = useSafeAreaInsets();
   const reducido = useMovimientoReducido();
-  const [ancho, setAncho] = useState(0);
-  const posicion = useRef(new Animated.Value(state.index)).current;
   const ocultar = useRef(new Animated.Value(0)).current;
   const oculta = useBarraPestanas((e) => e.oculta);
   const altura = useBarraPestanas((e) => e.altura);
@@ -101,26 +100,15 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
   const { comunidad } = useComunidadActiva();
   const { data: avisos } = useAvisos(comunidad?.id);
 
-  // Pestañas apagadas desde el panel (decisión 0091): no se dibujan. La rayita y el ancho se
-  // calculan sobre las visibles.
+  // Pestañas apagadas desde el panel (decisión 0091): no se dibujan.
   const modulos = useModulos();
   const visibles = state.routes
     .map((ruta, i) => ({ ruta, i }))
     .filter(({ ruta }) => !(ruta.name === "comunidad" && !modulos.comunidad) && !(ruta.name === "para-ti" && !modulos.paraTi));
-  const indiceVisible = Math.max(0, visibles.findIndex((v) => v.i === state.index));
 
   const hayAlertaNueva = (avisos ?? []).some(
     (a) => a.categoria === "seguridad" && (!comunidadVistaHasta || a.publicadoEn > comunidadVistaHasta),
   );
-
-  useEffect(() => {
-    Animated.timing(posicion, {
-      toValue: indiceVisible,
-      duration: reducido ? 0 : 280,
-      easing: Easing.bezier(0.2, 0.8, 0.2, 1),
-      useNativeDriver: NATIVO,
-    }).start();
-  }, [indiceVisible, reducido, posicion]);
 
   useEffect(() => {
     Animated.timing(ocultar, {
@@ -130,12 +118,6 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
       useNativeDriver: NATIVO,
     }).start();
   }, [oculta, reducido, ocultar]);
-
-  const anchoPestana = ancho / Math.max(1, visibles.length);
-  const traslado = posicion.interpolate({
-    inputRange: visibles.length > 1 ? visibles.map((_v, i) => i) : [0, 1],
-    outputRange: visibles.length > 1 ? visibles.map((_v, i) => i * anchoPestana + anchoPestana / 2 - ANCHO_CAPSULA / 2) : [anchoPestana / 2 - ANCHO_CAPSULA / 2, anchoPestana / 2 - ANCHO_CAPSULA / 2],
-  });
 
   const fondo = USA_DESENFOQUE ? (
     <BlurView intensity={60} tint={oscuro ? "dark" : "light"} style={StyleSheet.absoluteFill} />
@@ -156,14 +138,12 @@ export function BarraPestanas({ state, descriptors, navigation }: BottomTabBarPr
         },
       ]}
       onLayout={(e) => {
-        setAncho(e.nativeEvent.layout.width);
-        // Lo que tapa abajo: la cápsula más el margen que la separa del borde.
+        // Lo que tapa abajo: la barra más el margen que la separa del borde.
         setAltura(e.nativeEvent.layout.height + Math.max(insets.bottom, 10));
       }}
       accessibilityRole="tablist"
     >
       {fondo}
-      {ancho > 0 ? <Animated.View style={[styles.capsula, { transform: [{ translateX: traslado }] }]} /> : null}
       {visibles.map(({ ruta, i }) => {
         const { options } = descriptors[ruta.key];
         const enfocada = state.index === i;
@@ -200,11 +180,13 @@ function crearEstilos(colores: PaletaColores) {
       left: 12,
       right: 12,
       flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      height: 64,
+      paddingHorizontal: 8,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colores.bordeFuerte,
       borderRadius: 32,
-      paddingTop: 4,
-      paddingBottom: 6,
       overflow: "hidden",
       shadowColor: "#000000",
       shadowOpacity: 0.14,
@@ -212,23 +194,18 @@ function crearEstilos(colores: PaletaColores) {
       shadowOffset: { width: 0, height: 6 },
       elevation: 8,
     },
-    capsula: {
-      position: "absolute",
-      top: 4,
-      left: 0,
-      width: ANCHO_CAPSULA,
-      height: ALTO_CAPSULA,
-      borderRadius: ALTO_CAPSULA / 2,
-      backgroundColor: colores.primario,
-    },
     pestana: {
-      flex: 1,
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 6,
-      paddingTop: 2,
-      paddingBottom: 2,
-      minHeight: 52,
+      gap: 7,
+      minWidth: 48,
+      height: 46,
+      borderRadius: 23,
+    },
+    pestanaActiva: {
+      backgroundColor: colores.primario,
+      paddingHorizontal: 16,
     },
     punto: {
       position: "absolute",
@@ -242,12 +219,10 @@ function crearEstilos(colores: PaletaColores) {
       borderColor: colores.fondo,
     },
     etiqueta: {
-      fontFamily: "SchibstedGrotesk_600SemiBold",
-      fontSize: 11,
-      lineHeight: 13,
-    },
-    etiquetaActiva: {
-      fontFamily: "SchibstedGrotesk_700Bold",
+      fontFamily: "SchibstedGrotesk_800ExtraBold",
+      fontSize: 13.5,
+      lineHeight: 17,
+      color: "#ffffff",
     },
   });
 }
