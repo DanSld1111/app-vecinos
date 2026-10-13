@@ -16,6 +16,7 @@ import { queryClient } from "../src/datos/queryClient";
 import { useColores } from "../src/disenio";
 import { useTema } from "../src/estado/useTema";
 import { BannerSinConexion } from "../src/componentes/BannerSinConexion";
+import { AvisoNuevaVersion } from "../src/componentes/AvisoNuevaVersion";
 import { FlujoLogin } from "../src/componentes/FlujoLogin";
 import { FundidoTema } from "../src/componentes/transicion/FundidoTema";
 import { Onboarding } from "../src/componentes/Onboarding";
@@ -48,6 +49,7 @@ export default function LayoutRaiz() {
         <StatusBar style={modoOscuro ? "light" : "dark"} />
         <View style={{ flex: 1, backgroundColor: colores.fondo }}>
           <BannerSinConexion />
+          <AvisoNuevaVersion />
           {!autenticado ? (
             <FlujoLogin />
           ) : !onboardingVisto ? (
