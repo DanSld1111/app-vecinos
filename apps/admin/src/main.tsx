@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App";
+import { AvisoNuevaVersion } from "./componentes/AvisoNuevaVersion";
 import "./index.css";
 // Conecta las alertas emergentes a todas las acciones del panel (decisión 0084).
 import "./estado/alertasDeAcciones";
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <App />
+      <AvisoNuevaVersion />
     </BrowserRouter>
   </StrictMode>
 );

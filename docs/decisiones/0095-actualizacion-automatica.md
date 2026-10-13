@@ -17,3 +17,9 @@ publique una nueva, el vecino seguía viendo la anterior hasta cerrarla del todo
   - mientras se usa, revisa cada 5 minutos y muestra «Hay una versión nueva · Actualizar».
 - Recarga una sola vez por versión (sessionStorage), así no entra en bucle si el servidor tarda
   en servir la nueva.
+
+## Panel de administración
+
+Mismo mecanismo con Vite: `vite.config.ts` pone la versión en el bundle (`__VERSION_PANEL__`) y
+genera `version.json`. En el panel **no se recarga solo** (podría perderse un formulario a medio
+llenar): solo aparece abajo el aviso «Hay una versión nueva del panel» con «Actualizar» y «Después».
