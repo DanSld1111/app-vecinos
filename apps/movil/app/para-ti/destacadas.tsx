@@ -8,11 +8,15 @@ import { marcarVista, useDestacadas, useModulos } from "../../src/datos/hooks/us
 import { useDestacadasVistas } from "../../src/estado/useDestacadasVistas";
 import { NombreOficial, imagenDe, tiempoPublicacion } from "../../src/componentes/paraTi/TarjetaPublicacion";
 import { CuadroVideo } from "../../src/componentes/paraTi/ReproductorVideo";
+import { VideoVertical, YoutubeVertical } from "../../src/componentes/paraTi/VideoVertical";
+import { idYoutube } from "@app-vecinos/tipos";
 import { urlCompleta } from "../../src/utilidades/media";
 import { useAccionesPublicacion } from "../../src/componentes/paraTi/useAccionesPublicacion";
 import { Aviso } from "../../src/componentes/Aviso";
 
 const DURACION_MS = 6000;
+// Un video se ve un poco más (sin sonido) antes de pasar a la siguiente (decisión 0094).
+const DURACION_VIDEO_MS = 10000;
 
 /** El título en etiquetas blancas, como en las historias: hasta 3 renglones de unas 4 palabras. */
 function etiquetas(texto: string): string[] {
@@ -67,7 +71,8 @@ export default function DestacadasParaTi() {
     marcarVista(actual.id);
     avance.setValue(0);
     if (pausa) return;
-    const anim = Animated.timing(avance, { toValue: 1, duration: DURACION_MS, easing: Easing.linear, useNativeDriver: false });
+    const esVideoActual = actual.tipo === "video" || actual.tipo === "youtube";
+    const anim = Animated.timing(avance, { toValue: 1, duration: esVideoActual ? DURACION_VIDEO_MS : DURACION_MS, easing: Easing.linear, useNativeDriver: false });
     anim.start(({ finished }) => finished && siguiente());
     return () => anim.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,6 +84,7 @@ export default function DestacadasParaTi() {
   const imagen = imagenDe(actual);
   const cuadro = !imagen && actual.tipo === "video" && actual.videoUrl ? urlCompleta(actual.videoUrl) : null;
   const esVideo = actual.tipo === "video" || actual.tipo === "youtube";
+  const videoYoutube = actual.tipo === "youtube" ? idYoutube(actual.enlaceUrl) : null;
   const titulo = etiquetas(actual.texto || actual.enlaceTitulo || "");
   const verCompleta = () =>
     esVideo
@@ -88,7 +94,24 @@ export default function DestacadasParaTi() {
 
   return (
     <View style={[styles.raiz, { backgroundColor: "#2b2420" }]}>
-      {imagen ? <Image source={{ uri: imagen }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : cuadro ? <CuadroVideo url={cuadro} /> : null}
+      {/* Si es video, se reproduce sin sonido mientras dura la destacada. */}
+      {actual.tipo === "video" && actual.videoUrl ? (
+        <VideoVertical
+          key={actual.id}
+          url={urlCompleta(actual.videoUrl)!}
+          portada={urlCompleta(actual.portadaUrl)}
+          activo
+          pausado={pausa}
+          silenciado
+          onProgreso={() => {}}
+        />
+      ) : videoYoutube ? (
+        <YoutubeVertical key={actual.id} videoId={videoYoutube} activo silenciado miniatura={actual.enlaceMiniatura} />
+      ) : imagen ? (
+        <Image source={{ uri: imagen }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+      ) : cuadro ? (
+        <CuadroVideo url={cuadro} />
+      ) : null}
       <LinearGradient
         colors={["rgba(0,0,0,0.55)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0.85)"]}
         locations={[0, 0.22, 0.55, 1]}

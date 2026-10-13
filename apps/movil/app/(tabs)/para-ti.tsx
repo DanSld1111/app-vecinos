@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { Publicacion } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, tipografia, useColores } from "../../src/disenio";
-import { useAlturaBarra } from "../../src/utilidades/useDesplazamiento";
+import { useAlturaBarra, useDesplazamiento } from "../../src/utilidades/useDesplazamiento";
 import { marcarVista, registrarVisitaParaTi, useDestacadas, useModulos, usePublicacionesParaTi } from "../../src/datos/hooks/useParaTi";
 import { useDestacadasVistas } from "../../src/estado/useDestacadasVistas";
 import { useSesion } from "../../src/estado/useSesion";
@@ -29,6 +29,8 @@ export default function ParaTi() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const alturaBarra = useAlturaBarra();
+  // Como en Inicio y Comunidad: la barra de pestañas se esconde al bajar y vuelve al subir.
+  const desplazamiento = useDesplazamiento();
   const modulos = useModulos();
   const activo = modulos.paraTi;
   const [buscando, setBuscando] = useState(false);
@@ -165,6 +167,8 @@ export default function ParaTi() {
         keyExtractor={(p) => p.id}
         ListHeaderComponent={cabecera}
         style={{ width: "100%", maxWidth: ANCHO_MAXIMO, alignSelf: "center" }}
+        onScroll={desplazamiento.onScroll}
+        scrollEventThrottle={16}
         onViewableItemsChanged={alVerPublicaciones}
         viewabilityConfig={{ itemVisiblePercentThreshold: 50, minimumViewTime: 1000 }}
         renderItem={({ item }) => (
