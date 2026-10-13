@@ -21,6 +21,7 @@ import {
   ReportarComentarioDto,
   SilenciarDto,
   VisitaDto,
+  VistasDto,
 } from "./dto/guardar-publicacion.dto";
 
 type SolicitudConCuenta = { user: Cuenta };
@@ -71,6 +72,13 @@ export class ParaTiController {
   @HttpCode(204)
   async visita(@Body() dto: VisitaDto): Promise<void> {
     await this.paraTi.registrarVisita(dto.visitante);
+  }
+
+  /** El celular avisa en tandas qué publicaciones vio (no pide cuenta). */
+  @Post("vistas")
+  @HttpCode(204)
+  async vistas(@Body() dto: VistasDto): Promise<void> {
+    await this.paraTi.registrarVistas(dto.visitante, dto.ids);
   }
 
   @Get("corazones")

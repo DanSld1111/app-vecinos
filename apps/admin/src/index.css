@@ -4475,3 +4475,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .mover-cat:hover:not(:disabled) { border-color: var(--texto); }
 .mover-cat:disabled { opacity: .3; cursor: default; }
 .mover-cat:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
+
+/* Visualizaciones, corazones y comentarios en la tarjeta del muro (decisión 0094). */
+.numeros-muro { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; font-weight: 700; }
+.numeros-muro > span { display: inline-flex; align-items: center; gap: 4px; }
+.numeros-muro svg { font-size: 13px; }

@@ -47,6 +47,7 @@ interface FilaPublicacion {
   programada: boolean;
   corazones: number;
   compartidos: number;
+  vistas: number;
   comentarios: string;
   creado_en: Date;
   publicado_en: Date | null;
@@ -55,7 +56,7 @@ interface FilaPublicacion {
 
 const COLUMNAS = `p.id, p.tipo, p.texto, p.fotos, p.video_url, p.portada_url, p.enlace_url, p.enlace_titulo,
   p.enlace_miniatura, p.estado, p.permite_comentarios, p.destacada_hasta, p.destacada_orden,
-  (p.estado = 'publicada' AND p.publicado_en > now()) AS programada, p.corazones, p.compartidos,
+  (p.estado = 'publicada' AND p.publicado_en > now()) AS programada, p.corazones, p.compartidos, p.vistas,
   (SELECT COUNT(*) FROM publicacion_comentarios c WHERE c.publicacion_id = p.id AND NOT c.oculto) AS comentarios,
   p.creado_en, p.publicado_en, p.actualizado_en`;
 
@@ -77,6 +78,7 @@ function aPublicacion(f: FilaPublicacion): Publicacion {
     programada: f.programada,
     corazones: f.corazones,
     compartidos: f.compartidos,
+    vistas: f.vistas,
     comentarios: Number(f.comentarios),
     autor: AUTOR,
     creadoEn: f.creado_en.toISOString(),
@@ -278,6 +280,27 @@ export class ParaTiService {
     await this.bd.consultar(
       `INSERT INTO para_ti_visitas (dia, visitante) VALUES ((now() AT TIME ZONE '${ZONA}')::date, $1) ON CONFLICT DO NOTHING`,
       [visitante],
+    );
+  }
+
+  /**
+   * Este celular vio estas publicaciones (decisión 0094). Cuenta una vez por celular, publicación
+   * y día; solo las que los vecinos pueden ver.
+   */
+  async registrarVistas(visitante: string, ids: string[]): Promise<void> {
+    if (!/^[A-Za-z0-9_-]{8,64}$/.test(visitante)) throw new BadRequestException("Visitante no válido.");
+    const unicos = [...new Set(ids)].slice(0, 30);
+    if (!unicos.length) return;
+    await this.verificarEncendido();
+    await this.bd.consultar(
+      `WITH nuevas AS (
+         INSERT INTO publicacion_vistas (publicacion_id, visitante, dia)
+         SELECT p.id, $1, (now() AT TIME ZONE '${ZONA}')::date FROM publicaciones p WHERE p.id = ANY($2) AND ${VISIBLE}
+         ON CONFLICT DO NOTHING
+         RETURNING publicacion_id
+       )
+       UPDATE publicaciones SET vistas = vistas + 1 WHERE id IN (SELECT publicacion_id FROM nuevas)`,
+      [visitante, unicos],
     );
   }
 
@@ -592,11 +615,12 @@ export class ParaTiService {
   /** Corazones, comentarios de vecinos, compartidos y visitantes: 7 días contra los 7 anteriores. */
   async resumen(): Promise<MetricaParaTi[]> {
     const dia = (col: string) => `(${col} AT TIME ZONE '${ZONA}')::date = d.dia`;
-    const { rows } = await this.bd.consultar<{ corazones: string; comentarios: string; compartidos: string; visitantes: string }>(
+    const { rows } = await this.bd.consultar<{ vistas: string; corazones: string; comentarios: string; compartidos: string; visitantes: string }>(
       `WITH d AS (
          SELECT generate_series((now() AT TIME ZONE '${ZONA}')::date - 13, (now() AT TIME ZONE '${ZONA}')::date, interval '1 day')::date AS dia
        )
        SELECT d.dia,
+         (SELECT COUNT(*) FROM publicacion_vistas x WHERE x.dia = d.dia) AS vistas,
          (SELECT COUNT(*) FROM publicacion_corazones x WHERE ${dia("x.creado_en")}) AS corazones,
          (SELECT COUNT(*) FROM publicacion_comentarios x WHERE x.usuario_id IS NOT NULL AND ${dia("x.creado_en")}) AS comentarios,
          (SELECT COUNT(*) FROM publicacion_compartidos x WHERE ${dia("x.creado_en")}) AS compartidos,
@@ -609,7 +633,7 @@ export class ParaTiService {
          (SELECT COUNT(DISTINCT visitante) FROM para_ti_visitas
             WHERE dia > (now() AT TIME ZONE '${ZONA}')::date - 14 AND dia <= (now() AT TIME ZONE '${ZONA}')::date - 7) AS anterior`,
     );
-    const claves: MetricaParaTi["clave"][] = ["corazones", "comentarios", "compartidos", "visitantes"];
+    const claves: MetricaParaTi["clave"][] = ["vistas", "corazones", "comentarios", "compartidos", "visitantes"];
     return claves.map((clave) => {
       const valores = rows.map((r) => Number(r[clave]));
       const porDia = valores.slice(7);

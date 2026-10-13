@@ -33,6 +33,8 @@ export interface Publicacion {
   programada: boolean;
   corazones: number;
   compartidos: number;
+  /** Visualizaciones: celulares distintos que la vieron, una vez por día (decisión 0094). */
+  vistas: number;
   /** Comentarios visibles (no ocultos). */
   comentarios: number;
   /** Por ahora siempre "ELISUR". */
@@ -88,7 +90,7 @@ export type ResumenComentarios = Record<FiltroComentarios, number>;
 
 /** Números de Para ti para el inicio del panel: los últimos 7 días contra los 7 anteriores. */
 export interface MetricaParaTi {
-  clave: "corazones" | "comentarios" | "compartidos" | "visitantes";
+  clave: "vistas" | "corazones" | "comentarios" | "compartidos" | "visitantes";
   total: number;
   anterior: number;
   /** 7 valores, del más antiguo a hoy. */

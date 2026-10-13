@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Publicacion, idYoutube } from "@app-vecinos/tipos";
-import { useModulos, usePublicacion, usePublicacionesParaTi } from "../../src/datos/hooks/useParaTi";
+import { marcarVista, useModulos, usePublicacion, usePublicacionesParaTi } from "../../src/datos/hooks/useParaTi";
 import { useSesion } from "../../src/estado/useSesion";
 import { useAccionesPublicacion } from "../../src/componentes/paraTi/useAccionesPublicacion";
 import { HojaComentarios } from "../../src/componentes/paraTi/Comentarios";
@@ -186,6 +186,10 @@ export default function VideosParaTi() {
 
   useEffect(() => {
     if (!activoId && lista[0]) setActivoId(lista[0].id);
+  }, [activoId, lista]);
+
+  useEffect(() => {
+    if (activoId && lista.some((x) => x.id === activoId)) marcarVista(activoId);
   }, [activoId, lista]);
 
   const alCambiarVisibles = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {

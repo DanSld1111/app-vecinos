@@ -135,6 +135,39 @@ function idVisitante(): string {
     return `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
   }
 }
+/**
+ * Visualizaciones (decisión 0094): se juntan en tandas y se mandan cada pocos segundos. Aquí ya se
+ * descarta lo repetido en el día; la API además cuenta una sola vez por celular y por día.
+ */
+const vistasDelDia = new Set<string>();
+let diaDeVistas = "";
+let tanda: string[] = [];
+let temporizadorVistas: ReturnType<typeof setTimeout> | null = null;
+
+function enviarVistas() {
+  temporizadorVistas = null;
+  const ids = tanda.splice(0, 30);
+  if (!ids.length) return;
+  apiFetch<void>("/para-ti/vistas", { metodo: "POST", cuerpo: { visitante: idVisitante(), ids } }).catch(() => {
+    for (const id of ids) vistasDelDia.delete(id);
+  });
+  if (tanda.length) temporizadorVistas = setTimeout(enviarVistas, 3000);
+}
+
+/** Este celular vio la publicación (en el muro, abierta, en video o como destacada). */
+export function marcarVista(id: string) {
+  if (!esApi) return;
+  const hoy = new Date().toDateString();
+  if (hoy !== diaDeVistas) {
+    diaDeVistas = hoy;
+    vistasDelDia.clear();
+  }
+  if (vistasDelDia.has(id)) return;
+  vistasDelDia.add(id);
+  tanda.push(id);
+  if (!temporizadorVistas) temporizadorVistas = setTimeout(enviarVistas, 3000);
+}
+
 let visitaRegistrada = "";
 /** Avisa una vez por día que este celular abrió Para ti (decisión 0092). */
 export function registrarVisitaParaTi() {

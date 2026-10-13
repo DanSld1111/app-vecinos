@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../../src/disenio";
 import { useSesion } from "../../src/estado/useSesion";
-import { useModulos, usePublicacion } from "../../src/datos/hooks/useParaTi";
+import { marcarVista, useModulos, usePublicacion } from "../../src/datos/hooks/useParaTi";
 import { AccionesPublicacion, CabeceraAutor, Conteos, MediaPublicacion, formatearConteo } from "../../src/componentes/paraTi/TarjetaPublicacion";
 import { CajaComentario, ListaComentarios, useHiloComentarios } from "../../src/componentes/paraTi/Comentarios";
 import { useAccionesPublicacion } from "../../src/componentes/paraTi/useAccionesPublicacion";
@@ -26,6 +27,10 @@ export default function PublicacionParaTi() {
   const acciones = useAccionesPublicacion();
   const h = useHiloComentarios(p);
   const ancho = Math.min(width, ANCHO_MAXIMO);
+
+  useEffect(() => {
+    if (p?.id) marcarVista(p.id);
+  }, [p?.id]);
 
   if (modulos.cargado && !modulos.paraTi) return <Redirect href="/" />;
 

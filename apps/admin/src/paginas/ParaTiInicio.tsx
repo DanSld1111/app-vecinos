@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LuArrowLeft, LuArrowRight, LuPlus } from "react-icons/lu";
+import { LuArrowLeft, LuArrowRight, LuEye, LuHeart, LuMessageCircle, LuPlus } from "react-icons/lu";
 import { MAX_DESTACADAS, MetricaParaTi, Publicacion } from "@app-vecinos/tipos";
 import { useSesionAdmin } from "../estado/useSesionAdmin";
 import { avisarErrorParaTi, useParaTi } from "../estado/useParaTi";
@@ -19,6 +19,7 @@ import {
 } from "../utilidades/paraTi";
 
 const NOMBRE_METRICA: Record<MetricaParaTi["clave"], string> = {
+  vistas: "Visualizaciones",
   corazones: "Corazones",
   comentarios: "Comentarios",
   compartidos: "Veces compartido",
@@ -261,13 +262,21 @@ export function TarjetaMuro({ p, acciones }: { p: Publicacion; acciones?: React.
         </span>
         <span className="pie-muro">
           <b>{p.texto || p.enlaceTitulo || NOMBRE_TIPO[p.tipo]}</b>
-          <small>
-            {estado === "programada"
-              ? `Sale el ${fechaHora(p.publicadoEn!)}`
-              : estado === "borrador"
-                ? `Editado ${haceCuanto(p.actualizadoEn)}`
-                : `${miles(p.corazones)} corazones · ${miles(p.comentarios)} comentarios`}
-          </small>
+          {estado === "publicada" ? (
+            <span className="numeros-muro">
+              <span title="Visualizaciones" aria-label={`${p.vistas} visualizaciones`}>
+                <LuEye aria-hidden /> {miles(p.vistas)}
+              </span>
+              <span title="Corazones" aria-label={`${p.corazones} corazones`}>
+                <LuHeart aria-hidden /> {miles(p.corazones)}
+              </span>
+              <span title="Comentarios" aria-label={`${p.comentarios} comentarios`}>
+                <LuMessageCircle aria-hidden /> {miles(p.comentarios)}
+              </span>
+            </span>
+          ) : (
+            <small>{estado === "programada" ? `Sale el ${fechaHora(p.publicadoEn!)}` : `Editado ${haceCuanto(p.actualizadoEn)}`}</small>
+          )}
         </span>
       </Link>
       {acciones}

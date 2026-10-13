@@ -4,7 +4,7 @@ import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDestacadas, useModulos } from "../../src/datos/hooks/useParaTi";
+import { marcarVista, useDestacadas, useModulos } from "../../src/datos/hooks/useParaTi";
 import { useDestacadasVistas } from "../../src/estado/useDestacadasVistas";
 import { NombreOficial, imagenDe, tiempoPublicacion } from "../../src/componentes/paraTi/TarjetaPublicacion";
 import { CuadroVideo } from "../../src/componentes/paraTi/ReproductorVideo";
@@ -64,6 +64,7 @@ export default function DestacadasParaTi() {
   useEffect(() => {
     if (!actual) return;
     marcar(actual.id);
+    marcarVista(actual.id);
     avance.setValue(0);
     if (pausa) return;
     const anim = Animated.timing(avance, { toValue: 1, duration: DURACION_MS, easing: Easing.linear, useNativeDriver: false });

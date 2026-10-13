@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View, ViewToken, useWindowDimensions } from "react-native";
 import { Redirect, router, useFocusEffect } from "expo-router";
 import { useScrollToTop } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Publicacion } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, tipografia, useColores } from "../../src/disenio";
 import { useAlturaBarra } from "../../src/utilidades/useDesplazamiento";
-import { registrarVisitaParaTi, useDestacadas, useModulos, usePublicacionesParaTi } from "../../src/datos/hooks/useParaTi";
+import { marcarVista, registrarVisitaParaTi, useDestacadas, useModulos, usePublicacionesParaTi } from "../../src/datos/hooks/useParaTi";
 import { useDestacadasVistas } from "../../src/estado/useDestacadasVistas";
 import { useSesion } from "../../src/estado/useSesion";
 import { TarjetaPublicacion, imagenDe } from "../../src/componentes/paraTi/TarjetaPublicacion";
@@ -44,6 +44,10 @@ export default function ParaTi() {
   const lista = useRef<FlatList<Publicacion>>(null);
   useScrollToTop(lista);
   const ancho = Math.min(width, ANCHO_MAXIMO);
+  // Cuenta como vista cuando la publicación está a la vista al menos un segundo (decisión 0094).
+  const alVerPublicaciones = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    for (const v of viewableItems) if (v.isViewable && v.item) marcarVista((v.item as Publicacion).id);
+  }).current;
 
   useFocusEffect(
     useCallback(() => {
@@ -161,6 +165,8 @@ export default function ParaTi() {
         keyExtractor={(p) => p.id}
         ListHeaderComponent={cabecera}
         style={{ width: "100%", maxWidth: ANCHO_MAXIMO, alignSelf: "center" }}
+        onViewableItemsChanged={alVerPublicaciones}
+        viewabilityConfig={{ itemVisiblePercentThreshold: 50, minimumViewTime: 1000 }}
         renderItem={({ item }) => (
           <TarjetaPublicacion
             p={item}

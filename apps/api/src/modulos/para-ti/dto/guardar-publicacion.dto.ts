@@ -127,6 +127,18 @@ export class OrdenDestacadasDto {
   ids!: string[];
 }
 
+export class VistasDto {
+  @IsString()
+  @MaxLength(64)
+  visitante!: string;
+
+  @IsArray()
+  @ArrayMaxSize(30)
+  @IsString({ each: true })
+  @MaxLength(80, { each: true })
+  ids!: string[];
+}
+
 export class VisitaDto {
   @IsString()
   @MaxLength(64)
