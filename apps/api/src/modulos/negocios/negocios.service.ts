@@ -210,6 +210,48 @@ export class NegociosService {
     return rows.map(aProducto);
   }
 
+  /**
+   * Tours de todas las agencias activas de la comunidad (decisión 0096): productos de negocios
+   * cuya categoría usa la ficha Tours, con alguna salida desde hoy, ordenados por la más cercana.
+   */
+  async listarTours(comunidadId: string): Promise<{ producto: Producto; negocio: Negocio }[]> {
+    const { rows } = await this.bd.consultar<FilaProducto>(
+      `SELECT ${COLUMNAS_PRODUCTO.split(", ").map((c) => `p.${c}`).join(", ")}
+       FROM productos p
+       JOIN negocios n ON n.id = p.negocio_id
+       WHERE p.eliminado_en IS NULL AND n.comunidad_id = $1 AND n.estado = 'activo' AND n.archivado_en IS NULL
+         AND EXISTS (
+           SELECT 1 FROM negocio_categorias nc
+           JOIN categorias c ON c.id = nc.categoria_id
+           LEFT JOIN servicios_app s ON s.slug = c.servicio_slug
+           WHERE nc.negocio_id = n.id AND COALESCE(c.ficha, s.ficha) = 'tours'
+         )
+       LIMIT 300`,
+      [comunidadId],
+    );
+    const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Lima" });
+    const proxima = (p: Producto) =>
+      (p.detalle?.salidas ?? [])
+        .filter((s) => s.fecha >= hoy)
+        .map((s) => s.fecha + s.hora)
+        .sort()[0];
+    const productos = rows.map(aProducto).filter((p) => proxima(p));
+    if (!productos.length) return [];
+    const { rows: filas } = await this.bd.consultar<FilaNegocio>(
+      `SELECT ${COLUMNAS_NEGOCIO}
+       FROM negocios n
+       LEFT JOIN negocio_categorias nc ON nc.negocio_id = n.id
+       WHERE n.id = ANY($1)
+       GROUP BY n.id`,
+      [[...new Set(productos.map((p) => p.negocioId))]],
+    );
+    const negocios = new Map(filas.map((f) => [f.id, aNegocio(f)]));
+    return productos
+      .sort((a, b) => proxima(a)!.localeCompare(proxima(b)!))
+      .map((producto) => ({ producto, negocio: negocios.get(producto.negocioId)! }))
+      .filter((t) => t.negocio);
+  }
+
   /** Para la ficha del panel: cualquier estado, pero solo para quien administra ese negocio. */
   async obtenerParaAdmin(id: string, cuenta: Cuenta): Promise<Negocio> {
     await this.verificarAccesoBasico(cuenta, id);
@@ -804,14 +846,59 @@ export class NegociosService {
     return aProducto(rows[0]);
   }
 
+  /**
+   * Fotos extra y detalle del tour (decisión 0096): solo fotos subidas por la API (o las que ya
+   * tenía el producto) y el detalle sin textos vacíos.
+   */
+  private normalizarExtrasProducto(dto: GuardarProductoDto, anteriores: string[] = []) {
+    const fotos = [...new Set((dto.fotos ?? []).filter(Boolean))].slice(0, 9);
+    if (fotos.some((f) => !anteriores.includes(f) && !this.almacenamiento.esPropia(f))) {
+      throw new BadRequestException("Hay una foto que no se subió desde el panel. Súbela de nuevo.");
+    }
+    const d = dto.detalle;
+    const textos = (xs?: string[]) => (xs ?? []).map((x) => x.trim()).filter(Boolean);
+    const detalle = d
+      ? {
+          ...(d.salidas?.length
+            ? {
+                salidas: [...d.salidas]
+                  .map((s) => ({ fecha: s.fecha, hora: s.hora.padStart(5, "0"), cupos: s.cupos ?? null }))
+                  .sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora)),
+              }
+            : {}),
+          ...(d.itinerario?.length
+            ? {
+                itinerario: d.itinerario
+                  .filter((p) => p.titulo.trim())
+                  .map((p) => ({ hora: p.hora.trim(), titulo: p.titulo.trim(), ...(p.detalle?.trim() ? { detalle: p.detalle.trim() } : {}) })),
+              }
+            : {}),
+          ...(textos(d.incluye).length ? { incluye: textos(d.incluye) } : {}),
+          ...(textos(d.noIncluye).length ? { noIncluye: textos(d.noIncluye) } : {}),
+          ...(d.puntoEncuentro?.trim() ? { puntoEncuentro: d.puntoEncuentro.trim() } : {}),
+          ...(d.cancelacion?.trim() ? { cancelacion: d.cancelacion.trim() } : {}),
+        }
+      : undefined;
+    return { fotos, detalle };
+  }
+
+  /** Sube una foto extra de un producto; se guarda en el producto al enviar su lista `fotos`. */
+  async subirFotoExtraProducto(negocioId: string, archivo: Express.Multer.File, cuenta: Cuenta): Promise<{ url: string }> {
+    await this.verificarAccesoProductos(cuenta, negocioId);
+    await this.obtenerFilaAdminOFallar(negocioId);
+    const url = await this.almacenamiento.subir(CARPETA_FOTOS_PRODUCTO, archivo.buffer, archivo.originalname, archivo.mimetype);
+    return { url };
+  }
+
   async crearProducto(negocioId: string, dto: GuardarProductoDto, cuenta: Cuenta): Promise<Producto> {
     await this.verificarAccesoProductos(cuenta, negocioId);
     await this.obtenerFilaAdminOFallar(negocioId);
     const id = `prod-${randomUUID()}`;
+    const extras = this.normalizarExtrasProducto(dto);
     // Entra al final de su sección, no al principio — quien lo agrega espera verlo abajo.
     await this.bd.consultar(
-      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, atributos, moneda, orden)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+      `INSERT INTO productos (id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, atributos, moneda, fotos, detalle, orden)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb,
                COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0))`,
       [
         id,
@@ -823,6 +910,8 @@ export class NegociosService {
         dto.destacado ?? false,
         JSON.stringify(dto.atributos ?? {}),
         dto.moneda ?? null,
+        JSON.stringify(extras.fotos),
+        JSON.stringify(extras.detalle ?? {}),
       ],
     );
     await this.auditoria.registrar("crear", "producto", id, cuenta.id, { negocioId });
@@ -840,9 +929,13 @@ export class NegociosService {
     // Si cambió de sección, se manda al final de la nueva: su posición anterior no significa
     // nada en otra lista.
     const cambioDeSeccion = dto.categoriaMenu !== anterior.categoriaMenu;
+    const extras = this.normalizarExtrasProducto(dto, anterior.fotos ?? []);
+    // fotos y detalle sin enviar = no cambian (clientes viejos del panel no los conocen).
     await this.bd.consultar(
       `UPDATE productos
        SET nombre = $3, descripcion = $4, precio = $5, categoria_menu = $6, destacado = $7, atributos = $9, moneda = $10,
+           fotos = CASE WHEN $11 THEN $12::jsonb ELSE fotos END,
+           detalle = CASE WHEN $13 THEN $14::jsonb ELSE detalle END,
            orden = CASE WHEN $8
                         THEN COALESCE((SELECT MAX(orden) + 1 FROM productos WHERE negocio_id = $2 AND categoria_menu = $6), 0)
                         ELSE orden END
@@ -858,8 +951,15 @@ export class NegociosService {
         cambioDeSeccion,
         JSON.stringify(dto.atributos ?? {}),
         dto.moneda ?? null,
+        dto.fotos !== undefined,
+        JSON.stringify(extras.fotos),
+        dto.detalle !== undefined,
+        JSON.stringify(extras.detalle ?? {}),
       ],
     );
+    if (dto.fotos !== undefined) {
+      for (const url of anterior.fotos ?? []) if (!extras.fotos.includes(url)) await this.almacenamiento.eliminarPorUrl(url);
+    }
     await this.auditoria.registrar("actualizar", "producto", productoId, cuenta.id, { negocioId });
     return this.obtenerProductoOFallar(negocioId, productoId);
   }
@@ -892,6 +992,7 @@ export class NegociosService {
     const producto = await this.obtenerProductoOFallar(negocioId, productoId);
     await this.bd.consultar("DELETE FROM productos WHERE id = $1 AND negocio_id = $2", [productoId, negocioId]);
     await this.almacenamiento.eliminarPorUrl(producto.fotoUrl);
+    for (const url of producto.fotos ?? []) await this.almacenamiento.eliminarPorUrl(url);
     await this.auditoria.registrar("eliminar_definitivo", "producto", productoId, cuenta.id, { negocioId });
   }
 

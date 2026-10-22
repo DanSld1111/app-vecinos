@@ -225,6 +225,8 @@ type CampoEditable = {
   etiqueta: string;
   tipo: AtributoProductoDef["tipo"];
   opciones: string;
+  /** Solo "numero" (decisión 0096). */
+  unidad: string;
   oculto: boolean;
   filtro: boolean;
   insignia: boolean;
@@ -246,6 +248,7 @@ function aEditables(campos: AtributoProductoDef[] | undefined): CampoEditable[] 
     etiqueta: c.etiqueta,
     tipo: c.tipo,
     opciones: (c.opciones ?? []).join(", "),
+    unidad: c.unidad ?? "",
     oculto: Boolean(c.oculto),
     filtro: Boolean(c.filtro),
     insignia: Boolean(c.insignia),
@@ -261,9 +264,10 @@ function aDefiniciones(campos: CampoEditable[]): AtributoProductoDef[] {
       clave: c.clave,
       etiqueta: c.etiqueta.trim(),
       tipo: c.tipo,
-      ...(c.tipo === "opciones"
+      ...(c.tipo === "opciones" || c.tipo === "varias"
         ? { opciones: c.opciones.split(",").map((o) => o.trim()).filter(Boolean) }
         : {}),
+      ...(c.tipo === "numero" && c.unidad.trim() ? { unidad: c.unidad.trim() } : {}),
       ...(c.oculto ? { oculto: true } : {}),
       ...(c.tipo === "opciones" && c.filtro ? { filtro: true } : {}),
       ...(c.tipo === "opciones" && c.insignia ? { insignia: true } : {}),
@@ -488,17 +492,29 @@ function EditorCategoria({
                           value={c.tipo}
                           onChange={(e) => cambiarCampo(i, { tipo: e.target.value as CampoEditable["tipo"] })}
                         >
-                          <option value="opciones">Opciones</option>
+                          <option value="opciones">Opciones (elige una)</option>
+                          <option value="varias">Varias opciones (marca varias)</option>
+                          <option value="numero">Número</option>
                           <option value="texto">Texto libre</option>
                           <option value="color">Color</option>
                         </select>
-                        <input
-                          aria-label="Opciones"
-                          value={c.tipo === "opciones" ? c.opciones : ""}
-                          disabled={c.tipo !== "opciones"}
-                          placeholder={c.tipo === "opciones" ? "Separadas por comas" : "No aplica"}
-                          onChange={(e) => cambiarCampo(i, { opciones: e.target.value })}
-                        />
+                        {c.tipo === "numero" ? (
+                          <input
+                            aria-label="Unidad"
+                            value={c.unidad}
+                            maxLength={12}
+                            placeholder="Unidad (m², personas…) opcional"
+                            onChange={(e) => cambiarCampo(i, { unidad: e.target.value })}
+                          />
+                        ) : (
+                          <input
+                            aria-label="Opciones"
+                            value={c.tipo === "opciones" || c.tipo === "varias" ? c.opciones : ""}
+                            disabled={c.tipo !== "opciones" && c.tipo !== "varias"}
+                            placeholder={c.tipo === "opciones" || c.tipo === "varias" ? "Separadas por comas" : "No aplica"}
+                            onChange={(e) => cambiarCampo(i, { opciones: e.target.value })}
+                          />
+                        )}
                         <span className="acciones-campo">
                           <button
                             type="button"
@@ -569,11 +585,11 @@ function EditorCategoria({
                   type="button"
                   className="btn-accion-mini"
                   style={{ marginTop: 8 }}
-                  disabled={campos.length >= 12}
+                  disabled={campos.length >= 16}
                   onClick={() =>
                     setCampos((lista) => [
                       ...lista,
-                      { clave: "", etiqueta: "", tipo: "opciones", opciones: "", oculto: false, filtro: false, insignia: false, sufijoOpcion: "", sufijoTexto: "" },
+                      { clave: "", etiqueta: "", tipo: "opciones", opciones: "", unidad: "", oculto: false, filtro: false, insignia: false, sufijoOpcion: "", sufijoTexto: "" },
                     ])
                   }
                 >

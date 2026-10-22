@@ -4487,3 +4487,29 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .aviso-nueva-version button { border: none; border-radius: 99px; padding: 8px 16px; font: inherit; font-weight: 800; cursor: pointer; background: #fff; color: var(--verde-fuerte); }
 .aviso-nueva-version .cerrar-aviso-version { background: transparent; color: #fff; font-weight: 600; padding: 8px 10px; }
 .aviso-nueva-version button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Producto: campos número / varias, fotos extra y detalle del tour (decisión 0096). */
+.numero-con-unidad { display: flex; align-items: center; gap: 8px; }
+.numero-con-unidad input { flex: 1; min-width: 0; }
+.numero-con-unidad span { font-size: 13px; font-weight: 700; color: var(--texto-suave); }
+.chips-varias { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips-varias button { min-height: 34px; padding: 0 12px; border-radius: 17px; border: 1.5px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.chips-varias button.activa { border-color: var(--verde); background: var(--verde-suave); color: var(--verde-texto); font-weight: 800; }
+.fotos-extra-producto { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.fotos-extra-producto > label { font-size: 13px; font-weight: 700; }
+.fotos-extra-producto small, .bloque-tour small { font-weight: 500; color: var(--texto-tenue); }
+.grilla-fotos-extra { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.foto-extra { position: relative; aspect-ratio: 4 / 3; border-radius: 10px; background: var(--superficie-hundida) center / cover; }
+.foto-extra button { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; border: none; background: rgba(0, 0, 0, .6); color: #fff; font-size: 15px; line-height: 1; cursor: pointer; }
+.agregar-foto-extra { aspect-ratio: 4 / 3; border-radius: 10px; border: 2px dashed var(--borde-fuerte); background: var(--superficie); color: var(--verde-texto); font: inherit; font-weight: 700; cursor: pointer; }
+.detalle-tour { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--borde); display: flex; flex-direction: column; gap: 14px; }
+.bloque-tour { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.bloque-tour > label { font-size: 13px; font-weight: 700; }
+.fila-salida, .fila-paso { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; align-items: center; }
+.fila-salida input, .fila-paso input { min-height: 38px; border: 1.5px solid var(--borde-fuerte); border-radius: 9px; padding: 0 10px; font: inherit; font-size: 13.5px; background: var(--superficie); color: var(--texto); }
+.fila-salida input[type="date"] { flex: 1 1 150px; }
+.fila-salida input[type="time"] { flex: 0 1 110px; }
+.fila-salida input[inputmode] { flex: 1 1 150px; }
+.fila-paso input:first-child { flex: 0 0 80px; }
+.fila-paso input:nth-child(2) { flex: 2 1 200px; }
+.fila-paso input:nth-child(3) { flex: 2 1 200px; }

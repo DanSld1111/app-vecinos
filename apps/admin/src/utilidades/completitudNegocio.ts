@@ -23,6 +23,8 @@ const CONTENIDO: Record<TipoFicha, { etiqueta: string; pestana: PestanaParte; ti
   rubros: { etiqueta: "rubros", pestana: "rubros", tiene: (n) => Boolean(n.rubrosDisponibles?.length) },
   ofertas: { etiqueta: "ofertas", pestana: "ofertas", tiene: (n) => Boolean(n.ofertas?.length || n.pasillos?.length) },
   galeria: { etiqueta: "fotos de la galería", pestana: "fotos", tiene: (n) => n.fotosGaleria.length > 0 },
+  inmuebles: { etiqueta: "inmuebles", pestana: "productos", tiene: tieneProductos },
+  tours: { etiqueta: "tours", pestana: "productos", tiene: tieneProductos },
 };
 
 /**

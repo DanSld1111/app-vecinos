@@ -55,6 +55,13 @@ export class NegociosController {
     return this.negocios.buscar(filtro.q, filtro.comunidadId, filtro.limite);
   }
 
+  /** Tours de todas las agencias de la comunidad, para la pantalla de Turismo (decisión 0096). */
+  @Get("tours")
+  listarTours(@Query("comunidadId") comunidadId: string) {
+    if (!comunidadId) throw new BadRequestException("Falta la comunidad.");
+    return this.negocios.listarTours(comunidadId);
+  }
+
   @Get("admin")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("super_admin", "gestor_negocios")
@@ -371,6 +378,19 @@ export class NegociosController {
     @Req() req: SolicitudConCuenta,
   ): Promise<Negocio> {
     return this.negocios.guardarPasillos(id, dto, req.user);
+  }
+
+  /** Foto extra de un producto (decisión 0096): devuelve la URL para mandarla en `fotos`. */
+  @Post(":id/productos/fotos")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor("foto", opcionesUploadFotoProducto))
+  subirFotoExtraProducto(
+    @Param("id") id: string,
+    @UploadedFile() archivo: Express.Multer.File | undefined,
+    @Req() req: SolicitudConCuenta,
+  ): Promise<{ url: string }> {
+    if (!archivo) throw new BadRequestException("Falta el archivo de la foto.");
+    return this.negocios.subirFotoExtraProducto(id, archivo, req.user);
   }
 
   @Post(":id/productos/:productoId/foto")

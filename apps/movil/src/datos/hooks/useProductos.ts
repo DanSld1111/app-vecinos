@@ -8,3 +8,11 @@ export function useProductosPorNegocio(negocioId: string | undefined) {
     enabled: Boolean(negocioId),
   });
 }
+
+export function useTours(comunidadId: string | undefined) {
+  return useQuery({
+    queryKey: ["tours", comunidadId],
+    queryFn: () => repositorioProductos.listarTours(comunidadId as string),
+    enabled: Boolean(comunidadId),
+  });
+}

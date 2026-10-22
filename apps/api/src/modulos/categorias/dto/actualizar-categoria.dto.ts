@@ -30,7 +30,7 @@ export class ActualizarCategoriaDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(12)
+  @ArrayMaxSize(16)
   @ValidateNested({ each: true })
   @Type(() => CampoProductoDto)
   atributosProducto?: CampoProductoDto[];

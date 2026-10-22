@@ -3,7 +3,7 @@ import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsOptional, IsString, Matches, 
 
 /** Las fichas que la app sabe dibujar — igual que TIPOS_FICHA en paquetes/tipos/src/ficha.ts
  * (la API solo importa tipos de ese paquete, no valores). */
-export const TIPOS_FICHA = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria"] as const;
+export const TIPOS_FICHA = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria", "inmuebles", "tours"] as const;
 
 /** Texto detrás del precio cuando el producto tiene cierta opción (ej. Alquiler → "/mes"). */
 export class SufijoPrecioDto {
@@ -31,8 +31,14 @@ export class CampoProductoDto {
   @MaxLength(40)
   etiqueta!: string;
 
-  @IsIn(["opciones", "texto", "color"])
-  tipo!: "opciones" | "texto" | "color";
+  @IsIn(["opciones", "texto", "color", "numero", "varias"])
+  tipo!: "opciones" | "texto" | "color" | "numero" | "varias";
+
+  /** Solo "numero": lo que va detrás del valor (m², personas). */
+  @IsOptional()
+  @IsString()
+  @MaxLength(12)
+  unidad?: string;
 
   @IsOptional()
   @IsArray()

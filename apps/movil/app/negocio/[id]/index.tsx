@@ -19,6 +19,8 @@ import { EstadoVacio } from "../../../src/componentes/EstadoVacio";
 import { Hueso } from "../../../src/componentes/EsqueletoNegocio";
 import { MenuNegocio } from "../../../src/componentes/MenuNegocio";
 import { CatalogoNegocio } from "../../../src/componentes/CatalogoNegocio";
+import { FichaInmuebles } from "../../../src/componentes/fichasRubro/FichaInmuebles";
+import { FichaTours } from "../../../src/componentes/fichasRubro/FichaTours";
 import { ServiciosNegocio } from "../../../src/componentes/ServiciosNegocio";
 import { CategoriasRubroNegocio } from "../../../src/componentes/CategoriasRubroNegocio";
 import { OfertasPasillosNegocio } from "../../../src/componentes/OfertasPasillosNegocio";
@@ -312,6 +314,28 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
           <MenuNegocio productos={productos} moneda={negocio.moneda} busqueda={busqueda} titulo="Todo lo que vende" campos={camposExtra} />
         ) : null}
       </>
+    );
+  } else if (arquetipo === "inmuebles" && productos && productos.length > 0) {
+    contenido = (
+      <FichaInmuebles
+        productos={productos}
+        moneda={negocio.moneda}
+        whatsapp={negocio.whatsapp}
+        busqueda={busqueda}
+        titulo={tituloDe("inmuebles")}
+        campos={camposExtra}
+      />
+    );
+  } else if (arquetipo === "tours" && productos && productos.length > 0) {
+    contenido = (
+      <FichaTours
+        productos={productos}
+        moneda={negocio.moneda}
+        agencia={{ id: negocio.id, nombre: negocio.nombre, whatsapp: negocio.whatsapp }}
+        busqueda={busqueda}
+        titulo={tituloDe("tours")}
+        campos={camposExtra}
+      />
     );
   } else if (arquetipo === "catalogo" && productos && productos.length > 0) {
     contenido = (

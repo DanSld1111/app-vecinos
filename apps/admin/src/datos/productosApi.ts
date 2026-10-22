@@ -1,4 +1,4 @@
-import { Moneda, Producto } from "@app-vecinos/tipos";
+import { DetalleProducto, Moneda, Producto } from "@app-vecinos/tipos";
 import { apiFetch, apiSubirArchivo } from "./clienteApi";
 
 /**
@@ -17,7 +17,15 @@ export interface DatosProducto {
   atributos?: Record<string, string>;
   /** null = la moneda del negocio. */
   moneda?: Moneda | null;
+  /** Fotos extra, además de la portada (decisión 0096). Sin enviar = no cambian. */
+  fotos?: string[];
+  /** Ficha Tours: salidas, itinerario, incluye… Sin enviar = no cambia. */
+  detalle?: DetalleProducto;
 }
+
+/** Sube una foto extra y devuelve su URL; se guarda en el producto al mandar `fotos`. */
+export const subirFotoExtra = (negocioId: string, archivo: File, token: string) =>
+  apiSubirArchivo<{ url: string }>(`/negocios/${negocioId}/productos/fotos`, archivo, token);
 
 export const listarProductos = (negocioId: string) =>
   apiFetch<Producto[]>(`/negocios/${negocioId}/productos`);

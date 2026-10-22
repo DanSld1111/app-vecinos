@@ -21,8 +21,12 @@ export interface AtributoProductoDef {
   /** Clave estable para guardar en Producto.atributos — no cambiar una vez usada en datos reales. */
   clave: string;
   etiqueta: string;
-  /** "color" = combo con muestra de color (paleta fija, ver SelectorColorAtributo en el admin). */
-  tipo: "opciones" | "texto" | "color";
+  /** "color" = combo con muestra de color (paleta fija, ver SelectorColorAtributo en el admin).
+   * "numero" = cantidad (dormitorios, m²…), con `unidad` opcional. "varias" = se marcan varias
+   * de las `opciones` (características); el valor guarda las elegidas separadas por "|". */
+  tipo: "opciones" | "texto" | "color" | "numero" | "varias";
+  /** Solo "numero": lo que va detrás del valor, ej. "m²" o "personas". */
+  unidad?: string;
   /** Solo si tipo = "opciones". */
   opciones?: string[];
   /** Oculto = no se pide al cargar productos ni se muestra en la app, pero los valores ya

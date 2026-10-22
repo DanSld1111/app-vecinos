@@ -40,6 +40,9 @@ const ARQUETIPO_LEGADO: Record<TipoFicha, ArquetipoFicha | undefined> = {
   rubros: "categorias",
   ofertas: "ofertas",
   galeria: undefined,
+  // Las apps viejas no conocen estas fichas: las ven como catálogo.
+  inmuebles: "catalogo",
+  tours: "catalogo",
 };
 
 function aCategoria(fila: FilaCategoria): Categoria {
@@ -76,12 +79,17 @@ function normalizarCampos(campos: CampoProductoDto[]): NonNullable<Categoria["at
       for (let i = 2; usadas.has(clave); i += 1) clave = `${base}_${i}`;
       usadas.add(clave);
     }
-    const opciones = c.tipo === "opciones" ? (c.opciones ?? []).map((o) => o.trim()).filter(Boolean) : undefined;
+    const conLista = c.tipo === "opciones" || c.tipo === "varias";
+    const lista = conLista ? (c.opciones ?? []).map((o) => o.trim()).filter(Boolean) : undefined;
+    // filtro, insignia y sufijo solo valen para "opciones" (una sola elegida).
+    const opciones = c.tipo === "opciones" ? lista : undefined;
+    const unidad = c.tipo === "numero" ? c.unidad?.trim() : undefined;
     return {
       clave,
       etiqueta: c.etiqueta.trim(),
       tipo: c.tipo,
-      ...(opciones ? { opciones } : {}),
+      ...(lista ? { opciones: lista } : {}),
+      ...(unidad ? { unidad } : {}),
       ...(c.oculto ? { oculto: true } : {}),
       ...(opciones && c.filtro ? { filtro: true } : {}),
       ...(opciones && c.insignia ? { insignia: true } : {}),

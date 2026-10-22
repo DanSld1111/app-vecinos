@@ -63,7 +63,11 @@ export function atributosVisibles(
   }
   return campos
     .filter((c) => !c.oculto && !c.insignia && valores[c.clave])
-    .map((c) => ({ clave: c.clave, texto: `${c.etiqueta}: ${valores[c.clave]}` }));
+    .map((c) => {
+      // "Varias" se guarda "Cochera|Jardín"; "Número" lleva su unidad (decisión 0096).
+      const valor = c.tipo === "varias" ? valores[c.clave].split("|").filter(Boolean).join(", ") : c.tipo === "numero" && c.unidad ? `${valores[c.clave]} ${c.unidad}` : valores[c.clave];
+      return { clave: c.clave, texto: `${c.etiqueta}: ${valor}` };
+    });
 }
 
 const normalizar = (texto: string) => texto.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
