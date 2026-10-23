@@ -51,6 +51,7 @@ import { RescateModule } from "./modulos/rescate/rescate.module";
     ResenasModule,
     FavoritosModule,
     ParaTiModule,
+    RescateModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
