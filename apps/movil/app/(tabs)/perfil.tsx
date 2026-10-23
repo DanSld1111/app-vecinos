@@ -175,6 +175,10 @@ export default function Perfil() {
           <Ionicons name="chevron-forward" size={18} color={colores.textoTenue} />
         </Pressable>
 
+        <Grupo>
+          <FilaPerfil icono="paw-outline" texto="Mi actividad en Rescate animal" primero onPress={() => router.push("/rescate/actividad")} />
+        </Grupo>
+
         <Text style={styles.etiquetaSeccion}>Preferencias</Text>
         <Grupo>
           <FilaInterruptor

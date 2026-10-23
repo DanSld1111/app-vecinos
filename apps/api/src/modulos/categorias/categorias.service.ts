@@ -43,6 +43,7 @@ const ARQUETIPO_LEGADO: Record<TipoFicha, ArquetipoFicha | undefined> = {
   // Las apps viejas no conocen estas fichas: las ven como catálogo.
   inmuebles: "catalogo",
   tours: "catalogo",
+  mascotas: "servicios",
 };
 
 function aCategoria(fila: FilaCategoria): Categoria {

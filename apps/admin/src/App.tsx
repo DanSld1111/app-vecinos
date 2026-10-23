@@ -25,6 +25,8 @@ import { MisNegocios } from "./paginas/MisNegocios";
 import { MiNegocio } from "./paginas/MiNegocio";
 import { MiNegocioHorario } from "./paginas/MiNegocioHorario";
 import { MiNegocioProductos } from "./paginas/MiNegocioProductos";
+import { MiNegocioMascotas } from "./paginas/MiNegocioMascotas";
+import { AvisosMascotas } from "./paginas/AvisosMascotas";
 import { MiNegocioFotos } from "./paginas/MiNegocioFotos";
 import { MiNegocioOfertas } from "./paginas/MiNegocioOfertas";
 import { MiNegocioPasillos, MiNegocioRubros, MiNegocioServicios } from "./paginas/MiNegocioContenido";
@@ -123,6 +125,8 @@ export function App() {
         <Route path="/mi-negocio/horario" element={<MiNegocioHorario />} />
         <Route path="/mi-negocio/fotos" element={<MiNegocioFotos />} />
         <Route path="/mi-negocio/productos" element={<MiNegocioProductos />} />
+        <Route path="/mi-negocio/mascotas" element={<MiNegocioMascotas />} />
+        <Route path="/avisos-mascotas" element={<AvisosMascotas />} />
         <Route path="/mi-negocio/servicios" element={<MiNegocioServicios />} />
         <Route path="/mi-negocio/rubros" element={<MiNegocioRubros />} />
         <Route path="/mi-negocio/ofertas" element={<MiNegocioOfertas />} />

@@ -1,5 +1,6 @@
+import { abrirWhatsapp } from "../../utilidades/whatsapp";
 import { useEffect, useMemo, useState } from "react";
-import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -183,7 +184,7 @@ export function DetalleTour({
     if (!whatsapp) return;
     const fecha = elegida ? ` para el ${partesFecha(elegida.fecha).dia.toLowerCase()} ${partesFecha(elegida.fecha).fecha} (salida ${horaLegible(elegida.hora)})` : "";
     const texto = `Hola, quiero reservar "${tour.nombre}"${fecha} para ${personas} ${personas === 1 ? "persona" : "personas"}. Total: ${formatearPrecio(total, mon)}.`;
-    Linking.openURL(`https://wa.me/${whatsapp}?text=${encodeURIComponent(texto)}`);
+    abrirWhatsapp(whatsapp, texto);
   };
 
   return (

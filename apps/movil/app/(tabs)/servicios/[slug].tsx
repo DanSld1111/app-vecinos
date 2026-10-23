@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 import { GuiaListado } from "../../../src/componentes/GuiaListado";
 import { useServiciosApp } from "../../../src/datos/hooks/useServiciosApp";
 import { PantallaTurismo } from "../../../src/componentes/fichasRubro/PantallaTurismo";
+import { PantallaRescate } from "../../../src/componentes/rescate/PantallaRescate";
 
 /** Bajada de cada servicio sin pantalla propia; si no está aquí, se usa la descripción del panel. */
 const SUBTITULO: Record<string, string> = {
@@ -30,6 +31,8 @@ export default function ServicioGenerico() {
   if (slug === "turismo" && vista !== "agencias") {
     return <PantallaTurismo titulo={servicio?.nombre ?? "Turismo"} listado={<Listado slug={slug} nombre={servicio?.nombre} descripcion={servicio?.descripcion} />} />;
   }
+  // Rescate animal: adoptar, perdidos y ayudar; los albergues quedan abajo (0097).
+  if (slug === "rescate-animal") return <PantallaRescate titulo={servicio?.nombre ?? "Rescate animal"} fotoServicio={servicio?.fotoUrl} />;
   return <Listado slug={slug} nombre={servicio?.nombre} descripcion={servicio?.descripcion} />;
 }
 

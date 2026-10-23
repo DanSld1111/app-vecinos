@@ -19,6 +19,7 @@ import { NovedadesModule } from "./modulos/novedades/novedades.module";
 import { ResenasModule } from "./modulos/resenas/resenas.module";
 import { FavoritosModule } from "./modulos/favoritos/favoritos.module";
 import { ParaTiModule } from "./modulos/para-ti/para-ti.module";
+import { RescateModule } from "./modulos/rescate/rescate.module";
 
 // Etapa 2 cerrada: los 7 módulos que definía docs/tecnica/10-fases-pendientes.pdf ya existen.
 // NovedadesModule se sumó después (ver docs/decisiones/0034-conexion-real-paneles.md)

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { BannerMascotasPerdidas } from "../../src/componentes/rescate/BannerMascotasPerdidas";
 import { Negocio } from "@app-vecinos/tipos";
 import { abrirNegocio } from "../../src/componentes/transicion/abrirNegocio";
 import { TEXTO_BUSCADOR } from "../../src/componentes/transicion/BuscadorEnVuelo";
@@ -222,6 +223,8 @@ export default function Inicio() {
             ))}
           </ScrollView>
         ) : null}
+
+        <BannerMascotasPerdidas estilo={styles.bloque} />
 
         <View style={styles.bloque}>
           <OfertaDestacada />

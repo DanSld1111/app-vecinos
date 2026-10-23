@@ -1,5 +1,6 @@
+import { abrirWhatsapp } from "../utilidades/whatsapp";
 import { useMemo, useState } from "react";
-import { Image, Linking, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
 import { PaletaColores, espaciado, radios, tipografia, useColores } from "../disenio";
@@ -52,7 +53,7 @@ export function CatalogoNegocio({
 
   function alConsultar() {
     if (!whatsapp || !abierto) return;
-    Linking.openURL(`https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hola, me interesa "${abierto.nombre}"`)}`);
+    abrirWhatsapp(whatsapp, `Hola, me interesa "${abierto.nombre}"`);
   }
 
   return (

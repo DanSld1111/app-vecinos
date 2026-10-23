@@ -2,7 +2,7 @@ import { Categoria, Negocio, TipoFicha } from "@app-vecinos/tipos";
 import { fichaDelNegocio } from "./fichaNegocio";
 
 /** Pestaña de la ficha del negocio donde se completa cada parte ("" = Información). */
-export type PestanaParte = "" | "horario" | "fotos" | "dueno" | "productos" | "servicios" | "rubros" | "ofertas";
+export type PestanaParte = "" | "horario" | "fotos" | "dueno" | "productos" | "servicios" | "rubros" | "ofertas" | "mascotas";
 
 export interface ParteFicha {
   clave: "foto" | "horario" | "descripcion" | "categoria" | "dueno" | "contenido";
@@ -25,6 +25,8 @@ const CONTENIDO: Record<TipoFicha, { etiqueta: string; pestana: PestanaParte; ti
   galeria: { etiqueta: "fotos de la galería", pestana: "fotos", tiene: (n) => n.fotosGaleria.length > 0 },
   inmuebles: { etiqueta: "inmuebles", pestana: "productos", tiene: tieneProductos },
   tours: { etiqueta: "tours", pestana: "productos", tiene: tieneProductos },
+  // Las mascotas viven en su propia tabla (decisión 0097): la ficha no sabe cuántas hay.
+  mascotas: { etiqueta: "mascotas", pestana: "mascotas", tiene: () => true },
 };
 
 /**

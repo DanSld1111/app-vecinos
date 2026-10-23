@@ -1,5 +1,6 @@
+import { abrirWhatsapp } from "../../utilidades/whatsapp";
 import { useMemo, useState } from "react";
-import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AtributoProductoDef, Moneda, Producto, formatearPrecio } from "@app-vecinos/tipos";
@@ -152,7 +153,7 @@ function DetalleInmueble({
   const datos = datosDe(p, campos).filter((d) => d.campo.clave !== principal?.clave);
   const m2 = areaM2(p, campos);
   const sufijo = sufijoPrecio(p.atributos, campos);
-  const escribir = (texto: string) => whatsapp && Linking.openURL(`https://wa.me/${whatsapp}?text=${encodeURIComponent(texto)}`);
+  const escribir = (texto: string) => abrirWhatsapp(whatsapp, texto);
 
   return (
     <Modal visible animationType="slide" onRequestClose={onCerrar}>

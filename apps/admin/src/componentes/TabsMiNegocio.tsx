@@ -11,7 +11,8 @@ const TABS = [
   { a: "/mi-negocio", fin: true, icono: "📋", texto: "Información" },
   { a: "/mi-negocio/horario", fin: false, icono: "🕒", texto: "Horario" },
   { a: "/mi-negocio/fotos", fin: false, icono: "📷", texto: "Fotos" },
-  { a: "/mi-negocio/productos", fin: false, icono: "🍽️", texto: "Productos" },
+  { a: "/mi-negocio/productos", fin: false, icono: "🍽️", texto: "Productos", sinFicha: "mascotas" },
+  { a: "/mi-negocio/mascotas", fin: false, icono: "🐾", texto: "Mascotas y adopciones", contenido: "mascotas" },
   { a: "/mi-negocio/servicios", fin: false, icono: "💼", texto: "Servicios y tarifas", contenido: "servicios" },
   { a: "/mi-negocio/rubros", fin: false, icono: "📦", texto: "Rubros", contenido: "rubros" },
   { a: "/mi-negocio/ofertas", fin: false, icono: "🏷️", texto: "Ofertas" },
@@ -39,13 +40,14 @@ export function TabsMiNegocio() {
     servicios: "/mi-negocio/servicios",
     rubros: "/mi-negocio/rubros",
     ofertas: "/mi-negocio/ofertas",
+    mascotas: "/mi-negocio/mascotas",
   };
   const rutasConFalta = new Set(partes.filter((p) => !p.completa).map((p) => RUTA_DE[p.pestana]));
   return (
     <>
     {activo ? <FranjaFaltantes partes={partes} onIr={(tab) => navegar(RUTA_DE[tab] ?? "/mi-negocio")} /> : null}
     <div className="tabs-negocio">
-      {TABS.filter((tab) => !("contenido" in tab) || deContenido.includes(tab.contenido as string)).map((tab) => (
+      {TABS.filter((tab) => (!("contenido" in tab) || deContenido.includes(tab.contenido as string)) && !("sinFicha" in tab && deContenido.includes(tab.sinFicha as string))).map((tab) => (
         <NavLink
           key={tab.a}
           to={tab.a}

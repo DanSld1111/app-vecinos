@@ -3,7 +3,7 @@ import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsOptional, IsString, Matches, 
 
 /** Las fichas que la app sabe dibujar — igual que TIPOS_FICHA en paquetes/tipos/src/ficha.ts
  * (la API solo importa tipos de ese paquete, no valores). */
-export const TIPOS_FICHA = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria", "inmuebles", "tours"] as const;
+export const TIPOS_FICHA = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria", "inmuebles", "tours", "mascotas"] as const;
 
 /** Texto detrás del precio cuando el producto tiene cierta opción (ej. Alquiler → "/mes"). */
 export class SufijoPrecioDto {

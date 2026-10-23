@@ -15,6 +15,7 @@ import { EditorEstadoNegocio } from "../componentes/negocio/EditorEstadoNegocio"
 import { ConVistaPrevia } from "../componentes/negocio/ConVistaPrevia";
 import { EditorServiciosNegocio } from "../componentes/negocio/EditorServiciosNegocio";
 import { EditorListaNegocio } from "../componentes/negocio/EditorListaNegocio";
+import { EditorAlbergue } from "../componentes/albergue/EditorAlbergue";
 import { useCategorias } from "../estado/useCategorias";
 import { pestanasDeContenido } from "../utilidades/fichaNegocio";
 import { partesDeFicha } from "../utilidades/completitudNegocio";
@@ -24,13 +25,14 @@ import { alertaInfo } from "../estado/useToasts";
 import { urlCompleta } from "../utilidades/media";
 
 import { IconoEmoji } from "../componentes/IconoEmoji";
-type Pestana = "info" | "horario" | "fotos" | "productos" | "servicios" | "rubros" | "ofertas" | "pasillos" | "dueno" | "estado" | "historial";
+type Pestana = "info" | "horario" | "fotos" | "productos" | "mascotas" | "servicios" | "rubros" | "ofertas" | "pasillos" | "dueno" | "estado" | "historial";
 
 const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
   { id: "info", icono: "📋", texto: "Información" },
   { id: "horario", icono: "🕒", texto: "Horario" },
   { id: "fotos", icono: "📷", texto: "Fotos" },
   { id: "productos", icono: "🍽️", texto: "Productos" },
+  { id: "mascotas", icono: "🐾", texto: "Mascotas y adopciones" },
   { id: "servicios", icono: "💼", texto: "Servicios y tarifas" },
   { id: "rubros", icono: "📦", texto: "Rubros" },
   { id: "ofertas", icono: "🏷️", texto: "Ofertas" },
@@ -42,7 +44,7 @@ const PESTANAS: { id: Pestana; icono: string; texto: string }[] = [
 
 /** gestor_negocios arma y completa la ficha (incluido horario y ofertas, decisión 0083), pero no
  * publica ni despublica: eso es del validador de contenido. */
-const PESTANAS_GESTOR: Pestana[] = ["info", "horario", "dueno", "fotos", "productos", "servicios", "rubros", "ofertas", "pasillos", "estado", "historial"];
+const PESTANAS_GESTOR: Pestana[] = ["info", "horario", "dueno", "fotos", "productos", "mascotas", "servicios", "rubros", "ofertas", "pasillos", "estado", "historial"];
 
 function pillEstado(estado: Negocio["estado"]) {
   if (estado === "activo") return <span className="estado-negocio-pill activo">Activo</span>;
@@ -95,7 +97,8 @@ export function FichaNegocio() {
   const deContenido = negocioActual ? pestanasDeContenido(negocioActual, categorias) : [];
   const pestanas = PESTANAS.filter(
     (p) =>
-      (!["servicios", "rubros", "pasillos"].includes(p.id) || deContenido.includes(p.id as "servicios")) &&
+      (!["servicios", "rubros", "pasillos", "mascotas"].includes(p.id) || deContenido.includes(p.id as "servicios")) &&
+      (p.id !== "productos" || !deContenido.includes("mascotas")) &&
       (cuenta?.rol !== "gestor_negocios" || PESTANAS_GESTOR.includes(p.id)),
   );
   const pestanaUrl = searchParams.get("tab") as Pestana | null;
@@ -164,6 +167,8 @@ export function FichaNegocio() {
         ))}
       </div>
 
+      {/* Las mascotas no se ven en la vista previa del teléfono: van a ancho completo (0097). */}
+      {pestana === "mascotas" ? <EditorAlbergue key={negocio.id} negocio={negocio} /> : (
       <ConVistaPrevia negocio={negocio}>
       {pestana === "info" ? <EditorInfoNegocio key={negocio.id} negocio={negocio} /> : null}
       {pestana === "horario" ? <EditorHorarioNegocio key={negocio.id} negocio={negocio} /> : null}
@@ -177,6 +182,7 @@ export function FichaNegocio() {
       {pestana === "estado" ? <PestanaEstado negocio={negocio} /> : null}
       {pestana === "historial" ? <HistorialNegocio negocioId={negocio.id} /> : null}
       </ConVistaPrevia>
+      )}
     </>
   );
 }

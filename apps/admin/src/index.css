@@ -4513,3 +4513,61 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .fila-paso input:first-child { flex: 0 0 80px; }
 .fila-paso input:nth-child(2) { flex: 2 1 200px; }
 .fila-paso input:nth-child(3) { flex: 2 1 200px; }
+
+/* Rescate animal (decisión 0097) */
+.editor-albergue { display: flex; flex-direction: column; gap: 14px; }
+.tabs-albergue { display: flex; flex-wrap: wrap; gap: 4px; background: var(--superficie-hundida); border-radius: 12px; padding: 4px; align-self: flex-start; }
+.tabs-albergue button { min-height: 38px; padding: 0 16px; border: none; border-radius: 9px; background: transparent; color: var(--texto-suave); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.tabs-albergue button.activo { background: var(--superficie); color: var(--texto); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.contador-albergue { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--rojo); color: #fff; font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.grilla-mascotas { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.tarjeta-mascota { display: flex; flex-direction: column; border: 1px solid var(--borde); border-radius: 14px; overflow: hidden; background: var(--superficie); padding: 0; text-align: left; font: inherit; color: var(--texto); cursor: pointer; }
+.tarjeta-mascota:hover { border-color: var(--verde); }
+.tarjeta-mascota.adoptada { opacity: .6; }
+.foto-mascota { position: relative; display: block; aspect-ratio: 4 / 5; background: var(--superficie-hundida) center / cover; }
+.pill-urgente { position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 800; background: var(--rojo); color: #fff; border-radius: 99px; padding: 3px 9px; }
+.pill-portada { position: absolute; top: 4px; left: 4px; font-size: 10.5px; font-weight: 800; background: #fff; color: #141a16; border-radius: 99px; padding: 2px 7px; }
+.datos-mascota { display: flex; flex-direction: column; gap: 3px; padding: 9px 11px 11px; font-size: 12.5px; color: var(--texto-suave); }
+.datos-mascota b { font-size: 15px; color: var(--texto); }
+.estado-mascota, .estado-solicitud, .estado-padrino, .estado-aviso-mascota { align-self: flex-start; font-size: 11.5px; font-weight: 800; border-radius: 99px; padding: 3px 9px; white-space: nowrap; background: var(--superficie-hundida); color: var(--texto-suave); }
+.estado-mascota.disponible, .estado-solicitud.aprobada, .estado-solicitud.adoptada, .estado-padrino.activo, .estado-aviso-mascota.publicado { background: var(--verde-suave); color: var(--verde-texto); }
+.estado-mascota.en_proceso, .estado-solicitud.entrevista, .estado-padrino.por_confirmar { background: var(--oro-suave); color: var(--oro); }
+.estado-solicitud.nueva { background: var(--rojo); color: #fff; }
+.estado-padrino.atrasado, .estado-aviso-mascota.oculto { background: var(--coral-suave); color: var(--rojo); }
+.solicitudes-albergue { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+.lista-solicitudes { flex: 1 1 300px; min-width: 0; padding: 0 !important; overflow: hidden; }
+.lista-solicitudes button { width: 100%; display: flex; gap: 10px; align-items: center; padding: 10px 14px; border: none; border-bottom: 1px solid var(--borde); background: var(--superficie); font: inherit; color: var(--texto); text-align: left; cursor: pointer; }
+.lista-solicitudes button.activa { background: var(--verde-suave); }
+.lista-solicitudes .miniatura, .celda-aviso-mascota .miniatura { flex: none; width: 42px; height: 42px; border-radius: 10px; background: var(--superficie-hundida) center / cover; }
+.lista-solicitudes .texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; color: var(--texto-suave); }
+.lista-solicitudes .texto b { font-size: 14px; color: var(--texto); }
+.detalle-solicitud { flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.detalle-solicitud .cabeza { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.detalle-solicitud h3 { margin: 0; }
+.respuestas-solicitud { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+.respuestas-solicitud span { background: var(--superficie-hundida); border-radius: 10px; padding: 9px 11px; display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; }
+.respuestas-solicitud small { color: var(--texto-suave); font-size: 11.5px; }
+.motivo-solicitud { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--texto-suave); }
+.resumen-padrinos { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.resumen-padrinos span { flex: 1 1 150px; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+.resumen-padrinos small { font-size: 12px; color: var(--texto-suave); }
+.resumen-padrinos b { font-size: 22px; }
+.resumen-padrinos b.oro { color: var(--oro); }
+.ayuda-albergue { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.ayuda-albergue h3 { margin: 10px 0 0; font-size: 15px; }
+.ayuda-albergue > .btn-accion-mini { align-self: flex-start; }
+.fila-campos-albergue { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.fila-campos-albergue > .campo { flex: 1 1 200px; }
+.fila-necesidad, .fila-turno { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.fila-necesidad input, .fila-turno input { min-height: 38px; border: 1.5px solid var(--borde-fuerte); border-radius: 9px; padding: 0 10px; font: inherit; font-size: 13.5px; background: var(--superficie); color: var(--texto); }
+.fila-necesidad input:first-child, .fila-turno input:nth-child(3) { flex: 1 1 200px; }
+.fila-necesidad input[type="number"], .fila-turno input[type="number"] { width: 80px; }
+.fila-necesidad input:nth-child(5) { width: 100px; }
+.checks-albergue { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 4px 0 8px; }
+.checks-albergue label { display: flex; align-items: center; gap: 7px; font-size: 13.5px; min-height: 34px; cursor: pointer; }
+.checks-albergue input { width: 17px; height: 17px; accent-color: var(--verde); }
+.modal-mascota { max-height: 92vh; overflow-y: auto; }
+.celda-aviso-mascota { display: flex; gap: 10px; align-items: flex-start; }
+.texto-perdido { color: var(--rojo); font-weight: 800; }
+.texto-encontrado { color: var(--azul); font-weight: 800; }
+.detalle-solicitud .cabeza a.btn { text-decoration: none; }

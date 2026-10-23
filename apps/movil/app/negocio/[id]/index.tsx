@@ -1,3 +1,4 @@
+import { abrirWhatsapp as abrirChatWhatsapp } from "../../../src/utilidades/whatsapp";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Easing, Linking, Platform, Pressable, Share, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +22,7 @@ import { MenuNegocio } from "../../../src/componentes/MenuNegocio";
 import { CatalogoNegocio } from "../../../src/componentes/CatalogoNegocio";
 import { FichaInmuebles } from "../../../src/componentes/fichasRubro/FichaInmuebles";
 import { FichaTours } from "../../../src/componentes/fichasRubro/FichaTours";
+import { FichaMascotas } from "../../../src/componentes/rescate/FichaMascotas";
 import { ServiciosNegocio } from "../../../src/componentes/ServiciosNegocio";
 import { CategoriasRubroNegocio } from "../../../src/componentes/CategoriasRubroNegocio";
 import { OfertasPasillosNegocio } from "../../../src/componentes/OfertasPasillosNegocio";
@@ -209,7 +211,7 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
   }
 
   function abrirWhatsapp() {
-    if (negocio!.whatsapp) Linking.openURL(`https://wa.me/${negocio!.whatsapp}`);
+    abrirChatWhatsapp(negocio!.whatsapp);
   }
 
   function llamar() {
@@ -284,7 +286,8 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
   const tieneBuscador =
     (arquetipo === "servicios" && !!negocio.serviciosOfrecidos?.length) ||
     (arquetipo === "ofertas" && !!(negocio.ofertas?.length || negocio.pasillos?.length)) ||
-    (!!productos && productos.length > 0 && arquetipo !== "rubros");
+    (!!productos && productos.length > 0 && arquetipo !== "rubros") ||
+    arquetipo === "mascotas";
 
   let contenido;
   if (arquetipo === "servicios" && negocio.serviciosOfrecidos?.length) {
@@ -315,6 +318,8 @@ function FichaContenido({ fotoEnVuelo }: { fotoEnVuelo: OrigenFoto | null }) {
         ) : null}
       </>
     );
+  } else if (arquetipo === "mascotas") {
+    contenido = <FichaMascotas negocioId={negocio.id} titulo={tituloDe("mascotas")} busqueda={busqueda} />;
   } else if (arquetipo === "inmuebles" && productos && productos.length > 0) {
     contenido = (
       <FichaInmuebles
