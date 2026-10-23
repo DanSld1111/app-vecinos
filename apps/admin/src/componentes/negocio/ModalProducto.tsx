@@ -199,7 +199,7 @@ export function ModalProducto({
                 rows={2}
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                placeholder="Ej. Con papas fritas, arroz y ensalada criolla."
+                placeholder={esTour ? "Ej. Un día completo por el sur: islas, desierto y oasis." : esInmueble ? "Ej. Casa de dos pisos, bien iluminada, a dos cuadras del parque." : "Ej. Con papas fritas, arroz y ensalada criolla."}
               />
             </div>
             <div className={mostrarSeccion ? "fila-2-campos" : undefined}>
@@ -207,7 +207,7 @@ export function ModalProducto({
                 <label>{esTour ? "Precio por persona" : "Precio"}</label>
                 <div className="precio-con-moneda">
                   <SelectorMoneda valor={monedaPropia} monedaNegocio={moneda} onCambiar={setMonedaPropia} etiqueta="Moneda del precio" />
-                  <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 28" aria-label="Precio" />
+                  <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder={esTour ? "Ej. 129" : esInmueble ? "Ej. 350000" : "Ej. 28"} aria-label="Precio" />
                 </div>
               </div>
               {mostrarSeccion ? (
@@ -222,7 +222,7 @@ export function ModalProducto({
             </div>
 
             {atributosDef.length > 0 ? (
-              <div className="fila-2-campos">
+              <div className="grilla-atributos">
                 {atributosDef.map((def) => (
                   <div className="campo-modal" key={def.clave} style={def.tipo === "varias" ? { gridColumn: "1 / -1" } : undefined}>
                     <label>{def.etiqueta}</label>

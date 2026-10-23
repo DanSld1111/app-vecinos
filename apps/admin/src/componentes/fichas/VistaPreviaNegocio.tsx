@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { EnfoqueVistaPrevia } from "../../estado/useBorradorNegocio";
-import { Categoria, FICHAS, Negocio, Producto } from "@app-vecinos/tipos";
+import { Categoria, FICHAS, Mascota, Negocio, Producto } from "@app-vecinos/tipos";
 import { LuChevronLeft, LuHeart, LuMapPin, LuPhone, LuSearch, LuStar } from "react-icons/lu";
 import { urlCompleta } from "../../utilidades/media";
 import { fichaDelNegocio } from "../../utilidades/fichaNegocio";
@@ -35,7 +35,7 @@ function Calificacion({ negocio }: { negocio: Negocio }) {
   );
 }
 
-function PantallaFicha({ negocio, categorias, productos }: { negocio: Negocio; categorias: Categoria[]; productos: Producto[] }) {
+function PantallaFicha({ negocio, categorias, productos, mascotas }: { negocio: Negocio; categorias: Categoria[]; productos: Producto[]; mascotas?: Mascota[] }) {
   const { ficha, categoria, titulo } = fichaDelNegocio(negocio, categorias);
   const hoy = estadoHoyTexto(negocio.horarios);
   const semana = resumenSemana(negocio.horarios);
@@ -97,6 +97,7 @@ function PantallaFicha({ negocio, categorias, productos }: { negocio: Negocio; c
           ficha={ficha}
           negocio={negocio}
           productos={productos}
+          mascotas={mascotas}
           campos={FICHAS[ficha].usaProductos ? categoria?.atributosProducto ?? [] : []}
           moneda={negocio.moneda}
         />
@@ -178,12 +179,15 @@ export function VistaPreviaNegocio({
   negocio,
   categorias,
   productos,
+  mascotas,
   sinGuardar = false,
   enfoque = "arriba",
 }: {
   negocio: Negocio;
   categorias: Categoria[];
   productos: Producto[];
+  /** Ficha Mascotas (albergues, decisión 0097). */
+  mascotas?: Mascota[];
   sinGuardar?: boolean;
   /** Parte de la ficha que se está editando: la pantalla se desplaza hasta ahí. */
   enfoque?: EnfoqueVistaPrevia;
@@ -209,7 +213,7 @@ export function VistaPreviaNegocio({
       <div className="tf-telefono">
         <div className="tf-pantalla" ref={pantalla}>
           {vista === "ficha" ? (
-            <PantallaFicha negocio={negocio} categorias={categorias} productos={productos} />
+            <PantallaFicha negocio={negocio} categorias={categorias} productos={productos} mascotas={mascotas} />
           ) : (
             <PantallaListado negocio={negocio} categorias={categorias} />
           )}

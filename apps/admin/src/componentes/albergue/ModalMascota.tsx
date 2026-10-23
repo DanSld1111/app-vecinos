@@ -42,7 +42,7 @@ function Opciones<T extends string>({ etiqueta, valor, opciones, onCambiar }: { 
 }
 
 /** Crear o editar una mascota del albergue (decisión 0097). */
-export function ModalMascota({ negocio, mascota, onCerrar, onGuardado }: { negocio: Negocio; mascota: Mascota | null; onCerrar: () => void; onGuardado: () => void }) {
+export function ModalMascota({ negocio, mascota, onCerrar, onGuardado }: { negocio: Negocio; mascota: Mascota | null; onCerrar: () => void; onGuardado: (guardada?: Mascota) => void }) {
   const token = useSesionAdmin((e) => e.token)!;
   const [nombre, setNombre] = useState(mascota?.nombre ?? "");
   const [especie, setEspecie] = useState<EspecieMascota>(mascota?.especie ?? "perro");
@@ -104,10 +104,9 @@ export function ModalMascota({ negocio, mascota, onCerrar, onGuardado }: { negoc
     };
     setGuardando(true);
     try {
-      if (mascota) await actualizarMascota(negocio.id, mascota.id, datos, token);
-      else await crearMascota(negocio.id, datos, token);
+      const guardada = mascota ? await actualizarMascota(negocio.id, mascota.id, datos, token) : await crearMascota(negocio.id, datos, token);
       alertaExito(mascota ? "Mascota actualizada" : "Mascota publicada", estado === "adoptada" ? "Ya no se muestra para adopción." : "Los vecinos ya la ven en Rescate animal.");
-      onGuardado();
+      onGuardado(guardada);
     } catch (e) {
       alertaError("No se pudo guardar", e);
     } finally {

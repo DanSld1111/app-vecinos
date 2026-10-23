@@ -4571,3 +4571,21 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .texto-perdido { color: var(--rojo); font-weight: 800; }
 .texto-encontrado { color: var(--azul); font-weight: 800; }
 .detalle-solicitud .cabeza a.btn { text-decoration: none; }
+
+/* Vista previa de las fichas Inmuebles, Tours (0096) y Mascotas (0097) */
+.tf-inmueble { overflow: hidden; border: 1px solid var(--tf-linea); border-radius: 12px; margin-bottom: 8px; }
+.tf-inmueble-img { position: relative; height: 96px; background: #eef1ee center / cover; }
+.tf-inmueble-img .tf-insignia, .tf-card-img .tf-insignia { position: absolute; top: 6px; left: 6px; }
+.tf-insignia.verde { background: var(--tf-verde); color: #fff; }
+.tf-insignia.rojo { background: #b4361e; color: #fff; }
+.tf-precio.grande { display: block; font-size: 14px; font-weight: 800; color: var(--tf-texto); }
+.tf-specs { display: block; font-size: 10.5px; color: var(--tf-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tf-ft.grande { width: 58px; height: 62px; border-radius: 9px; }
+.tf-chip-tipo { display: inline-block; font-style: normal; font-size: 9.5px; font-weight: 800; padding: 1px 7px; border-radius: 999px; background: var(--tf-chip); color: var(--tf-verde); margin-bottom: 2px; }
+.tf-pp { font-style: normal; font-weight: 500; font-size: 10px; color: var(--tf-suave); }
+.tf-card-img.alta { position: relative; aspect-ratio: 4 / 5; }
+.tf-hembra { font-style: normal; color: #9a3a68; }
+.tf-macho { font-style: normal; color: #2c5d8f; }
+.tarjeta-primero-ficha { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.tarjeta-primero-ficha ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; color: var(--texto-suave); }
+.grilla-atributos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0 12px; margin-top: 4px; }
