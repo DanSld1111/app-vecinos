@@ -314,13 +314,6 @@ export function EditorProductosNegocio({ negocio }: { negocio: Negocio }) {
           atributosDef={atributosDef}
           mostrarSeccion={mostrarSeccion}
           etiquetaSeccion={etiquetaSeccion}
-          ficha={categoriaPrincipal?.fichaEfectiva}
-          subirFotoExtra={(archivo) =>
-            api
-              .subirFotoExtra(negocio.id, archivo, token)
-              .then((r) => r.url)
-              .catch(() => null)
-          }
           onGuardar={guardar}
           onCerrar={() => {
             setEditando(null);

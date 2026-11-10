@@ -12,13 +12,11 @@ export interface FilaProducto {
   orden: number;
   atributos: Record<string, string>;
   moneda: Producto["moneda"];
-  fotos: string[] | null;
-  detalle: Producto["detalle"] | null;
 }
 
 /** Las mismas columnas en todas las consultas de producto — antes se repetía la lista a mano. */
 export const COLUMNAS_PRODUCTO =
-  "id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, foto_url, orden, atributos, moneda, fotos, detalle";
+  "id, negocio_id, nombre, descripcion, precio, categoria_menu, destacado, foto_url, orden, atributos, moneda";
 
 export function aProducto(fila: FilaProducto): Producto {
   return {
@@ -33,7 +31,5 @@ export function aProducto(fila: FilaProducto): Producto {
     orden: fila.orden,
     atributos: fila.atributos ?? {},
     moneda: fila.moneda ?? null,
-    fotos: fila.fotos ?? [],
-    detalle: fila.detalle ?? {},
   };
 }

@@ -4,7 +4,7 @@
  * cada categoría la hereda o elige otra. Una ficha nueva es código nuevo en la app: se agrega aquí
  * y en el componente que la dibuja (apps/movil/app/negocio/[id]/index.tsx).
  */
-export type TipoFicha = "menu" | "catalogo" | "servicios" | "rubros" | "ofertas" | "galeria" | "inmuebles" | "tours" | "mascotas";
+export type TipoFicha = "menu" | "catalogo" | "servicios" | "rubros" | "ofertas" | "galeria";
 
 export interface InfoFicha {
   nombre: string;
@@ -17,7 +17,7 @@ export interface InfoFicha {
   usaProductos: boolean;
 }
 
-export const TIPOS_FICHA: TipoFicha[] = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria", "inmuebles", "tours", "mascotas"];
+export const TIPOS_FICHA: TipoFicha[] = ["menu", "catalogo", "servicios", "rubros", "ofertas", "galeria"];
 
 export const FICHAS: Record<TipoFicha, InfoFicha> = {
   menu: {
@@ -56,29 +56,6 @@ export const FICHAS: Record<TipoFicha, InfoFicha> = {
     // Los productos son opcionales: si el negocio los carga, se listan bajo las ofertas con los
     // campos de la categoría (ej. Licorerías: Tipo, Presentación, Volumen).
     usaProductos: true,
-  },
-  // Decisión 0096: dos fichas hechas para su rubro.
-  inmuebles: {
-    nombre: "Inmuebles",
-    tituloPorDefecto: "Inmuebles",
-    descripcion: "Tarjetas grandes con precio, dormitorios, baños y m², filtro Venta / Alquiler y detalle con galería.",
-    queCarga: ["Título y precio", "Varias fotos", "Operación y tipo de inmueble", "Dormitorios, baños, m²…", "Características"],
-    usaProductos: true,
-  },
-  tours: {
-    nombre: "Tours",
-    tituloPorDefecto: "Tours y salidas",
-    descripcion: "Tours con precio por persona, fechas de salida con cupos, itinerario e incluye / no incluye.",
-    queCarga: ["Nombre y precio por persona", "Varias fotos", "Fechas de salida con cupos", "Itinerario", "Incluye y no incluye"],
-    usaProductos: true,
-  },
-  // Decisión 0097: albergues de Rescate animal.
-  mascotas: {
-    nombre: "Mascotas en adopción",
-    tituloPorDefecto: "Buscan hogar",
-    descripcion: "Las mascotas del albergue con edad, tamaño, salud y personalidad; solicitud de adopción y padrinazgo.",
-    queCarga: ["Mascotas: fotos, edad, tamaño, salud y su historia", "Yape o Plin para padrinos", "Necesidades del albergue"],
-    usaProductos: false,
   },
   galeria: {
     nombre: "Galería",

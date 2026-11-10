@@ -2,7 +2,8 @@ import { useState, useRef, useCallback } from "react";
 import { Redirect } from "expo-router";
 import { useModulos } from "../../src/datos/hooks/useParaTi";
 import { Ionicons } from "@expo/vector-icons";
-import { Animated, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { router } from "expo-router";
 import { useFocusEffect, useScrollToTop } from "@react-navigation/native";
 import Reanimated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 
@@ -26,22 +27,31 @@ import { EstadoVacio } from "../../src/componentes/EstadoVacio";
 import { EstadoError } from "../../src/componentes/EstadoError";
 import { EsqueletoListaAvisos } from "../../src/componentes/EsqueletoAviso";
 import { agruparPorFecha } from "../../src/utilidades/agruparAvisos";
+import { useClasificados } from "../../src/datos/hooks/useClasificados";
+import { FilaClasificado, ROJO_SE_BUSCA, AZUL_TURISMO, TarjetaClasificado } from "../../src/componentes/avisos/comun";
 
-type FiltroComunidad = "todo" | "municipal" | "junta_vecinal" | "seguridad" | "perdidos";
+type SeccionAviso = "inmuebles" | "mascotas" | "turismo";
+type FiltroComunidad = "todo" | SeccionAviso | "municipal" | "junta_vecinal" | "seguridad";
+
+/** Las secciones de los avisos de vecinos (decisión 0098) viven aquí junto a los avisos oficiales. */
+const SECCIONES_AVISO: SeccionAviso[] = ["inmuebles", "mascotas", "turismo"];
+const esSeccion = (f: FiltroComunidad): f is SeccionAviso => SECCIONES_AVISO.includes(f as SeccionAviso);
 
 function filtros(colores: PaletaColores): { id: FiltroComunidad; etiqueta: string; colorPunto?: string }[] {
   return [
     { id: "todo", etiqueta: "Todo", colorPunto: colores.textoTenue },
+    { id: "inmuebles", etiqueta: "Inmuebles", colorPunto: colores.primario },
+    { id: "mascotas", etiqueta: "Mascotas", colorPunto: ROJO_SE_BUSCA },
+    { id: "turismo", etiqueta: "Turismo", colorPunto: AZUL_TURISMO },
     { id: "municipal", etiqueta: "Municipal", colorPunto: colores.primario },
     { id: "junta_vecinal", etiqueta: "Junta vecinal", colorPunto: "#b8862e" },
     { id: "seguridad", etiqueta: "Seguridad", colorPunto: colores.error },
-    { id: "perdidos", etiqueta: "Perdidos", colorPunto: colores.textoTenue },
   ];
 }
 
 function filtrarAvisos(avisos: Aviso[], filtro: FiltroComunidad): Aviso[] {
   if (filtro === "todo") return avisos;
-  if (filtro === "perdidos") return [];
+  if (esSeccion(filtro)) return [];
   return avisos.filter((a) => a.categoria === filtro);
 }
 
@@ -67,6 +77,12 @@ function PantallaComunidad() {
   const { data: avisos, isLoading, isError, isRefetching, refetch } = useAvisos(comunidad?.id);
 
   const avisosFiltrados = filtrarAvisos(avisos ?? [], filtro);
+  const { width } = useWindowDimensions();
+  const anchoPost = Math.min(width, 640);
+  const { data: clasificados, isLoading: cargandoClasificados, refetch: refetchClasificados } = useClasificados(
+    esSeccion(filtro) ? { seccion: filtro, limite: 30 } : { limite: 5 },
+    filtro === "todo" || esSeccion(filtro),
+  );
 
   // Las alertas de seguridad se fijan arriba del feed mientras estén vigentes, sin importar la fecha.
   const mostrarFijadas = filtro === "todo";
@@ -83,9 +99,9 @@ function PantallaComunidad() {
         onScroll={desplazamiento.onScroll}
         scrollEventThrottle={16}
         style={styles.contenedor}
-        contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top, paddingBottom: alturaBarra + espaciado.xl }]}
+        contentContainerStyle={[styles.contenido, { paddingTop: espaciado.lg + insets.top, paddingBottom: alturaBarra + espaciado.xl + 64 }]}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor={colores.primario} />
+          <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); refetchClasificados(); }} tintColor={colores.primario} />
         }
       >
         <View style={styles.filaTitulo}>
@@ -107,8 +123,20 @@ function PantallaComunidad() {
           ))}
         </View>
 
-        {filtro === "perdidos" ? (
-          <EstadoVacio titulo="Esta sección llega pronto a Comunidad." />
+        {esSeccion(filtro) ? (
+          cargandoClasificados ? (
+            <EsqueletoListaAvisos cantidad={2} />
+          ) : clasificados && clasificados.length ? (
+            <View style={{ gap: 12, marginHorizontal: -espaciado.lg, marginTop: espaciado.sm }}>
+              {clasificados.map((c) => (
+                <View key={c.id} style={{ width: anchoPost, alignSelf: "center" }}>
+                  <TarjetaClasificado c={c} ancho={anchoPost} />
+                </View>
+              ))}
+            </View>
+          ) : (
+            <EstadoVacio titulo="Todavía no hay avisos aquí. ¿Tienes uno? Envíanoslo." />
+          )
         ) : isLoading ? (
           <EsqueletoListaAvisos cantidad={3} />
         ) : isError ? (
@@ -129,6 +157,15 @@ function PantallaComunidad() {
               </View>
             ) : null}
 
+            {filtro === "todo" && clasificados && clasificados.length ? (
+              <View style={styles.grupo}>
+                <Text style={styles.tituloGrupo}>Avisos de vecinos</Text>
+                {clasificados.map((c) => (
+                  <FilaClasificado key={c.id} c={c} />
+                ))}
+              </View>
+            ) : null}
+
             {grupos.map((grupo) => (
               <Reanimated.View key={grupo.etiqueta} style={styles.grupo} layout={TRANSICION_LISTA} entering={ENTRADA} exiting={SALIDA}>
                 <Text style={styles.tituloGrupo}>{grupo.etiqueta}</Text>
@@ -145,6 +182,15 @@ function PantallaComunidad() {
         )}
       </Animated.ScrollView>
       <BarraTituloFija titulo="Comunidad" scrollY={desplazamiento.scrollY} />
+      <Pressable
+        onPress={() => router.push(esSeccion(filtro) ? `/avisos/enviar?seccion=${filtro}` : "/avisos/enviar")}
+        style={[styles.botonEnviar, { bottom: alturaBarra + espaciado.md }]}
+        accessibilityRole="button"
+        accessibilityLabel="Envíanos tu aviso"
+      >
+        <Ionicons name="add" size={22} color="#ffffff" />
+        <Text style={styles.botonEnviarTexto}>Envíanos tu aviso</Text>
+      </Pressable>
     </View>
   );
 }
@@ -209,6 +255,24 @@ function crearEstilos(colores: PaletaColores, oscuro: boolean) {
       paddingVertical: 4,
       borderRadius: radios.completo,
     },
+    botonEnviar: {
+      position: "absolute",
+      right: espaciado.lg,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      minHeight: 50,
+      paddingLeft: 14,
+      paddingRight: 18,
+      borderRadius: 25,
+      backgroundColor: colores.primario,
+      shadowColor: "#1a531a",
+      shadowOpacity: 0.35,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 6,
+    },
+    botonEnviarTexto: { fontFamily: "SchibstedGrotesk_800ExtraBold", fontSize: 15, color: "#ffffff" },
     tituloFijado: {
       ...tipografia.etiqueta,
       color: colores.error,

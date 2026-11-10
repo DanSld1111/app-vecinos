@@ -4488,104 +4488,58 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .aviso-nueva-version .cerrar-aviso-version { background: transparent; color: #fff; font-weight: 600; padding: 8px 10px; }
 .aviso-nueva-version button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-/* Producto: campos número / varias, fotos extra y detalle del tour (decisión 0096). */
-.numero-con-unidad { display: flex; align-items: center; gap: 8px; }
-.numero-con-unidad input { flex: 1; min-width: 0; }
-.numero-con-unidad span { font-size: 13px; font-weight: 700; color: var(--texto-suave); }
-.chips-varias { display: flex; flex-wrap: wrap; gap: 6px; }
-.chips-varias button { min-height: 34px; padding: 0 12px; border-radius: 17px; border: 1.5px solid var(--borde-fuerte); background: var(--superficie); color: var(--texto); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
-.chips-varias button.activa { border-color: var(--verde); background: var(--verde-suave); color: var(--verde-texto); font-weight: 800; }
-.fotos-extra-producto { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
-.fotos-extra-producto > label { font-size: 13px; font-weight: 700; }
-.fotos-extra-producto small, .bloque-tour small { font-weight: 500; color: var(--texto-tenue); }
-.grilla-fotos-extra { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
-.foto-extra { position: relative; aspect-ratio: 4 / 3; border-radius: 10px; background: var(--superficie-hundida) center / cover; }
-.foto-extra button { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; border: none; background: rgba(0, 0, 0, .6); color: #fff; font-size: 15px; line-height: 1; cursor: pointer; }
-.agregar-foto-extra { aspect-ratio: 4 / 3; border-radius: 10px; border: 2px dashed var(--borde-fuerte); background: var(--superficie); color: var(--verde-texto); font: inherit; font-weight: 700; cursor: pointer; }
-.detalle-tour { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--borde); display: flex; flex-direction: column; gap: 14px; }
-.bloque-tour { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-.bloque-tour > label { font-size: 13px; font-weight: 700; }
-.fila-salida, .fila-paso { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; align-items: center; }
-.fila-salida input, .fila-paso input { min-height: 38px; border: 1.5px solid var(--borde-fuerte); border-radius: 9px; padding: 0 10px; font: inherit; font-size: 13.5px; background: var(--superficie); color: var(--texto); }
-.fila-salida input[type="date"] { flex: 1 1 150px; }
-.fila-salida input[type="time"] { flex: 0 1 110px; }
-.fila-salida input[inputmode] { flex: 1 1 150px; }
-.fila-paso input:first-child { flex: 0 0 80px; }
-.fila-paso input:nth-child(2) { flex: 2 1 200px; }
-.fila-paso input:nth-child(3) { flex: 2 1 200px; }
-
-/* Rescate animal (decisión 0097) */
-.editor-albergue { display: flex; flex-direction: column; gap: 14px; }
-.tabs-albergue { display: flex; flex-wrap: wrap; gap: 4px; background: var(--superficie-hundida); border-radius: 12px; padding: 4px; align-self: flex-start; }
-.tabs-albergue button { min-height: 38px; padding: 0 16px; border: none; border-radius: 9px; background: transparent; color: var(--texto-suave); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-.tabs-albergue button.activo { background: var(--superficie); color: var(--texto); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
-.contador-albergue { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--rojo); color: #fff; font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
-.grilla-mascotas { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
-.tarjeta-mascota { display: flex; flex-direction: column; border: 1px solid var(--borde); border-radius: 14px; overflow: hidden; background: var(--superficie); padding: 0; text-align: left; font: inherit; color: var(--texto); cursor: pointer; }
-.tarjeta-mascota:hover { border-color: var(--verde); }
-.tarjeta-mascota.adoptada { opacity: .6; }
-.foto-mascota { position: relative; display: block; aspect-ratio: 4 / 5; background: var(--superficie-hundida) center / cover; }
-.pill-urgente { position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 800; background: var(--rojo); color: #fff; border-radius: 99px; padding: 3px 9px; }
-.pill-portada { position: absolute; top: 4px; left: 4px; font-size: 10.5px; font-weight: 800; background: #fff; color: #141a16; border-radius: 99px; padding: 2px 7px; }
-.datos-mascota { display: flex; flex-direction: column; gap: 3px; padding: 9px 11px 11px; font-size: 12.5px; color: var(--texto-suave); }
-.datos-mascota b { font-size: 15px; color: var(--texto); }
-.estado-mascota, .estado-solicitud, .estado-padrino, .estado-aviso-mascota { align-self: flex-start; font-size: 11.5px; font-weight: 800; border-radius: 99px; padding: 3px 9px; white-space: nowrap; background: var(--superficie-hundida); color: var(--texto-suave); }
-.estado-mascota.disponible, .estado-solicitud.aprobada, .estado-solicitud.adoptada, .estado-padrino.activo, .estado-aviso-mascota.publicado { background: var(--verde-suave); color: var(--verde-texto); }
-.estado-mascota.en_proceso, .estado-solicitud.entrevista, .estado-padrino.por_confirmar { background: var(--oro-suave); color: var(--oro); }
-.estado-solicitud.nueva { background: var(--rojo); color: #fff; }
-.estado-padrino.atrasado, .estado-aviso-mascota.oculto { background: var(--coral-suave); color: var(--rojo); }
-.solicitudes-albergue { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
-.lista-solicitudes { flex: 1 1 300px; min-width: 0; padding: 0 !important; overflow: hidden; }
-.lista-solicitudes button { width: 100%; display: flex; gap: 10px; align-items: center; padding: 10px 14px; border: none; border-bottom: 1px solid var(--borde); background: var(--superficie); font: inherit; color: var(--texto); text-align: left; cursor: pointer; }
-.lista-solicitudes button.activa { background: var(--verde-suave); }
-.lista-solicitudes .miniatura, .celda-aviso-mascota .miniatura { flex: none; width: 42px; height: 42px; border-radius: 10px; background: var(--superficie-hundida) center / cover; }
-.lista-solicitudes .texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; color: var(--texto-suave); }
-.lista-solicitudes .texto b { font-size: 14px; color: var(--texto); }
-.detalle-solicitud { flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-.detalle-solicitud .cabeza { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-.detalle-solicitud h3 { margin: 0; }
-.respuestas-solicitud { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
-.respuestas-solicitud span { background: var(--superficie-hundida); border-radius: 10px; padding: 9px 11px; display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; }
-.respuestas-solicitud small { color: var(--texto-suave); font-size: 11.5px; }
-.motivo-solicitud { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--texto-suave); }
-.resumen-padrinos { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-.resumen-padrinos span { flex: 1 1 150px; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
-.resumen-padrinos small { font-size: 12px; color: var(--texto-suave); }
-.resumen-padrinos b { font-size: 22px; }
-.resumen-padrinos b.oro { color: var(--oro); }
-.ayuda-albergue { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
-.ayuda-albergue h3 { margin: 10px 0 0; font-size: 15px; }
-.ayuda-albergue > .btn-accion-mini { align-self: flex-start; }
-.fila-campos-albergue { display: flex; flex-wrap: wrap; gap: 4px 16px; }
-.fila-campos-albergue > .campo { flex: 1 1 200px; }
-.fila-necesidad, .fila-turno { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.fila-necesidad input, .fila-turno input { min-height: 38px; border: 1.5px solid var(--borde-fuerte); border-radius: 9px; padding: 0 10px; font: inherit; font-size: 13.5px; background: var(--superficie); color: var(--texto); }
-.fila-necesidad input:first-child, .fila-turno input:nth-child(3) { flex: 1 1 200px; }
-.fila-necesidad input[type="number"], .fila-turno input[type="number"] { width: 80px; }
-.fila-necesidad input:nth-child(5) { width: 100px; }
-.checks-albergue { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 4px 0 8px; }
-.checks-albergue label { display: flex; align-items: center; gap: 7px; font-size: 13.5px; min-height: 34px; cursor: pointer; }
-.checks-albergue input { width: 17px; height: 17px; accent-color: var(--verde); }
-.modal-mascota { max-height: 92vh; overflow-y: auto; }
-.celda-aviso-mascota { display: flex; gap: 10px; align-items: flex-start; }
-.texto-perdido { color: var(--rojo); font-weight: 800; }
-.texto-encontrado { color: var(--azul); font-weight: 800; }
-.detalle-solicitud .cabeza a.btn { text-decoration: none; }
-
-/* Vista previa de las fichas Inmuebles, Tours (0096) y Mascotas (0097) */
-.tf-inmueble { overflow: hidden; border: 1px solid var(--tf-linea); border-radius: 12px; margin-bottom: 8px; }
-.tf-inmueble-img { position: relative; height: 96px; background: #eef1ee center / cover; }
-.tf-inmueble-img .tf-insignia, .tf-card-img .tf-insignia { position: absolute; top: 6px; left: 6px; }
-.tf-insignia.verde { background: var(--tf-verde); color: #fff; }
-.tf-insignia.rojo { background: #b4361e; color: #fff; }
-.tf-precio.grande { display: block; font-size: 14px; font-weight: 800; color: var(--tf-texto); }
-.tf-specs { display: block; font-size: 10.5px; color: var(--tf-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tf-ft.grande { width: 58px; height: 62px; border-radius: 9px; }
-.tf-chip-tipo { display: inline-block; font-style: normal; font-size: 9.5px; font-weight: 800; padding: 1px 7px; border-radius: 999px; background: var(--tf-chip); color: var(--tf-verde); margin-bottom: 2px; }
-.tf-pp { font-style: normal; font-weight: 500; font-size: 10px; color: var(--tf-suave); }
-.tf-card-img.alta { position: relative; aspect-ratio: 4 / 5; }
-.tf-hembra { font-style: normal; color: #9a3a68; }
-.tf-macho { font-style: normal; color: #2c5d8f; }
-.tarjeta-primero-ficha { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.tarjeta-primero-ficha ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; color: var(--texto-suave); }
-.grilla-atributos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0 12px; margin-top: 4px; }
+/* ─── Avisos de vecinos (decisión 0098) ─────────────────────────────────────── */
+.avc-bandejas { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--borde); margin-bottom: 18px; }
+.avc-bandejas > button { padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--texto-suave); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; display: flex; gap: 7px; align-items: center; }
+.avc-bandejas > button span { font-size: 12px; font-weight: 800; background: var(--superficie-hundida); color: var(--texto); border-radius: 9px; padding: 1px 7px; }
+.avc-bandejas > button.activa { color: var(--texto); font-weight: 800; border-bottom-color: var(--verde); }
+.avc-espacio { flex: 1; }
+.avc-chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 6px 0; }
+.avc-chips button { padding: 6px 12px; border-radius: 16px; border: 1px solid var(--borde-fuerte); background: var(--superficie); font-size: 13px; font-weight: 700; color: var(--texto); cursor: pointer; }
+.avc-chips button.activa { background: var(--verde); border-color: var(--verde); color: #fff; }
+.avc-cuerpo { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+.avc-lista { flex: 1 1 300px; max-width: 380px; display: flex; flex-direction: column; gap: 8px; }
+.avc-item { display: flex; gap: 10px; align-items: center; text-align: left; padding: 10px; border-radius: 14px; border: 1px solid var(--borde); background: var(--superficie); cursor: pointer; color: var(--texto); font: inherit; }
+.avc-item:hover { background: var(--superficie-hover); }
+.avc-item.activo { border: 2px solid var(--verde); padding: 9px; }
+.avc-miniatura { flex: 0 0 60px; height: 60px; border-radius: 10px; background: var(--superficie-hundida) center / cover no-repeat; }
+.avc-item-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.avc-item-texto b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avc-item-texto small { font-size: 12px; color: var(--texto-suave); }
+.avc-item-texto em { color: var(--rojo); font-style: normal; font-weight: 700; }
+.avc-tipo { font-weight: 800; letter-spacing: .3px; text-transform: uppercase; font-size: 11px !important; color: var(--verde-texto) !important; }
+.avc-tipo.perdido { color: var(--rojo) !important; }
+.avc-tipo.turismo { color: #3b6fb0 !important; }
+.avc-vacio { color: var(--texto-suave); padding: 24px 8px; text-align: center; }
+.avc-editor { flex: 2 1 480px; min-width: 0; background: var(--superficie); border: 1px solid var(--borde); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.avc-fila { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.avc-estado { margin-left: auto; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 9px; background: var(--superficie-hundida); text-transform: capitalize; }
+.avc-estado.pendiente { background: var(--oro-suave); color: var(--oro); }
+.avc-estado.publicado { background: var(--verde-suave); color: var(--verde-texto); }
+.avc-estado.rechazado { background: var(--rojo-suave); color: var(--rojo); }
+.avc-fotos { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.avc-foto { width: 110px; height: 80px; border-radius: 10px; background: var(--superficie-hundida) center / cover no-repeat; position: relative; }
+.avc-foto.portada { outline: 3px solid var(--verde); }
+.avc-foto.agregar { border: 1.5px dashed var(--borde-fuerte); font-weight: 800; color: var(--verde-texto); cursor: pointer; font-size: 13px; }
+.avc-foto-acciones { position: absolute; right: 4px; top: 4px; display: flex; gap: 4px; }
+.avc-foto-acciones button { width: 24px; height: 24px; border-radius: 12px; border: none; background: rgba(20, 26, 22, .75); color: #fff; cursor: pointer; font-size: 12px; }
+.avc-original { background: var(--superficie-hundida); border-radius: 12px; padding: 12px 14px; }
+.avc-original small { font-size: 11px; font-weight: 800; color: var(--texto-suave); letter-spacing: .4px; }
+.avc-original p { margin: 4px 0 0; font-size: 14px; line-height: 1.45; white-space: pre-wrap; }
+.avc-campo { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 700; color: var(--texto-suave); }
+.avc-campo input, .avc-campo select, .avc-campo textarea { font-size: 14px; font-weight: 600; color: var(--texto); }
+.avc-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+.avc-grilla .ancho { grid-column: span 2; }
+.avc-precio { display: flex; gap: 6px; }
+.avc-precio select { width: 70px; }
+.avc-precio input { flex: 1; min-width: 0; }
+.avc-checks { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; }
+.avc-salidas { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.avc-salidas span { display: flex; gap: 4px; align-items: center; }
+.avc-salidas span button { border: none; background: none; color: var(--texto-suave); cursor: pointer; }
+.avc-autoriza { margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; }
+.avc-autoriza.si { background: var(--verde-suave); color: var(--verde-texto); }
+.avc-autoriza.no { background: var(--oro-suave); color: var(--oro); }
+.avc-acciones { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.avc-acciones a.btn-accion-mini { text-decoration: none; }
+.avc-rechazar { border: none; background: none; color: var(--rojo); font-weight: 800; font-size: 14px; cursor: pointer; padding: 8px; }

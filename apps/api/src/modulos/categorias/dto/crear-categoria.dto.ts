@@ -29,7 +29,7 @@ export class CrearCategoriaDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(16)
+  @ArrayMaxSize(12)
   @ValidateNested({ each: true })
   @Type(() => CampoProductoDto)
   atributosProducto?: CampoProductoDto[];

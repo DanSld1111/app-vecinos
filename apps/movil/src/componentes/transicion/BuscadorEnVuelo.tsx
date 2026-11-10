@@ -5,7 +5,7 @@ import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming
 import { tipografia, useColores } from "../../disenio";
 import { RectanguloVentana } from "../../estado/useTransicionBuscador";
 
-export const TEXTO_BUSCADOR = "Negocio, plato o producto";
+export const TEXTO_BUSCADOR = "Negocio, depa, mascota o paseo";
 
 /**
  * Copia del buscador de Inicio que se desliza y se ajusta hasta el campo de la pantalla Buscar

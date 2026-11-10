@@ -19,7 +19,6 @@ import {
   LuMessageSquare,
   LuMoon,
   LuNewspaper,
-  LuPawPrint,
   LuPercent,
   LuPlus,
   LuSparkles,
@@ -41,6 +40,7 @@ import { urlCompleta } from "../utilidades/media";
 import { SelectorNegocioSidebar } from "./SelectorNegocioSidebar";
 import { PilaToasts } from "./PilaToasts";
 import { temaEfectivo, useTemaAdmin } from "../estado/useTemaAdmin";
+import { resumenClasificados } from "../datos/clasificadosApi";
 
 interface ItemNav {
   a: string;
@@ -60,7 +60,7 @@ const itemsParaTi = (reportados: number): ItemNav[] => [
   { a: "/para-ti/comentarios", texto: "Comentarios", icono: LuMessageSquare, contador: reportados },
 ];
 
-function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: "admin" | "para-ti" = "admin", reportados = 0): ItemNav[] {
+function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: "admin" | "para-ti" = "admin", reportados = 0, porRevisar = 0): ItemNav[] {
   switch (rol) {
     case "super_admin":
       if (panel === "para-ti") return itemsParaTi(reportados);
@@ -73,7 +73,7 @@ function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: 
         { a: "/servicios", texto: "Servicios", icono: LuLayoutGrid },
         { a: "/negocios", texto: "Negocios", icono: LuStore, grupo: "Negocios" },
         { a: "/avisos", texto: "Avisos", icono: LuMegaphone, grupo: "Comunicación" },
-        { a: "/avisos-mascotas", texto: "Mascotas perdidas", icono: LuPawPrint },
+        { a: "/avisos-vecinos", texto: "Avisos de vecinos", icono: LuHouse, contador: porRevisar },
         { a: "/para-ti", texto: "Para ti", icono: LuNewspaper },
         { a: "/novedades", texto: "Novedades", icono: LuSparkles },
         { a: "/publicidad", texto: "Publicidad", icono: LuImage },
@@ -95,6 +95,7 @@ function itemsPorRol(rol: RolCuenta, pendientes: number, rechazados = 0, panel: 
       return [
         { a: "/validacion", texto: "Cola de validación", icono: LuBadgeCheck, grupo: "Validación", contador: pendientes },
         { a: "/validacion/historial", texto: "Historial", icono: LuHistory },
+        { a: "/avisos-vecinos", texto: "Avisos de vecinos", icono: LuHouse, grupo: "Comunidad", contador: porRevisar },
       ];
     // Módulo de negocios completo (alta, edición, reenvío) pero nada más del panel; publicar es
     // del validador. El inicio cuenta los negocios rechazados que esperan corrección (0086).
@@ -141,6 +142,12 @@ export function LayoutAdmin() {
   const reportados = useParaTi((e) => e.resumenComentarios?.reportados ?? 0);
   const cargarResumenComentarios = useParaTi((e) => e.cargarResumenComentarios);
   const veParaTi = cuenta?.rol === "editor_redes" || (cuenta?.rol === "super_admin" && panel === "para-ti");
+  // Avisos de vecinos por revisar (decisión 0098): se vuelve a contar al cambiar de pantalla.
+  const [porRevisar, setPorRevisar] = useState(0);
+  const veAvisosVecinos = cuenta?.rol === "super_admin" || cuenta?.rol === "validador_contenido";
+  useEffect(() => {
+    if (token && veAvisosVecinos) resumenClasificados(token).then((r) => setPorRevisar(r.revisar)).catch(() => undefined);
+  }, [token, veAvisosVecinos, ubicacion.pathname]);
 
   // Comentarios reportados en el menú de Para ti (decisión 0092).
   useEffect(() => {
@@ -251,7 +258,7 @@ export function LayoutAdmin() {
           </div>
         ) : null}
         <nav>
-          {itemsPorRol(cuenta.rol, pendientes, rechazados, panelVisible, reportados).map((item) => (
+          {itemsPorRol(cuenta.rol, pendientes, rechazados, panelVisible, reportados, porRevisar).map((item) => (
             <Fragment key={item.a}>
               {item.grupo ? <span className="grupo-nav">{item.grupo}</span> : null}
               <NavLink

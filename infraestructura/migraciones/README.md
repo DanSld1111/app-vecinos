@@ -19,6 +19,8 @@ Esquema de base de datos de Etapa 2 (PostgreSQL 15+ con la extensión PostGIS). 
 | `0027_aviso_version_rechazada.sql` | versión rechazada de un aviso reenviado (antes y después) |
 | `0028_fichas.sql` | ficha por servicio y por categoría, título de sección (decisión 0080) |
 | `0029_quitar_arquetipos.sql` | borra arquetipos, plantillas visuales y las columnas viejas de categorías |
+| … | (0030 a 0037: ver cada archivo) |
+| `0038_avisos_comunidad.sql` | avisos de la comunidad (inmuebles, mascotas, turismo); retira las fichas de 0036/0037 |
 
 Aplicar todo en una base vacía:
 

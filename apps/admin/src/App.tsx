@@ -19,14 +19,13 @@ import { RolCuenta } from "@app-vecinos/tipos";
 import { Publicidad } from "./paginas/Publicidad";
 import { Novedades } from "./paginas/Novedades";
 import { Avisos } from "./paginas/Avisos";
+import { AvisosVecinos } from "./paginas/AvisosVecinos";
 import { Cuentas } from "./paginas/Cuentas";
 import { Usuarios } from "./paginas/Usuarios";
 import { MisNegocios } from "./paginas/MisNegocios";
 import { MiNegocio } from "./paginas/MiNegocio";
 import { MiNegocioHorario } from "./paginas/MiNegocioHorario";
 import { MiNegocioProductos } from "./paginas/MiNegocioProductos";
-import { MiNegocioMascotas } from "./paginas/MiNegocioMascotas";
-import { AvisosMascotas } from "./paginas/AvisosMascotas";
 import { MiNegocioFotos } from "./paginas/MiNegocioFotos";
 import { MiNegocioOfertas } from "./paginas/MiNegocioOfertas";
 import { MiNegocioPasillos, MiNegocioRubros, MiNegocioServicios } from "./paginas/MiNegocioContenido";
@@ -116,6 +115,7 @@ export function App() {
         <Route path="/publicidad" element={<Publicidad />} />
         <Route path="/novedades" element={<Novedades />} />
         <Route path="/avisos" element={<Avisos />} />
+        <Route path="/avisos-vecinos" element={<AvisosVecinos />} />
         <Route path="/validacion" element={<ColaValidacion />} />
         <Route path="/validacion/historial" element={<HistorialValidaciones />} />
         <Route path="/cuentas" element={<Cuentas />} />
@@ -125,8 +125,6 @@ export function App() {
         <Route path="/mi-negocio/horario" element={<MiNegocioHorario />} />
         <Route path="/mi-negocio/fotos" element={<MiNegocioFotos />} />
         <Route path="/mi-negocio/productos" element={<MiNegocioProductos />} />
-        <Route path="/mi-negocio/mascotas" element={<MiNegocioMascotas />} />
-        <Route path="/avisos-mascotas" element={<AvisosMascotas />} />
         <Route path="/mi-negocio/servicios" element={<MiNegocioServicios />} />
         <Route path="/mi-negocio/rubros" element={<MiNegocioRubros />} />
         <Route path="/mi-negocio/ofertas" element={<MiNegocioOfertas />} />

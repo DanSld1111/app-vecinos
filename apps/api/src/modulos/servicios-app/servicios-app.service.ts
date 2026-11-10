@@ -59,7 +59,7 @@ export class ServiciosAppService {
    */
   async listar(): Promise<ServicioApp[]> {
     const { rows } = await this.bd.consultar<FilaServicioApp>(
-      `SELECT ${COLUMNAS} FROM servicios_app sa ORDER BY sa.orden`,
+      `SELECT ${COLUMNAS} FROM servicios_app sa WHERE sa.estado <> 'retirado' ORDER BY sa.orden`,
     );
     return rows.map(aServicioApp);
   }

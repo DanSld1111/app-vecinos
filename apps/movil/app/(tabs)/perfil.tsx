@@ -176,7 +176,7 @@ export default function Perfil() {
         </Pressable>
 
         <Grupo>
-          <FilaPerfil icono="paw-outline" texto="Mi actividad en Rescate animal" primero onPress={() => router.push("/rescate/actividad")} />
+          <FilaPerfil icono="megaphone-outline" texto="Mis avisos" primero onPress={() => router.push("/avisos/mios")} />
         </Grupo>
 
         <Text style={styles.etiquetaSeccion}>Preferencias</Text>

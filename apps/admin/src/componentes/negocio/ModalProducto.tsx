@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { SelectorMoneda } from "./SelectorMoneda";
-import { AtributoProductoDef, DetalleProducto, MAX_FOTOS_EXTRA, Moneda, PasoItinerario, Producto, SIMBOLO_MONEDA, SalidaTour, TipoFicha, valoresVarias } from "@app-vecinos/tipos";
+import { AtributoProductoDef, Moneda, Producto, SIMBOLO_MONEDA } from "@app-vecinos/tipos";
 import { DatosProducto } from "../../datos/productosApi";
 import { urlCompleta } from "../../utilidades/media";
 import { SelectorColorAtributo } from "./SelectorColorAtributo";
@@ -26,13 +26,7 @@ export function ModalProducto({
   onEliminar,
   onQuitarFoto,
   onCerrar,
-  ficha,
-  subirFotoExtra,
 }: {
-  /** Ficha de la categoría: "inmuebles" y "tours" piden más datos (decisión 0096). */
-  ficha?: TipoFicha;
-  /** Sube una foto extra y devuelve su URL. Sin esto no se muestra la galería. */
-  subirFotoExtra?: (archivo: File) => Promise<string | null>;
   /** null = producto nuevo. */
   producto: Producto | null;
   moneda: Moneda;
@@ -60,12 +54,6 @@ export function ModalProducto({
   const [atributos, setAtributos] = useState<Record<string, string>>(producto?.atributos ?? {});
   const [monedaPropia, setMonedaPropia] = useState<Moneda | null>(producto?.moneda ?? null);
   const [fotoNueva, setFotoNueva] = useState<File | null>(null);
-  const [fotos, setFotos] = useState<string[]>(producto?.fotos ?? []);
-  const [subiendoFoto, setSubiendoFoto] = useState(false);
-  const [detalle, setDetalle] = useState<DetalleProducto>(producto?.detalle ?? {});
-  const inputFotosExtra = useRef<HTMLInputElement>(null);
-  const esTour = ficha === "tours";
-  const esInmueble = ficha === "inmuebles";
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmandoEliminar, setConfirmandoEliminar] = useState(false);
@@ -92,8 +80,6 @@ export function ModalProducto({
           destacado,
           atributos,
           moneda: monedaPropia,
-          ...(subirFotoExtra ? { fotos } : {}),
-          ...(esTour ? { detalle } : {}),
         },
         fotoNueva,
       );
@@ -105,8 +91,8 @@ export function ModalProducto({
 
   return (
     <div className="overlay-modal" onClick={onCerrar}>
-      <div className="modal-card" style={{ width: esTour || esInmueble ? "min(820px, 96vw)" : "min(680px, 94vw)" }} onClick={(e) => e.stopPropagation()}>
-        <h3>{producto ? (esTour ? "Editar tour" : esInmueble ? "Editar inmueble" : "Editar producto") : esTour ? "Nuevo tour" : esInmueble ? "Nuevo inmueble" : "Nuevo producto"}</h3>
+      <div className="modal-card" style={{ width: "min(680px, 94vw)" }} onClick={(e) => e.stopPropagation()}>
+        <h3>{producto ? "Editar producto" : "Nuevo producto"}</h3>
         <p className="sub">
           Los precios de este negocio van en {SIMBOLO_MONEDA[moneda]} ({moneda}); este producto puede usar otra moneda.
         </p>
@@ -186,12 +172,7 @@ export function ModalProducto({
           <div>
             <div className="campo-modal">
               <label>Nombre</label>
-              <input
-                autoFocus
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder={esTour ? "Ej. Full day Paracas y Huacachina" : esInmueble ? "Ej. Casa en venta con cochera" : "Ej. Lomo saltado"}
-              />
+              <input autoFocus value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Lomo saltado" />
             </div>
             <div className="campo-modal">
               <label>Descripción</label>
@@ -199,15 +180,15 @@ export function ModalProducto({
                 rows={2}
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                placeholder={esTour ? "Ej. Un día completo por el sur: islas, desierto y oasis." : esInmueble ? "Ej. Casa de dos pisos, bien iluminada, a dos cuadras del parque." : "Ej. Con papas fritas, arroz y ensalada criolla."}
+                placeholder="Ej. Con papas fritas, arroz y ensalada criolla."
               />
             </div>
             <div className={mostrarSeccion ? "fila-2-campos" : undefined}>
               <div className="campo-modal">
-                <label>{esTour ? "Precio por persona" : "Precio"}</label>
+                <label>Precio</label>
                 <div className="precio-con-moneda">
                   <SelectorMoneda valor={monedaPropia} monedaNegocio={moneda} onCambiar={setMonedaPropia} etiqueta="Moneda del precio" />
-                  <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder={esTour ? "Ej. 129" : esInmueble ? "Ej. 350000" : "Ej. 28"} aria-label="Precio" />
+                  <input value={precio} onChange={(e) => setPrecio(e.target.value)} inputMode="decimal" placeholder="Ej. 28" aria-label="Precio" />
                 </div>
               </div>
               {mostrarSeccion ? (
@@ -222,44 +203,11 @@ export function ModalProducto({
             </div>
 
             {atributosDef.length > 0 ? (
-              <div className="grilla-atributos">
+              <div className="fila-2-campos">
                 {atributosDef.map((def) => (
-                  <div className="campo-modal" key={def.clave} style={def.tipo === "varias" ? { gridColumn: "1 / -1" } : undefined}>
+                  <div className="campo-modal" key={def.clave}>
                     <label>{def.etiqueta}</label>
-                    {def.tipo === "numero" ? (
-                      <div className="numero-con-unidad">
-                        <input
-                          inputMode="numeric"
-                          value={atributos[def.clave] ?? ""}
-                          onChange={(e) => setAtributos((a) => ({ ...a, [def.clave]: e.target.value.replace(/[^0-9.,]/g, "") }))}
-                          placeholder="0"
-                        />
-                        {def.unidad ? <span>{def.unidad}</span> : null}
-                      </div>
-                    ) : def.tipo === "varias" ? (
-                      <div className="chips-varias" role="group" aria-label={def.etiqueta}>
-                        {(def.opciones ?? []).map((op) => {
-                          const marcadas = valoresVarias(atributos[def.clave]);
-                          const activa = marcadas.includes(op);
-                          return (
-                            <button
-                              key={op}
-                              type="button"
-                              aria-pressed={activa}
-                              className={activa ? "activa" : ""}
-                              onClick={() =>
-                                setAtributos((a) => ({
-                                  ...a,
-                                  [def.clave]: (activa ? marcadas.filter((x) => x !== op) : [...marcadas, op]).join("|"),
-                                }))
-                              }
-                            >
-                              {op}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : def.tipo === "opciones" ? (
+                    {def.tipo === "opciones" ? (
                       <select
                         value={atributos[def.clave] ?? ""}
                         onChange={(e) => setAtributos((a) => ({ ...a, [def.clave]: e.target.value }))}
@@ -292,54 +240,12 @@ export function ModalProducto({
                 <i />
               </div>
               <div>
-                <b>{esTour || esInmueble ? "Destacar" : 'Marcar como "Más pedido"'}</b>
-                <span>{esTour || esInmueble ? "Sale primero en la lista que ve el vecino" : "Se destaca en la carta que ve el vecino"}</span>
+                <b>Marcar como "Más pedido"</b>
+                <span>Se destaca en la carta que ve el vecino</span>
               </div>
             </div>
           </div>
         </div>
-
-        {subirFotoExtra ? (
-          <div className="fotos-extra-producto">
-            <label>
-              Más fotos <small>· hasta {MAX_FOTOS_EXTRA}, además de la principal</small>
-            </label>
-            <input
-              ref={inputFotosExtra}
-              type="file"
-              accept={TIPOS_ACEPTADOS}
-              multiple
-              style={{ display: "none" }}
-              onChange={async (e) => {
-                const lista = Array.from(e.target.files ?? []).slice(0, MAX_FOTOS_EXTRA - fotos.length);
-                e.target.value = "";
-                setSubiendoFoto(true);
-                for (const archivo of lista) {
-                  const url = await subirFotoExtra(archivo);
-                  if (url) setFotos((f) => [...f, url]);
-                  else setError("No se pudo subir una de las fotos.");
-                }
-                setSubiendoFoto(false);
-              }}
-            />
-            <div className="grilla-fotos-extra">
-              {fotos.map((f, i) => (
-                <div key={f} className="foto-extra" style={{ backgroundImage: `url(${urlCompleta(f)})` }}>
-                  <button type="button" aria-label={`Quitar foto ${i + 2}`} onClick={() => setFotos((l) => l.filter((x) => x !== f))}>
-                    ×
-                  </button>
-                </div>
-              ))}
-              {fotos.length < MAX_FOTOS_EXTRA ? (
-                <button type="button" className="agregar-foto-extra" disabled={subiendoFoto} onClick={() => inputFotosExtra.current?.click()}>
-                  {subiendoFoto ? "Subiendo…" : "+ Agregar"}
-                </button>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-
-        {esTour ? <EditorDetalleTour detalle={detalle} onCambiar={setDetalle} /> : null}
 
         {error ? <p style={{ fontSize: 11.5, color: "var(--rojo)", margin: "10px 0 0" }}>{error}</p> : null}
 
@@ -379,88 +285,6 @@ export function ModalProducto({
           }}
         />
       ) : null}
-    </div>
-  );
-}
-
-/** Fechas de salida, itinerario, incluye / no incluye, recojo y cancelación de un tour (decisión 0096). */
-function EditorDetalleTour({ detalle, onCambiar }: { detalle: DetalleProducto; onCambiar: (d: DetalleProducto) => void }) {
-  const salidas = detalle.salidas ?? [];
-  const pasos = detalle.itinerario ?? [];
-  const cambiarSalida = (i: number, cambio: Partial<SalidaTour>) =>
-    onCambiar({ ...detalle, salidas: salidas.map((s, j) => (j === i ? { ...s, ...cambio } : s)) });
-  const cambiarPaso = (i: number, cambio: Partial<PasoItinerario>) =>
-    onCambiar({ ...detalle, itinerario: pasos.map((p, j) => (j === i ? { ...p, ...cambio } : p)) });
-  const lineas = (xs?: string[]) => (xs ?? []).join("\n");
-  const aLista = (texto: string) => texto.split("\n").map((x) => x.trimStart());
-  const hoy = new Date().toLocaleDateString("en-CA");
-
-  return (
-    <div className="detalle-tour">
-      <div className="bloque-tour">
-        <label>Fechas de salida <small>· cada una con su hora y cupos; las pasadas ya no se muestran</small></label>
-        {salidas.map((s, i) => (
-          <div className="fila-salida" key={i}>
-            <input type="date" aria-label="Fecha de salida" value={s.fecha} min={hoy} onChange={(e) => cambiarSalida(i, { fecha: e.target.value })} />
-            <input type="time" aria-label="Hora de salida" value={s.hora} onChange={(e) => cambiarSalida(i, { hora: e.target.value })} />
-            <input
-              inputMode="numeric"
-              aria-label="Cupos"
-              placeholder="Cupos (vacío = sin límite)"
-              value={s.cupos ?? ""}
-              onChange={(e) => cambiarSalida(i, { cupos: e.target.value ? Number(e.target.value.replace(/\D/g, "")) : null })}
-            />
-            <button type="button" className="btn-accion-mini" aria-label="Quitar fecha" onClick={() => onCambiar({ ...detalle, salidas: salidas.filter((_, j) => j !== i) })}>
-              ×
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="btn-accion-mini"
-          onClick={() => onCambiar({ ...detalle, salidas: [...salidas, { fecha: salidas[salidas.length - 1]?.fecha ?? hoy, hora: salidas[salidas.length - 1]?.hora ?? "05:00", cupos: salidas[salidas.length - 1]?.cupos ?? null }] })}
-        >
-          + Agregar fecha
-        </button>
-      </div>
-
-      <div className="bloque-tour">
-        <label>Itinerario <small>· paso a paso, con la hora</small></label>
-        {pasos.map((p, i) => (
-          <div className="fila-paso" key={i}>
-            <input aria-label="Hora" placeholder="05:00" value={p.hora} maxLength={10} onChange={(e) => cambiarPaso(i, { hora: e.target.value })} />
-            <input aria-label="Qué se hace" placeholder="Ej. Recojo en San Borja" value={p.titulo} maxLength={80} onChange={(e) => cambiarPaso(i, { titulo: e.target.value })} />
-            <input aria-label="Detalle (opcional)" placeholder="Detalle (opcional)" value={p.detalle ?? ""} maxLength={160} onChange={(e) => cambiarPaso(i, { detalle: e.target.value })} />
-            <button type="button" className="btn-accion-mini" aria-label="Quitar paso" onClick={() => onCambiar({ ...detalle, itinerario: pasos.filter((_, j) => j !== i) })}>
-              ×
-            </button>
-          </div>
-        ))}
-        <button type="button" className="btn-accion-mini" onClick={() => onCambiar({ ...detalle, itinerario: [...pasos, { hora: "", titulo: "" }] })}>
-          + Agregar paso
-        </button>
-      </div>
-
-      <div className="fila-2-campos">
-        <div className="campo-modal">
-          <label>Incluye <small>(uno por línea)</small></label>
-          <textarea rows={4} value={lineas(detalle.incluye)} onChange={(e) => onCambiar({ ...detalle, incluye: aLista(e.target.value) })} placeholder={"Transporte ida y vuelta\nGuía oficial"} />
-        </div>
-        <div className="campo-modal">
-          <label>No incluye <small>(uno por línea)</small></label>
-          <textarea rows={4} value={lineas(detalle.noIncluye)} onChange={(e) => onCambiar({ ...detalle, noIncluye: aLista(e.target.value) })} placeholder={"Almuerzo\nPropinas"} />
-        </div>
-      </div>
-      <div className="fila-2-campos">
-        <div className="campo-modal">
-          <label>Punto de recojo</label>
-          <input value={detalle.puntoEncuentro ?? ""} maxLength={160} onChange={(e) => onCambiar({ ...detalle, puntoEncuentro: e.target.value })} placeholder="Ej. Parque [nombre], San Borja" />
-        </div>
-        <div className="campo-modal">
-          <label>Política de cancelación</label>
-          <input value={detalle.cancelacion ?? ""} maxLength={240} onChange={(e) => onCambiar({ ...detalle, cancelacion: e.target.value })} placeholder="Ej. Gratis hasta 48 horas antes" />
-        </div>
-      </div>
     </div>
   );
 }

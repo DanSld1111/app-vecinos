@@ -29,6 +29,9 @@ import { SinFoto } from "../src/componentes/SinFoto";
 import { useAnuncios } from "../src/datos/hooks/useAnuncios";
 import { recolectarOfertas } from "../src/utilidades/ofertas";
 import { urlCompleta } from "../src/utilidades/media";
+import { useClasificados } from "../src/datos/hooks/useClasificados";
+import { interpretarBusqueda } from "../src/utilidades/interpretarBusqueda";
+import { FilaClasificado } from "../src/componentes/avisos/comun";
 
 const TENDENCIAS: { termino: string; categoria: string }[] = [
   { termino: "veterinaria", categoria: "Mascotas" },
@@ -78,6 +81,17 @@ export default function BuscarPantallaCompleta() {
     busqueda: texto.trim() || undefined,
     limite: 20,
   });
+
+  // Los avisos de la comunidad (decisión 0098) también se buscan: «depa 2 dormitorios alquiler»
+  // se entiende como filtros; lo que no se reconoce se busca por texto.
+  const interpretada = useMemo(() => interpretarBusqueda(texto), [texto]);
+  const { data: avisosBuscados } = useClasificados(
+    interpretada.entendido.length
+      ? { seccion: interpretada.seccion, subtipo: interpretada.subtipo, tipo: interpretada.tipo, q: interpretada.resto || undefined, limite: 30 }
+      : { q: texto.trim(), limite: 10 },
+    texto.trim().length >= 2,
+  );
+  const avisos = (avisosBuscados ?? []).filter((c) => !interpretada.dormitorios || (c.datos.dormitorios ?? 0) >= interpretada.dormitorios);
 
   const { data: negociosComunidad } = useNegocios({
     comunidadId: comunidad?.id ?? "",
@@ -149,8 +163,30 @@ export default function BuscarPantallaCompleta() {
           data={negociosBuscados?.items ?? []}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.contenido}
+          ListHeaderComponent={
+            avisos.length || interpretada.entendido.length ? (
+              <View style={{ marginBottom: espaciado.md }}>
+                {interpretada.entendido.length ? (
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 6 }}>
+                    {interpretada.entendido.map((e) => (
+                      <Text key={e} style={styles.chipEntendido}>
+                        {e}
+                      </Text>
+                    ))}
+                  </View>
+                ) : null}
+                <Text style={styles.tituloSeccion}>
+                  {avisos.length ? `Avisos de la comunidad · ${avisos.length}` : "No hay avisos con esos datos todavía."}
+                </Text>
+                {avisos.map((c) => (
+                  <FilaClasificado key={c.id} c={c} />
+                ))}
+                {avisos.length && negociosBuscados?.items.length ? <Text style={[styles.tituloSeccion, { marginTop: espaciado.lg }]}>Negocios</Text> : null}
+              </View>
+            ) : null
+          }
           ListEmptyComponent={
-            !isLoading ? <EstadoVacio titulo="No encontramos negocios con ese nombre." /> : null
+            !isLoading && !avisos.length ? <EstadoVacio titulo="No encontramos negocios con ese nombre." /> : null
           }
           renderItem={({ item }) => (
             <TarjetaNegocio
@@ -350,6 +386,16 @@ function crearEstilos(colores: PaletaColores) {
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: espaciado.xs,
+    },
+    chipEntendido: {
+      fontFamily: "SchibstedGrotesk_700Bold",
+      fontSize: 12.5,
+      color: colores.primario,
+      backgroundColor: colores.superficieHundida,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 14,
+      overflow: "hidden",
     },
     tituloSeccion: {
       ...tipografia.subtitulo,

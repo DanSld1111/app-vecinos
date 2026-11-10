@@ -17,11 +17,9 @@ export function fichaDelNegocio(negocio: Negocio, categorias: Categoria[]) {
  * Qué editores de contenido de ficha corresponden a un negocio: el de su ficha, más cualquiera
  * que ya tenga datos (para no esconder algo cargado si la categoría cambió de ficha).
  */
-export function pestanasDeContenido(negocio: Negocio, categorias: Categoria[]): ("servicios" | "rubros" | "pasillos" | "mascotas")[] {
+export function pestanasDeContenido(negocio: Negocio, categorias: Categoria[]): ("servicios" | "rubros" | "pasillos")[] {
   const { ficha } = fichaDelNegocio(negocio, categorias);
-  const lista: ("servicios" | "rubros" | "pasillos" | "mascotas")[] = [];
-  // Un albergue (decisión 0097) carga mascotas en vez de productos.
-  if (ficha === "mascotas") lista.push("mascotas");
+  const lista: ("servicios" | "rubros" | "pasillos")[] = [];
   if (ficha === "servicios" || negocio.serviciosOfrecidos?.length) lista.push("servicios");
   if (ficha === "rubros" || negocio.rubrosDisponibles?.length) lista.push("rubros");
   if (ficha === "ofertas" || negocio.pasillos?.length) lista.push("pasillos");

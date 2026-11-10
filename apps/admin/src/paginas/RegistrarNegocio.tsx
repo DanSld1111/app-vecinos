@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AtributoProductoDef, Coordenada, Mascota, Moneda, Negocio, Producto, TipoFicha, edadMascota, formatearPrecio, tamanoMascota } from "@app-vecinos/tipos";
-import { ModalMascota } from "../componentes/albergue/ModalMascota";
+import { AtributoProductoDef, Coordenada, Moneda, Negocio, Producto } from "@app-vecinos/tipos";
 import { SelectorMoneda } from "../componentes/negocio/SelectorMoneda";
 import { useNegocios } from "../estado/useNegocios";
 import { useGeografia } from "../estado/useGeografia";
@@ -29,35 +28,6 @@ const ETIQUETAS_PASO: Record<Paso, string> = {
   2: "Dueño",
   3: "Primer producto",
   4: "Listo",
-};
-
-/**
- * Lo que se carga en el paso 3 según la ficha de la categoría: un inmueble, un tour (0096) o una
- * mascota del albergue (0097) piden más que nombre y precio, así que se cargan con su formulario
- * completo; las demás fichas siguen con el formulario corto del primer producto.
- */
-const PRIMERO: Partial<Record<TipoFicha, { paso: string; cosa: string; otra: string; intro: string; pide: string[] }>> = {
-  inmuebles: {
-    paso: "Primer inmueble",
-    cosa: "inmueble",
-    otra: "+ Agregar otro inmueble",
-    intro: "Último paso — publica el primer inmueble. Se pide lo que el vecino mira para decidir una visita.",
-    pide: ["Varias fotos (la primera es la portada)", "Título y precio", "Operación y tipo de inmueble", "Dormitorios, baños y m²", "Características: cochera, jardín, piscina…"],
-  },
-  tours: {
-    paso: "Primer tour",
-    cosa: "tour",
-    otra: "+ Agregar otro tour",
-    intro: "Último paso — publica el primer tour con sus fechas de salida: así aparece en «Próximas salidas» de Turismo.",
-    pide: ["Varias fotos", "Nombre y precio por persona", "Fechas de salida con hora y cupos", "Itinerario", "Qué incluye y qué no, punto de recojo y cancelación"],
-  },
-  mascotas: {
-    paso: "Primera mascota",
-    cosa: "mascota",
-    otra: "+ Agregar otra mascota",
-    intro: "Último paso — publica la primera mascota en adopción. Lo demás del albergue (Yape, necesidades, voluntariado) se completa después.",
-    pide: ["Fotos de cara y de cuerpo entero", "Nombre, especie, sexo, edad y tamaño", "Salud: vacunas, esterilización…", "Si se lleva con niños, perros o gatos", "Personalidad y su historia"],
-  },
 };
 
 const CENTRO_LIMA: Coordenada = { lat: -12.0851, lng: -77.0}; // San Borja, aprox — solo mientras no hay comunidad elegida.
@@ -166,8 +136,6 @@ export function RegistrarNegocio() {
   // Menú y Catálogo agrupan los productos por sección (en la app: títulos o chips de filtro).
   const mostrarSeccion = categoriaActual?.fichaEfectiva === "menu" || categoriaActual?.fichaEfectiva === "catalogo";
   const etiquetaSeccion = categoriaActual?.fichaEfectiva === "catalogo" ? "Sección del catálogo" : "Sección del menú";
-  const ficha = categoriaActual?.fichaEfectiva;
-  const primero = ficha ? PRIMERO[ficha] : undefined;
 
   // Dueño (paso 2)
   const cuentas = useCuentas((estado) => estado.cuentas);
@@ -188,14 +156,9 @@ export function RegistrarNegocio() {
 
   // Producto (paso 3/4)
   const [productoCreado, setProductoCreado] = useState<Producto | null>(null);
-  const [modalProducto, setModalProducto] = useState<"primero" | "nuevo" | "editar" | null>(null);
+  const [modalProducto, setModalProducto] = useState<"nuevo" | "editar" | null>(null);
   const [busqueda, setBusqueda] = useState("");
   const [productoBorrador, setProductoBorrador] = useState<Producto | null>(null);
-  // Mascotas (ficha de albergue, decisión 0097)
-  const [mascotas, setMascotas] = useState<Mascota[]>([]);
-  const [modalMascota, setModalMascota] = useState<Mascota | "nueva" | null>(null);
-  const subirFotoExtra = (archivo: File) =>
-    negocioId ? productosApi.subirFotoExtra(negocioId, archivo, token).then((r) => r.url).catch(() => null) : Promise.resolve(null);
 
   // Vista previa en vivo: lo que se lleva escrito sobre el negocio ya creado (o uno en blanco).
   const negocioCreado = useNegocios((estado) => estado.negocios.find((n) => n.id === negocioId) ?? null);
@@ -270,7 +233,7 @@ export function RegistrarNegocio() {
     setProductoCreado(final);
     setModalProducto(null);
     setPaso(4);
-    alertar({ titulo: primero ? `${primero.cosa[0].toUpperCase()}${primero.cosa.slice(1)} agregado` : "Producto agregado", detalle: `"${final.nombre}" · ${nombre}` });
+    alertar({ titulo: "Producto agregado", detalle: `"${final.nombre}" · ${nombre}` });
   }
 
   async function guardarOtroProducto(datos: DatosProducto, fotoNueva: File | null) {
@@ -313,7 +276,7 @@ export function RegistrarNegocio() {
                 onClick={() => alcanzable && setPaso(p)}
               >
                 <span className="circulo-stepper">{completado ? "✓" : p}</span>
-                <span className="etiqueta-stepper">{p === 3 && primero ? primero.paso : ETIQUETAS_PASO[p]}</span>
+                <span className="etiqueta-stepper">{ETIQUETAS_PASO[p]}</span>
               </button>
             );
           })}
@@ -496,33 +459,10 @@ export function RegistrarNegocio() {
 
           {paso === 3 ? (
             <div>
-              {primero ? (
-                <>
-                  <p className="ayuda-paso-registro">{primero.intro}</p>
-                  <div className="tarjeta-paso-registro tarjeta-primero-ficha">
-                    <b>Para cada {primero.cosa} se pide:</b>
-                    <ul>
-                      {primero.pide.map((t) => (
-                        <li key={t}>{t}</li>
-                      ))}
-                    </ul>
-                    <button
-                      type="button"
-                      className="btn btn-primario"
-                      onClick={() => (ficha === "mascotas" ? setModalMascota("nueva") : setModalProducto("primero"))}
-                    >
-                      {ficha === "mascotas" ? "Agregar la primera mascota" : `Agregar el primer ${primero.cosa}`}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="ayuda-paso-registro">
-                    Último paso — agrega el primer producto o servicio. Los campos cambian según la categoría elegida en el paso 1.
-                  </p>
-                  <FormularioPrimerProducto atributosDef={atributosDef} onGuardar={guardarPrimerProducto} onCambio={setProductoBorrador} />
-                </>
-              )}
+              <p className="ayuda-paso-registro">
+                Último paso — agrega el primer producto o servicio. Los campos cambian según la categoría elegida en el paso 1.
+              </p>
+              <FormularioPrimerProducto atributosDef={atributosDef} onGuardar={guardarPrimerProducto} onCambio={setProductoBorrador} />
               <button type="button" className="link-omitir-registro" onClick={() => setPaso(4)}>
                 Omitir, lo hago después →
               </button>
@@ -539,34 +479,9 @@ export function RegistrarNegocio() {
                 </p>
               </div>
 
-              {ficha === "mascotas" ? (
+              {productoCreado ? (
                 <>
-                  {mascotas.length ? <label style={{ display: "block", marginBottom: 8 }}>{mascotas.length === 1 ? "Mascota publicada" : `${mascotas.length} mascotas publicadas`}</label> : null}
-                  {mascotas.map((m) => (
-                    <div className="tarjeta-resumen-producto" key={m.id}>
-                      <div className="foto-servicio" style={{ width: 52, height: 52, borderRadius: 10, flex: "none" }}>
-                        {m.fotoUrl ? <img src={urlCompleta(m.fotoUrl)} alt="" /> : <IconoEmoji e="🐾" />}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <b style={{ fontSize: 13 }}>{m.nombre}</b>
-                        <div style={{ fontSize: 11.5, color: "var(--texto-tenue)" }}>
-                          {m.sexo === "hembra" ? "Hembra" : "Macho"} · {edadMascota(m)} · {tamanoMascota(m)}
-                        </div>
-                      </div>
-                      <button type="button" className="btn-accion-mini" onClick={() => setModalMascota(m)}>
-                        Editar
-                      </button>
-                    </div>
-                  ))}
-                  <button type="button" className="btn-agregar-otro-registro" onClick={() => setModalMascota("nueva")}>
-                    {mascotas.length ? "+ Agregar otra mascota" : "+ Agregar la primera mascota"}
-                  </button>
-                </>
-              ) : null}
-
-              {ficha !== "mascotas" && productoCreado ? (
-                <>
-                  <label style={{ display: "block", marginBottom: 8 }}>{primero ? `${primero.cosa[0].toUpperCase()}${primero.cosa.slice(1)} agregado` : "Producto agregado"}</label>
+                  <label style={{ display: "block", marginBottom: 8 }}>Producto agregado</label>
                   <div className="tarjeta-resumen-producto">
                     <div className="foto-servicio" style={{ width: 52, height: 52, borderRadius: 10, flex: "none" }}>
                       {productoCreado.fotoUrl ? <img src={urlCompleta(productoCreado.fotoUrl)} alt="" /> : <IconoEmoji e="🖼️" />}
@@ -574,8 +489,7 @@ export function RegistrarNegocio() {
                     <div style={{ flex: 1 }}>
                       <b style={{ fontSize: 13 }}>{productoCreado.nombre}</b>
                       <div style={{ fontSize: 11.5, color: "var(--texto-tenue)" }}>
-                        {formatearPrecio(productoCreado.precio, productoCreado.moneda ?? "PEN")}
-                        {ficha === "tours" ? " por persona" : ""} · {categoriaActual?.nombre}
+                        S/ {productoCreado.precio.toFixed(2)} · {categoriaActual?.nombre}
                       </div>
                     </div>
                     <button type="button" className="btn-accion-mini" onClick={() => setModalProducto("editar")}>
@@ -585,11 +499,9 @@ export function RegistrarNegocio() {
                 </>
               ) : null}
 
-              {ficha !== "mascotas" ? (
-                <button type="button" className="btn-agregar-otro-registro" onClick={() => setModalProducto("nuevo")}>
-                  {primero?.otra ?? "+ Agregar otro producto"}
-                </button>
-              ) : null}
+              <button type="button" className="btn-agregar-otro-registro" onClick={() => setModalProducto("nuevo")}>
+                + Agregar otro producto
+              </button>
 
               <label style={{ display: "block", margin: "20px 0 8px" }}>Seguir completando el negocio</label>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -610,11 +522,6 @@ export function RegistrarNegocio() {
                 >
                   Agregar más fotos
                 </button>
-                {ficha === "mascotas" ? (
-                  <button type="button" className="pill-accion-registro" onClick={() => negocioId && navegar(`/negocios/${negocioId}?tab=mascotas`)}>
-                    Yape, necesidades y voluntariado
-                  </button>
-                ) : null}
               </div>
             </div>
           ) : null}
@@ -623,7 +530,6 @@ export function RegistrarNegocio() {
           negocio={vistaPrevia}
           categorias={categorias}
           productos={productosVistaPrevia}
-          mascotas={mascotas}
           enfoque={paso === 3 ? "contenido" : "arriba"}
         />
       </div>
@@ -660,7 +566,7 @@ export function RegistrarNegocio() {
         )}
       </div>
 
-      {modalProducto === "nuevo" || modalProducto === "primero" ? (
+      {modalProducto === "nuevo" ? (
         <ModalProducto
           producto={null}
           moneda="PEN"
@@ -669,23 +575,8 @@ export function RegistrarNegocio() {
           atributosDef={atributosDef}
           mostrarSeccion={mostrarSeccion}
           etiquetaSeccion={etiquetaSeccion}
-          ficha={ficha}
-          subirFotoExtra={subirFotoExtra}
-          onGuardar={modalProducto === "primero" ? guardarPrimerProducto : guardarOtroProducto}
+          onGuardar={guardarOtroProducto}
           onCerrar={() => setModalProducto(null)}
-        />
-      ) : null}
-      {modalMascota && negocioId ? (
-        <ModalMascota
-          negocio={negocioCreado ?? { ...vistaPrevia, id: negocioId }}
-          mascota={modalMascota === "nueva" ? null : modalMascota}
-          onCerrar={() => setModalMascota(null)}
-          onGuardado={(m) => {
-            setModalMascota(null);
-            if (!m) return;
-            setMascotas((l) => (l.some((x) => x.id === m.id) ? l.map((x) => (x.id === m.id ? m : x)) : [...l, m]));
-            setPaso(4);
-          }}
         />
       ) : null}
       {modalProducto === "editar" && productoCreado ? (
@@ -697,8 +588,6 @@ export function RegistrarNegocio() {
           atributosDef={atributosDef}
           mostrarSeccion={mostrarSeccion}
           etiquetaSeccion={etiquetaSeccion}
-          ficha={ficha}
-          subirFotoExtra={subirFotoExtra}
           onGuardar={guardarOtroProducto}
           onCerrar={() => setModalProducto(null)}
         />

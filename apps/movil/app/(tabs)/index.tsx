@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { BannerMascotasPerdidas } from "../../src/componentes/rescate/BannerMascotasPerdidas";
 import { Negocio } from "@app-vecinos/tipos";
 import { abrirNegocio } from "../../src/componentes/transicion/abrirNegocio";
 import { TEXTO_BUSCADOR } from "../../src/componentes/transicion/BuscadorEnVuelo";
@@ -35,6 +34,7 @@ import { TarjetaVitrina } from "../../src/componentes/vitrina/TarjetaVitrina";
 import { useNotificaciones } from "../../src/estado/useNotificaciones";
 import { fechaCorta } from "../../src/utilidades/saludo";
 import { tiempoRelativo } from "../../src/utilidades/tiempoRelativo";
+import { BannerSeBusca, CarruselAvisosComunidad, CirculosAvisos, useAvisosInicio } from "../../src/componentes/avisos/BloqueAvisosInicio";
 
 function FilaRanking({
   negocio,
@@ -108,6 +108,7 @@ export default function Inicio() {
   });
   const { data: avisos } = useAvisos(comunidad?.id);
   const avisoReciente = avisos?.[0];
+  const { avisos: clasificados, seBusca } = useAvisosInicio();
 
   // Ranking real de la semana: solo negocios con visitas, nunca "el primero de la lista porque sí".
   const masVisitados = [...(negocios?.items ?? [])]
@@ -211,8 +212,9 @@ export default function Inicio() {
           </View>
         </View>
 
-        {categorias && categorias.length > 0 ? (
+        {categorias ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filaCategorias}>
+            <CirculosAvisos avisos={clasificados} />
             {categorias.map((cat) => (
               <CirculoCategoria
                 key={cat.id}
@@ -224,7 +226,7 @@ export default function Inicio() {
           </ScrollView>
         ) : null}
 
-        <BannerMascotasPerdidas estilo={styles.bloque} />
+        <BannerSeBusca avisos={seBusca} estilo={styles.bloque} />
 
         <View style={styles.bloque}>
           <OfertaDestacada />
@@ -256,6 +258,8 @@ export default function Inicio() {
             </Tocable>
           </View>
         ) : null}
+
+        <CarruselAvisosComunidad avisos={clasificados} />
 
         <View style={[styles.bloque, styles.filaTitulo]}>
           <Text style={styles.subtitulo} accessibilityRole="header">
