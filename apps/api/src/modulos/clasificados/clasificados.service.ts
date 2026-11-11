@@ -1,20 +1,15 @@
 import { randomUUID } from "crypto";
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import {
-  DIAS_VIGENCIA_CLASIFICADO,
-  type Clasificado,
-  type ClasificadoAdmin,
-  type ClasificadoPropio,
-  type Cuenta,
-  type DatosClasificado,
-  type UsuarioApp,
-} from "@app-vecinos/tipos";
+import type { Clasificado, ClasificadoAdmin, ClasificadoPropio, Cuenta, DatosClasificado, UsuarioApp } from "@app-vecinos/tipos";
 import { BaseDatosService } from "../../comun/base-datos/base-datos.service";
 import { AlmacenamientoService } from "../../comun/almacenamiento/almacenamiento.service";
 import { AuditoriaService } from "../../comun/auditoria/auditoria.service";
 import { NotificacionesPushService } from "../../comun/notificaciones-push/notificaciones-push.service";
 import { EnviarClasificadoDto, GuardarClasificadoDto } from "./dto/clasificados.dto";
 
+// Solo tipos desde @app-vecinos/tipos: en Render el paquete no se compila y un valor importado de
+// ahí rompe el arranque (ERR_MODULE_NOT_FOUND). Mismo número que DIAS_VIGENCIA_CLASIFICADO.
+const DIAS_VIGENCIA_CLASIFICADO = 30;
 /** Con estos reportes de vecinos distintos el aviso vuelve a revisión. */
 const REPORTES_PARA_REVISAR = 3;
 /** Avisos «por vencer»: los que vencen en esta cantidad de días. */
