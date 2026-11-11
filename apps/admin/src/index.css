@@ -4543,3 +4543,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--texto); outline:
 .avc-acciones { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .avc-acciones a.btn-accion-mini { text-decoration: none; }
 .avc-rechazar { border: none; background: none; color: var(--rojo); font-weight: 800; font-size: 14px; cursor: pointer; padding: 8px; }
+.avc-campo input, .avc-campo select, .avc-campo textarea, .avc-salidas input {
+  box-sizing: border-box; width: 100%; min-height: 40px; padding: 8px 11px;
+  border: 1px solid var(--borde-fuerte); border-radius: 10px; background: var(--superficie); font-family: inherit;
+}
+.avc-campo textarea { resize: vertical; line-height: 1.45; }
+.avc-salidas input { width: auto; }
+.avc-precio select { width: 76px; flex: 0 0 76px; }
+.avc-acciones .btn-primario, .topbar .btn-primario { border: none; border-radius: 12px; padding: 11px 20px; font-weight: 800; font-size: 14px; cursor: pointer; }
